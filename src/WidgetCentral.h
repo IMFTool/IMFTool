@@ -36,13 +36,21 @@ public:
 	bool IsImpInstalled() const { return mpImfPackage; }
 	int ShowCplEditor(const QUuid &rCplAssetId);
 	void SaveCurrentCpl() const;
+	void SaveAllCpl() const;
 	void CopyCPL(const QSharedPointer<AssetCpl> &rDestination);
 	int GetIndex(const QUuid &rCplAssetId);
 	QUndoStack* GetUndoStack(int index) const;
 	QUndoStack* GetCurrentUndoStack() const;
+	//WR begin
+	QSharedPointer<ImfPackage> GetMpImfPackage() const {return mpImfPackage;}
 
 signals:
 	void UndoStackChanged(QUndoStack *pStack);
+	void CplSaveStateChanged(bool isDirty);
+//WR begin
+	void SaveAllCplFinished() const;
+//WR end;
+
 
 private slots:
 void rCurrentChanged(int tabWidgetIndex);

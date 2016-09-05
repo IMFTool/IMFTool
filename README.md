@@ -30,10 +30,12 @@ Currently, IMF Tool does not provide a video preview.
 We are working on a solution.
 
 ##Binary installers
-We provide binary installers, currently for Mac OS and Windows, in the dist/ folder.
+For your convenience, we provide binary installers, currently for Mac OS and Windows, in the dist-binaries/ folder.
+Please click on the installer image you would like to download and select "Download" on the page that opens.
+Please carefully read dist-binaries/README.binaries.
 
 ##Runtime Requirements
-For creating essence descriptors, IMF Tool uses regxmllib [2] and requires Oracle JRE 1.8 to be installed, and java/java.exe being available in the executable search path.
+For creating essence descriptors, IMF Tool uses regxmllib [2] and requires Oracle JDK 1.8 to be installed, and java/java.exe being available in the executable search path. (In particular under Mac OS X, the JRE is not sufficient - you'll have to install the JDK !)
 
 ##Building
 IMF Tool is multi-platform and been susccesfully tested to build under Mac OS X 10.10 and 10.11, Windows 7 and Linux 64 bit.
@@ -43,6 +45,17 @@ Prerequisites:
 -	asdcplib, see http://www.cinecert.com
 -	libxsd
 -	Xerces 3.1
+
+##DISCLAIMER
+  THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
+APPLICABLE LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT
+HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY
+OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM
+IS WITH YOU.  SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF
+ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+
 
 
 [1] IMF: Interoperable Master Format. For an introduction see here:

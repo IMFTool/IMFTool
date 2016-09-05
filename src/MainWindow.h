@@ -43,6 +43,7 @@ public slots:
 	void ShowCplEditor(const QUuid &rCplAssetId);
 	void CloseImfPackage();
 	void SaveCurrent();
+	void SaveAllCpl();
 	void SaveAsNewCPL();
 	void ShowWidgetSettings();
 	void WritePackage();
@@ -52,8 +53,9 @@ private slots:
 	void rEnableSaveActions();
 	void rFocusChanged(QWidget *pOld, QWidget *pNow);
 	void rSaveCPLRequest();
-	bool rQuitRequest();
-	void rOpenImfRequest();
+	void rOpenImpRequest();
+	void rCloseImpRequest();
+	void rReinstallImp();
 
 private:
 	Q_DISABLE_COPY(MainWindow);
@@ -61,8 +63,10 @@ private:
 	void InitMenuAndToolbar();
 	void CenterWidget(QWidget *pWidget, bool useSizeHint);
 	void closeEvent (QCloseEvent *event);
-	//writes all via "Save as new CPL" created CPL-Filepaths to QList mpUnwrittenCPL
+	//writes all via "Save as new CPL" created CPL-Filepaths to QList "mpUnwrittenCPL"
 	void SetUnwrittenCPL(QString FilePath);
+	//returns 0 if undostack is empty
+	bool checkUndoStack();
 
 	QMessageBox	*mpMsgBox;
 	WidgetImpBrowser *mpWidgetImpBrowser;

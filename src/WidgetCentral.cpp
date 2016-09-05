@@ -207,7 +207,23 @@ QUndoStack* WidgetCentral::GetCurrentUndoStack() const {
 }
 
 void WidgetCentral::SaveCurrentCpl() const {
+
 	SaveCpl(mpTabWidget->currentIndex());
+}
+
+void WidgetCentral::SaveAllCpl() const {
+
+	for(int i = 0; i < mpTabWidget->count(); i++) {
+		//QSharedPointer<AssetCpl> asset_cpl = this->GetMpImfPackage()->GetAsset(0).objectCast<AssetCpl>();
+		WidgetComposition *p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->widget(i));
+		QSharedPointer<AssetCpl> asset_cpl = this->GetMpImfPackage()->GetAsset(p_composition->GetCplAssetId()).objectCast<AssetCpl>();
+
+		if (asset_cpl->GetIsNewOrModified()) SaveCpl(i);
+		if (asset_cpl->GetIsNewOrModified()) qDebug() << "asset_cpl->GetIsNewOrModified";
+	}
+	//WR begin
+	emit SaveAllCplFinished();
+	//WR end
 }
 
 void WidgetCentral::SaveCpl(int index) const {
@@ -242,9 +258,14 @@ void WidgetCentral::SaveCpl(int index) const {
 void WidgetCentral::CopyCPL(const QSharedPointer<AssetCpl> &rDestination) {
 
 	WidgetComposition *p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->widget(mpTabWidget->currentIndex()));
-	p_composition->SetID(rDestination.data()->GetId());
 	if(p_composition) {
+		QUuid oldId = p_composition->GetId();
+		p_composition->SetID(rDestination.data()->GetId());
 		ImfError error = p_composition->WriteNew(rDestination.data()->GetPath().absoluteFilePath());
+		//We will undo all changes for this object:
+		QSharedPointer<AssetCpl> asset_cpl = mpImfPackage->GetAsset(oldId).objectCast<AssetCpl>();
+		asset_cpl.data()->SetIsNewOrModified(false);
+		p_composition->SetID(oldId);
 		if(error.IsError() == false) {
 			if(error.IsRecoverableError() == true) {
 				QString error_msg = QString("%1\n%2").arg(error.GetErrorMsg()).arg(error.GetErrorDescription());
@@ -266,4 +287,8 @@ void WidgetCentral::CopyCPL(const QSharedPointer<AssetCpl> &rDestination) {
 			mpMsgBox->exec();
 		}
 	}
+	for (int i = 0; i < GetCurrentUndoStack()->count(); i++) {
+		GetCurrentUndoStack()->undo();
+	}
+	GetCurrentUndoStack()->clear();
 }

@@ -34,6 +34,7 @@ QString third_party = QString("Third Party:\n\n"
 															"QT (Version: %1): The Qt Toolkit is Copyright (C) 2015 The Qt Company Ltd and other contributors.\n"
 															"Contact: http ://www.qt.io/licensing/\n\n"
 															"AS-DCP lib. (Version %2): is Copyright (c) 2003-2012, John Hurst All rights reserved.\n\n"
+															"regxmllib: Copyright (c) 2014, Pierre-Anthony Lemieux (pal@sandflow.com) All rights reserved.\n\n"
 															"Window Icon: Toma4025 http://toma4025.deviantart.com/art/RumixIP-107029752\n\n"
 															"Other Icons: Copyright 2009-2014 FatCow Web Hosting\n\n"
 															"QtWaitingSpinner: Original Work Copyright (c) 2012-2014 Alexander Turkin Modified 2014 by William Hallatt\n\n"
@@ -43,7 +44,8 @@ QString third_party = QString("Third Party:\n\n"
 QString notice(PROJECT_NAME" Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel\n"
 							 "This program comes with ABSOLUTELY NO WARRANTY.\n"
 							 "This is free software, and you are welcome to redistribute it\n"
-							 "under certain conditions.\n"
+							 "under certain conditions.\n\n"
+							 "The initial development of this software has kindly been sponsored by Netflix Inc.\n"
 							 );
 }
 

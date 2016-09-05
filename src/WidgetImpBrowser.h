@@ -55,17 +55,23 @@ public:
 	virtual QSize minimumSizeHint() const;
 	QUndoStack* GetUndoStack() const { return mpUndoStack; }
 	QSharedPointer<AssetCpl> GenerateEmptyCPL();
+	QDir GetWorkingDir() {return mpImfPackage->GetRootDir();}
 
 signals:
 	void ImpSaveStateChanged(bool isDirty);
 	void ImplInstalled(bool installed);
 	void ShowCpl(const QUuid &rCplAssetId);
+	void WritePackageComplete();
+	void CallSaveAllCpl();
 
 	public slots:
 	void Save();
 	void ShowResourceGeneratorWavMode();
 	void ShowResourceGeneratorTimedTextMode();
 	void ShowCompositionGenerator();
+	//WR begin
+	void RecalcHashForCpls();
+	//WR end
 
 	private slots :
 	void rRemoveSelectedRow();
@@ -79,6 +85,7 @@ signals:
 	void rJobQueueFinished();
 	void rImpViewDoubleClicked(const QModelIndex &rIndex);
 	void rOpenCplTimeline();
+	void rReinstallImp();
 
 protected:
 	virtual void keyPressEvent(QKeyEvent *pEvent);

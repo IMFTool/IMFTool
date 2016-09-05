@@ -73,6 +73,10 @@ void MainWindow::InitLayout() {
 #endif
 	connect(mpWidgetImpBrowser, SIGNAL(ShowCpl(const QUuid &)), this, SLOT(ShowCplEditor(const QUuid &)));
 	connect(qApp, SIGNAL(focusChanged(QWidget*, QWidget*)), this, SLOT(rFocusChanged(QWidget*, QWidget*)));
+	connect(mpWidgetImpBrowser, SIGNAL(WritePackageComplete()), this, SLOT(rReinstallImp()));
+	//WR begin
+	connect(mpCentralWidget, SIGNAL(SaveAllCplFinished()), mpWidgetImpBrowser, SLOT(RecalcHashForCpls()));
+	//WR end
 }
 
 void MainWindow::InitMenuAndToolbar() {
@@ -104,14 +108,14 @@ void MainWindow::InitMenuAndToolbar() {
 	p_menu_about->addAction(p_action_about);
 	QMenu *p_menu_file = new QMenu(tr("&FILE"), menuBar());
 	QAction *p_action_open = new QAction(QIcon(":/folder.png"), tr("&Open IMF Package"), menuBar());
-	connect(p_action_open, SIGNAL(triggered(bool)), this, SLOT(rOpenImfRequest()));
+	connect(p_action_open, SIGNAL(triggered(bool)), this, SLOT(rOpenImpRequest()));
 	p_action_open->setShortcut(QKeySequence::Open);
 	QAction *p_action_write = new QAction(QIcon(":/inbox_upload.png"), tr("&Write IMF Package"), menuBar());
 	p_action_write->setDisabled(true);
 	connect(p_action_write, SIGNAL(triggered(bool)), this, SLOT(WritePackage()));
 	connect(mpWidgetImpBrowser, SIGNAL(ImpSaveStateChanged(bool)), p_action_write, SLOT(setEnabled(bool)));
 	QAction *p_action_close = new QAction(QIcon(":/close.png"), tr("&Close IMF Package"), menuBar());
-	connect(p_action_close, SIGNAL(triggered(bool)), this, SLOT(CloseImfPackage()));
+	connect(p_action_close, SIGNAL(triggered(bool)), this, SLOT(rCloseImpRequest()));
 	QAction *p_action_exit = new QAction(tr("&Quit"), menuBar());
 	p_action_exit->setShortcut(tr("Ctrl+Q"));
 	connect(p_action_exit, SIGNAL(triggered(bool)), qApp, SLOT(closeAllWindows()));
@@ -128,6 +132,8 @@ void MainWindow::InitMenuAndToolbar() {
 	QMenu *p_menu_tools = new QMenu(tr("&TOOLS"), menuBar());
 	QAction *p_action_preferences = new QAction(QIcon(":/gear.png"), tr("&Preferences"), menuBar());
 	connect(p_action_preferences, SIGNAL(triggered(bool)), this, SLOT(ShowWidgetSettings()));
+	//WR
+	p_action_preferences->setDisabled(true);
 	p_menu_tools->addAction(p_action_preferences);
 
 	menuBar()->addMenu(p_menu_file);
@@ -166,22 +172,32 @@ void MainWindow::rSaveCPLRequest() {
 		return;
 }
 
+//Check unsaved changes when closing application
 void MainWindow::closeEvent (QCloseEvent *event)
 {
-	if (rQuitRequest() == 1)
+	if (checkUndoStack() == 1)
 		event->ignore();
 	else
 		event->accept();
 }
 
-void MainWindow::rOpenImfRequest() {
-	if (rQuitRequest() == 1)
+//Check unsaved changes when opening new IMP
+void MainWindow::rOpenImpRequest() {
+	if (checkUndoStack() == 1)
 		return;
 	else
 		ShowWorkspaceLauncher();
 }
 
-bool MainWindow::rQuitRequest() {
+//Check unsaved changes when closing IMP
+void MainWindow::rCloseImpRequest() {
+	if (checkUndoStack() == 1)
+		return;
+	else
+		CloseImfPackage();
+}
+
+bool MainWindow::checkUndoStack() {
 
 	//check if every UndoStack is clean or not!
 	bool changes = false;
@@ -195,13 +211,17 @@ bool MainWindow::rQuitRequest() {
 	if(changes == true) {
 		mpMsgBox->setText(tr("There are unsaved changes in the current IMP!"));
 		mpMsgBox->setInformativeText(tr("Do you want to proceed?"));
-		mpMsgBox->setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+		mpMsgBox->setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel | QMessageBox::SaveAll);
 		mpMsgBox->setDefaultButton(QMessageBox::Cancel);
 		mpMsgBox->setIcon(QMessageBox::Warning);
 		int ret = mpMsgBox->exec();
 
 		if(ret == QMessageBox::Cancel)
 			return 1;
+		else if(ret == QMessageBox::SaveAll) {
+			WritePackage();
+			return 0;
+		}
 		else {
 			for(int i=0; i<mpUnwrittenCPLs.size(); i++){
 				QFile::remove(mpUnwrittenCPLs.at(i));
@@ -298,6 +318,9 @@ void MainWindow::SaveAsNewCPL() {
 
 	QSharedPointer<AssetCpl> newCPL = mpWidgetImpBrowser->GenerateEmptyCPL();
 	mpCentralWidget->CopyCPL(newCPL);
+	emit mpWidgetImpBrowser->ShowCpl(newCPL->GetId());		//Opens the new CPL in WidgetCentral as current tab
+	//CopyCPL calls WriteNew for the old WidgetComposition object, here we call it for the new WidgetComposition object:
+	SaveCurrent();
 	SetUnwrittenCPL(newCPL->GetPath().absoluteFilePath());
 }
 			/* -----Denis Manthey----- */
@@ -339,12 +362,32 @@ void MainWindow::CenterWidget(QWidget *pWidget, bool useSizeHint) {
 	pWidget->move(cw, ch);
 }
 
+			/* -----Denis Manthey----- */
+void MainWindow::rReinstallImp() {
+
+	QDir dir(mpWidgetImpBrowser->GetWorkingDir());
+	CloseImfPackage();
+	QSharedPointer<ImfPackage> imf_package(new ImfPackage(dir));
+	imf_package->Ingest();
+	mpWidgetImpBrowser->InstallImp(imf_package);
+	mpCentralWidget->InstallImp(imf_package);
+}
+			/* -----Denis Manthey----- */
+
 void MainWindow::WritePackage() {
 
+	//mpCentralWidget->SaveAllCpl();
+	connect(mpWidgetImpBrowser, SIGNAL(CallSaveAllCpl()), this, SLOT(SaveAllCpl()));
 	mpWidgetImpBrowser->Save();
 	mpUnwrittenCPLs.clear();
 }
 
+void MainWindow::SaveAllCpl() {
+
+	mpCentralWidget->SaveAllCpl();
+}
+
 void MainWindow::SetUnwrittenCPL(QString FilePath) {
+
 	mpUnwrittenCPLs.append(FilePath);
 }

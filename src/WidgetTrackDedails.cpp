@@ -168,7 +168,10 @@ void WidgetTrackDetails::InitLayout() {
 	p_tool_button->setPopupMode(QToolButton::InstantPopup);
 	p_tool_button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 	QMenu *p_menu = new QMenu(this);
-	p_menu->addAction(QIcon(":/delete.png"), tr("&Remove Track"), this, SLOT(DeleteAction()));
+	mpDelete = new QAction(QIcon(":/delete.png"), tr("&Remove Track"), this);
+	connect(p_menu, SIGNAL(aboutToShow()), this, SLOT(EnableDeleteAction()));
+	connect(mpDelete, SIGNAL(triggered()), this, SLOT(DeleteAction()));
+	p_menu->addAction(mpDelete);
 	p_menu->addSeparator();
 // 	p_menu->addAction(QIcon(":/up.png"), tr("Move &Up"), this, SLOT(MoveUpAction()));
 // 	p_menu->addAction(QIcon(":/down.png"), tr("Move &Down"), this, SLOT(MoveDownAction()));
@@ -180,6 +183,14 @@ void WidgetTrackDetails::InitLayout() {
 
 	p_layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
 	setLayout(p_layout);
+}
+
+void WidgetTrackDetails::EnableDeleteAction() {
+
+	if (mType == MainImageSequence)
+		mpDelete->setDisabled(true);
+	else
+		mpDelete->setEnabled(true);
 }
 
 QSize WidgetTrackDetails::sizeHint() const {

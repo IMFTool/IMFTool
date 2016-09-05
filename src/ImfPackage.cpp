@@ -21,6 +21,16 @@
 #include <QFile>
 #include <fstream>
 #include <QThreadPool>
+//WR begin
+#include <xercesc/parsers/XercesDOMParser.hpp>
+#include <xercesc/framework/MemBufInputSource.hpp>
+#include<iostream>
+#include<fstream>
+#include<string>
+#include<cstdlib>
+#include<sstream>
+
+//WR end
 
 
 ImfPackage::ImfPackage(const QDir &rWorkingDir) :
@@ -106,8 +116,12 @@ ImfError ImfPackage::Outgest() {
 	pkl_namespace["ds"].name = XML_NAMESPACE_DS;
 	pkl_namespace["xs"].name = XML_NAMESPACE_XS;
 
+	QUuid pkl_id = QUuid::createUuid();
+	QString pkl_file_path(mRootDir.absoluteFilePath(QString("PKL_%1.xml").arg(strip_uuid(pkl_id))));
+
 	for(int i = 0; i < mPackingLists.size(); i++) {
 		if(mPackingLists.at(i)) {
+
 			pkl::PackingListType packing_list(mPackingLists.at(i)->Write());
 			packing_list.setAssetList(pkl::PackingListType_AssetListType());
 			packing_list.getAssetList().setAsset(pkl::PackingListType_AssetListType::AssetSequence());
@@ -123,6 +137,8 @@ ImfError ImfPackage::Outgest() {
 				}
 			}
 			// Write Packing List
+			packing_list.setId(ImfXmlHelper::Convert(pkl_id));
+
 			std::ofstream pkl_ofs(mPackingLists.at(i)->GetFilePath().absoluteFilePath().toStdString().c_str(), std::ofstream::out);
 			try {
 				pkl::serializePackingList(pkl_ofs, packing_list, pkl_namespace, "UTF-8", xml_schema::Flags::dont_initialize);
@@ -140,6 +156,17 @@ ImfError ImfPackage::Outgest() {
 			else break;
 		}
 	}
+
+	QString old_pkl_file_path;
+	for(int i = 0; i < mPackingLists.size(); i++){
+		old_pkl_file_path = mPackingLists.at(i)->GetFilePath().absoluteFilePath();
+		RemoveAsset(mPackingLists.at(i)->GetId());
+	}
+	QFile::rename(old_pkl_file_path, pkl_file_path);
+	QSharedPointer<AssetPkl> pkl_asset(new AssetPkl(pkl_file_path, pkl_id));
+	mPackingLists.clear();
+	mPackingLists.push_back(new PackingList(this, pkl_file_path, pkl_id));
+	AddAsset(pkl_asset, QUuid());
 
 	if(serialization_error.IsError() == false) {
 		// Write VOLINDEX.xml
@@ -166,6 +193,7 @@ ImfError ImfPackage::Outgest() {
 			}
 
 			// Write ASSETMAP.xml
+			mpAssetMap->SetId();	//Generates new UUID for AM everytime the AM is written
 			std::ofstream am_ofs(mpAssetMap->GetFilePath().absoluteFilePath().toStdString().c_str(), std::ofstream::out);
 			try {
 				am::serializeAssetMap(am_ofs, asset_map, am_namespace, "UTF-8", xml_schema::Flags::dont_initialize);
@@ -409,6 +437,7 @@ QSharedPointer<Asset> ImfPackage::GetAsset(int index) {
 
 void ImfPackage::RemoveAsset(const QUuid &rUuid) {
 
+	mpAssetMap->SetId();
 	for(int i = 0; i < mAssetList.size(); i++) {
 		if(rUuid == mAssetList.at(i)->GetId()) {
 			mAssetList.at(i)->AffinityLost(mpAssetMap);
@@ -868,6 +897,16 @@ void Asset::FileModified() {
 
 	mFileNeedsNewHash = true;
 	emit AssetModified(this);
+	//WR begin
+	//This slot is called when wrapping was successful. "this" points to the Asset that was modified.
+	//First we try to cast this to AssetMxfTrack
+	AssetMxfTrack *assetMxfTrack = dynamic_cast<AssetMxfTrack*>(this);
+	if (assetMxfTrack){
+		//Here we call SetEssenceDescriptorSetAny, which extracts and sets mEssenceDescriptor
+		assetMxfTrack->SetEssenceDescriptorSetAny(QString(this->GetPath().absoluteFilePath()));
+		qDebug() << "Essence Descriptor updated for " << this->GetPath().absoluteFilePath();
+	}
+	//WR end
 }
 
 AssetPkl::AssetPkl(const QFileInfo &rFilePath, const am::AssetType &rAsset) :
@@ -882,12 +921,16 @@ Asset(Asset::pkl, rFilePath, rId, rAnnotationText) {
 
 AssetCpl::AssetCpl(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl::AssetType &rPklAsset) :
 Asset(Asset::cpl, rFilePath, rAmAsset, std::auto_ptr<pkl::AssetType>(new pkl::AssetType(rPklAsset))) {
-
+//WR begin
+	mIsNewOrModified = false;
+//WR end
 }
 
 AssetCpl::AssetCpl(const QFileInfo &rFilePath, const QUuid &rId, const UserText &rAnnotationText /*= QString()*/) :
 Asset(Asset::cpl, rFilePath, rId, rAnnotationText) {
-
+	//WR begin
+	mIsNewOrModified = false;
+	//WR end
 }
 
 AssetOpl::AssetOpl(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl::AssetType &rPklAsset) :
@@ -902,13 +945,24 @@ Asset(Asset::opl, rFilePath, rId, rAnnotationText) {
 
 AssetMxfTrack::AssetMxfTrack(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl::AssetType &rPklAsset) :
 Asset(Asset::mxf, rFilePath, rAmAsset, std::auto_ptr<pkl::AssetType>(new pkl::AssetType(rPklAsset))), mMetadata(), mSourceFiles(), mFirstProxyImage(), mMetadataExtr() {
-
 	mMetadataExtr.ReadMetadata(mMetadata, rFilePath.absoluteFilePath());
 	SetDefaultProxyImages();
+	//WR begin
+	//New UUID for SourceENcoding
+	mSourceEncoding = QUuid::createUuid();
+	//new ED with SourceEncoding as ID
+	mEssenceDescriptor = new cpl::EssenceDescriptorBaseType(ImfXmlHelper::Convert(mSourceEncoding));
+	//Extract ED from MXF and write it into mEssenceDescriptor
+	SetEssenceDescriptorSetAny(QString(rFilePath.absoluteFilePath()));
+
+	//WR end
 }
 
 AssetMxfTrack::AssetMxfTrack(const QFileInfo &rFilePath, const QUuid &rId, const UserText &rAnnotationText /*= QString()*/) :
 Asset(Asset::mxf, rFilePath, rId, rAnnotationText), mMetadata(), mSourceFiles(), mFirstProxyImage() {
+	mSourceEncoding = QUuid::createUuid();
+	mEssenceDescriptor = new cpl::EssenceDescriptorBaseType(ImfXmlHelper::Convert(mSourceEncoding));
+	//leave ED empty because file does not exist yet on the file system
 
 
 }
@@ -992,3 +1046,109 @@ void AssetMxfTrack::SetDefaultProxyImages() {
 	}
 }
 
+//WR begin
+
+void AssetMxfTrack::SetEssenceDescriptorSetAny(const QString &filePath) {
+	QString fPath = filePath;
+	QString classPath = QApplication::applicationDirPath() + QString("/regxmllib/regxmllib.jar");
+	const unsigned short dictLength = 4;
+	QString dict[dictLength] = {
+		QApplication::applicationDirPath() + QString("/regxmllib/www-smpte-ra-org-reg-335-2012.xml"),
+		QApplication::applicationDirPath() + QString("/regxmllib/www-smpte-ra-org-reg-335-2012-13-1-aaf.xml"),
+		QApplication::applicationDirPath() + QString("/regxmllib/www-smpte-ra-org-reg-395-2014-13-1-aaf.xml"),
+		QApplication::applicationDirPath() + QString("/regxmllib/www-smpte-ra-org-reg-2003-2012.xml")
+	};
+#ifdef WIN32
+	classPath = QString("\"") + classPath + QString("\"");
+	fPath = QString("\"") + fPath + QString("\"");
+	for (int i=0; i < dictLength; i++) {
+		dict[i] = QString("\"") + dict[i] + QString("\"");
+	}
+#else
+	classPath = classPath.replace(" ", "\\ ");
+	fPath = fPath.replace(" ", "\\ ");
+	for (int i=0; i < dictLength; i++) {
+		dict[i] = dict[i].replace(" ", "\\ ");
+	}
+#endif
+
+	QString command = "java -cp " + classPath + " com.sandflow.smpte.tools.RegXMLDump -ed -d ";
+	for (int i=0; i < dictLength; i++) {
+		command += dict[i] + QString(" ");
+	}
+	command += QString("-i ") + fPath;
+
+	std::string result = this->ssystem(command.toStdString().c_str());
+	QString qresult = QString::fromStdString(result.c_str());
+
+	if (result.length() > 0) {
+		cpl::EssenceDescriptorBaseType::AnySequence &r_any_sequence(mEssenceDescriptor->getAny());
+		xercesc::DOMElement * p_dom_element;
+		const char * strEssenceDescriptor;
+		xercesc::DOMNode * node;
+		xercesc::XercesDOMParser * parser = new xercesc::XercesDOMParser();
+		try {
+			strEssenceDescriptor = qresult.toUtf8();
+			xercesc::MemBufInputSource src((const XMLByte*)strEssenceDescriptor, qresult.length(), "dummy", false);
+			parser->parse(src);
+
+			xercesc::DOMDocument * p_dom_document2 = parser->getDocument();
+
+			xercesc::DOMDocument &p_dom_document  = mEssenceDescriptor->getDomDocument();
+			p_dom_element = p_dom_document2->getDocumentElement();
+			if (p_dom_element) {
+			  node = p_dom_document.importNode(p_dom_element, true);
+
+			  // Appending the node to the new document
+			  if (node) {
+				  p_dom_document.appendChild(node);
+			  }
+			}
+			p_dom_element = p_dom_document.getDocumentElement();
+		}
+	  catch (const xercesc::DOMException& toCatch) {
+			char* message = xercesc::XMLString::transcode(toCatch.msg);
+			qDebug() << "Exception message is:"
+				 << QString(message);
+			xercesc::XMLString::release(&message);
+			delete parser;
+			return;
+	  }
+	  catch (...) {
+			qDebug() << "Failed to extract essence descriptor from " << filePath;
+			return;
+	  }
+
+	  if (p_dom_element) {
+		  //p_dom_element->setAttribute(X("xmlns"), NULL);
+		  try {
+		  r_any_sequence.push_back(p_dom_element);
+		  mEssenceDescriptor->setAny(r_any_sequence);
+		  }
+		  catch (...) {
+				qDebug() << "Failed to extract essence descriptor from " << filePath;
+				return;
+		  }
+	  }
+	  else
+		  qDebug() << "p_dom_element == NULL";
+
+	  delete parser;
+  }
+}
+std::string AssetMxfTrack::ssystem (const char *command) {
+    char tmpname [L_tmpnam];
+    std::tmpnam ( tmpname );
+    std::string scommand = command;
+    std::string cmd = scommand + " >> " + tmpname;
+    std::system(cmd.c_str());
+    std::ifstream file(tmpname, std::ios::in );
+    std::string result;
+        if (file) {
+      while (!file.eof()) result.push_back(file.get());
+          file.close();
+    }
+    remove(tmpname);
+    return result;
+}
+//WR end

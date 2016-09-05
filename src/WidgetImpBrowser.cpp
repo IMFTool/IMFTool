@@ -325,9 +325,20 @@ void WidgetImpBrowser::Save() {
 				}
 			}
 			mpJobQueue->StartQueue();
+			//connect(mpJobQueue, SIGNAL(finished()), this, SLOT(rReinstallImp()));
 		}
 	}
 }
+
+						/* -----Denis Manthey----- */
+
+
+
+void WidgetImpBrowser::rReinstallImp() {
+
+	emit WritePackageComplete();
+}
+						/* -----Denis Manthey----- */
 
 void WidgetImpBrowser::ShowResourceGeneratorWavMode() {
 
@@ -417,7 +428,7 @@ void WidgetImpBrowser::rResourceGeneratorAccepted() {
 					QSharedPointer<AssetMxfTrack> mxf_asset(new AssetMxfTrack(mxf_asset_file_path, id));
 					mxf_asset->SetSourceFiles(selected_files);
 					if (mxf_asset->GetDuration().GetCount() == 0)
-					mxf_asset->SetDuration(duration);
+						mxf_asset->SetDuration(duration);
 
 					mpUndoStack->push(new AddAssetCommand(mpImfPackage, mxf_asset, mpImfPackage->GetPackingListId()));
 				}
@@ -451,7 +462,8 @@ QSharedPointer<AssetCpl> WidgetImpBrowser::GenerateEmptyCPL() {
 	QFileInfo cpl_file_path(mpImfPackage->GetRootDir().absoluteFilePath(file_name));
 	QSharedPointer<AssetCpl> cpl_asset(new AssetCpl(cpl_file_path, id));
 	XmlSerializationError error = WidgetComposition::WriteMinimal(cpl_file_path.absoluteFilePath(), id, edit_rate, title, issuer, content_originator);
-	if(error.IsError() == false) mpUndoStack->push(new AddAssetCommand(mpImfPackage, cpl_asset, mpImfPackage->GetPackingListId()));
+	if(error.IsError() == false)
+		mpUndoStack->push(new AddAssetCommand(mpImfPackage, cpl_asset, mpImfPackage->GetPackingListId()));
 	else {
 		QString error_string = error.GetErrorMsg();
 		error.AppendErrorDescription(error_string);
@@ -542,8 +554,33 @@ void WidgetImpBrowser::rJobQueueFinished() {
 		error_msg.append(QString("%1: %2\n%3\n").arg(i + 1).arg(errors.at(i).GetErrorMsg()).arg(errors.at(i).GetErrorDescription()));
 	}
 	error_msg.chop(1); // remove last \n
+	bool cplsChanged = false;
 	if(errors.empty() == true) {
-		StartOutgest();
+
+		//Open all CPLs for writing (updates the essence descriptor list)
+		for (int i = 0; i < mpImfPackage->GetAssetCount(); i++) {
+			if (mpImfPackage->GetAsset(i)->GetType() == Asset::cpl) {
+				QSharedPointer<AssetCpl> asset_cpl = mpImfPackage->GetAsset(i).objectCast<AssetCpl>();
+				//WR begin
+				if (asset_cpl && asset_cpl->GetIsNewOrModified()) {
+				//WR end
+					cplsChanged = true;
+					emit ShowCpl(asset_cpl->GetId());
+					asset_cpl->FileModified();
+					qDebug() << "Re-open CPL" << asset_cpl->GetId();
+				}
+			}
+		}
+		if (!cplsChanged) {
+			StartOutgest();
+			emit WritePackageComplete();
+		} else {
+			emit CallSaveAllCpl();
+		}
+		//WR begin
+		//StartOutgest();
+		//WR end
+		//emit WritePackageComplete();
 	}
 	else {
 		mpMsgBox->setText(tr("Wrapping Error"));
@@ -642,12 +679,31 @@ void WidgetImpBrowser::rDeleteSelectedRow() {
 					}
 					else {
 						StartOutgest(false);
+						rReinstallImp();
 					}
 				}
 			}
 		}
 	}
 }
+//WR begin
+// Called via signal SaveAllCplFinished() by WidgetCentral::SaveAllCpl
+void WidgetImpBrowser::RecalcHashForCpls() {
+	mpJobQueue->FlushQueue();
+	for(int i = 0; i < mpImfPackage->GetAssetCount(); i++) {
+		QSharedPointer<AssetCpl> asset_cpl = mpImfPackage->GetAsset(i).objectCast<AssetCpl>();
+		if(asset_cpl && asset_cpl->NeedsNewHash() ) {
+			JobCalculateHash *p_hash_job = new JobCalculateHash(asset_cpl->GetPath().absoluteFilePath());
+			connect(p_hash_job, SIGNAL(Result(const QByteArray&, const QVariant&)), asset_cpl.data(), SLOT(SetHash(const QByteArray&)));
+			mpJobQueue->AddJob(p_hash_job);
+			asset_cpl->SetIsNewOrModified(false);
+		}
+	}
+	mpJobQueue->StartQueue();
+	qDebug() << "mpJobQueue->StartQueue";
+	//mpJobQueue will send signal finished(), calling SLOT WidgetImpBrowser::rJobQueueFinished
+}
+//WR end
 
 
 CustomTableView::CustomTableView(QWidget *pParent /*= NULL*/) :

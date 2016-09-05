@@ -202,7 +202,7 @@ void WizardResourceGeneratorPage::InitLayout() {
 	QGridLayout *p_wrapper_layout_three = new QGridLayout();
 	QGridLayout *vbox = new QGridLayout;
 	p_wrapper_layout_three->setContentsMargins(0, 0, 0, 0);
-	p_wrapper_layout_three->addWidget(new QLabel(tr("Select a Timed Text Resource (.ttml) that is conform to IMSC1"), this), 0, 0, 1, 3);
+	p_wrapper_layout_three->addWidget(new QLabel(tr("Select a Timed Text Resource (.ttml) compliant to IMSC1"), this), 0, 0, 1, 3);
 	p_wrapper_layout_three->addWidget(mpTableViewTimedText, 1, 0, 1, 3);
 	p_wrapper_layout_three->addWidget(pGenNew, 2, 0, 1, 3);
 

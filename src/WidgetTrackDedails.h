@@ -89,12 +89,14 @@ public:
 	virtual eSequenceType GetType() const { return mType; }
 
 	private slots:
-	void DeleteAction() { emit DeleteClicked(mTrackId); }
+	void DeleteAction() { if(mType != MainImageSequence) emit DeleteClicked(mTrackId); }
+	void EnableDeleteAction();
 
 private:
 	Q_DISABLE_COPY(WidgetTrackDetails);
 	void InitLayout();
 
+	QAction *mpDelete;
 	QUuid mTrackId;
 	eSequenceType mType;
 };

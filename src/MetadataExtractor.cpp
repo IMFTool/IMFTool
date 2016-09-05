@@ -443,10 +443,16 @@ float MetadataExtractor::GetElementDuration(DOMElement* eleDom, float fr, int tr
 
 float MetadataExtractor::DurationExtractor(DOMDocument *dom_doc, float fr, int tr) {
 
-	float eleduration=0, divduration=0, div2duration=0, pduration=0, p2duration=0, spanduration=0, duration=0;
+	float bodyduration=0, eleduration=0, divduration=0, div2duration=0, pduration=0, p2duration=0, spanduration=0, duration=0;
 
 	DOMNodeList	*bodyitems = dom_doc->getElementsByTagName(XMLString::transcode("body"));
 	DOMElement* bodyeleDom = dynamic_cast<DOMElement*>(bodyitems->item(0));
+	bodyduration = GetElementDuration(bodyeleDom, fr, tr);
+	if (bodyduration > 0) {
+		duration = bodyduration;
+		return duration;
+	}
+
 	QString bodytime = XMLString::transcode(bodyeleDom->getAttribute(XMLString::transcode("timeContainer")));  //bodytime: par/seq
 
 	//---start with div childelements of body---
@@ -641,8 +647,6 @@ Error MetadataExtractor::ReadTimedTextMetadata(Metadata &rMetadata, const QFileI
 		QString profile = XMLString::transcode(preleDom->getAttribute(XMLString::transcode("ttp:profile")));
 		if (profile.isEmpty())
 			profile = "Unknown";
-			//else
-			//profile = profile.remove(0, 40);
 		metadata.profile = profile;
 
 		//Frame Rate Multiplier Extractor
@@ -675,10 +679,6 @@ Error MetadataExtractor::ReadTimedTextMetadata(Metadata &rMetadata, const QFileI
 		//Duration Extractor
 		float duration;
 		duration = DurationExtractor(dom_doc,framerate,tickrate);
-		/*if (duration == 0){
-			error = (Error::UnknownDuration);
-			return error;
-		}*/
 
 		metadata.editRate = ASDCP::Rational(1000, 1);
 		metadata.infoEditRate = ASDCP::Rational(editrate*num, den);

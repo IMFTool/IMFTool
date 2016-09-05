@@ -136,6 +136,7 @@ public:
 	UserText GetAnnotationText() const { if(mData.getAnnotationText().present() == true) return ImfXmlHelper::Convert(mData.getAnnotationText().get()); else return UserText(); }
 	QDateTime GetIssueDate() const { return ImfXmlHelper::Convert(mData.getIssueDate()); }
 	UserText GetIssuer() const { return ImfXmlHelper::Convert(mData.getIssuer()); }
+	void SetId() {mData.setId(ImfXmlHelper::Convert(QUuid::createUuid()));}
 
 	void SetAnnotationText(const UserText &rAnnotationText) { mData.setAnnotationText(ImfXmlHelper::Convert(rAnnotationText)); }
 	void SetIssuer(const UserText &rIssuer) { mData.setIssuer(ImfXmlHelper::Convert(rIssuer)); }
@@ -287,9 +288,12 @@ public:
 	//! Create New CPL.
 	AssetCpl(const QFileInfo &rFilePath, const QUuid &rId, const UserText &rAnnotationText = QString());
 	virtual ~AssetCpl() {}
+	bool GetIsNewOrModified() {return mIsNewOrModified;}
+	void SetIsNewOrModified(bool rIsNewOrModified) { mIsNewOrModified = rIsNewOrModified;}
 
 private:
 	Q_DISABLE_COPY(AssetCpl);
+	bool mIsNewOrModified;
 };
 
 
@@ -332,6 +336,11 @@ public:
 	QString GetProfile() const { return mMetadata.profile; }
 	EditRate GetTimedTextFrameRate() const {return mMetadata.infoEditRate;};
 	QImage GetProxyImage() const { return mFirstProxyImage; }
+	//WR begin
+	//Getter methods for the corresponding members
+	cpl::EssenceDescriptorBaseType* GetEssenceDescriptor() { return mEssenceDescriptor;};
+	QUuid GetSourceEncoding() const {return mSourceEncoding;};
+	//WR end
 	//! Set the Wav or Aces files that should be wrapped into Mxf. Does nothing if finalized. WARNING: overwrites old frame rate, soundfield group.
 	void SetSourceFiles(const QStringList &rSourceFiles);
 	//! Set the frame rate for Aces Asset. Does nothing if finalized.
@@ -341,6 +350,11 @@ public:
 	//! Set the duration for timed Text Asset. Does nothing if finalized.
 	void SetDuration(const Duration &rDuration);
 	//! Set the ACES System Version for ACES Asset. Does nothing if finalized.
+	//WR begin
+	//This method extracts the essence descriptor from rFilePath and writes it into mEssenceDescriptor
+	void SetEssenceDescriptorSetAny(const QString &filePath);
+	std::string ssystem (const char *command);
+	//WR end
 	private slots :
 	void rTransformationFinished(const QImage &rImage, const QVariant &rIdentifier = QVariant());
 
@@ -352,4 +366,9 @@ private:
 	QStringList mSourceFiles;
 	QImage			mFirstProxyImage;
 	MetadataExtractor mMetadataExtr;
+//WR begin
+	//These are member variables for the corresponding CPL elements
+	cpl::EssenceDescriptorBaseType* mEssenceDescriptor;
+	QUuid mSourceEncoding;
+//WR end
 };

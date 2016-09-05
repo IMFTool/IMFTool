@@ -35,6 +35,9 @@
 #include <fstream>
 #include <QPropertyAnimation>
 
+//WR begin
+#include <xercesc/framework/MemBufInputSource.hpp>
+//WR end
 
 WidgetComposition::WidgetComposition(const QSharedPointer<ImfPackage> &rImp, const QUuid &rCplAssetId, QWidget *pParent /*= NULL*/) :
 QFrame(pParent), mpCompositionView(NULL), mpCompositionScene(NULL), mpTimelineView(NULL), mpTimelineScene(NULL), mpCompositionTracksWidget(NULL),
@@ -293,6 +296,14 @@ ImfError WidgetComposition::Write(const QString &rDestination /*= QString()*/) {
 	cpl.setIssueDate(ImfXmlHelper::Convert(QDateTime::currentDateTimeUtc()));
 	cpl::CompositionPlaylistType_SegmentListType segment_list;
 	cpl::CompositionPlaylistType_SegmentListType::SegmentSequence &segment_sequence = segment_list.getSegment();
+	//WR begin
+	//Essence descriptor variables
+	cpl::CompositionPlaylistType_EssenceDescriptorListType essence_descriptor_list;
+	cpl::CompositionPlaylistType_EssenceDescriptorListType::EssenceDescriptorSequence &essence_descriptor_sequence = essence_descriptor_list.getEssenceDescriptor();
+	essence_descriptor_sequence.clear();
+	//List of UUIDs of resources with essence descriptor
+	QStringList resourceIDs;
+	//WR end
 	for(int i = 0; i < mpCompositionGraphicsWidget->GetSegmentCount(); i++) {
 		GraphicsWidgetSegment *p_segment = mpCompositionGraphicsWidget->GetSegment(i);
 		if(p_segment) {
@@ -308,6 +319,22 @@ ImfError WidgetComposition::Write(const QString &rDestination /*= QString()*/) {
 						AbstractGraphicsWidgetResource *p_resource = p_sequence->GetResource(iii);
 						if(p_resource) {
 							std::auto_ptr<cpl::BaseResourceType> resource = p_resource->Write();
+							//WR begin
+							// Test if resource is a track file resource
+							cpl::TrackFileResourceType *p_file_resource = dynamic_cast<cpl::TrackFileResourceType*>(&(*resource));
+							//Get corresponding AssetMxfTrack object
+							QSharedPointer<AssetMxfTrack> mxffile = p_resource->GetAsset().objectCast<AssetMxfTrack>();
+							if (p_file_resource && mxffile){
+								//Set SourceEncoding in CPL
+								p_file_resource->setSourceEncoding(ImfXmlHelper::Convert(mxffile->GetSourceEncoding()));
+								if (!resourceIDs.contains(mxffile->GetId().toString())){
+									//If not yet added:
+									resourceIDs.append(mxffile->GetId().toString());
+									//Push Essence Descriptor into CPL
+									essence_descriptor_sequence.push_back(*(mxffile->GetEssenceDescriptor()));
+								}
+							}
+							//WR end
 							resource_sequence.push_back(resource);
 						}
 					}
@@ -372,6 +399,9 @@ ImfError WidgetComposition::Write(const QString &rDestination /*= QString()*/) {
 		}
 	}
 	cpl.setSegmentList(segment_list);
+	//WR begin
+	cpl.setEssenceDescriptorList(essence_descriptor_list);
+	//WR end
 	QString destination(rDestination);
 	if(destination.isEmpty() && mAssetCpl) {
 		destination = mAssetCpl->GetPath().absoluteFilePath();
@@ -398,6 +428,10 @@ ImfError WidgetComposition::Write(const QString &rDestination /*= QString()*/) {
 	if(!error) {
 		mpUndoStack->clear();
 		if(mAssetCpl) mAssetCpl->FileModified();
+		//WR begin
+		if(mAssetCpl) mAssetCpl->SetIsNewOrModified(true);
+		//WR end
+		qDebug() << "Write " << destination.toStdString().c_str();
 	}
 	return error;
 }
@@ -418,6 +452,12 @@ ImfError WidgetComposition::WriteNew(const QString &rDestination /*= QString()*/
 	cpl.setIssueDate(ImfXmlHelper::Convert(QDateTime::currentDateTimeUtc()));
 	cpl::CompositionPlaylistType_SegmentListType segment_list;
 	cpl::CompositionPlaylistType_SegmentListType::SegmentSequence &segment_sequence = segment_list.getSegment();
+	//WR begin
+	cpl::CompositionPlaylistType_EssenceDescriptorListType essence_descriptor_list;
+	cpl::CompositionPlaylistType_EssenceDescriptorListType::EssenceDescriptorSequence &essence_descriptor_sequence = essence_descriptor_list.getEssenceDescriptor();
+	essence_descriptor_sequence.clear();
+	QStringList resourceIDs;
+	//WR end
 
 	//create for every existing Track ID a new Track ID
 	QStringList oldTrackIDs;
@@ -433,7 +473,6 @@ ImfError WidgetComposition::WriteNew(const QString &rDestination /*= QString()*/
 	for (int i = 0; i < oldTrackIDs.size(); i++){
 		newTrackIDs.append(QUuid::createUuid());
 	}
-
 
 	for(int i = 0; i < mpCompositionGraphicsWidget->GetSegmentCount(); i++) {
 		GraphicsWidgetSegment *p_segment = mpCompositionGraphicsWidget->GetSegment(i);
@@ -451,6 +490,23 @@ ImfError WidgetComposition::WriteNew(const QString &rDestination /*= QString()*/
 						if(p_resource) {
 							p_resource=p_resource->Clone();
 							std::auto_ptr<cpl::BaseResourceType> resource = p_resource->Write();
+
+							//WR begin
+							// Test if resource is a track file resource
+							cpl::TrackFileResourceType *p_file_resource = dynamic_cast<cpl::TrackFileResourceType*>(&(*resource));
+							//Get corresponding AssetMxfTrack object
+							QSharedPointer<AssetMxfTrack> mxffile = p_resource->GetAsset().objectCast<AssetMxfTrack>();
+							if (p_file_resource && mxffile){
+								//Set SourceEncoding in CPL
+								p_file_resource->setSourceEncoding(ImfXmlHelper::Convert(mxffile->GetSourceEncoding()));
+								if (!resourceIDs.contains(mxffile->GetId().toString())){
+									//If not yet added:
+									resourceIDs.append(mxffile->GetId().toString());
+									//Push Essence Descriptor into CPL
+									essence_descriptor_sequence.push_back(*(mxffile->GetEssenceDescriptor()));
+								}
+							}
+							//WR end
 
 							resource_sequence.push_back(resource);
 						}
@@ -519,6 +575,9 @@ ImfError WidgetComposition::WriteNew(const QString &rDestination /*= QString()*/
 		}
 	}
 	cpl.setSegmentList(segment_list);
+//WR begin
+	cpl.setEssenceDescriptorList(essence_descriptor_list);
+//WR end
 	QString destination(rDestination);
 	if(destination.isEmpty() && mAssetCpl) {
 		destination = mAssetCpl->GetPath().absoluteFilePath();
@@ -544,6 +603,10 @@ ImfError WidgetComposition::WriteNew(const QString &rDestination /*= QString()*/
 	}
 	if(!error) {
 		if(mAssetCpl) mAssetCpl->FileModified();
+		//WR begin
+		if(mAssetCpl) mAssetCpl->SetIsNewOrModified(true);
+		//WR end
+		qDebug() << "WriteNew " << destination.toStdString().c_str();
 	}
 	return error;
 }
