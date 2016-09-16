@@ -260,11 +260,14 @@ void WidgetCentral::CopyCPL(const QSharedPointer<AssetCpl> &rDestination) {
 	WidgetComposition *p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->widget(mpTabWidget->currentIndex()));
 	if(p_composition) {
 		QUuid oldId = p_composition->GetId();
+		QSharedPointer<AssetCpl> asset_cpl = mpImfPackage->GetAsset(oldId).objectCast<AssetCpl>();
+		bool isNew = asset_cpl.data()->GetIsNewOrModified();
 		p_composition->SetID(rDestination.data()->GetId());
 		ImfError error = p_composition->WriteNew(rDestination.data()->GetPath().absoluteFilePath());
-		//We will undo all changes for this object:
-		QSharedPointer<AssetCpl> asset_cpl = mpImfPackage->GetAsset(oldId).objectCast<AssetCpl>();
-		asset_cpl.data()->SetIsNewOrModified(false);
+		//WriteNew sets mIsNewOrModified to TRUE for the original p_composition object
+		//We will undo all changes for this object, so we set mIsNewOrModified to FALSE
+		//but only if it wasn't TRUE before
+		if (!isNew) asset_cpl.data()->SetIsNewOrModified(false);
 		p_composition->SetID(oldId);
 		if(error.IsError() == false) {
 			if(error.IsRecoverableError() == true) {

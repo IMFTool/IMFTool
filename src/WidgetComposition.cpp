@@ -488,9 +488,9 @@ ImfError WidgetComposition::WriteNew(const QString &rDestination /*= QString()*/
 					for(int iii = 0; iii < p_sequence->GetResourceCount(); iii++) {
 						AbstractGraphicsWidgetResource *p_resource = p_sequence->GetResource(iii);
 						if(p_resource) {
-							p_resource=p_resource->Clone();
 							std::auto_ptr<cpl::BaseResourceType> resource = p_resource->Write();
-
+							// Create a new UUID for all resources
+							resource->setId(ImfXmlHelper::Convert(QUuid::createUuid()));
 							//WR begin
 							// Test if resource is a track file resource
 							cpl::TrackFileResourceType *p_file_resource = dynamic_cast<cpl::TrackFileResourceType*>(&(*resource));

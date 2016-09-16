@@ -1279,6 +1279,10 @@ void GraphicsWidgetMarkerResource::MoveMarker(GraphicsWidgetMarker *pMarker, qin
 		QPointF local_pos = mapFromScene(pos, 0);
 		if(local_pos.x() < boundingRect().left()) local_pos.setX(boundingRect().left());
 
+		//WR
+		// We don't allow to change the intrinsic duration of marker segments
+		if(local_pos.x() > boundingRect().right()) local_pos.setX(boundingRect().right());
+		//WR
 		qint64 max_offset = local_pos.x();
 		QList<QGraphicsItem*> items = childItems();
 		for(int i = 0; i < items.size(); i++) {
@@ -1289,14 +1293,20 @@ void GraphicsWidgetMarkerResource::MoveMarker(GraphicsWidgetMarker *pMarker, qin
 			}
 		}
 		Duration new_source_duration = max_offset * samples_factor;
-		if(new_source_duration > GetSourceDuration()) {
+		//WR
+		// Commented out, because the else block has reduced the duration of the marker sequence,
+		// which in turn created holes in the virtual marker track timeline
+		// As a consequence, also the first block has been commented out
+		// TODO Create event when the total duration of a video/audio/tt segment changes and adjust marker segment duration accordingly
+		/*if(new_source_duration > GetSourceDuration()) {
 			SetIntrinsicDuaration(new_source_duration + GetEntryPoint());
 			SetSourceDuration(new_source_duration);
 		}
 		else {
-			SetSourceDuration(new_source_duration);
-			SetIntrinsicDuaration(new_source_duration + GetEntryPoint());
-		}
+			//SetSourceDuration(new_source_duration);
+			//SetIntrinsicDuaration(new_source_duration + GetEntryPoint());
+		}*/
+		//WR
 		pMarker->setPos(local_pos.x(), 1);
 	}
 }
