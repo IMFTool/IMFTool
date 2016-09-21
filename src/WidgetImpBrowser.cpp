@@ -302,7 +302,7 @@ void WidgetImpBrowser::Save() {
 				QSharedPointer<AssetMxfTrack> mxf_asset = mpImfPackage->GetAsset(i).objectCast<AssetMxfTrack>();
 				if(mxf_asset && mxf_asset->Exists() == false) {
 					if(mxf_asset->GetEssenceType() == Metadata::Pcm) {
-						JobWrapWav *p_wrap_job = new JobWrapWav(mxf_asset->GetSourceFiles(), mxf_asset->GetPath().absoluteFilePath(), mxf_asset->GetSoundfieldGroup(), mxf_asset->GetId());
+						JobWrapWav *p_wrap_job = new JobWrapWav(mxf_asset->GetSourceFiles(), mxf_asset->GetPath().absoluteFilePath(), mxf_asset->GetSoundfieldGroup(), mxf_asset->GetId(), mxf_asset->GetLanguageTag());
 						connect(p_wrap_job, SIGNAL(Success()), mxf_asset.data(), SLOT(FileModified()));
 						mpJobQueue->AddJob(p_wrap_job);
 					}
@@ -310,7 +310,7 @@ void WidgetImpBrowser::Save() {
 
 						/* -----Denis Manthey----- */
 					else if(mxf_asset->GetEssenceType() == Metadata::TimedText) {
-						JobWrapTimedText *p_wrap_job = new JobWrapTimedText(mxf_asset->GetSourceFiles(), mxf_asset->GetPath().absoluteFilePath(), mxf_asset->GetEditRate(), mxf_asset->GetDuration(), mxf_asset->GetId(), mxf_asset->GetProfile(), mxf_asset->GetTimedTextFrameRate());
+						JobWrapTimedText *p_wrap_job = new JobWrapTimedText(mxf_asset->GetSourceFiles(), mxf_asset->GetPath().absoluteFilePath(), mxf_asset->GetEditRate(), mxf_asset->GetDuration(), mxf_asset->GetId(), mxf_asset->GetProfile(), mxf_asset->GetTimedTextFrameRate(), mxf_asset->GetLanguageTag());
 						connect(p_wrap_job, SIGNAL(Success()), mxf_asset.data(), SLOT(FileModified()));
 						mpJobQueue->AddJob(p_wrap_job);
 					}
@@ -389,6 +389,10 @@ void WidgetImpBrowser::rShowResourceGeneratorForAsset(const QUuid &rAssetId) {
 			p_wizard_resource_generator->setField(FIELD_NAME_SELECTED_FILES, QVariant(asset->GetSourceFiles()));
 			p_wizard_resource_generator->setField(FIELD_NAME_SOUNDFIELD_GROUP, QVariant::fromValue<SoundfieldGroup>(asset->GetSoundfieldGroup()));
 			p_wizard_resource_generator->setField(FIELD_NAME_EDIT_RATE, QVariant::fromValue<EditRate>(asset->GetEditRate()));
+			//WR
+			p_wizard_resource_generator->setField(FIELD_NAME_LANGUAGETAG_WAV, QVariant::fromValue<QString>(asset->GetLanguageTag()));
+			p_wizard_resource_generator->setField(FIELD_NAME_LANGUAGETAG_TT, QVariant::fromValue<QString>(asset->GetLanguageTag()));
+			//WR
 			p_wizard_resource_generator->setProperty(ASSET_ID_DYNAMIK_PROPERTY, QVariant(asset->GetId()));
 			p_wizard_resource_generator->show();
 			connect(p_wizard_resource_generator, SIGNAL(accepted()), this, SLOT(rResourceGeneratorAccepted()));
@@ -404,6 +408,12 @@ void WidgetImpBrowser::rResourceGeneratorAccepted() {
 		SoundfieldGroup soundfield_group = qvariant_cast<SoundfieldGroup>(p_resource_generator->field(FIELD_NAME_SOUNDFIELD_GROUP));
 		EditRate edit_rate = qvariant_cast<EditRate>(p_resource_generator->field(FIELD_NAME_EDIT_RATE));
 		Duration duration = qvariant_cast<Duration>(p_resource_generator->field(FIELD_NAME_DURATION));
+		//WR
+		QString language_tag_wav = qvariant_cast<QString>(p_resource_generator->field(FIELD_NAME_LANGUAGETAG_WAV));
+		QString language_tag_tt = qvariant_cast<QString>(p_resource_generator->field(FIELD_NAME_LANGUAGETAG_TT));
+		qDebug() << "language_tag_wav:" << language_tag_wav;
+		qDebug() << "language_tag_tt:" << language_tag_tt;
+		//WR
 		if(mpImfPackage) {
 			QVariant asset_id = p_resource_generator->property(ASSET_ID_DYNAMIK_PROPERTY);
 			// New Asset
@@ -415,6 +425,9 @@ void WidgetImpBrowser::rResourceGeneratorAccepted() {
 					QSharedPointer<AssetMxfTrack> mxf_asset(new AssetMxfTrack(mxf_asset_file_path, id));
 					mxf_asset->SetSourceFiles(selected_files);
 					mxf_asset->SetSoundfieldGroup(soundfield_group);
+					//WR
+					mxf_asset->SetLanguageTag(language_tag_wav);
+					//WR
 					mpUndoStack->push(new AddAssetCommand(mpImfPackage, mxf_asset, mpImfPackage->GetPackingListId()));
 				}
 
@@ -430,6 +443,9 @@ void WidgetImpBrowser::rResourceGeneratorAccepted() {
 					if (mxf_asset->GetDuration().GetCount() == 0)
 						mxf_asset->SetDuration(duration);
 
+					//WR
+					mxf_asset->SetLanguageTag(language_tag_tt);
+					//WR
 					mpUndoStack->push(new AddAssetCommand(mpImfPackage, mxf_asset, mpImfPackage->GetPackingListId()));
 				}
 						/* -----Denis Manthey----- */

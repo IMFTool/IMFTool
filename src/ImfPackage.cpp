@@ -22,19 +22,19 @@
 #include <fstream>
 #include <QThreadPool>
 //WR begin
+#include <QMessageBox>
+#include <QProgressDialog>
+#include <QProcess>
+#include "JobQueue.h"
+#include "Jobs.h"
 #include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/framework/MemBufInputSource.hpp>
-#include<iostream>
-#include<fstream>
-#include<string>
-#include<cstdlib>
-#include<sstream>
 
 //WR end
 
 
 ImfPackage::ImfPackage(const QDir &rWorkingDir) :
-QAbstractTableModel(NULL), mpAssetMap(NULL), mPackingLists(), mAssetList(), mRootDir(rWorkingDir), mIsDirty(false), mIsIngest(false) {
+QAbstractTableModel(NULL), mpAssetMap(NULL), mPackingLists(), mAssetList(), mRootDir(rWorkingDir), mIsDirty(false), mIsIngest(false), mpJobQueue(NULL) {
 
 	mpAssetMap = new AssetMap(this, mRootDir.absoluteFilePath(ASSET_SEARCH_NAME));
 	QUuid pkl_id = QUuid::createUuid();
@@ -42,10 +42,26 @@ QAbstractTableModel(NULL), mpAssetMap(NULL), mPackingLists(), mAssetList(), mRoo
 	QSharedPointer<AssetPkl> pkl_asset(new AssetPkl(pkl_file_path, pkl_id));
 	mPackingLists.push_back(new PackingList(this, pkl_file_path, pkl_id));
 	AddAsset(pkl_asset, QUuid());
+	//WR
+	mpJobQueue = new JobQueue(this);
+	mpJobQueue->SetInterruptIfError(true);
+	connect(mpJobQueue, SIGNAL(finished()), this, SLOT(rJobQueueFinished()));
+	mpProgressDialog = new QProgressDialog();
+	mpProgressDialog->setWindowModality(Qt::WindowModal);
+	mpProgressDialog->setMinimumSize(500, 150);
+	mpProgressDialog->setMinimum(0);
+	mpProgressDialog->setMaximum(100);
+	mpProgressDialog->setValue(100);
+	mpProgressDialog->setMinimumDuration(0);
+	connect(mpJobQueue, SIGNAL(Progress(int)), mpProgressDialog, SLOT(setValue(int)));
+	connect(mpJobQueue, SIGNAL(NextJobStarted(const QString&)), mpProgressDialog, SLOT(setLabelText(const QString&)));
+	//connect(mpProgressDialog, SIGNAL(canceled()), mpJobQueue, SLOT(InterruptQueue()));
+	mpMsgBox = new QMessageBox();
+	//WR
 }
 
 ImfPackage::ImfPackage(const QDir &rWorkingDir, const UserText &rIssuer, const UserText &rAnnotationText /*= QString()*/) :
-QAbstractTableModel(NULL), mpAssetMap(NULL), mPackingLists(), mAssetList(), mRootDir(rWorkingDir), mIsDirty(true), mIsIngest(false) {
+QAbstractTableModel(NULL), mpAssetMap(NULL), mPackingLists(), mAssetList(), mRootDir(rWorkingDir), mIsDirty(true), mIsIngest(false), mpJobQueue(NULL) {
 
 	mpAssetMap = new AssetMap(this, mRootDir.absoluteFilePath(ASSET_SEARCH_NAME), rAnnotationText, rIssuer);
 	QUuid pkl_id = QUuid::createUuid();
@@ -53,6 +69,10 @@ QAbstractTableModel(NULL), mpAssetMap(NULL), mPackingLists(), mAssetList(), mRoo
 	QSharedPointer<AssetPkl> pkl_asset(new AssetPkl(pkl_file_path, pkl_id));
 	mPackingLists.push_back(new PackingList(this, pkl_file_path, pkl_id, QUuid(), QUuid(), rAnnotationText, rIssuer));
 	AddAsset(pkl_asset, QUuid());
+	mpJobQueue = new JobQueue(this);
+	mpJobQueue->SetInterruptIfError(true);
+	connect(mpJobQueue, SIGNAL(finished()), this, SLOT(rJobQueueFinished()));
+	mpMsgBox = new QMessageBox();
 }
 
 ImfError ImfPackage::Ingest() {
@@ -238,6 +258,9 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 
 	if(parse_error.IsError() == false) {
 		// XML parsing succeeds.
+		//WR
+		mpJobQueue->FlushQueue();
+		//WR
 		if(asset_map->getVolumeCount() == 1) {
 			mpAssetMap = new AssetMap(this, rAssetMapFilePath, *asset_map.get()); // add new Asset Map
 			// We must find all Packing Lists.
@@ -284,6 +307,11 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 													// Add Asset MXF Track
 													QSharedPointer<AssetMxfTrack> mxf_track(new AssetMxfTrack(new_asset_path, am_asset, pkl_asset));
 													AddAsset(mxf_track, ImfXmlHelper::Convert(packing_list->getId()));
+													//WR
+													JobExtractEssenceDescriptor *p_ed_job = new JobExtractEssenceDescriptor(mxf_track->GetPath().absoluteFilePath());
+													connect(p_ed_job, SIGNAL(Result(const QString&, const QVariant&)), mxf_track.data(), SLOT(SetEssenceDescriptor(const QString&)));
+													mpJobQueue->AddJob(p_ed_job);
+													//WR
 												}
 												else if(pkl_asset.getType().compare(MIME_TYPE_XML) == 0) {
 													// Add CPL or OPL
@@ -346,6 +374,9 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 		else {
 			error = ImfError(ImfError::AssetMapSplit);
 		}
+		//WR
+		mpJobQueue->StartQueue();
+		//WR
 	}
 	else {
 		qDebug() << parse_error;
@@ -700,6 +731,28 @@ Qt::DropActions ImfPackage::supportedDropActions() const {
 	return Qt::CopyAction;
 }
 
+//WR
+
+void ImfPackage::rJobQueueFinished() {
+	mpProgressDialog->reset();
+	QString error_msg;
+	QList<Error> errors = mpJobQueue->GetErrors();
+	for(int i = 0; i < errors.size(); i++) {
+		error_msg.append(QString("%1: %2\n%3\n").arg(i + 1).arg(errors.at(i).GetErrorMsg()).arg(errors.at(i).GetErrorDescription()));
+	}
+	error_msg.chop(1); // remove last \n
+	if (error_msg != "") {
+		qDebug() << "rJobQueueFinished error:" << error_msg;
+		mpMsgBox->setText(tr("Critical error, can't extract Essence Descriptor:"));
+		mpMsgBox->setInformativeText(error_msg + "\n\n Aborting to extract Essence Descriptors");
+		mpMsgBox->setStandardButtons(QMessageBox::Ok);
+		mpMsgBox->setDefaultButton(QMessageBox::Ok);
+		mpMsgBox->setIcon(QMessageBox::Critical);
+		mpMsgBox->exec();
+	}
+}
+//WR
+
 AssetMap::AssetMap(ImfPackage *pParent, const QFileInfo &rFilePath, const am::AssetMapType &rAssetMap) :
 QObject(pParent), mFilePath(rFilePath), mData(rAssetMap) {
 
@@ -902,8 +955,8 @@ void Asset::FileModified() {
 	//First we try to cast this to AssetMxfTrack
 	AssetMxfTrack *assetMxfTrack = dynamic_cast<AssetMxfTrack*>(this);
 	if (assetMxfTrack){
-		//Here we call SetEssenceDescriptorSetAny, which extracts and sets mEssenceDescriptor
-		assetMxfTrack->SetEssenceDescriptorSetAny(QString(this->GetPath().absoluteFilePath()));
+		//Here we call ExtractEssenceDescriptor, which extracts and sets mEssenceDescriptor
+		assetMxfTrack->ExtractEssenceDescriptor(QString(this->GetPath().absoluteFilePath()));
 		qDebug() << "Essence Descriptor updated for " << this->GetPath().absoluteFilePath();
 	}
 	//WR end
@@ -952,9 +1005,6 @@ Asset(Asset::mxf, rFilePath, rAmAsset, std::auto_ptr<pkl::AssetType>(new pkl::As
 	mSourceEncoding = QUuid::createUuid();
 	//new ED with SourceEncoding as ID
 	mEssenceDescriptor = new cpl::EssenceDescriptorBaseType(ImfXmlHelper::Convert(mSourceEncoding));
-	//Extract ED from MXF and write it into mEssenceDescriptor
-	SetEssenceDescriptorSetAny(QString(rFilePath.absoluteFilePath()));
-
 	//WR end
 }
 
@@ -1048,53 +1098,62 @@ void AssetMxfTrack::SetDefaultProxyImages() {
 
 //WR begin
 
-void AssetMxfTrack::SetEssenceDescriptorSetAny(const QString &filePath) {
-	QString fPath = filePath;
-	QString classPath = QApplication::applicationDirPath() + QString("/regxmllib/regxmllib.jar");
-	const unsigned short dictLength = 4;
-	QString dict[dictLength] = {
-		QApplication::applicationDirPath() + QString("/regxmllib/www-smpte-ra-org-reg-335-2012.xml"),
-		QApplication::applicationDirPath() + QString("/regxmllib/www-smpte-ra-org-reg-335-2012-13-1-aaf.xml"),
-		QApplication::applicationDirPath() + QString("/regxmllib/www-smpte-ra-org-reg-395-2014-13-1-aaf.xml"),
-		QApplication::applicationDirPath() + QString("/regxmllib/www-smpte-ra-org-reg-2003-2012.xml")
-	};
-#ifdef WIN32
-	classPath = QString("\"") + classPath + QString("\"");
-	fPath = QString("\"") + fPath + QString("\"");
-	for (int i=0; i < dictLength; i++) {
-		dict[i] = QString("\"") + dict[i] + QString("\"");
+Error AssetMxfTrack::ExtractEssenceDescriptor(const QString &filePath) {
+	QString qresult;
+	QProcess *myProcess = new QProcess();
+	const QString program = "java";
+	QStringList arg;
+	Error error;
+	arg << "-cp";
+	arg << QApplication::applicationDirPath() + QString("/regxmllib/regxmllib.jar");
+	arg << "com.sandflow.smpte.tools.RegXMLDump";
+	arg << "-ed";
+	arg << "-d";
+	arg << QApplication::applicationDirPath() + QString("/regxmllib/www-smpte-ra-org-reg-335-2012.xml");
+	arg << QApplication::applicationDirPath() + QString("/regxmllib/www-smpte-ra-org-reg-335-2012-13-1-aaf.xml");
+	arg << QApplication::applicationDirPath() + QString("/regxmllib/www-smpte-ra-org-reg-395-2014-13-1-aaf.xml");
+	arg << QApplication::applicationDirPath() + QString("/regxmllib/www-smpte-ra-org-reg-2003-2012.xml");
+	arg << "-i";
+	arg << filePath;
+	myProcess->start(program, arg);
+	myProcess->waitForFinished(-1);
+	if (myProcess->exitStatus() == QProcess::NormalExit) {
+		if (myProcess->exitCode() != 0) { return error = Error(Error::ExitCodeNotZero); }
+	} else {
+		return error = Error(Error::ExitStatusError);
 	}
-#else
-	classPath = classPath.replace(" ", "\\ ");
-	fPath = fPath.replace(" ", "\\ ");
-	for (int i=0; i < dictLength; i++) {
-		dict[i] = dict[i].replace(" ", "\\ ");
+
+	try {
+		qresult = myProcess->readAllStandardOutput();
 	}
-#endif
-
-	QString command = "java -cp " + classPath + " com.sandflow.smpte.tools.RegXMLDump -ed -d ";
-	for (int i=0; i < dictLength; i++) {
-		command += dict[i] + QString(" ");
+	catch (...) {
+		return error = Error(Error::EssenceDescriptorExtraction);
 	}
-	command += QString("-i ") + fPath;
 
-	std::string result = this->ssystem(command.toStdString().c_str());
-	QString qresult = QString::fromStdString(result.c_str());
+	if(error.IsError() == false) {
+		SetEssenceDescriptor(qresult);
+	}
+	return error;
+}
 
-	if (result.length() > 0) {
-		cpl::EssenceDescriptorBaseType::AnySequence &r_any_sequence(mEssenceDescriptor->getAny());
+
+void AssetMxfTrack::SetEssenceDescriptor(const QString& qresult) {
+	if (!qresult.isEmpty()) {
+		cpl::EssenceDescriptorBaseType* rEssenceDescriptor = this->GetEssenceDescriptor();
+		cpl::EssenceDescriptorBaseType::AnySequence &r_any_sequence(rEssenceDescriptor->getAny());
 		xercesc::DOMElement * p_dom_element;
-		const char * strEssenceDescriptor;
 		xercesc::DOMNode * node;
 		xercesc::XercesDOMParser * parser = new xercesc::XercesDOMParser();
 		try {
-			strEssenceDescriptor = qresult.toUtf8();
+			unsigned char * strEssenceDescriptor = new unsigned char[qresult.length()];
+			memcpy(strEssenceDescriptor, qresult.toStdString().c_str(), qresult.size());
 			xercesc::MemBufInputSource src((const XMLByte*)strEssenceDescriptor, qresult.length(), "dummy", false);
 			parser->parse(src);
+			delete[] strEssenceDescriptor;
 
 			xercesc::DOMDocument * p_dom_document2 = parser->getDocument();
 
-			xercesc::DOMDocument &p_dom_document  = mEssenceDescriptor->getDomDocument();
+			xercesc::DOMDocument &p_dom_document  = rEssenceDescriptor->getDomDocument();
 			p_dom_element = p_dom_document2->getDocumentElement();
 			if (p_dom_element) {
 			  node = p_dom_document.importNode(p_dom_element, true);
@@ -1115,7 +1174,7 @@ void AssetMxfTrack::SetEssenceDescriptorSetAny(const QString &filePath) {
 			return;
 	  }
 	  catch (...) {
-			qDebug() << "Failed to extract essence descriptor from " << filePath;
+			qDebug() << "Failed to extract essence descriptor"; // from " << mFilePath;
 			return;
 	  }
 
@@ -1123,10 +1182,10 @@ void AssetMxfTrack::SetEssenceDescriptorSetAny(const QString &filePath) {
 		  //p_dom_element->setAttribute(X("xmlns"), NULL);
 		  try {
 		  r_any_sequence.push_back(p_dom_element);
-		  mEssenceDescriptor->setAny(r_any_sequence);
+		  rEssenceDescriptor->setAny(r_any_sequence);
 		  }
 		  catch (...) {
-				qDebug() << "Failed to extract essence descriptor from " << filePath;
+				qDebug() << "Failed to extract essence descriptor"; // from " << mFilePath;
 				return;
 		  }
 	  }
@@ -1134,21 +1193,7 @@ void AssetMxfTrack::SetEssenceDescriptorSetAny(const QString &filePath) {
 		  qDebug() << "p_dom_element == NULL";
 
 	  delete parser;
-  }
+	}
 }
-std::string AssetMxfTrack::ssystem (const char *command) {
-    char tmpname [L_tmpnam];
-    std::tmpnam ( tmpname );
-    std::string scommand = command;
-    std::string cmd = scommand + " >> " + tmpname;
-    std::system(cmd.c_str());
-    std::ifstream file(tmpname, std::ios::in );
-    std::string result;
-        if (file) {
-      while (!file.eof()) result.push_back(file.get());
-          file.close();
-    }
-    remove(tmpname);
-    return result;
-}
+
 //WR end

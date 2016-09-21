@@ -72,7 +72,10 @@
 #define FIELD_NAME_DURATION "Duration"
 #define FIELD_NAME_SOUNDFIELD_GROUP "SoundfiledGourpName"
 #define FIELD_NAME_WORKING_DIR "WorkingDir"
-
+//WR
+#define FIELD_NAME_LANGUAGETAG_WAV "LanguageTagWav"
+#define FIELD_NAME_LANGUAGETAG_TT "LanguageTagTT"
+//WR
 
 enum eUserEventType {
 

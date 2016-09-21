@@ -71,8 +71,8 @@ Error JobCalculateHash::Execute() {
 	return error;
 }
 
-JobWrapWav::JobWrapWav(const QStringList &rSourceFiles, const QString &rOutputFile, const SoundfieldGroup &rSoundFieldGroup, const QUuid &rAssetId) :
-AbstractJob(tr("Wrapping %1").arg(QFileInfo(rOutputFile).fileName())), mOutputFile(rOutputFile), mSourceFiles(rSourceFiles), mSoundFieldGoup(rSoundFieldGroup), mWriterInfo() {
+JobWrapWav::JobWrapWav(const QStringList &rSourceFiles, const QString &rOutputFile, const SoundfieldGroup &rSoundFieldGroup, const QUuid &rAssetId, const QString &rLanguageTag) :
+AbstractJob(tr("Wrapping %1").arg(QFileInfo(rOutputFile).fileName())), mOutputFile(rOutputFile), mSourceFiles(rSourceFiles), mSoundFieldGoup(rSoundFieldGroup), mLanguageTag(rLanguageTag), mWriterInfo() {
 
 	convert_uuid(rAssetId, (unsigned char*)mWriterInfo.AssetUUID);
 }
@@ -117,9 +117,16 @@ Error JobWrapWav::Execute() {
 					buffer.Capacity(ASDCP::PCM::CalcFrameBufferSize(audio_descriptor));
 					essence_descriptor = new ASDCP::MXF::WaveAudioDescriptor(dict);
 					result = ASDCP::PCM_ADesc_to_MD(audio_descriptor, essence_descriptor);
-					if(mca_config.DecodeString(mSoundFieldGoup.GetAsString().toStdString()) == false) {
-						error = Error(Error::MCAStringDecoding);
-						return error;
+					if (mLanguageTag.isEmpty()) {
+						if(mca_config.DecodeString(mSoundFieldGoup.GetAsString().toStdString()) == false) {
+							error = Error(Error::MCAStringDecoding);
+							return error;
+						}
+					} else {
+						if(mca_config.DecodeString(mSoundFieldGoup.GetAsString().toStdString(), mLanguageTag.toStdString()) == false) {
+							error = Error(Error::MCAStringDecoding);
+							return error;
+						}
 					}
 					if(mca_config.ChannelCount() != essence_descriptor->ChannelCount) {
 						error = Error(Error::ChannelCountMismatch);
@@ -174,8 +181,8 @@ Error JobWrapWav::Execute() {
 
 
 
-JobWrapTimedText::JobWrapTimedText(const QStringList &rSourceFiles, const QString &rOutputFile, const EditRate &rEditRate, const Duration &rDuration, const QUuid &rAssetId, const QString &rProfile, const EditRate &rFrameRate) :
-AbstractJob(tr("Wrapping %1").arg(QFileInfo(rOutputFile).fileName())), mOutputFile(rOutputFile), mSourceFiles(rSourceFiles), mEditRate(rEditRate), mDuration(rDuration), mFrameRate(rFrameRate), mProfile(rProfile){
+JobWrapTimedText::JobWrapTimedText(const QStringList &rSourceFiles, const QString &rOutputFile, const EditRate &rEditRate, const Duration &rDuration, const QUuid &rAssetId, const QString &rProfile, const EditRate &rFrameRate, const QString &rLanguageTag) :
+AbstractJob(tr("Wrapping %1").arg(QFileInfo(rOutputFile).fileName())), mOutputFile(rOutputFile), mSourceFiles(rSourceFiles), mEditRate(rEditRate), mDuration(rDuration), mFrameRate(rFrameRate), mProfile(rProfile), mLanguageTag(rLanguageTag) {
 
 	convert_uuid(rAssetId, (unsigned char*)mWriterInfo.AssetUUID);
 
@@ -190,6 +197,7 @@ Error JobWrapTimedText::Execute() {
 	AS_02::TimedText::MXFWriter Writer;
 	TimedText::FrameBuffer buffer;
 	AS_02::TimedText::TimedTextDescriptor TDesc;
+	ASDCP::MXF::TimedTextDescriptor *essence_descriptor = NULL;
 
 	QFileInfo output_file(mOutputFile);
 	QFileInfo file_info(mSourceFiles.first());
@@ -206,9 +214,23 @@ Error JobWrapTimedText::Execute() {
 	TDesc.NamespaceName = mProfile.toStdString();
 	Kumu::GenRandomUUID(TDesc.AssetID);
 
+	ASDCP::MXF::InterchangeObject* tmp_obj = NULL;
+
 	result = Writer.OpenWrite(output_file.absoluteFilePath().toStdString(), mWriterInfo, TDesc);
 
 	if(ASDCP_SUCCESS(result)){
+		//WR RFC5646LanguageTagList is available only in ASDCP::MXF::TimedTextDescriptor, not in AS_02::TimedText::TimedTextDescriptor
+		result = Writer.OP1aHeader().GetMDObjectByType(DefaultCompositeDict().ul(MDD_TimedTextDescriptor), &tmp_obj);
+
+		if(KM_SUCCESS(result)) {
+			essence_descriptor = dynamic_cast<ASDCP::MXF::TimedTextDescriptor*>(tmp_obj);
+			if(essence_descriptor == NULL) {
+				error = Error(Error::UnsupportedEssence);
+				return error;
+			}
+		}
+		essence_descriptor->RFC5646LanguageTagList.set(mLanguageTag.toStdString());
+		//WR
 		std::string XMLDoc;
 		AS_02::TimedText::ResourceList_t::const_iterator ri;
 
@@ -244,4 +266,57 @@ Error JobWrapTimedText::Execute() {
 
 	return error;
 }
+//WR
 
+JobExtractEssenceDescriptor::JobExtractEssenceDescriptor(const QString &rSourceFile) :
+AbstractJob(tr("Extracting Essence Descriptor from: %1").arg(QFileInfo(rSourceFile).fileName())), mSourceFile(rSourceFile) {
+
+}
+
+Error JobExtractEssenceDescriptor::Execute() {
+
+	QFile file(mSourceFile);
+	if(file.open(QIODevice::ReadOnly) == false) {
+		return Error(Error::SourceFileOpenError, file.fileName());
+	}
+	Error error;
+
+	QString filePath = mSourceFile;
+	QString qresult;
+	QProcess *myProcess = new QProcess();
+	const QString program = "java";
+	QStringList arg;
+	arg << "-cp";
+	arg << QApplication::applicationDirPath() + QString("/regxmllib/regxmllib.jar");
+	arg << "com.sandflow.smpte.tools.RegXMLDump";
+	arg << "-ed";
+	arg << "-d";
+	arg << QApplication::applicationDirPath() + QString("/regxmllib/www-smpte-ra-org-reg-335-2012.xml");
+	arg << QApplication::applicationDirPath() + QString("/regxmllib/www-smpte-ra-org-reg-335-2012-13-1-aaf.xml");
+	arg << QApplication::applicationDirPath() + QString("/regxmllib/www-smpte-ra-org-reg-395-2014-13-1-aaf.xml");
+	arg << QApplication::applicationDirPath() + QString("/regxmllib/www-smpte-ra-org-reg-2003-2012.xml");
+	arg << "-i";
+	arg << filePath;
+	myProcess->start(program, arg);
+	myProcess->waitForFinished(-1);
+	if (myProcess->exitStatus() == QProcess::NormalExit) {
+		if (myProcess->exitCode() != 0) { return error = Error(Error::ExitCodeNotZero); }
+	} else {
+		return error = Error(Error::ExitStatusError);
+	}
+
+	try {
+		qresult = myProcess->readAllStandardOutput();
+	}
+	catch (...) {
+		return error = Error(Error::EssenceDescriptorExtraction);
+	}
+
+	if(error.IsError() == false) {
+		emit Result(qresult, GetIdentifier());
+	}
+
+	return error;
+}
+
+//WR

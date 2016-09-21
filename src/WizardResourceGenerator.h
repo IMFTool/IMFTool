@@ -70,6 +70,10 @@ class WizardResourceGeneratorPage : public QWizardPage {
 		Q_PROPERTY(SoundfieldGroup SoundfieldGroupSelected READ GetSoundfieldGroup WRITE SetSoundfieldGroup NOTIFY SoundfieldGroupChanged)
 		Q_PROPERTY(EditRate EditRateSelected READ GetEditRate WRITE SetEditRate NOTIFY EditRateChanged)
 		Q_PROPERTY(Duration DurationSelected READ GetDuration WRITE SetDuration NOTIFY DurationChanged)
+		//WR LanguageTagSelected
+		Q_PROPERTY(QString LanguageTagWavSelected READ GetLanguageTagWav WRITE SetLanguageTagWav NOTIFY LanguageTagWavChanged)
+		Q_PROPERTY(QString LanguageTagTTSelected READ GetLanguageTagTT WRITE SetLanguageTagTT NOTIFY LanguageTagTTChanged)
+		//WR
 
 public:
 	WizardResourceGeneratorPage(QWidget *pParent = NULL);
@@ -79,6 +83,10 @@ public:
 	SoundfieldGroup GetSoundfieldGroup() const;
 	EditRate GetEditRate() const;
 	Duration GetDuration() const;
+	//WR
+	QString GetLanguageTagWav() const;
+	QString GetLanguageTagTT() const;
+	//WR
 
 protected:
 
@@ -87,12 +95,20 @@ signals:
 	void SoundfieldGroupChanged();
 	void EditRateChanged();
 	void DurationChanged();
+	//WR
+	void LanguageTagWavChanged();
+	void LanguageTagTTChanged();
+	//WR
 
 	public slots:
 	void SetSourceFiles(const QStringList &rFiles);
 	void SetSoundfieldGroup(const SoundfieldGroup &rSoundfieldGroup);
 	void SetEditRate(const EditRate &rEditRate);
 	void SetDuration(const Duration &Duration);
+	//WR
+	void SetLanguageTagWav(const QString &rLanguageTag);
+	void SetLanguageTagTT(const QString &rLanguageTag);
+	//WR
 	void ChangeSoundfieldGroup(const QString &rName);
 	void ShowFileDialog();
 	void ShowDirDialog();
@@ -121,6 +137,10 @@ private:
 	QStackedLayout *mpStackedLayout;
 	QComboBox	*mpComboBoxEditRate;
 	QComboBox *mpComboBoxSoundfieldGroup;
+	//WR
+	QLineEdit *mpLineEditLanguageTagWav;
+	QLineEdit *mpLineEditLanguageTagTT;
+	//WR
 	QFileDialog *mpDirDialog;
 	QLineEdit *mpLineEditDuration;
 	QLineEdit *mpLineEditFileDir;

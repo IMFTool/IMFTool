@@ -350,4 +350,10 @@ public:
 		}
 		return ret;
 	}
+	//WR
+	static ::UserText Convert(const cpl::ContentKindType &rContentKindType) {
+
+		return ::UserText(rContentKindType.c_str(), "");
+	}
+	//WR
 };

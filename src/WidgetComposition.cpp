@@ -35,9 +35,6 @@
 #include <fstream>
 #include <QPropertyAnimation>
 
-//WR begin
-#include <xercesc/framework/MemBufInputSource.hpp>
-//WR end
 
 WidgetComposition::WidgetComposition(const QSharedPointer<ImfPackage> &rImp, const QUuid &rCplAssetId, QWidget *pParent /*= NULL*/) :
 QFrame(pParent), mpCompositionView(NULL), mpCompositionScene(NULL), mpTimelineView(NULL), mpTimelineScene(NULL), mpCompositionTracksWidget(NULL),

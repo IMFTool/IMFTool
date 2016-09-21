@@ -40,6 +40,9 @@ public:
 		WorkerRunning,
 		OpenCLError,
 		XMLSchemeError,
+		EssenceDescriptorExtraction,
+		ExitCodeNotZero,
+		ExitStatusError,
 		Unknown
 	};
 	//! Constructs empty error (IsError returns false).
@@ -82,6 +85,12 @@ public:
 				ret = QObject::tr("OpenCL Error"); break;
 			case XMLSchemeError:
 				ret = QObject::tr("XML Schema Error"); break;
+			case EssenceDescriptorExtraction:
+				ret = QObject::tr("Error extracting Essence Descriptor"); break;
+			case ExitCodeNotZero:
+				ret = QObject::tr("Java call has returned an error"); break;
+			case ExitStatusError:
+				ret = QObject::tr("Java call has returned an error"); break;
 			case Unknown:
 				ret = QObject::tr("Unknown error"); break;
 			default:

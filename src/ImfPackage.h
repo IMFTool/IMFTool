@@ -39,6 +39,11 @@ class Asset;
 class AssetMap;
 class PackingList;
 class QAbstractItemModel;
+//WR
+class QMessageBox;
+class QProgressDialog;
+class JobQueue;
+//WR
 
 class ImfPackage : public QAbstractTableModel {
 
@@ -99,6 +104,9 @@ signals:
 
 	private slots:
 	void rAssetModified(Asset *pAsset);
+	//WR
+	void rJobQueueFinished();
+	//WR
 
 private:
 	Q_DISABLE_COPY(ImfPackage);
@@ -113,6 +121,11 @@ private:
 	const QDir						mRootDir;
 	bool mIsDirty;
 	bool mIsIngest; // Used for suppressing DirtyChanged signals during ingest.
+	//WR
+	QMessageBox *mpMsgBox;
+	QProgressDialog *mpProgressDialog;
+	JobQueue *mpJobQueue;
+	//WR
 };
 
 
@@ -332,6 +345,8 @@ public:
 	bool HasSourceFiles() const { return !mSourceFiles.empty(); }
 	SoundfieldGroup GetSoundfieldGroup() const { return mMetadata.soundfieldGroup; }
 	EditRate GetEditRate() const { return mMetadata.editRate; }
+	//WR
+	QString GetLanguageTag() const { return mMetadata.languageTag; }
 	Duration GetDuration() const { return mMetadata.duration; }
 	QString GetProfile() const { return mMetadata.profile; }
 	EditRate GetTimedTextFrameRate() const {return mMetadata.infoEditRate;};
@@ -349,11 +364,14 @@ public:
 	void SetSoundfieldGroup(const SoundfieldGroup &rSoundfieldGroup);
 	//! Set the duration for timed Text Asset. Does nothing if finalized.
 	void SetDuration(const Duration &rDuration);
-	//! Set the ACES System Version for ACES Asset. Does nothing if finalized.
 	//WR begin
+	//! Set the Language Tag for Audio and Timed Text Assets.
+	void SetLanguageTag(const QString &rLanguageTag) {mMetadata.languageTag = rLanguageTag;};
 	//This method extracts the essence descriptor from rFilePath and writes it into mEssenceDescriptor
-	void SetEssenceDescriptorSetAny(const QString &filePath);
-	std::string ssystem (const char *command);
+	Error ExtractEssenceDescriptor(const QString &filePath);
+
+	public slots:
+	void SetEssenceDescriptor(const QString& qresult);
 	//WR end
 	private slots :
 	void rTransformationFinished(const QImage &rImage, const QVariant &rIdentifier = QVariant());

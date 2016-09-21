@@ -39,6 +39,9 @@ fileName(),
 filePath(),
 profile(),
 infoEditRate()
+//WR
+,languageTag("")
+//WR
 {
 }
 
@@ -67,6 +70,9 @@ QString Metadata::GetAsString() {
 			if(audioQuantization != 0)										ret.append(QObject::tr("Bit Depth: %1 bit\n").arg(audioQuantization));
 			if(audioChannelCount != 0)										ret.append(QObject::tr("Channels: %1\n").arg(audioChannelCount));
 			ret.append(QObject::tr("Channel Configuration: %1\n").arg(soundfieldGroup.GetName()));
+			//WR
+			if(!languageTag.isEmpty()) ret.append(QObject::tr("Language: %1\n").arg(languageTag));
+			//WR
 			break;
 		case Metadata::TimedText:
 			ret.append(QObject::tr("%1").arg("Timed Text\n"));
@@ -81,6 +87,9 @@ QString Metadata::GetAsString() {
 			else
 				ret.append(QObject::tr("Edit Rate: not set\n"));
 			ret.append(QObject::tr("Profile: %1\n").arg(profile.remove(0, 40)));
+			//WR
+			if(!languageTag.isEmpty()) ret.append(QObject::tr("Language: %1\n").arg(languageTag));
+			//WR
 			break;
 	default:
 			ret = QObject::tr("Unknown\n");
@@ -158,6 +167,9 @@ void Metadata::GetAsTextDocument(QTextDocument &rDoc) {
 		if(audioChannelCount != 0)																				table->cellAt(2, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Channels: %1").arg(audioChannelCount), Qt::ElideRight, column_text_width));
 		else																															table->cellAt(2, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Channels: Unknown"), Qt::ElideRight, column_text_width));
 		table->cellAt(2, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Channel Configuration: %1").arg(soundfieldGroup.GetName()), Qt::ElideRight, column_text_width));
+		//WR
+		if(!languageTag.isEmpty()) table->cellAt(3, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Language: %1").arg(languageTag), Qt::ElideRight, column_text_width));
+		//WR
 	}
 	else if(type == Metadata::TimedText) {
 
@@ -176,5 +188,8 @@ void Metadata::GetAsTextDocument(QTextDocument &rDoc) {
 			table->cellAt(2, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Edit Rate: %1 fps").arg(infoEditRate.GetQuotient()), Qt::ElideRight, column_text_width));
 		else
 			table->cellAt(2, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Edit Rate: not set"), Qt::ElideRight, column_text_width));
+		//WR
+		if(!languageTag.isEmpty()) table->cellAt(3, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Language: %1").arg(languageTag), Qt::ElideRight, column_text_width));
+		//WR
 	}
 }

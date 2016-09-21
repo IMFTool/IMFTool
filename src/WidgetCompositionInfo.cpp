@@ -52,8 +52,12 @@ void WidgetCompositionInfo::InitLayout() {
 	p_content_originator->setPlaceholderText(tr("--The originator of the content underlying the composition--"));
 	mpMapper->addMapping(p_content_originator, CompositionInfoModel::ColumnContentOriginator);
 
-	QComboBox *p_content_kind = new QComboBox(this);
-	p_content_kind->setEditable(true);
+	//WR
+	/*	QComboBox *p_content_kind = new QComboBox(this);
+	p_content_kind->setEditable(true);*/
+	QLineEdit *p_content_kind = new QLineEdit(this);
+	p_content_kind->setDisabled(true);
+	//WR
 	mpMapper->addMapping(p_content_kind, CompositionInfoModel::ColumnContentKind);
 	QLineEdit *p_edit_rate = new QLineEdit(this);
 	p_edit_rate->setDisabled(true);
@@ -105,7 +109,9 @@ Qt::ItemFlags CompositionInfoModel::flags(const QModelIndex &rIndex) const {
 	if(column == ColumnContentTitle
 		 || column == ColumnIssuer
 		 || column == ColumnContentOriginator
-		 || column == ColumnContentKind
+		 //WR
+		 //|| column == ColumnContentKind
+		 //WR
 		 || column == ColumnAnnotation) {
 		return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
 	}
@@ -158,6 +164,13 @@ QVariant CompositionInfoModel::data(const QModelIndex &rIndex, int role /*= Qt::
 				return mpComposition->GetIssuerDate().toString(Qt::SystemLocaleShortDate);
 			}
 		}
+		//WR
+		else if(column == ColumnContentKind) {
+			if(role == Qt::EditRole) {
+				return mpComposition->GetContentKind().first;
+			}
+		}
+		//WR
 	}
 	return QVariant();
 }

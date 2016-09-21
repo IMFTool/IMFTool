@@ -262,6 +262,13 @@ Error MetadataExtractor::ReadPcmMxfDescriptor(Metadata &rMetadata, const QFileIn
 									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_Cs)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelCs);
 									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_HI)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelHI);
 									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_VIN)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelVIN);
+									//WR
+									const unsigned short IdentBufferLen = 128;
+									char identbuf[IdentBufferLen];
+									if (!p_channel_descriptor->RFC5646SpokenLanguage.empty()) {
+										metadata.languageTag = QString(p_channel_descriptor->RFC5646SpokenLanguage.get().EncodeString(identbuf, IdentBufferLen));
+									}
+									//WR
 								}
 							}
 						}
@@ -290,30 +297,38 @@ Error MetadataExtractor::ReadTimedTextMxfDescriptor(Metadata &rMetadata, const Q
 	metadata.filePath = rSourceFile.filePath();
 
 	AS_02::TimedText::MXFReader reader;
-	AS_02::TimedText::TimedTextDescriptor TDesc;
-	//ASDCP::WriterInfo Info;
+	//AS_02::TimedText::TimedTextDescriptor TDesc;
+	//WR: Only ASDCP::MXF::TimedTextDescriptor exposes RFC5646LanguageTagList:
+	ASDCP::MXF::TimedTextDescriptor *tt_descriptor = NULL;
 
 	AS_02::Result_t result = reader.OpenRead(rSourceFile.absoluteFilePath().toStdString());
 	if(ASDCP_SUCCESS(result)) {
-		//result = reader.FillWriterInfo(Info);
-		//if(ASDCP_SUCCESS(result)) {
-		//	metadata.profile = Info.ProductName.data();
-			result = reader.FillTimedTextDescriptor(TDesc);
-				if(ASDCP_SUCCESS(result)) {
-					metadata.infoEditRate = TDesc.EditRate;
-					metadata.editRate = EditRate(1000, 1);
-					metadata.duration = Duration(ceil(TDesc.ContainerDuration*1000./metadata.infoEditRate.GetQuotient()));
-					metadata.profile = QString::fromStdString(TDesc.NamespaceName);
-				}
-				else {
-					error = Error(result);
-					return error;
-				}
-		//}
-		//else {
-		//	error = Error(result);
-		//	return error;
-		//}
+		//WR
+		ASDCP::MXF::InterchangeObject* tmp_obj = NULL;
+
+		result = reader.OP1aHeader().GetMDObjectByType(DefaultCompositeDict().ul(MDD_TimedTextDescriptor), &tmp_obj);
+
+		if(ASDCP_SUCCESS(result)) {
+			tt_descriptor = dynamic_cast<ASDCP::MXF::TimedTextDescriptor*>(tmp_obj);
+			if(tt_descriptor == NULL) {
+				error = Error(Error::UnsupportedEssence);
+				return error;
+			}
+
+			metadata.infoEditRate = tt_descriptor->SampleRate;
+			metadata.editRate = EditRate(1000, 1);
+			metadata.duration = Duration(ceil(tt_descriptor->ContainerDuration*1000./metadata.infoEditRate.GetQuotient()));
+			metadata.profile = QString::fromStdString(tt_descriptor->NamespaceURI);
+			const unsigned short IdentBufferLen = 128;
+			char identbuf[IdentBufferLen];
+			if (!tt_descriptor->RFC5646LanguageTagList.empty()) {
+				metadata.languageTag = QString(tt_descriptor->RFC5646LanguageTagList.get().EncodeString(identbuf, IdentBufferLen));
+			}
+			//WR
+		} else {
+			error = Error(result);
+			return error;
+		}
 	}
 	else {
 		error = Error(result);
@@ -641,18 +656,23 @@ Error MetadataExtractor::ReadTimedTextMetadata(Metadata &rMetadata, const QFileI
 		parser->parse(xmlFile);
 		dom_doc = parser->getDocument();
 
+		DOMNodeList *ttitem = dom_doc->getElementsByTagName(XMLString::transcode("tt"));
+		//Check if <tt> is present
+		if (ttitem->getLength() == 0) {
+			error = (Error::XMLSchemeError);
+			return error;
+		}
+		//write <tt> from DOMNodelist to DOMElement
+		DOMElement* tteleDom = dynamic_cast<DOMElement*>(ttitem->item(0));
+
 		//Profile Extractor
-		DOMNodeList *pritem = dom_doc->getElementsByTagName(XMLString::transcode("tt"));
-		DOMElement* preleDom = dynamic_cast<DOMElement*>(pritem->item(0));
-		QString profile = XMLString::transcode(preleDom->getAttribute(XMLString::transcode("ttp:profile")));
+		QString profile = XMLString::transcode(tteleDom->getAttribute(XMLString::transcode("ttp:profile")));
 		if (profile.isEmpty())
 			profile = "Unknown";
 		metadata.profile = profile;
 
 		//Frame Rate Multiplier Extractor
-		DOMNodeList *multitem = dom_doc->getElementsByTagName(XMLString::transcode("tt"));
-		DOMElement* multeleDom = dynamic_cast<DOMElement*>(multitem->item(0));
-		QString mult = XMLString::transcode(multeleDom->getAttribute(XMLString::transcode("ttp:frameRateMultiplier")));
+		QString mult = XMLString::transcode(tteleDom->getAttribute(XMLString::transcode("ttp:frameRateMultiplier")));
 		float num = 1000;
 		float den = 1000;
 		if (!mult.isEmpty()){
@@ -661,9 +681,7 @@ Error MetadataExtractor::ReadTimedTextMetadata(Metadata &rMetadata, const QFileI
 		}
 
 		//Frame Rate Extractor
-		DOMNodeList *fritem = dom_doc->getElementsByTagName(XMLString::transcode("tt"));
-		DOMElement* freleDom = dynamic_cast<DOMElement*>(fritem->item(0));
-		QString fr = XMLString::transcode(freleDom->getAttribute(XMLString::transcode("ttp:frameRate")));
+		QString fr = XMLString::transcode(tteleDom->getAttribute(XMLString::transcode("ttp:frameRate")));
 		int editrate = 30;					//editrate is for the metadata object (expects editrate*numerator, denominator)
 		float framerate = 30*(num/den);		//framerate is for calculating the duration, we need the fractal editrate!
 		if(!fr.isEmpty()){
@@ -671,12 +689,16 @@ Error MetadataExtractor::ReadTimedTextMetadata(Metadata &rMetadata, const QFileI
 			editrate = fr.toInt();}
 
 		//Tick Rate Extractor
-		DOMNodeList *tritem = dom_doc->getElementsByTagName(XMLString::transcode("tt"));
-		DOMElement* treleDom = dynamic_cast<DOMElement*>(tritem->item(0));
-		QString tr = XMLString::transcode(treleDom->getAttribute(XMLString::transcode("ttp:tickRate")));
+		QString tr = XMLString::transcode(tteleDom->getAttribute(XMLString::transcode("ttp:tickRate")));
 		int tickrate = tr.toInt();
 
 		//Duration Extractor
+		DOMNodeList	*bodyitem = dom_doc->getElementsByTagName(XMLString::transcode("body"));
+		//Check if <body> is present
+		if (bodyitem->getLength() == 0) {
+			error = (Error::XMLSchemeError);
+			return error;
+		}
 		float duration;
 		duration = DurationExtractor(dom_doc,framerate,tickrate);
 

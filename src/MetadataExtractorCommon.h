@@ -66,6 +66,9 @@ public:
 	QString									fileType;
 	EditRate								infoEditRate; //TT Edit Rate is based od milliseconds in this application. infoEdirRate is used for the real ER of the tt
 	QString									profile;	//Timed Text Profile
+	//WR
+	QString									languageTag;
+	//WR
 };
 
 

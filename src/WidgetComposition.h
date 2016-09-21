@@ -57,6 +57,9 @@ public:
 	UserText GetContentOriginator() const { return (mData.getContentOriginator().present() ? ImfXmlHelper::Convert(mData.getContentOriginator().get()) : UserText()); }
 	//UserText GetContentVersionTag() const { return (mData.getContentVersionList().present() ? ImfXmlHelper::Convert(mData.getContentVersionList().get()) : UserText()); }
 	UserText GetAnnotation() const { return (mData.getAnnotation().present() ? ImfXmlHelper::Convert(mData.getAnnotation().get()) : UserText()); }
+	//WR
+	UserText GetContentKind() const { return (mData.getContentKind().present() ? ImfXmlHelper::Convert(mData.getContentKind().get()) : UserText()); }
+	//WR
 	QDateTime GetIssuerDate() const { return ImfXmlHelper::Convert(mData.getIssueDate()); }
 	EditRate GetEditRate() const { return ImfXmlHelper::Convert(mData.getEditRate()); }
 

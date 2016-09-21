@@ -128,7 +128,23 @@ void WizardResourceGeneratorPage::InitLayout() {
 	mpTableViewWav->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	mpTableViewWav->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	mpTableViewWav->setItemDelegateForColumn(SoundFieldGroupModel::ColumnDstChannel, new DelegateComboBox(this, false, false));
-
+	//WR
+	//language code is two or three samll letters, region code is either two capital letters or three digits"
+	QRegExp rx_lang("[a-z]{2,3}\-([A-Z]{2}|[0-9]{3})");
+	QRegExpValidator *v_lang = new QRegExpValidator(rx_lang, this);
+	mpLineEditLanguageTagWav = new QLineEdit(this);
+	mpLineEditLanguageTagWav->setAlignment(Qt::AlignRight);
+	mpLineEditLanguageTagWav->setPlaceholderText("en-US");
+	mpLineEditLanguageTagWav->setValidator(v_lang);
+	connect(mpLineEditLanguageTagWav, SIGNAL(LanguageTagWavChanged(QString)), this, SLOT(SetLanguageTagWav()));
+	QRegExp rx_lang2("[a-z]{2,3}\-([A-Z]{2}|[0-9]{3})");
+	QRegExpValidator *v_lang2 = new QRegExpValidator(rx_lang2, this);
+	mpLineEditLanguageTagTT = new QLineEdit(this);
+	mpLineEditLanguageTagTT->setAlignment(Qt::AlignRight);
+	mpLineEditLanguageTagTT->setPlaceholderText("en-US");
+	mpLineEditLanguageTagTT->setValidator(v_lang2);
+	connect(mpLineEditLanguageTagTT, SIGNAL(LanguageTagTTChanged(QString)), this, SLOT(SetLanguageTagTT()));
+	//WR
 
 			/* -----Denis Manthey----- */
 
@@ -192,7 +208,9 @@ void WizardResourceGeneratorPage::InitLayout() {
 	p_wrapper_layout_two->setContentsMargins(0, 0, 0, 0);
 	p_wrapper_layout_two->addWidget(new QLabel(tr("Soundfield group:"), this), 0, 0, 1, 1);
 	p_wrapper_layout_two->addWidget(mpComboBoxSoundfieldGroup, 0, 1, 1, 1);
-	p_wrapper_layout_two->addWidget(mpTableViewWav, 1, 0, 1, 2);
+	p_wrapper_layout_two->addWidget(new QLabel(tr("RFC 5646 Language Tag (e.g. en-US):"), this), 1, 0, 1, 1);
+	p_wrapper_layout_two->addWidget(mpLineEditLanguageTagWav, 1, 1, 1, 1);
+	p_wrapper_layout_two->addWidget(mpTableViewWav, 2, 0, 1, 2);
 	p_wrapper_widget_two->setLayout(p_wrapper_layout_two);
 
 
@@ -203,8 +221,10 @@ void WizardResourceGeneratorPage::InitLayout() {
 	QGridLayout *vbox = new QGridLayout;
 	p_wrapper_layout_three->setContentsMargins(0, 0, 0, 0);
 	p_wrapper_layout_three->addWidget(new QLabel(tr("Select a Timed Text Resource (.ttml) compliant to IMSC1"), this), 0, 0, 1, 3);
-	p_wrapper_layout_three->addWidget(mpTableViewTimedText, 1, 0, 1, 3);
-	p_wrapper_layout_three->addWidget(pGenNew, 2, 0, 1, 3);
+	p_wrapper_layout_three->addWidget(new QLabel(tr("RFC 5646 Language Tag (e.g. en-US):"), this), 1, 0, 1, 2);
+	p_wrapper_layout_three->addWidget(mpLineEditLanguageTagTT, 1, 2, 1, 1);
+	p_wrapper_layout_three->addWidget(mpTableViewTimedText, 2, 0, 1, 3);
+	p_wrapper_layout_three->addWidget(pGenNew, 3, 0, 1, 3);
 
 	vbox->addWidget(new QLabel(tr("Set the file name of the empty tt resource:"), this), 1, 0, 1, 1);
 	vbox->addWidget(mpLineEditFileName, 1, 1, 1, 1);
@@ -218,7 +238,7 @@ void WizardResourceGeneratorPage::InitLayout() {
 	mpGroupBox->setLayout(vbox);
 	mpGroupBox->hide();
 
-	p_wrapper_layout_three->addWidget(mpGroupBox, 3, 0, 1, 3);
+	p_wrapper_layout_three->addWidget(mpGroupBox, 4, 0, 1, 3);
 	p_wrapper_widget_three->setLayout(p_wrapper_layout_three);
 
 
@@ -235,6 +255,10 @@ void WizardResourceGeneratorPage::InitLayout() {
 	registerField(FIELD_NAME_SOUNDFIELD_GROUP, this, "SoundfieldGroupSelected", SIGNAL(SoundfieldGroupChanged()));
 	registerField(FIELD_NAME_EDIT_RATE, this, "EditRateSelected", SIGNAL(EditRateChanged()));
 	registerField(FIELD_NAME_DURATION, this, "DurationSelected", SIGNAL(DurationChanged()));
+	//WR
+	registerField(FIELD_NAME_LANGUAGETAG_WAV, this, "LanguageTagWavSelected", SIGNAL(LanguageTagWavChanged()));
+	registerField(FIELD_NAME_LANGUAGETAG_TT, this, "LanguageTagTTSelected", SIGNAL(LanguageTagTTChanged()));
+	//WR
 
 	connect(mpFileDialog, SIGNAL(filesSelected(const QStringList &)), this, SLOT(SetSourceFiles(const QStringList &)));
 	connect(mpComboBoxSoundfieldGroup, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(ChangeSoundfieldGroup(const QString&)));
@@ -486,6 +510,20 @@ void WizardResourceGeneratorPage::SetDuration(const Duration &rDuration) {
 	emit completeChanged();
 }
 
+//WR
+void WizardResourceGeneratorPage::SetLanguageTagWav(const QString &rLanguageTag) {
+	mpLineEditLanguageTagWav->setText(rLanguageTag);
+	emit LanguageTagWavChanged();
+	emit completeChanged();
+}
+
+void WizardResourceGeneratorPage::SetLanguageTagTT(const QString &rLanguageTag) {
+	mpLineEditLanguageTagTT->setText(rLanguageTag);
+	emit LanguageTagTTChanged();
+	emit completeChanged();
+}
+//WR
+
 
 EditRate WizardResourceGeneratorPage::GetEditRate() const {
 
@@ -496,6 +534,18 @@ Duration WizardResourceGeneratorPage::GetDuration() const {
 
 	return Duration(mpLineEditDuration->text().toInt()*1000);
 }
+
+//WR
+QString WizardResourceGeneratorPage::GetLanguageTagWav() const {
+
+	return mpLineEditLanguageTagWav->text();
+}
+
+QString WizardResourceGeneratorPage::GetLanguageTagTT() const {
+
+	return mpLineEditLanguageTagTT->text();
+}
+//WR
 
 
 bool WizardResourceGeneratorPage::isComplete() const {

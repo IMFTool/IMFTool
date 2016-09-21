@@ -66,7 +66,7 @@ class JobWrapWav : public AbstractJob {
 	Q_OBJECT
 
 public:
-	JobWrapWav(const QStringList &rSourceFiles, const QString &rOutputFile, const SoundfieldGroup &rSoundFieldGroup, const QUuid &rAssetId);
+	JobWrapWav(const QStringList &rSourceFiles, const QString &rOutputFile, const SoundfieldGroup &rSoundFieldGroup, const QUuid &rAssetId, const QString &rLanguageTag);
 	virtual ~JobWrapWav() {}
 
 protected:
@@ -78,6 +78,9 @@ private:
 	const QString mOutputFile;
 	const QStringList mSourceFiles;
 	const SoundfieldGroup	mSoundFieldGoup;
+	//WR
+	const QString mLanguageTag;
+	//WR
 	Info mWriterInfo;
 };
 
@@ -91,7 +94,7 @@ class JobWrapTimedText : public AbstractJob {
 	Q_OBJECT
 
 public:
-	JobWrapTimedText(const QStringList &rSourceFiles, const QString &rOutputFile, const EditRate &rEditRate, const Duration &rDuration, const QUuid &rAssetId, const QString &rProfile, const EditRate &rFrameRate);
+	JobWrapTimedText(const QStringList &rSourceFiles, const QString &rOutputFile, const EditRate &rEditRate, const Duration &rDuration, const QUuid &rAssetId, const QString &rProfile, const EditRate &rFrameRate, const QString &rLanguageTag);
 	virtual ~JobWrapTimedText() {}
 
 protected:
@@ -108,5 +111,28 @@ private:
 	const EditRate mFrameRate; //Based on real Framerate
 
 	Info mWriterInfo;
+	//WR
+	const QString mLanguageTag;
+	//WR
 };
 
+class JobExtractEssenceDescriptor : public AbstractJob {
+
+	Q_OBJECT
+
+public:
+	JobExtractEssenceDescriptor(const QString &rSourceFile);
+	virtual ~JobExtractEssenceDescriptor() {}
+
+signals:
+	void Result(const QString &qresult, const QVariant &rIdentifier = QVariant());
+
+protected:
+	virtual Error Execute();
+
+private:
+	Q_DISABLE_COPY(JobExtractEssenceDescriptor);
+
+	const QString mSourceFile;
+
+};
