@@ -4,6 +4,7 @@ A tool for editing IMF CPLs and creating new versions of an existing IMF package
 ##What is IMF Tool
 IMF Tool supports browsing and limited editing of IMF [1] packages (IMPs).
 In particular, it supports the addition and deletion of audio tracks and subtitle tracks (versioning).
+An introductory video is available on YouTube [2].
 
 ##Workflows supported:
 -	Open an IMP, visualize the timeline of the CPL(s) included in the IMP
@@ -15,7 +16,7 @@ In particular, it supports the addition and deletion of audio tracks and subtitl
 -	Export the IMP
 
 ##Workflows supported soon (under development):
--	Export of the modifications as Partial (aka Supplemental) IMP
+-	Export of the modifications as Partial (aka Supplemental) IMP - expected by mid October
 -	Editing of the ContentVersionList element, including custom LabelText entries
 -	Audio Inserts
 
@@ -35,7 +36,7 @@ Please click on the installer image you would like to download and select "Downl
 Please carefully read dist-binaries/README.binaries.
 
 ##Runtime Requirements
-For creating essence descriptors, IMF Tool uses regxmllib [2] and requires Oracle JDK 1.8 to be installed, and java/java.exe being available in the executable search path. (In particular under Mac OS X, the JRE is not sufficient - you'll have to install the JDK !)
+For creating essence descriptors, IMF Tool uses regxmllib [3] and requires Oracle JDK 1.8 to be installed, and java/java.exe being available in the executable search path. (In particular under Mac OS X, the JRE is not sufficient - you'll have to install the JDK !)
 
 ##Building
 IMF Tool is multi-platform and been susccesfully tested to build under Mac OS X 10.10 and 10.11, Windows 7 and Linux 64 bit.
@@ -60,7 +61,9 @@ ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
 
 [1] IMF: Interoperable Master Format. For an introduction see here:
 http://techblog.netflix.com/2016/03/imf-prescription-for-versionitis.html
-[2] regxmllib: https://github.com/sandflow/regxmllib
 
+[2] IMF-Tool introductory video: https://www.youtube.com/watch?v=Zi3p8oElPM8
+
+[3] regxmllib: https://github.com/sandflow/regxmllib
 
 
