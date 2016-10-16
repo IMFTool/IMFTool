@@ -66,7 +66,7 @@ class JobWrapWav : public AbstractJob {
 	Q_OBJECT
 
 public:
-	JobWrapWav(const QStringList &rSourceFiles, const QString &rOutputFile, const SoundfieldGroup &rSoundFieldGroup, const QUuid &rAssetId, const QString &rLanguageTag);
+	JobWrapWav(const QStringList &rSourceFiles, const QString &rOutputFile, const SoundfieldGroup &rSoundFieldGroup, const QUuid &rAssetId, const QString &rLanguageTag, const QString &rMCATitle, const QString &rMCATitleVersion, const QString &rMCAAudioContentKind, const QString &rMCAAudioElementKind);
 	virtual ~JobWrapWav() {}
 
 protected:
@@ -80,6 +80,10 @@ private:
 	const SoundfieldGroup	mSoundFieldGoup;
 	//WR
 	const QString mLanguageTag;
+	const QString mMCATitle;
+	const QString mMCATitleVersion;
+	const QString mMCAAudioContentKind;
+	const QString mMCAAudioElementKind;
 	//WR
 	Info mWriterInfo;
 };

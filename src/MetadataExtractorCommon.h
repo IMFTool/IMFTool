@@ -68,6 +68,10 @@ public:
 	QString									profile;	//Timed Text Profile
 	//WR
 	QString									languageTag;
+	QString									mcaTitle;
+	QString									mcaTitleVersion;
+	QString									mcaAudioContentKind;
+	QString									mcaAudioElementKind;
 	//WR
 };
 

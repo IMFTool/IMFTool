@@ -71,8 +71,8 @@ Error JobCalculateHash::Execute() {
 	return error;
 }
 
-JobWrapWav::JobWrapWav(const QStringList &rSourceFiles, const QString &rOutputFile, const SoundfieldGroup &rSoundFieldGroup, const QUuid &rAssetId, const QString &rLanguageTag) :
-AbstractJob(tr("Wrapping %1").arg(QFileInfo(rOutputFile).fileName())), mOutputFile(rOutputFile), mSourceFiles(rSourceFiles), mSoundFieldGoup(rSoundFieldGroup), mLanguageTag(rLanguageTag), mWriterInfo() {
+JobWrapWav::JobWrapWav(const QStringList &rSourceFiles, const QString &rOutputFile, const SoundfieldGroup &rSoundFieldGroup, const QUuid &rAssetId, const QString &rLanguageTag, const QString &rMCATitle, const QString &rMCATitleVersion, const QString &rMCAAudioContentKind, const QString &rMCAAudioElementKind) :
+AbstractJob(tr("Wrapping %1").arg(QFileInfo(rOutputFile).fileName())), mOutputFile(rOutputFile), mSourceFiles(rSourceFiles), mSoundFieldGoup(rSoundFieldGroup), mLanguageTag(rLanguageTag), mMCATitle(rMCATitle), mMCATitleVersion(rMCATitleVersion), mMCAAudioContentKind(rMCAAudioContentKind), mMCAAudioElementKind(rMCAAudioElementKind), mWriterInfo() {
 
 	convert_uuid(rAssetId, (unsigned char*)mWriterInfo.AssetUUID);
 }
@@ -132,7 +132,21 @@ Error JobWrapWav::Execute() {
 						error = Error(Error::ChannelCountMismatch);
 						return error;
 					}
-					// this is the d-cinema MCA label, what is the one for IMF?
+					ASDCP::MXF::InterchangeObject_list_t::iterator i;
+					for ( i = mca_config.begin(); i != mca_config.end(); ++i ) {
+					  if ( (*i)->GetUL() == UL(dict->ul(MDD_SoundfieldGroupLabelSubDescriptor))) {
+						  ASDCP::MXF::SoundfieldGroupLabelSubDescriptor *current_soundfield;
+						  current_soundfield = reinterpret_cast<ASDCP::MXF::SoundfieldGroupLabelSubDescriptor*>(*i);
+						  if (current_soundfield) {
+							  // Set SoundfieldGroupLabelSubDescriptor items which are mandatory per ST 2067-2
+							  if (mMCATitle != "") current_soundfield->MCATitle = mMCATitle.toStdString();
+							  if (mMCATitleVersion != "") current_soundfield->MCATitleVersion = mMCATitleVersion.toStdString();
+							  if (mMCAAudioContentKind != "") current_soundfield->MCAAudioContentKind = mMCAAudioContentKind.toStdString();
+							  if (mMCAAudioElementKind != "") current_soundfield->MCAAudioElementKind = mMCAAudioElementKind.toStdString();
+							  //current_soundfield->Dump();
+						  }
+					  }
+					}
 					essence_descriptor->ChannelAssignment = dict->ul(MDD_IMFAudioChannelCfg_MCA);
 				}
 			}

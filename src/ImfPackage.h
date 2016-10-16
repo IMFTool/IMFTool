@@ -303,10 +303,13 @@ public:
 	virtual ~AssetCpl() {}
 	bool GetIsNewOrModified() {return mIsNewOrModified;}
 	void SetIsNewOrModified(bool rIsNewOrModified) { mIsNewOrModified = rIsNewOrModified;}
+	bool GetIsNew() {return mIsNew;}
+	void SetIsNew(bool rIsNew) { mIsNew = rIsNew;}
 
 private:
 	Q_DISABLE_COPY(AssetCpl);
 	bool mIsNewOrModified;
+	bool mIsNew;
 };
 
 
@@ -347,6 +350,10 @@ public:
 	EditRate GetEditRate() const { return mMetadata.editRate; }
 	//WR
 	QString GetLanguageTag() const { return mMetadata.languageTag; }
+	QString GetMCATitle() const { return mMetadata.mcaTitle; }
+	QString GetMCATitleVersion() const { return mMetadata.mcaTitleVersion; }
+	QString GetMCAAudioContentKind() const { return mMetadata.mcaAudioContentKind; }
+	QString GetMCAAudioElementKind() const { return mMetadata.mcaAudioElementKind; }
 	Duration GetDuration() const { return mMetadata.duration; }
 	QString GetProfile() const { return mMetadata.profile; }
 	EditRate GetTimedTextFrameRate() const {return mMetadata.infoEditRate;};
@@ -367,12 +374,20 @@ public:
 	//WR begin
 	//! Set the Language Tag for Audio and Timed Text Assets.
 	void SetLanguageTag(const QString &rLanguageTag) {mMetadata.languageTag = rLanguageTag;};
+	// Set MCA metadata (mandatory per ST 2067-2)
+	void SetMCATitle(const QString &rText) {mMetadata.mcaTitle = rText;};
+	void SetMCATitleVersion(const QString &rText) {mMetadata.mcaTitleVersion = rText;};
+	void SetMCAAudioContentKind(const QString &rText) {mMetadata.mcaAudioContentKind = rText;};
+	void SetMCAAudioElementKind(const QString &rText) {mMetadata.mcaAudioElementKind = rText;};
 	//This method extracts the essence descriptor from rFilePath and writes it into mEssenceDescriptor
 	Error ExtractEssenceDescriptor(const QString &filePath);
+	bool GetIsNew() {return mIsNew;}
+	void SetIsNew(bool rIsNew) { mIsNew = rIsNew;}
 
 	public slots:
 	void SetEssenceDescriptor(const QString& qresult);
 	//WR end
+
 	private slots :
 	void rTransformationFinished(const QImage &rImage, const QVariant &rIdentifier = QVariant());
 
@@ -388,5 +403,6 @@ private:
 	//These are member variables for the corresponding CPL elements
 	cpl::EssenceDescriptorBaseType* mEssenceDescriptor;
 	QUuid mSourceEncoding;
+	bool mIsNew;
 //WR end
 };

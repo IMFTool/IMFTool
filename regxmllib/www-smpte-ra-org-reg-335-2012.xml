@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--Created: Thu Sep 17 15:28:37 CEST 2015--><!--By: regxmllib build c989a02ac80facc24e018a54c4010dd8c2d27451--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
+<!--Created: Fri Oct 07 09:05:40 PDT 2016--><!--By: regxmllib build c989a02ac80facc24e018a54c4010dd8c2d27451--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
 <SchemeID>urn:uuid:e9ad45b5-abdb-5f16-7ffc-ff560e475a87</SchemeID>
 <SchemeURI>http://www.smpte-ra.org/reg/335/2012</SchemeURI>
 <MetaDefinitions>
@@ -48,28 +48,6 @@
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.01010000</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
-<Identification>urn:smpte:ul:060e2b34.0101010d.04200202.02000000</Identification>
-<Symbol>FocusPositionFromImagePlane</Symbol>
-<Description>Distance in meters between the image plane and the object in focus</Description>
-<Name>Focus Position From Image Plane</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01020400.00000000</Type>
-<IsOptional>true</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>32769</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.01010000</MemberOf>
-</PropertyDefinition>
-<PropertyDefinition>
-<Identification>urn:smpte:ul:060e2b34.0101010d.04200202.03000000</Identification>
-<Symbol>FocusPositionFromFrontLensVertex</Symbol>
-<Description>Distance in meters between the front of the lens and the object in focus</Description>
-<Name>Focus Position From Front Lens Vertex</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01020400.00000000</Type>
-<IsOptional>true</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>32770</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.01010000</MemberOf>
-</PropertyDefinition>
-<PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010e.04200202.0a000000</Identification>
 <Symbol>FocusRingPosition</Symbol>
 <Description>Focus ring rotation angle in unsigned integer. 0 is for near-end, FFFFh for infinity</Description>
@@ -89,28 +67,6 @@
 <IsOptional>true</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>32771</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.01010000</MemberOf>
-</PropertyDefinition>
-<PropertyDefinition>
-<Identification>urn:smpte:ul:060e2b34.0101010d.04200202.05000000</Identification>
-<Symbol>LensZoom35mmStillCameraEquivalent</Symbol>
-<Description>Focal length in meters.</Description>
-<Name>Lens Zoom 35mm Still Camera Equivalent</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01020400.00000000</Type>
-<IsOptional>true</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>32772</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.01010000</MemberOf>
-</PropertyDefinition>
-<PropertyDefinition>
-<Identification>urn:smpte:ul:060e2b34.0101010d.04200202.06000000</Identification>
-<Symbol>LensZoomActualFocalLength</Symbol>
-<Description>Focal length in meters.</Description>
-<Name>Lens Zoom Actual Focal Length</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01020400.00000000</Type>
-<IsOptional>true</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>32773</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.01010000</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
@@ -409,17 +365,6 @@
 <IsOptional>true</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>33046</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
-</PropertyDefinition>
-<PropertyDefinition>
-<Identification>urn:smpte:ul:060e2b34.0101010e.04200103.02080000</Identification>
-<Symbol>ASCCDLV12</Symbol>
-<Description>10 parameters of ASC Color Decision List V1.2.</Description>
-<Name>ASC CDL V1.2</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.04011300.00000000</Type>
-<IsOptional>true</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>33047</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
@@ -2125,6 +2070,56 @@
 <Description>Specifies the alternate aspect ratio subset(s) of the active area, containing all of the critical action and centered on the active area.</Description>
 <Name>Alternative Center Cuts</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.04030100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01012700</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04200401.01010000</Identification>
+<Symbol>MasteringDisplayPrimaries</Symbol>
+<Description>Display Primaries metadata as specified in ST 2086</Description>
+<Name>Mastering Display Primaries</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04020a00.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01012700</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04200401.01020000</Identification>
+<Symbol>MasteringDisplayWhitePointChromaticity</Symbol>
+<Description>
+Chromaticity of White Point metadata as specified in ST 2086
+</Description>
+<Name>Mastering Display White Point Chromaticity</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010c00.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01012700</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04200401.01030000</Identification>
+<Symbol>MasteringDisplayMaximumLuminance</Symbol>
+<Description>
+Maximum Display Mastering Luminance metadata as specified in ST 2086
+</Description>
+<Name>Mastering Display Maximum Luminance</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01012700</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04200401.01040000</Identification>
+<Symbol>MasteringDisplayMinimumLuminance</Symbol>
+<Description>
+Minimum Display Mastering Luminance metadata as specified in ST 2086
+</Description>
+<Name>Mastering Display Minimum Luminance</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
 <IsOptional>true</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>0</LocalIdentification>
@@ -4480,6 +4475,17 @@
 <Name>Namespace URI</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
 <IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01016400</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.03010102.02160000</Identification>
+<Symbol>RFC5646LanguageTagList</Symbol>
+<Description>Identifies one or more languages as a comma-separated list of RFC 5646 language tags.</Description>
+<Name>RFC 5646 Language Tag List</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>true</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01016400</MemberOf>
@@ -7793,6 +7799,94 @@
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.02020000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010d.06010104.05410100</Identification>
+<Symbol>TextBasedObject</Symbol>
+<Description>Instance UID of the instance of a Text-based Object. This may be a Generic Stream Text-based Set, a UTF-8 Text-based Set or a UTF-16 Text-based Set.</Description>
+<Name>Text-Based Object</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.05022a00.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.04010100</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010d.01030408.00000000</Identification>
+<Symbol>GenericStreamID</Symbol>
+<Description>Stream ID of the linked Generic Stream payload</Description>
+<Name>Generic Stream ID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.04020100</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010d.03010220.03010000</Identification>
+<Symbol>UTF8TextData</Symbol>
+<Description>UTF-8 Text Data</Description>
+<Name>UTF-8 Text Data</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100600.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.04020200</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010d.03010220.03020000</Identification>
+<Symbol>UTF16TextData</Symbol>
+<Description>UTF-16 Text Data</Description>
+<Name>UTF-16 Text Data</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.04020300</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010d.04060806.00000000</Identification>
+<Symbol>TextBasedMetadataPayloadSchemeID</Symbol>
+<Description>Unique identifier for text-based payload scheme.</Description>
+<Name>Text-Based Metadata Payload Scheme Identifier</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01030100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.04030100</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010d.04090202.00000000</Identification>
+<Symbol>TextMIMEMediaType</Symbol>
+<Description>Specifies the MIME media type as defined by IETF.</Description>
+<Name>Text MIME Media Type</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.04030100</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010d.03010102.02140000</Identification>
+<Symbol>RFC5646TextLanguageCode</Symbol>
+<Description>Identifies the language of the written content as an RFC 5646 code.</Description>
+<Name>RFC 5646 Text Language Code</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.04030100</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010d.03020106.03020000</Identification>
+<Symbol>TextDataDescription</Symbol>
+<Description>A freeform text description.</Description>
+<Name>Text Data Description</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.04030100</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010e.01011514.00000000</Identification>

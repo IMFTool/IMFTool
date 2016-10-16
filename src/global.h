@@ -72,9 +72,21 @@
 #define FIELD_NAME_DURATION "Duration"
 #define FIELD_NAME_SOUNDFIELD_GROUP "SoundfiledGourpName"
 #define FIELD_NAME_WORKING_DIR "WorkingDir"
+
+
+			/* -----Denis Manthey Beg----- */
+#define FIELD_NAME_PARTIAL_DIR "PartialDir"
+#define FIELD_NAME_PARTIAL_NAME "PartialName"
+#define FIELD_NAME_PARTIAL_ISSUER "PartialIssuer"
+#define FIELD_NAME_PARTIAL_ANNOTATION "PartialAnnotation"
+			/* -----Denis Manthey End----- */
 //WR
 #define FIELD_NAME_LANGUAGETAG_WAV "LanguageTagWav"
 #define FIELD_NAME_LANGUAGETAG_TT "LanguageTagTT"
+#define FIELD_NAME_MCA_TITLE "MCATitle"
+#define FIELD_NAME_MCA_TITLE_VERSION "MCATitleVersion"
+#define FIELD_NAME_MCA_AUDIO_CONTENT_KIND "MCAAudioContentKind"
+#define FIELD_NAME_MCA_AUDIO_ELEMENT_KIND "MCAAudioElementKind"
 //WR
 
 enum eUserEventType {
@@ -171,13 +183,6 @@ inline bool is_wav_file(const QString &rFilePath) {
 }
 
 
-inline bool is_exr_file(const QString &rFilePath) {
-
-	if(QFileInfo(rFilePath).suffix().compare("exr", Qt::CaseInsensitive) == 0) return true;
-	return false;
-}
-
-
 inline bool is_ttml_file(const QString &rFilePath) {
 
 	if(QFileInfo(rFilePath).suffix().compare("ttml", Qt::CaseInsensitive) == 0 || QFileInfo(rFilePath).suffix().compare("xml", Qt::CaseInsensitive) == 0) return true;
@@ -195,13 +200,6 @@ inline bool is_mxf_file(const QString &rFilePath) {
 inline bool is_wav_file(const QFileInfo &rFilePath) {
 
 	if(rFilePath.suffix().compare("wav", Qt::CaseInsensitive) == 0) return true;
-	return false;
-}
-
-
-inline bool is_exr_file(const QFileInfo &rFilePath) {
-
-	if(rFilePath.suffix().compare("exr", Qt::CaseInsensitive) == 0) return true;
 	return false;
 }
 
@@ -274,8 +272,7 @@ public:
 private:
 	Q_DISABLE_COPY(IconProviderExrWav);
 	virtual QIcon icon(const QFileInfo &info) const {
-		if(info.suffix() == "exr") return QIcon(":/film.png");
-		else if(info.suffix() == "wav") return QIcon(":/sound.png");
+		if(info.suffix() == "wav") return QIcon(":/sound.png");
 		else if(info.suffix() == "ttml" || info.suffix() == "xml") return QIcon(":/text.png");
 		return QFileIconProvider::icon(info);
 	}

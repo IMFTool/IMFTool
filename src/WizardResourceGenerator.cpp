@@ -53,7 +53,7 @@ QWizard(pParent) {
 
 QSize WizardResourceGenerator::sizeHint() const {
 
-	return QSize(600, 500);
+	return QSize(600, 600);
 }
 
 void WizardResourceGenerator::InitLayout() {
@@ -136,14 +136,36 @@ void WizardResourceGeneratorPage::InitLayout() {
 	mpLineEditLanguageTagWav->setAlignment(Qt::AlignRight);
 	mpLineEditLanguageTagWav->setPlaceholderText("en-US");
 	mpLineEditLanguageTagWav->setValidator(v_lang);
-	connect(mpLineEditLanguageTagWav, SIGNAL(LanguageTagWavChanged(QString)), this, SLOT(SetLanguageTagWav()));
+	connect(mpLineEditLanguageTagWav, SIGNAL(textEdited(QString)), this, SLOT(languageTagWavChanged()));
 	QRegExp rx_lang2("[a-z]{2,3}\-([A-Z]{2}|[0-9]{3})");
 	QRegExpValidator *v_lang2 = new QRegExpValidator(rx_lang2, this);
 	mpLineEditLanguageTagTT = new QLineEdit(this);
 	mpLineEditLanguageTagTT->setAlignment(Qt::AlignRight);
 	mpLineEditLanguageTagTT->setPlaceholderText("en-US");
 	mpLineEditLanguageTagTT->setValidator(v_lang2);
-	connect(mpLineEditLanguageTagTT, SIGNAL(LanguageTagTTChanged(QString)), this, SLOT(SetLanguageTagTT()));
+	connect(mpLineEditLanguageTagTT, SIGNAL(textEdited(QString)), this, SLOT(languageTagTTChanged()));
+	QRegExp mca_items("[0-9a-zA-Z_]{1,15}");
+	QRegExpValidator *v_mca_items = new QRegExpValidator(mca_items, this);
+	mpLineEditMCATitle = new QLineEdit(this);
+	mpLineEditMCATitle->setAlignment(Qt::AlignRight);
+	mpLineEditMCATitle->setText("Default Title");
+	mpLineEditMCATitle->setValidator(v_mca_items);
+	connect(mpLineEditMCATitle, SIGNAL(textEdited(QString)), this, SLOT(mcaTitleChanged()));
+	mpLineEditMCATitleVersion = new QLineEdit(this);
+	mpLineEditMCATitleVersion->setAlignment(Qt::AlignRight);
+	mpLineEditMCATitleVersion->setText("Domestic");
+	mpLineEditMCATitleVersion->setValidator(v_mca_items);
+	connect(mpLineEditMCATitleVersion, SIGNAL(textEdited(QString)), this, SLOT(mcaTitleVersionChanged()));
+	mpLineEditMCAAudioContentKind = new QLineEdit(this);
+	mpLineEditMCAAudioContentKind->setAlignment(Qt::AlignRight);
+	mpLineEditMCAAudioContentKind->setText("Feature");
+	mpLineEditMCAAudioContentKind->setValidator(v_mca_items);
+	connect(mpLineEditMCAAudioContentKind, SIGNAL(textEdited(QString)), this, SLOT(mcaAudioContentKindChanged()));
+	mpLineEditMCAAudioElementKind = new QLineEdit(this);
+	mpLineEditMCAAudioElementKind->setAlignment(Qt::AlignRight);
+	mpLineEditMCAAudioElementKind->setText("Composite Mix");
+	mpLineEditMCAAudioElementKind->setValidator(v_mca_items);
+	connect(mpLineEditMCAAudioElementKind, SIGNAL(textEdited(QString)), this, SLOT(mcaAudioElementKindChanged()));
 	//WR
 
 			/* -----Denis Manthey----- */
@@ -210,7 +232,15 @@ void WizardResourceGeneratorPage::InitLayout() {
 	p_wrapper_layout_two->addWidget(mpComboBoxSoundfieldGroup, 0, 1, 1, 1);
 	p_wrapper_layout_two->addWidget(new QLabel(tr("RFC 5646 Language Tag (e.g. en-US):"), this), 1, 0, 1, 1);
 	p_wrapper_layout_two->addWidget(mpLineEditLanguageTagWav, 1, 1, 1, 1);
-	p_wrapper_layout_two->addWidget(mpTableViewWav, 2, 0, 1, 2);
+	p_wrapper_layout_two->addWidget(new QLabel(tr("MCA Title:"), this), 2, 0, 1, 1);
+	p_wrapper_layout_two->addWidget(mpLineEditMCATitle, 2, 1, 1, 1);
+	p_wrapper_layout_two->addWidget(new QLabel(tr("MCA Title Version:"), this), 3, 0, 1, 1);
+	p_wrapper_layout_two->addWidget(mpLineEditMCATitleVersion, 3, 1, 1, 1);
+	p_wrapper_layout_two->addWidget(new QLabel(tr("MCA Audio Content Kind:"), this), 4, 0, 1, 1);
+	p_wrapper_layout_two->addWidget(mpLineEditMCAAudioContentKind, 4, 1, 1, 1);
+	p_wrapper_layout_two->addWidget(new QLabel(tr("MCA Audio Element Kind:"), this), 5, 0, 1, 1);
+	p_wrapper_layout_two->addWidget(mpLineEditMCAAudioElementKind, 5, 1, 1, 1);
+	p_wrapper_layout_two->addWidget(mpTableViewWav, 6, 0, 1, 2);
 	p_wrapper_widget_two->setLayout(p_wrapper_layout_two);
 
 
@@ -258,6 +288,10 @@ void WizardResourceGeneratorPage::InitLayout() {
 	//WR
 	registerField(FIELD_NAME_LANGUAGETAG_WAV, this, "LanguageTagWavSelected", SIGNAL(LanguageTagWavChanged()));
 	registerField(FIELD_NAME_LANGUAGETAG_TT, this, "LanguageTagTTSelected", SIGNAL(LanguageTagTTChanged()));
+	registerField(FIELD_NAME_MCA_TITLE, this, "MCATitleSelected", SIGNAL(MCATitleChanged()));
+	registerField(FIELD_NAME_MCA_TITLE_VERSION, this, "MCATitleVersionSelected", SIGNAL(MCATitleVersionChanged()));
+	registerField(FIELD_NAME_MCA_AUDIO_CONTENT_KIND, this, "MCAAudioContentKindSelected", SIGNAL(MCAAudioContentKindChanged()));
+	registerField(FIELD_NAME_MCA_AUDIO_ELEMENT_KIND, this, "MCAAudioElementKindSelected", SIGNAL(MCAAudioElementKindChanged()));
 	//WR
 
 	connect(mpFileDialog, SIGNAL(filesSelected(const QStringList &)), this, SLOT(SetSourceFiles(const QStringList &)));
@@ -274,6 +308,24 @@ void WizardResourceGeneratorPage::textChanged()
 	else
 		mpGenerateEmpty_button->setEnabled(false);
 }
+//WR
+void WizardResourceGeneratorPage::languageTagWavChanged()
+{
+	QRegExp rx_lang("[a-z]{2,3}\-([A-Z]{2}|[0-9]{3})");
+	// ^$ empty string
+	//qDebug() << mpLineEditLanguageTagWav->text();
+	// TO-DO: Disable QWizard::FinishButton if string doesn't match regexp
+}
+void WizardResourceGeneratorPage::languageTagTTChanged()
+{
+	QRegExp rx_lang("[a-z]{2,3}\-([A-Z]{2}|[0-9]{3})");
+	// ^$ empty string
+	//qDebug() << mpLineEditLanguageTagWav->text();
+	// TO-DO: Disable QWizard::FinishButton if string doesn't match regexp
+	//rx_lang.exactMatch(mpLineEditLanguageTagTT->text())
+}
+//WR
+
 
 //hide/show Generate Empty context, when "Generate Empty Timed Text Resource" button is clicked
 void WizardResourceGeneratorPage::hideGroupBox() {
@@ -522,6 +574,31 @@ void WizardResourceGeneratorPage::SetLanguageTagTT(const QString &rLanguageTag) 
 	emit LanguageTagTTChanged();
 	emit completeChanged();
 }
+
+void WizardResourceGeneratorPage::SetMCATitle(const QString &text) {
+	mpLineEditMCATitle->setText(text);
+	emit MCATitleChanged();
+	emit completeChanged();
+}
+
+void WizardResourceGeneratorPage::SetMCATitleVersion(const QString &text) {
+	mpLineEditMCATitleVersion->setText(text);
+	emit MCATitleVersionChanged();
+	emit completeChanged();
+}
+
+void WizardResourceGeneratorPage::SetMCAAudioContentKind(const QString &text) {
+	mpLineEditMCAAudioContentKind->setText(text);
+	emit MCAAudioContentKindChanged();
+	emit completeChanged();
+}
+
+void WizardResourceGeneratorPage::SetMCAAudioElementKind(const QString &text) {
+	mpLineEditMCAAudioElementKind->setText(text);
+	emit MCAAudioElementKindChanged();
+	emit completeChanged();
+}
+
 //WR
 
 
@@ -545,6 +622,26 @@ QString WizardResourceGeneratorPage::GetLanguageTagTT() const {
 
 	return mpLineEditLanguageTagTT->text();
 }
+
+QString WizardResourceGeneratorPage::GetMCATitle() const {
+
+	return mpLineEditMCATitle->text();
+}
+
+QString WizardResourceGeneratorPage::GetMCATitleVersion() const {
+
+	return mpLineEditMCATitleVersion->text();
+}
+
+QString WizardResourceGeneratorPage::GetMCAAudioContentKind() const {
+
+	return mpLineEditMCAAudioContentKind->text();
+}
+
+QString WizardResourceGeneratorPage::GetMCAAudioElementKind() const {
+
+	return mpLineEditMCAAudioElementKind->text();
+}
 //WR
 
 
@@ -566,13 +663,10 @@ bool WizardResourceGeneratorPage::isComplete() const {
 void WizardResourceGeneratorPage::SwitchMode(WizardResourceGenerator::eMode mode) {
 
 	switch(mode) {
-		case WizardResourceGenerator::ExrMode:
-			mpStackedLayout->setCurrentIndex(ExrIndex);
-			mpFileDialog->setNameFilters(QStringList() << "*.exr" << "*.wav" << "*.ttml");
-			break;
 		case WizardResourceGenerator::WavMode:
 			mpStackedLayout->setCurrentIndex(WavIndex);
 			mpFileDialog->setNameFilters(QStringList() << "*.wav" << "*.exr" << "*.ttml");
+			mpFileDialog->setFileMode(QFileDialog::ExistingFiles);
 			break;
 
 
@@ -580,6 +674,7 @@ void WizardResourceGeneratorPage::SwitchMode(WizardResourceGenerator::eMode mode
 		case WizardResourceGenerator::TTMLMode:
 			mpStackedLayout->setCurrentIndex(TTMLIndex);
 			mpFileDialog->setNameFilters(QStringList() << "*.ttml *.xml");
+			mpFileDialog->setFileMode(QFileDialog::ExistingFile);
 			break;
 				/* -----Denis Manthey----- */
 	}

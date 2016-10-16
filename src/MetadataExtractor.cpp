@@ -148,7 +148,7 @@ Error MetadataExtractor::ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileI
 			else metadata.displayWidth = cdci_descriptor->StoredWidth;
 			metadata.storedHeight = cdci_descriptor->StoredHeight;
 			metadata.storedWidth = cdci_descriptor->StoredWidth;
-			metadata.horizontalSubsampling = 1;
+			metadata.horizontalSubsampling = 2;
 			metadata.componentDepth = cdci_descriptor->ComponentDepth;
 		}
 	}
@@ -234,6 +234,22 @@ Error MetadataExtractor::ReadPcmMxfDescriptor(Metadata &rMetadata, const QFileIn
 					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_61)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup61;
 					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_M)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupM;
 					else metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupNone;
+					//WR
+					const unsigned short IdentBufferLen = 256;
+					char identbuf[IdentBufferLen];
+					if (!soundfield_group->MCATitle.empty()) {
+						metadata.mcaTitle = QString(soundfield_group->MCATitle.get().EncodeString(identbuf, IdentBufferLen));
+					}
+					if (!soundfield_group->MCATitleVersion.empty()) {
+						metadata.mcaTitleVersion = QString(soundfield_group->MCATitleVersion.get().EncodeString(identbuf, IdentBufferLen));
+					}
+					if (!soundfield_group->MCAAudioContentKind.empty()) {
+						metadata.mcaAudioContentKind = QString(soundfield_group->MCAAudioContentKind.get().EncodeString(identbuf, IdentBufferLen));
+					}
+					if (!soundfield_group->MCAAudioElementKind.empty()) {
+						metadata.mcaAudioElementKind = QString(soundfield_group->MCAAudioElementKind.get().EncodeString(identbuf, IdentBufferLen));
+					}
+					//WR
 					if(metadata.soundfieldGroup.IsWellKnown()) {
 						std::list<InterchangeObject*> object_list;
 						result = reader.OP1aHeader().GetMDObjectsByType(DefaultCompositeDict().ul(MDD_AudioChannelLabelSubDescriptor), object_list);

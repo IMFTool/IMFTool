@@ -755,7 +755,7 @@ void GraphicsSceneComposition::dragEnterEvent(QGraphicsSceneDragDropEvent *pEven
 						break;
 
 
-							/* -----Denis Manthey----- */
+							/* -----Denis Manthey Beg----- */
 					case Metadata::TimedText:
 						p_resource = new GraphicsWidgetTimedTextResource(NULL, asset);
 						p_resource->hide();
@@ -763,7 +763,7 @@ void GraphicsSceneComposition::dragEnterEvent(QGraphicsSceneDragDropEvent *pEven
 						ProcessInitDrag(mDropInfo, p_resource, pEvent->scenePos().toPoint(), QPoint(p_resource->boundingRect().center().toPoint()));
 						accept = true;
 						break;
-							/* -----Denis Manthey----- */
+							/* -----Denis Manthey End----- */
 
 
 					default:

@@ -42,7 +42,7 @@
 
 
 WidgetImpBrowser::WidgetImpBrowser(QWidget *pParent /*= NULL*/) :
-QFrame(pParent), mpViewImp(NULL), mpViewAssets(NULL), mpImfPackage(NULL), mpToolBar(NULL), mpUndoStack(NULL), mpUndoProxyModel(NULL), mpSortProxyModelImp(NULL), mpSortProxyModelAssets(NULL), mpMsgBox(NULL), mpJobQueue(NULL) {
+QFrame(pParent), mpViewImp(NULL), mpViewAssets(NULL), mpImfPackage(NULL), mpToolBar(NULL), mpUndoStack(NULL), mpUndoProxyModel(NULL), mpSortProxyModelImp(NULL), mpSortProxyModelAssets(NULL), mpMsgBox(NULL), mpJobQueue(NULL), mPartialOutgestInProgress(false) {
 
 	setFrameStyle(QFrame::StyledPanel);
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -291,7 +291,7 @@ void WidgetImpBrowser::Save() {
 
 	if(mpImfPackage) {
 		mpMsgBox->setText(tr("Start Outgest?"));
-		mpMsgBox->setInformativeText(tr("All changes will be written on the file system an can not be undone. Proceed?"));
+		mpMsgBox->setInformativeText(tr("All changes will be written on the file system and can not be undone. Proceed?"));
 		mpMsgBox->setStandardButtons(QMessageBox::Ok | QMessageBox::Abort);
 		mpMsgBox->setDefaultButton(QMessageBox::Abort);
 		mpMsgBox->setIcon(QMessageBox::Information);
@@ -302,19 +302,19 @@ void WidgetImpBrowser::Save() {
 				QSharedPointer<AssetMxfTrack> mxf_asset = mpImfPackage->GetAsset(i).objectCast<AssetMxfTrack>();
 				if(mxf_asset && mxf_asset->Exists() == false) {
 					if(mxf_asset->GetEssenceType() == Metadata::Pcm) {
-						JobWrapWav *p_wrap_job = new JobWrapWav(mxf_asset->GetSourceFiles(), mxf_asset->GetPath().absoluteFilePath(), mxf_asset->GetSoundfieldGroup(), mxf_asset->GetId(), mxf_asset->GetLanguageTag());
+						JobWrapWav *p_wrap_job = new JobWrapWav(mxf_asset->GetSourceFiles(), mxf_asset->GetPath().absoluteFilePath(), mxf_asset->GetSoundfieldGroup(), mxf_asset->GetId(), mxf_asset->GetLanguageTag(), mxf_asset->GetMCATitle(), mxf_asset->GetMCATitleVersion(), mxf_asset->GetMCAAudioContentKind(), mxf_asset->GetMCAAudioElementKind());
 						connect(p_wrap_job, SIGNAL(Success()), mxf_asset.data(), SLOT(FileModified()));
 						mpJobQueue->AddJob(p_wrap_job);
 					}
 
 
-						/* -----Denis Manthey----- */
+						/* -----Denis Manthey Beg----- */
 					else if(mxf_asset->GetEssenceType() == Metadata::TimedText) {
 						JobWrapTimedText *p_wrap_job = new JobWrapTimedText(mxf_asset->GetSourceFiles(), mxf_asset->GetPath().absoluteFilePath(), mxf_asset->GetEditRate(), mxf_asset->GetDuration(), mxf_asset->GetId(), mxf_asset->GetProfile(), mxf_asset->GetTimedTextFrameRate(), mxf_asset->GetLanguageTag());
 						connect(p_wrap_job, SIGNAL(Success()), mxf_asset.data(), SLOT(FileModified()));
 						mpJobQueue->AddJob(p_wrap_job);
 					}
-						/* -----Denis Manthey----- */
+						/* -----Denis Manthey End----- */
 
 				}
 				QSharedPointer<Asset> abstract_asset = mpImfPackage->GetAsset(i);
@@ -330,38 +330,35 @@ void WidgetImpBrowser::Save() {
 	}
 }
 
-						/* -----Denis Manthey----- */
-
-
-
+						/* -----Denis Manthey Beg----- */
 void WidgetImpBrowser::rReinstallImp() {
 
 	emit WritePackageComplete();
 }
-						/* -----Denis Manthey----- */
+						/* -----Denis Manthey End----- */
 
 void WidgetImpBrowser::ShowResourceGeneratorWavMode() {
 
 	WizardResourceGenerator *p_wizard_resource_generator = new WizardResourceGenerator(this);
 	p_wizard_resource_generator->setAttribute(Qt::WA_DeleteOnClose, true);
 	p_wizard_resource_generator->SwitchMode(WizardResourceGenerator::WavMode);
+	p_wizard_resource_generator->resize( QSize(600, 600).expandedTo(minimumSizeHint()) );
 	p_wizard_resource_generator->show();
 	connect(p_wizard_resource_generator, SIGNAL(accepted()), this, SLOT(rResourceGeneratorAccepted()));
 }
 
 
-		/* -----Denis Manthey----- */
+		/* -----Denis Manthey Beg----- */
 void WidgetImpBrowser::ShowResourceGeneratorTimedTextMode() {
 
 	WizardResourceGenerator *p_wizard_resource_generator = new WizardResourceGenerator(this);
 	p_wizard_resource_generator->setAttribute(Qt::WA_DeleteOnClose, true);
 	p_wizard_resource_generator->SwitchMode(WizardResourceGenerator::TTMLMode);
+	p_wizard_resource_generator->resize( QSize(600, 500).expandedTo(minimumSizeHint()) );
 	p_wizard_resource_generator->show();
 	connect(p_wizard_resource_generator, SIGNAL(accepted()), this, SLOT(rResourceGeneratorAccepted()));
 }
-		/* -----Denis Manthey----- */
-
-
+		/* -----Denis Manthey End----- */
 
 void WidgetImpBrowser::ShowCompositionGenerator() {
 
@@ -392,6 +389,10 @@ void WidgetImpBrowser::rShowResourceGeneratorForAsset(const QUuid &rAssetId) {
 			//WR
 			p_wizard_resource_generator->setField(FIELD_NAME_LANGUAGETAG_WAV, QVariant::fromValue<QString>(asset->GetLanguageTag()));
 			p_wizard_resource_generator->setField(FIELD_NAME_LANGUAGETAG_TT, QVariant::fromValue<QString>(asset->GetLanguageTag()));
+			p_wizard_resource_generator->setField(FIELD_NAME_MCA_TITLE, QVariant::fromValue<QString>(asset->GetMCATitle()));
+			p_wizard_resource_generator->setField(FIELD_NAME_MCA_TITLE_VERSION, QVariant::fromValue<QString>(asset->GetMCATitleVersion()));
+			p_wizard_resource_generator->setField(FIELD_NAME_MCA_AUDIO_CONTENT_KIND, QVariant::fromValue<QString>(asset->GetMCAAudioContentKind()));
+			p_wizard_resource_generator->setField(FIELD_NAME_MCA_AUDIO_ELEMENT_KIND, QVariant::fromValue<QString>(asset->GetMCAAudioElementKind()));
 			//WR
 			p_wizard_resource_generator->setProperty(ASSET_ID_DYNAMIK_PROPERTY, QVariant(asset->GetId()));
 			p_wizard_resource_generator->show();
@@ -411,8 +412,10 @@ void WidgetImpBrowser::rResourceGeneratorAccepted() {
 		//WR
 		QString language_tag_wav = qvariant_cast<QString>(p_resource_generator->field(FIELD_NAME_LANGUAGETAG_WAV));
 		QString language_tag_tt = qvariant_cast<QString>(p_resource_generator->field(FIELD_NAME_LANGUAGETAG_TT));
-		qDebug() << "language_tag_wav:" << language_tag_wav;
-		qDebug() << "language_tag_tt:" << language_tag_tt;
+		QString mca_title = qvariant_cast<QString>(p_resource_generator->field(FIELD_NAME_MCA_TITLE));
+		QString mca_title_version = qvariant_cast<QString>(p_resource_generator->field(FIELD_NAME_MCA_TITLE_VERSION));
+		QString mca_audio_content_kind = qvariant_cast<QString>(p_resource_generator->field(FIELD_NAME_MCA_AUDIO_CONTENT_KIND));
+		QString mca_audio_element_kind = qvariant_cast<QString>(p_resource_generator->field(FIELD_NAME_MCA_AUDIO_ELEMENT_KIND));
 		//WR
 		if(mpImfPackage) {
 			QVariant asset_id = p_resource_generator->property(ASSET_ID_DYNAMIK_PROPERTY);
@@ -427,13 +430,17 @@ void WidgetImpBrowser::rResourceGeneratorAccepted() {
 					mxf_asset->SetSoundfieldGroup(soundfield_group);
 					//WR
 					mxf_asset->SetLanguageTag(language_tag_wav);
+					mxf_asset->SetMCATitle(mca_title);
+					mxf_asset->SetMCATitleVersion(mca_title_version);
+					mxf_asset->SetMCAAudioContentKind(mca_audio_content_kind);
+					mxf_asset->SetMCAAudioElementKind(mca_audio_element_kind);
 					//WR
 					mpUndoStack->push(new AddAssetCommand(mpImfPackage, mxf_asset, mpImfPackage->GetPackingListId()));
 				}
 
 
 
-						/* -----Denis Manthey----- */
+						/* -----Denis Manthey Beg----- */
 				else if(selected_files.isEmpty() == false && is_ttml_file(selected_files.first())) {
 					QUuid id = QUuid::createUuid();
 					QString file_name = QString("TimedText_%1.mxf").arg(strip_uuid(id));
@@ -448,7 +455,7 @@ void WidgetImpBrowser::rResourceGeneratorAccepted() {
 					//WR
 					mpUndoStack->push(new AddAssetCommand(mpImfPackage, mxf_asset, mpImfPackage->GetPackingListId()));
 				}
-						/* -----Denis Manthey----- */
+						/* -----Denis Manthey End----- */
 
 
 			}
@@ -467,7 +474,7 @@ void WidgetImpBrowser::rResourceGeneratorAccepted() {
 
 
 
-				/* -----Denis Manthey----- */
+				/* -----Denis Manthey Beg----- */
 QSharedPointer<AssetCpl> WidgetImpBrowser::GenerateEmptyCPL() {
 	EditRate edit_rate;
 	QString title;
@@ -477,6 +484,7 @@ QSharedPointer<AssetCpl> WidgetImpBrowser::GenerateEmptyCPL() {
 	QString file_name = QString("CPL_%1.xml").arg(strip_uuid(id));
 	QFileInfo cpl_file_path(mpImfPackage->GetRootDir().absoluteFilePath(file_name));
 	QSharedPointer<AssetCpl> cpl_asset(new AssetCpl(cpl_file_path, id));
+	cpl_asset->SetIsNew(true);
 	XmlSerializationError error = WidgetComposition::WriteMinimal(cpl_file_path.absoluteFilePath(), id, edit_rate, title, issuer, content_originator);
 	if(error.IsError() == false)
 		mpUndoStack->push(new AddAssetCommand(mpImfPackage, cpl_asset, mpImfPackage->GetPackingListId()));
@@ -492,7 +500,7 @@ QSharedPointer<AssetCpl> WidgetImpBrowser::GenerateEmptyCPL() {
 	}
 	return cpl_asset;
 }
-				/* -----Denis Manthey----- */
+				/* -----Denis Manthey End----- */
 
 
 
@@ -626,19 +634,63 @@ void WidgetImpBrowser::rImpViewDoubleClicked(const QModelIndex &rIndex) {
 	}
 }
 
-			/* -----Denis Manthey----- */
+			/* -----Denis Manthey Beg----- */
 void WidgetImpBrowser::rOpenCplTimeline() {
 	QSharedPointer<AssetCpl> asset_cpl = mpImfPackage->GetAsset(mpSortProxyModelImp->mapToSource(mpViewImp->currentIndex()).row()).objectCast<AssetCpl>();
 	if(asset_cpl && asset_cpl->Exists() == true) {
 		emit ShowCpl(asset_cpl->GetId());
 	}
 }
-			/* -----Denis Manthey----- */
+			/* -----Denis Manthey End----- */
 
 
 void WidgetImpBrowser::StartOutgest(bool clearUndoStack /*= true*/) {
 
 	if(mpImfPackage) {
+		//WR
+		qDebug() << "StartOutgest";
+		if (GetPartialOutgestInProgress()) {
+			QSharedPointer<ImfPackage> PartialImp(new ImfPackage(QDir(GetPartialImpPath())));
+			qDebug() << "StartOutgest:" << GetPartialImpPath();
+			ImfError error = PartialImp->Ingest();
+			if(error.IsError()) {
+				QString error_msg = QString("%1\n%2").arg(error.GetErrorMsg()).arg(error.GetErrorDescription());
+				mpMsgBox->setText(tr("Ingest Error"));
+				mpMsgBox->setIcon(QMessageBox::Critical);
+				mpMsgBox->setInformativeText(error_msg);
+				mpMsgBox->setStandardButtons(QMessageBox::Ok);
+				mpMsgBox->setDefaultButton(QMessageBox::Ok);
+				mpMsgBox->exec();
+			}
+
+			for (int i = 0; i < mpImfPackage->GetAssetCount(); i++) {
+				//Add new CPLs to the IMP
+				if (mpImfPackage->GetAsset(i)->GetType() == Asset::cpl) {
+					QSharedPointer<AssetCpl> asset_cpl = mpImfPackage->GetAsset(i).objectCast<AssetCpl>();
+					if (asset_cpl->GetIsNew() == true) {
+						QFile::copy(asset_cpl->GetPath().absoluteFilePath(), QString("%1/%2").arg(PartialImp->GetRootDir().absolutePath()).arg(asset_cpl->GetOriginalFileName().first));
+						QSharedPointer<AssetCpl> newCPL(new AssetCpl(QString("%1/%2").arg(PartialImp->GetRootDir().absolutePath()).arg(asset_cpl->GetOriginalFileName().first), asset_cpl->GetId(), asset_cpl->GetAnnotationText()));
+						newCPL->SetHash(asset_cpl->GetHash());
+						QFile::remove(asset_cpl->GetPath().absoluteFilePath());
+						PartialImp->AddAsset(newCPL, PartialImp->GetPackingListId());
+					}
+				}
+				//Add new MXF Tracks to the IMP
+				if (mpImfPackage->GetAsset(i)->GetType() == Asset::mxf) {
+					QSharedPointer<AssetMxfTrack> asset_mxf = mpImfPackage->GetAsset(i).objectCast<AssetMxfTrack>();
+					if (asset_mxf->GetIsNew() == true) {
+						QFile::copy(asset_mxf->GetPath().absoluteFilePath(), QString("%1/%2").arg(PartialImp->GetRootDir().absolutePath()).arg(asset_mxf->GetOriginalFileName().first));
+						QSharedPointer<AssetMxfTrack> newMXF(new AssetMxfTrack(QString("%1/%2").arg(PartialImp->GetRootDir().absolutePath()).arg(asset_mxf->GetOriginalFileName().first), asset_mxf->GetId()));
+						newMXF->SetHash(asset_mxf->GetHash());
+						QFile::remove(asset_mxf->GetPath().absoluteFilePath());
+						PartialImp->AddAsset(newMXF, PartialImp->GetPackingListId());
+					}
+				}
+			}
+			InstallImp(PartialImp);
+			SetPartialOutgestInProgress(false);
+		}
+		//WR
 		ImfError error = mpImfPackage->Outgest();
 		if(error.IsError() == false) {
 			if(error.IsRecoverableError() == true) {
@@ -721,6 +773,28 @@ void WidgetImpBrowser::RecalcHashForCpls() {
 }
 //WR end
 
+
+void WidgetImpBrowser::ExportPartialImp(QString &rDir, QString &rIssuer, QString &rAnnotation) {
+
+	QSharedPointer<ImfPackage> PartialImp(new ImfPackage(rDir, rIssuer, rAnnotation));
+	//Write Packing List and Assetmap to Root Folder. This is neccessary for adding assets to the IMP
+	PartialImp->Outgest();
+	//WR
+	SetPartialImpPath(rDir);
+	SetPartialOutgestInProgress(true);
+	for (int i = 0; i < mpImfPackage->GetAssetCount(); i++) {
+		if (mpImfPackage->GetAsset(i)->GetType() == Asset::mxf) {
+			QSharedPointer<AssetMxfTrack> asset_mxf = mpImfPackage->GetAsset(i).objectCast<AssetMxfTrack>();
+			if(asset_mxf->Exists()) {
+				asset_mxf->SetIsNew(false);
+			} else {
+				asset_mxf->SetIsNew(true);
+			}
+		}
+	}
+	//WR
+	Save();
+}
 
 CustomTableView::CustomTableView(QWidget *pParent /*= NULL*/) :
 QTableView(pParent) {

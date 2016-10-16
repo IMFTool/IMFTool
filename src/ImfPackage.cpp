@@ -977,6 +977,7 @@ Asset(Asset::cpl, rFilePath, rAmAsset, std::auto_ptr<pkl::AssetType>(new pkl::As
 //WR begin
 	mIsNewOrModified = false;
 //WR end
+	mIsNew = false;
 }
 
 AssetCpl::AssetCpl(const QFileInfo &rFilePath, const QUuid &rId, const UserText &rAnnotationText /*= QString()*/) :
@@ -984,6 +985,7 @@ Asset(Asset::cpl, rFilePath, rId, rAnnotationText) {
 	//WR begin
 	mIsNewOrModified = false;
 	//WR end
+	mIsNew = false;
 }
 
 AssetOpl::AssetOpl(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl::AssetType &rPklAsset) :
@@ -1005,6 +1007,7 @@ Asset(Asset::mxf, rFilePath, rAmAsset, std::auto_ptr<pkl::AssetType>(new pkl::As
 	mSourceEncoding = QUuid::createUuid();
 	//new ED with SourceEncoding as ID
 	mEssenceDescriptor = new cpl::EssenceDescriptorBaseType(ImfXmlHelper::Convert(mSourceEncoding));
+	mIsNew = false;
 	//WR end
 }
 

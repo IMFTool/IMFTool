@@ -73,6 +73,10 @@ class WizardResourceGeneratorPage : public QWizardPage {
 		//WR LanguageTagSelected
 		Q_PROPERTY(QString LanguageTagWavSelected READ GetLanguageTagWav WRITE SetLanguageTagWav NOTIFY LanguageTagWavChanged)
 		Q_PROPERTY(QString LanguageTagTTSelected READ GetLanguageTagTT WRITE SetLanguageTagTT NOTIFY LanguageTagTTChanged)
+		Q_PROPERTY(QString MCATitleSelected READ GetMCATitle WRITE SetMCATitle NOTIFY MCATitleChanged)
+		Q_PROPERTY(QString MCATitleVersionSelected READ GetMCATitleVersion WRITE SetMCATitleVersion NOTIFY MCATitleVersionChanged)
+		Q_PROPERTY(QString MCAAudioContentKindSelected READ GetMCAAudioContentKind WRITE SetMCAAudioContentKind NOTIFY MCAAudioContentKindChanged)
+		Q_PROPERTY(QString MCAAudioElementKindSelected READ GetMCAAudioElementKind WRITE SetMCAAudioElementKind NOTIFY MCAAudioElementKindChanged)
 		//WR
 
 public:
@@ -86,6 +90,10 @@ public:
 	//WR
 	QString GetLanguageTagWav() const;
 	QString GetLanguageTagTT() const;
+	QString GetMCATitle() const;
+	QString GetMCATitleVersion() const;
+	QString GetMCAAudioContentKind() const;
+	QString GetMCAAudioElementKind() const;
 	//WR
 
 protected:
@@ -98,6 +106,10 @@ signals:
 	//WR
 	void LanguageTagWavChanged();
 	void LanguageTagTTChanged();
+	void MCATitleChanged();
+	void MCATitleVersionChanged();
+	void MCAAudioContentKindChanged();
+	void MCAAudioElementKindChanged();
 	//WR
 
 	public slots:
@@ -108,6 +120,10 @@ signals:
 	//WR
 	void SetLanguageTagWav(const QString &rLanguageTag);
 	void SetLanguageTagTT(const QString &rLanguageTag);
+	void SetMCATitle(const QString &rLanguageTag);
+	void SetMCATitleVersion(const QString &rLanguageTag);
+	void SetMCAAudioContentKind(const QString &rLanguageTag);
+	void SetMCAAudioElementKind(const QString &rLanguageTag);
 	//WR
 	void ChangeSoundfieldGroup(const QString &rName);
 	void ShowFileDialog();
@@ -117,6 +133,10 @@ signals:
 	void GenerateEmptyTimedText();
 	private slots:
 	void hideGroupBox();
+	//WR
+	void languageTagWavChanged();
+	void languageTagTTChanged();
+	//WR
 
 private:
 	enum eStackedLayoutIndex {
@@ -140,6 +160,10 @@ private:
 	//WR
 	QLineEdit *mpLineEditLanguageTagWav;
 	QLineEdit *mpLineEditLanguageTagTT;
+	QLineEdit *mpLineEditMCATitle;
+	QLineEdit *mpLineEditMCATitleVersion;
+	QLineEdit *mpLineEditMCAAudioContentKind;
+	QLineEdit *mpLineEditMCAAudioElementKind;
 	//WR
 	QFileDialog *mpDirDialog;
 	QLineEdit *mpLineEditDuration;

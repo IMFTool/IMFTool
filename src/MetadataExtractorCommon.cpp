@@ -58,7 +58,7 @@ QString Metadata::GetAsString() {
 			if(aspectRatio != ASDCP::Rational())					ret.append(QObject::tr("Aspect Ratio: %1 (%2:%3)\n").arg(aspectRatio.Quotient()).arg(aspectRatio.Numerator).arg(aspectRatio.Denominator));
 			if(horizontalSubsampling != 0 && colorEncoding != Unknown_Color_Encoding) {
 				if(colorEncoding == Metadata::RGBA)					ret.append(QObject::tr("Color Mode: %1").arg("RGB"));
-				else if(colorEncoding == Metadata::CDCI)		ret.append(QObject::tr("Color Mode: %1").arg("YUV"));
+				else if(colorEncoding == Metadata::CDCI)		ret.append(QObject::tr("Color Mode: %1").arg("YCbCr"));
 				ret.append(QObject::tr("(%1:%2:%3)\n").arg(4).arg(4 / horizontalSubsampling).arg(4 / horizontalSubsampling));
 			}
 			if(componentDepth != 0)												ret.append(QObject::tr("Color Depth: %1 bit\n").arg(componentDepth));
@@ -145,7 +145,7 @@ void Metadata::GetAsTextDocument(QTextDocument &rDoc) {
 		else																															table->cellAt(2, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Displayed Resolution: Unknown"), Qt::ElideRight, column_text_width));
 		if(horizontalSubsampling != 0 && colorEncoding != Metadata::Unknown_Color_Encoding) {
 			if(colorEncoding == Metadata::RGBA)															table->cellAt(3, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Color Mode: %1(%2:%3:%4)").arg("RGB").arg(4).arg(4 / horizontalSubsampling).arg(4 / horizontalSubsampling), Qt::ElideRight, column_text_width));
-			else if(colorEncoding == Metadata::CDCI)												table->cellAt(3, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Color Mode: %1(%2:%3:%4)").arg("YUV").arg(4).arg(4 / horizontalSubsampling).arg(4 / horizontalSubsampling), Qt::ElideRight, column_text_width));
+			else if(colorEncoding == Metadata::CDCI)												table->cellAt(3, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Color Mode: %1(%2:%3:%4)").arg("YCbCr").arg(4).arg(4 / horizontalSubsampling).arg(4 / horizontalSubsampling), Qt::ElideRight, column_text_width));
 		}
 		else																															table->cellAt(3, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Color Mode: Unknown"), Qt::ElideRight, column_text_width));
 		if(componentDepth != 0)																						table->cellAt(3, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Color Depth: %1 bit").arg(componentDepth), Qt::ElideRight, column_text_width));

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--Created: Thu Sep 17 15:28:37 CEST 2015--><!--By: regxmllib build c989a02ac80facc24e018a54c4010dd8c2d27451--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
+<!--Created: Fri Oct 07 09:05:40 PDT 2016--><!--By: regxmllib build c989a02ac80facc24e018a54c4010dd8c2d27451--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
 <SchemeID>urn:uuid:eb4c6bf8-c197-5ffe-7f01-2123ea606f17</SchemeID>
 <SchemeURI>http://www.smpte-ra.org/reg/2003/2012</SchemeURI>
 <MetaDefinitions>
@@ -120,29 +120,13 @@
 <Name>PhaseFrameType</Name>
 <RenamedType>urn:smpte:ul:060e2b34.01040101.01010700.00000000</RenamedType>
 </TypeDefinitionRename>
-<TypeDefinitionFloat>
+<TypeDefinitionInteger>
 <Identification>urn:smpte:ul:060e2b34.01040101.01020100.00000000</Identification>
 <Symbol>Float</Symbol>
-<Name>Float</Name>
+<Name>float</Name>
 <Size>4</Size>
-</TypeDefinitionFloat>
-<TypeDefinitionFloat>
-<Identification>urn:smpte:ul:060e2b34.01040101.01020200.00000000</Identification>
-<Symbol>Double</Symbol>
-<Name>Double</Name>
-<Size>8</Size>
-</TypeDefinitionFloat>
-<TypeDefinitionFloat>
-<Identification>urn:smpte:ul:060e2b34.01040101.01020300.00000000</Identification>
-<Symbol>HalfFloat</Symbol>
-<Name>HalfFloat</Name>
-<Size>2</Size>
-</TypeDefinitionFloat>
-<TypeDefinitionLenseSerialFloat>
-<Identification>urn:smpte:ul:060e2b34.01040101.01020400.00000000</Identification>
-<Symbol>LensSerialHalfFloat</Symbol>
-<Name>LensSerialHalfFloat</Name>
-</TypeDefinitionLenseSerialFloat>
+<IsSigned>true</IsSigned>
+</TypeDefinitionInteger>
 <TypeDefinitionRecord>
 <Identification>urn:smpte:ul:060e2b34.01040101.01030100.00000000</Identification>
 <Symbol>AUID</Symbol>
@@ -1345,12 +1329,6 @@
 <ElementType>urn:smpte:ul:060e2b34.01040101.01010200.00000000</ElementType>
 </TypeDefinitionVariableArray>
 <TypeDefinitionVariableArray>
-<Identification>urn:smpte:ul:060e2b34.01040101.04011300.00000000</Identification>
-<Symbol>HalfFloatArray</Symbol>
-<Name>HalfFloatArray</Name>
-<ElementType>urn:smpte:ul:060e2b34.01040101.01020300.00000000</ElementType>
-</TypeDefinitionVariableArray>
-<TypeDefinitionVariableArray>
 <Identification>urn:smpte:ul:060e2b34.01040101.04011500.00000000</Identification>
 <Symbol>UUIDArray</Symbol>
 <Name>UUIDArray</Name>
@@ -1411,6 +1389,13 @@
 <Name>J2KComponentSizingArray</Name>
 <ElementType>urn:smpte:ul:060e2b34.01040101.03010a00.00000000</ElementType>
 </TypeDefinitionVariableArray>
+<TypeDefinitionFixedArray>
+<Identification>urn:smpte:ul:060e2b34.01040101.04020a00.00000000</Identification>
+<Symbol>ThreeColorPrimaries</Symbol>
+<Name>Three-Color Primaries</Name>
+<ElementCount>3</ElementCount>
+<ElementType>urn:smpte:ul:060e2b34.01040101.03010c00.00000000</ElementType>
+</TypeDefinitionFixedArray>
 <TypeDefinitionSet>
 <Identification>urn:smpte:ul:060e2b34.01040101.04030100.00000000</Identification>
 <Symbol>AUIDSet</Symbol>
@@ -1435,6 +1420,17 @@
 <Name>ASMLEKeyIDMappingSet</Name>
 <ElementType>urn:smpte:ul:060e2b34.01040101.03010b00.00000000</ElementType>
 </TypeDefinitionSet>
+<TypeDefinitionRecord>
+<Identification>urn:smpte:ul:060e2b34.01040101.03010c00.00000000</Identification>
+<Symbol>ColorPrimary</Symbol>
+<Name>Color Primary</Name>
+<Members>
+<Name>X</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+<Name>Y</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+</Members>
+</TypeDefinitionRecord>
 <TypeDefinitionVariableArray>
 <Identification>urn:smpte:ul:060e2b34.01040101.04100100.00000000</Identification>
 <Symbol>DataValue</Symbol>

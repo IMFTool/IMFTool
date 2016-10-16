@@ -14,9 +14,9 @@ An introductory video is available on YouTube [2].
 -	Add new segments
 -	Set edit points and markers
 -	Export the IMP
+-	Export all new MXF files and new CPL(s) as Partial IMP 
 
 ##Workflows supported soon (under development):
--	Export of the modifications as Partial (aka Supplemental) IMP - expected by mid October
 -	Editing of the ContentVersionList element, including custom LabelText entries
 -	Audio Inserts
 
@@ -43,7 +43,7 @@ IMF Tool is multi-platform and been susccesfully tested to build under Mac OS X 
 The build system is based on CMake. Please use CMake to create make files and project files for eclipse or Visual Studio. Installation instructions including CMake screenshots are provided as pdf file here.
 Prerequisites:
 -	Qt Version 5.x
--	asdcplib, see http://www.cinecert.com
+-	asdcplib, see http://www.cinecert.com. IMPORTANT: A few files of asdcplib-2.5.14 need to be replaced by the files provided in folder asdcplib-2.5.14-patches
 -	libxsd
 -	Xerces 3.1
 

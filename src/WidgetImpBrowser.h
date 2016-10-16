@@ -57,6 +57,14 @@ public:
 	QSharedPointer<AssetCpl> GenerateEmptyCPL();
 	QDir GetWorkingDir() {return mpImfPackage->GetRootDir();}
 
+	void ExportPartialImp(QString &rDir, QString &rIssuer, QString &rAnnotation);
+	//WR
+	void SetPartialOutgestInProgress(bool rPartialOutgestInProgress) {mPartialOutgestInProgress = rPartialOutgestInProgress;}
+	bool GetPartialOutgestInProgress() {return mPartialOutgestInProgress;}
+	void SetPartialImpPath (QString rPartialImpPath) {mPartialImpPath = rPartialImpPath;}
+	QString GetPartialImpPath () {return mPartialImpPath;}
+	//WR
+
 signals:
 	void ImpSaveStateChanged(bool isDirty);
 	void ImplInstalled(bool installed);
@@ -108,4 +116,8 @@ private:
 	QMessageBox *mpMsgBox;
 	QProgressDialog *mpProgressDialog;
 	JobQueue *mpJobQueue;
+	//WR
+	bool mPartialOutgestInProgress;
+	QString mPartialImpPath;
+	//WR
 };

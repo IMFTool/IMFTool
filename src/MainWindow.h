@@ -40,6 +40,7 @@ signals:
 public slots:
 	void ShowWidgetAbout();
 	void ShowWorkspaceLauncher();
+	void ShowWorkspaceLauncherPartialImp();
 	void ShowCplEditor(const QUuid &rCplAssetId);
 	void CloseImfPackage();
 	void SaveCurrent();
@@ -48,8 +49,10 @@ public slots:
 	void ShowWidgetSettings();
 	void WritePackage();
 
+
 private slots:
 	void rWorkspaceLauncherAccepted();
+	void rWorkspaceLauncherPartialImpAccepted();
 	void rEnableSaveActions();
 	void rFocusChanged(QWidget *pOld, QWidget *pNow);
 	void rSaveCPLRequest();
@@ -76,4 +79,5 @@ private:
 	QAction	*mpActionSaveAll;
 	QAction	*mpActionSaveAsNewCPL;
 	QList <QString> mpUnwrittenCPLs;
+	QString mpRootDirection;
 };

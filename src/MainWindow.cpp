@@ -15,10 +15,10 @@
  */
 #include "MainWindow.h"
 #include "global.h"
-#include "WidgetFileBrowser.h"
 #include "WidgetAbout.h"
 #include "WidgetImpBrowser.h"
 #include "WizardWorkspaceLauncher.h"
+#include "WizardPartialImpGenerator.h"
 #include "MetadataExtractor.h"
 #include "WidgetCentral.h"
 #include "WidgetSettings.h"
@@ -35,7 +35,7 @@
 #include <QMainWindow>
 #include <QMessageBox>
 #include <QStatusBar>
-
+#include <QDir>
 
 
 
@@ -114,6 +114,12 @@ void MainWindow::InitMenuAndToolbar() {
 	p_action_write->setDisabled(true);
 	connect(p_action_write, SIGNAL(triggered(bool)), this, SLOT(WritePackage()));
 	connect(mpWidgetImpBrowser, SIGNAL(ImpSaveStateChanged(bool)), p_action_write, SLOT(setEnabled(bool)));
+
+	QAction *p_action_writePartial = new QAction(QIcon(":/inbox_upload_plus.png"), tr("&Write Partial IMF Package"), menuBar());
+	p_action_writePartial->setDisabled(true);
+	connect(p_action_writePartial, SIGNAL(triggered(bool)), this, SLOT(ShowWorkspaceLauncherPartialImp()));
+	connect(mpWidgetImpBrowser, SIGNAL(ImpSaveStateChanged(bool)), p_action_writePartial, SLOT(setEnabled(bool)));
+
 	QAction *p_action_close = new QAction(QIcon(":/close.png"), tr("&Close IMF Package"), menuBar());
 	connect(p_action_close, SIGNAL(triggered(bool)), this, SLOT(rCloseImpRequest()));
 	QAction *p_action_exit = new QAction(tr("&Quit"), menuBar());
@@ -121,6 +127,7 @@ void MainWindow::InitMenuAndToolbar() {
 	connect(p_action_exit, SIGNAL(triggered(bool)), qApp, SLOT(closeAllWindows()));
 
 	p_menu_file->addAction(p_action_write);
+	p_menu_file->addAction(p_action_writePartial);
 	p_menu_file->addAction(p_action_open);
 	p_menu_file->addAction(p_action_close);
 	p_menu_file->addSeparator();
@@ -144,6 +151,7 @@ void MainWindow::InitMenuAndToolbar() {
 	p_tool_bar->setIconSize(QSize(20, 20));
 	p_tool_bar->addAction(p_action_open);
 	p_tool_bar->addAction(p_action_write);
+	p_tool_bar->addAction(p_action_writePartial);
 	p_tool_bar->addSeparator();
 	//p_tool_bar->addAction(mpActionSaveAll);
 	p_tool_bar->addSeparator();
@@ -156,7 +164,7 @@ void MainWindow::InitMenuAndToolbar() {
 	connect(mpCentralWidget, SIGNAL(UndoStackChanged(QUndoStack*)), mpUndoGroup, SLOT(setActiveStack(QUndoStack*)));
 }
 
-			/* -----Denis Manthey----- */
+			/* -----Denis Manthey Beg----- */
 
 void MainWindow::rSaveCPLRequest() {
 
@@ -233,7 +241,7 @@ bool MainWindow::checkUndoStack() {
 		return 0;
 }
 
-			/* -----Denis Manthey----- */
+			/* -----Denis Manthey End----- */
 
 void MainWindow::ShowWidgetAbout() {
 
@@ -253,12 +261,24 @@ void MainWindow::ShowWorkspaceLauncher() {
 }
 
 
+				/* -----Denis Manthey Beg----- */
+void MainWindow::ShowWorkspaceLauncherPartialImp() {
+
+	WizardPartialImpGenerator *p_partial_imp_generator = new WizardPartialImpGenerator(this);
+	p_partial_imp_generator->setAttribute(Qt::WA_DeleteOnClose);
+	p_partial_imp_generator->addPage(new WizardPartialImpGeneratorPage(p_partial_imp_generator));
+	connect(p_partial_imp_generator, SIGNAL(accepted()), this, SLOT(rWorkspaceLauncherPartialImpAccepted()));
+	p_partial_imp_generator->show();
+}
+				/* -----Denis Manthey End----- */
+
 void MainWindow::rWorkspaceLauncherAccepted() {
 
 	WizardWorkspaceLauncher *p_workspace_launcher = qobject_cast<WizardWorkspaceLauncher *>(sender());
 	if(p_workspace_launcher) {
 		QString working_dir = p_workspace_launcher->field(FIELD_NAME_WORKING_DIR).toString();
 		QDir dir(working_dir);
+		mpRootDirection = working_dir;
 		QSharedPointer<ImfPackage> imf_package(new ImfPackage(dir));
 		ImfError error = imf_package->Ingest();
 		if(error.IsError() == false) {
@@ -289,6 +309,45 @@ void MainWindow::rWorkspaceLauncherAccepted() {
 }
 
 
+
+			/* -----Denis Manthey Beg----- */
+void MainWindow::rWorkspaceLauncherPartialImpAccepted() {
+
+	WizardPartialImpGenerator *p_partial_imp_generator = qobject_cast<WizardPartialImpGenerator *>(sender());
+	bool success;
+	if (p_partial_imp_generator) {
+		QString partial_imp_dir = QString("%1/%2").arg(p_partial_imp_generator->field(FIELD_NAME_PARTIAL_DIR).toString()).arg(p_partial_imp_generator->field(FIELD_NAME_PARTIAL_NAME).toString());
+		QString partial_imp_issuer = QString("%1").arg(p_partial_imp_generator->field(FIELD_NAME_PARTIAL_ISSUER).toString());
+		QString partial_imp_annotation = QString("%1").arg(p_partial_imp_generator->field(FIELD_NAME_PARTIAL_ANNOTATION).toString());
+		//Check if folder exists
+		if (QDir(partial_imp_dir).exists() == false)
+			success = QDir().mkdir(partial_imp_dir);
+		else {
+			mpMsgBox->setText(tr("Couldn't create folder"));
+			mpMsgBox->setIcon(QMessageBox::Warning);
+			mpMsgBox->setInformativeText("Folder already exists in the selected directory!");
+			mpMsgBox->setStandardButtons(QMessageBox::Ok);
+			mpMsgBox->setDefaultButton(QMessageBox::Ok);
+			mpMsgBox->exec();
+		}
+		//check writing permissions
+		if (success == true) {
+			//WR
+			connect(mpWidgetImpBrowser, SIGNAL(CallSaveAllCpl()), this, SLOT(SaveAllCpl()));
+			//WR
+			mpWidgetImpBrowser->ExportPartialImp(partial_imp_dir, partial_imp_issuer, partial_imp_annotation);
+		} else {
+			mpMsgBox->setText(tr("Couldn't create folder"));
+			mpMsgBox->setIcon(QMessageBox::Warning);
+			mpMsgBox->setInformativeText("Please check your writing permissions!");
+			mpMsgBox->setStandardButtons(QMessageBox::Ok);
+			mpMsgBox->setDefaultButton(QMessageBox::Ok);
+			mpMsgBox->exec();
+		}
+	}
+}
+				/* -----Denis Manthey End----- */
+
 void MainWindow::rEnableSaveActions() {
 
 	mpActionSave->setEnabled(true);
@@ -313,7 +372,7 @@ void MainWindow::SaveCurrent() {
 }
 
 
-			/* -----Denis Manthey----- */
+			/* -----Denis Manthey Beg----- */
 void MainWindow::SaveAsNewCPL() {
 
 	QSharedPointer<AssetCpl> newCPL = mpWidgetImpBrowser->GenerateEmptyCPL();
@@ -323,7 +382,7 @@ void MainWindow::SaveAsNewCPL() {
 	SaveCurrent();
 	SetUnwrittenCPL(newCPL->GetPath().absoluteFilePath());
 }
-			/* -----Denis Manthey----- */
+			/* -----Denis Manthey En----- */
 
 
 void MainWindow::rFocusChanged(QWidget *pOld, QWidget *pNow) {
@@ -362,17 +421,17 @@ void MainWindow::CenterWidget(QWidget *pWidget, bool useSizeHint) {
 	pWidget->move(cw, ch);
 }
 
-			/* -----Denis Manthey----- */
+			/* -----Denis Manthey Beg----- */
 void MainWindow::rReinstallImp() {
 
-	QDir dir(mpWidgetImpBrowser->GetWorkingDir());
+	//QDir dir(mpWidgetImpBrowser->GetWorkingDir());
 	CloseImfPackage();
-	QSharedPointer<ImfPackage> imf_package(new ImfPackage(dir));
+	QSharedPointer<ImfPackage> imf_package(new ImfPackage(mpRootDirection));
 	imf_package->Ingest();
 	mpWidgetImpBrowser->InstallImp(imf_package);
 	mpCentralWidget->InstallImp(imf_package);
 }
-			/* -----Denis Manthey----- */
+			/* -----Denis Manthey End----- */
 
 void MainWindow::WritePackage() {
 
@@ -382,6 +441,7 @@ void MainWindow::WritePackage() {
 	mpUnwrittenCPLs.clear();
 }
 
+			/* -----Denis Manthey Beg----- */
 void MainWindow::SaveAllCpl() {
 
 	mpCentralWidget->SaveAllCpl();
@@ -391,3 +451,4 @@ void MainWindow::SetUnwrittenCPL(QString FilePath) {
 
 	mpUnwrittenCPLs.append(FilePath);
 }
+			/* -----Denis Manthey End----- */
