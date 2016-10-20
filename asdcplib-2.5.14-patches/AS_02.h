@@ -347,8 +347,8 @@ namespace AS_02
 	  virtual ~Type5UUIDFilenameResolver();
 	  Result_t OpenRead(const std::string& dirname);
 	  Result_t ResolveRID(const byte_t* uuid, ASDCP::TimedText::FrameBuffer& FrameBuf) const;
-	  Result_t PngNameToType5UUID(const std::string& png_name, Kumu::UUID& uuid);
-	  Result_t FontNameToType5UUID(const std::string& font_name, Kumu::UUID& uuid);
+	  static Result_t PngNameToType5UUID(const std::string& png_name, Kumu::UUID& uuid);
+	  static Result_t FontNameToType5UUID(const std::string& font_name, Kumu::UUID& uuid);
 	};
       
       //

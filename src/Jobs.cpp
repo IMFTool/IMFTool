@@ -227,6 +227,7 @@ Error JobWrapTimedText::Execute() {
 	TDesc.ContainerDuration = mDuration.GetCount()*mFrameRate.GetQuotient()/1000.;
 	TDesc.NamespaceName = mProfile.toStdString();
 	Kumu::GenRandomUUID(TDesc.AssetID);
+	buffer.Capacity(4*Kumu::Megabyte);
 
 	ASDCP::MXF::InterchangeObject* tmp_obj = NULL;
 

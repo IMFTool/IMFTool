@@ -146,9 +146,9 @@ AS_02::TimedText::Type5UUIDFilenameResolver::OpenRead(const std::string& dirname
 
   if ( KM_SUCCESS(result) )
     {
-      while ( KM_SUCCESS(dir_reader.GetNext(next_item, ft)) )
+	while ( KM_SUCCESS(dir_reader.GetNext(next_item, ft)) )
         {
-          if ( next_item[0] == '.' ) continue; // no hidden files
+		  if ( next_item[0] == '.' ) continue; // no hidden files
 	  std::string tmp_path = PathJoin(abs_dirname, next_item);
 
 	  if ( ft == DET_FILE )
@@ -167,8 +167,8 @@ AS_02::TimedText::Type5UUIDFilenameResolver::OpenRead(const std::string& dirname
 		  if ( memcmp(read_buffer, PNGMagic, sizeof(PNGMagic)) == 0 )
 		    {
 		      UUID asset_id = create_png_name_id(next_item);
-		      m_ResourceMap.insert(ResourceMap::value_type(asset_id, next_item));
-		    }
+		      m_ResourceMap.insert(ResourceMap::value_type(asset_id, tmp_path));
+		  }
 		  // is it a font?
 		  else if ( memcmp(read_buffer, OpenTypeMagic, sizeof(OpenTypeMagic)) == 0
 			    || memcmp(read_buffer, TrueTypeMagic, sizeof(TrueTypeMagic)) == 0 )
@@ -193,7 +193,6 @@ AS_02::TimedText::Type5UUIDFilenameResolver::ResolveRID(const byte_t* uuid, ASDC
   char buf[64];
 
   ResourceMap::const_iterator i = m_ResourceMap.find(tmp_id);
-
   if ( i == m_ResourceMap.end() )
     {
       DefaultLogSink().Debug("Missing timed-text resource \"%s\"\n", tmp_id.EncodeHex(buf, 64));
@@ -223,7 +222,7 @@ AS_02::TimedText::Type5UUIDFilenameResolver::ResolveRID(const byte_t* uuid, ASDC
 
 Result_t
 AS_02::TimedText::Type5UUIDFilenameResolver::PngNameToType5UUID(const std::string& name, Kumu::UUID& uuid){
-	if (name.find("/") == std::string::npos) {
+	if ((name.find("/") != std::string::npos) || (name.find("\\") != std::string::npos)){
 	      DefaultLogSink(). Error("PNG file name must not contain a path.\n");
 	      return RESULT_READFAIL;
 	}
@@ -233,8 +232,8 @@ AS_02::TimedText::Type5UUIDFilenameResolver::PngNameToType5UUID(const std::strin
 
 Result_t
 AS_02::TimedText::Type5UUIDFilenameResolver::FontNameToType5UUID(const std::string& name, Kumu::UUID& uuid){
-	if (name.find("/") == std::string::npos) {
-	      DefaultLogSink(). Error("Font file name must not contain a path.\n");
+	if ((name.find("/") != std::string::npos) || (name.find("\\") != std::string::npos)) {
+		  DefaultLogSink(). Error("Font file name must not contain a path.\n");
 	      return RESULT_READFAIL;
 	}
 	uuid = create_font_name_id(name);
@@ -268,10 +267,21 @@ public:
 
   ASDCP::TimedText::IResourceResolver* GetDefaultResolver()
   {
-    if ( m_DefaultResolver.empty() )
+	  if ( m_DefaultResolver.empty() )
       {
 	AS_02::TimedText::Type5UUIDFilenameResolver *resolver = new AS_02::TimedText::Type5UUIDFilenameResolver;
-	resolver->OpenRead(PathDirname(m_Filename));
+#ifdef KM_WIN32
+	const char separator = '/';
+	// Replace '\\' by '/' im m_Filename
+	size_t found = m_Filename.find_first_of('\\');
+	while (found != std::string::npos) { // While our position in the sting is in range.
+		m_Filename[found] = '/'; // Change the character at position.
+		found = m_Filename.find_first_of('\\', found + 1); // Relocate again.
+	}
+#else
+	const char separator = '/';
+#endif
+	resolver->OpenRead(PathDirname(m_Filename, separator));
 	m_DefaultResolver = resolver;
       }
     
@@ -292,7 +302,7 @@ AS_02::TimedText::ST2052_TextParser::h__TextParser::OpenRead(const std::string& 
 
   if ( KM_SUCCESS(result) )
     {
-      m_Filename = filename;
+	  m_Filename = filename;
       result = OpenRead();
     }
 
@@ -305,6 +315,7 @@ AS_02::TimedText::ST2052_TextParser::h__TextParser::OpenRead(const std::string& 
 {
   m_XMLDoc = xml_doc;
   m_Filename = filename;
+
   return OpenRead();
 }
 

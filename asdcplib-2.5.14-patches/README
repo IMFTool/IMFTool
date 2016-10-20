@@ -1,3 +1,13 @@
 This folder contains patches (file replacements) for asdcplib-2.5.14
 asdcplib can be downloaded from www.cinecert.com
 
+Instructions:
+
+- Download and unpack asdcplib-2.5.14.tar.gz from www.cincert.com
+
+- Copy the files in this directory (including CMakeLists.txt) into the src/ folder.
+
+- Follow the build instructions in README.cmake in the root folder of the asdcplib distribution
+
+
+asdcplib is (c) by Robert Scheler, Heiko Sparenberg Fraunhofer IIS, and John Hurst
