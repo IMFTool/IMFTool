@@ -318,8 +318,8 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 													// We have to parse the file to determine the type (opl or cpl)
 													bool is_opl = true;
 													bool is_cpl = true;
-
-													try { cpl::parseCompositionPlaylist(new_asset_path.absoluteFilePath().toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize); }
+													std::auto_ptr< cpl::CompositionPlaylistType> cpl_data;
+													try { cpl_data = cpl::parseCompositionPlaylist(new_asset_path.absoluteFilePath().toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize); }
 													catch(...) { is_cpl = false; }
 													try { opl::parseOutputProfileList(new_asset_path.absoluteFilePath().toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize); }
 													catch(...) { is_opl = false; }
@@ -327,6 +327,10 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 														// Add CPL
 														QSharedPointer<AssetCpl> cpl(new AssetCpl(new_asset_path, am_asset, pkl_asset));
 														AddAsset(cpl, ImfXmlHelper::Convert(packing_list->getId()));
+														//WR
+														mImpEditRates.push_back(ImfXmlHelper::Convert(cpl_data->getEditRate()));
+														qDebug() << "CPL Edit Rate: " << mImpEditRates.last().GetNumerator()  << mImpEditRates.last().GetDenominator();
+														//WR
 													}
 													else if(is_opl && !is_cpl) {
 														// Add Opl

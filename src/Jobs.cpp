@@ -139,10 +139,10 @@ Error JobWrapWav::Execute() {
 						  current_soundfield = reinterpret_cast<ASDCP::MXF::SoundfieldGroupLabelSubDescriptor*>(*i);
 						  if (current_soundfield) {
 							  // Set SoundfieldGroupLabelSubDescriptor items which are mandatory per ST 2067-2
-							  if (mMCATitle != "") current_soundfield->MCATitle = mMCATitle.toStdString();
-							  if (mMCATitleVersion != "") current_soundfield->MCATitleVersion = mMCATitleVersion.toStdString();
-							  if (mMCAAudioContentKind != "") current_soundfield->MCAAudioContentKind = mMCAAudioContentKind.toStdString();
-							  if (mMCAAudioElementKind != "") current_soundfield->MCAAudioElementKind = mMCAAudioElementKind.toStdString();
+							  if (!mMCATitle.isEmpty()) current_soundfield->MCATitle = mMCATitle.toStdString();
+							  if (!mMCATitleVersion.isEmpty()) current_soundfield->MCATitleVersion = mMCATitleVersion.toStdString();
+							  if (!mMCAAudioContentKind.isEmpty()) current_soundfield->MCAAudioContentKind = mMCAAudioContentKind.toStdString();
+							  if (!mMCAAudioElementKind.isEmpty()) current_soundfield->MCAAudioElementKind = mMCAAudioElementKind.toStdString();
 							  //current_soundfield->Dump();
 						  }
 					  }
@@ -244,7 +244,9 @@ Error JobWrapTimedText::Execute() {
 				return error;
 			}
 		}
-		essence_descriptor->RFC5646LanguageTagList.set(mLanguageTag.toStdString());
+		if (!mLanguageTag.isEmpty()) {
+			essence_descriptor->RFC5646LanguageTagList.set(mLanguageTag.toStdString());
+		}
 		//WR
 		std::string XMLDoc;
 		AS_02::TimedText::ResourceList_t::const_iterator ri;

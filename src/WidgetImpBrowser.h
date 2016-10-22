@@ -76,7 +76,6 @@ signals:
 	void Save();
 	void ShowResourceGeneratorWavMode();
 	void ShowResourceGeneratorTimedTextMode();
-	void ShowCompositionGenerator();
 	//WR begin
 	void RecalcHashForCpls();
 	//WR end

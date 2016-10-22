@@ -33,6 +33,7 @@
 #include <QImage>
 #include <QAbstractTableModel>
 #include <QUndoCommand>
+#include <QVector>
 
 
 class Asset;
@@ -125,6 +126,7 @@ private:
 	QMessageBox *mpMsgBox;
 	QProgressDialog *mpProgressDialog;
 	JobQueue *mpJobQueue;
+	QVector<EditRate> mImpEditRates; //required for creating TT assets
 	//WR
 };
 

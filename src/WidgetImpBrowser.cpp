@@ -360,13 +360,6 @@ void WidgetImpBrowser::ShowResourceGeneratorTimedTextMode() {
 }
 		/* -----Denis Manthey End----- */
 
-void WidgetImpBrowser::ShowCompositionGenerator() {
-
-	WizardCompositionGenerator *p_wizard_composition_generator = new WizardCompositionGenerator(this);
-	p_wizard_composition_generator->setAttribute(Qt::WA_DeleteOnClose, true);
-	p_wizard_composition_generator->show();
-	connect(p_wizard_composition_generator, SIGNAL(accepted()), this, SLOT(rCompositionGeneratorAccepted()));
-}
 
 void WidgetImpBrowser::rShowResourceGeneratorForSelectedRow() {
 

@@ -169,7 +169,7 @@ void WidgetComposition::AddNewTrackRequest(eSequenceType type) {
 	AbstractWidgetTrackDetails *p_track = NULL;
 	if(type == MainAudioSequence) p_track = new WidgetAudioTrackDetails(track_id, mpCompositionTracksWidget);
 
-	if(type == SubtitlesSequence) p_track = new WidgetTrackDetails(track_id, type, mpCompositionTracksWidget);
+	else if(type == SubtitlesSequence) p_track = new WidgetTrackDetails(track_id, type, mpCompositionTracksWidget);
 
 	else p_track = new WidgetTrackDetails(track_id, type, mpCompositionTracksWidget);
 	int track_index = GetLastTrackDetailIndexForType(type) + 1;
