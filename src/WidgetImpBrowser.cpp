@@ -17,7 +17,6 @@
 #include "global.h"
 #include "ImfPackageCommands.h"
 #include "WizardResourceGenerator.h"
-#include "WizardCompositionGenerator.h"
 #include "MetadataExtractor.h"
 #include "DelegateMetadata.h"
 #include "WidgetComposition.h"
@@ -201,6 +200,8 @@ void WidgetImpBrowser::InstallImp(const QSharedPointer<ImfPackage> &rImfPackage,
 
 void WidgetImpBrowser::UninstallImp() {
 
+	disconnect(mpViewAssets->selectionModel(), NULL, this, NULL);
+	disconnect(mpViewImp, NULL, this, NULL);
 	disconnect(mpImfPackage.data(), NULL, this, NULL);
 	emit ImplInstalled(false);
 	emit ImpSaveStateChanged(false);
@@ -310,7 +311,7 @@ void WidgetImpBrowser::Save() {
 
 						/* -----Denis Manthey Beg----- */
 					else if(mxf_asset->GetEssenceType() == Metadata::TimedText) {
-						JobWrapTimedText *p_wrap_job = new JobWrapTimedText(mxf_asset->GetSourceFiles(), mxf_asset->GetPath().absoluteFilePath(), mxf_asset->GetEditRate(), mxf_asset->GetDuration(), mxf_asset->GetId(), mxf_asset->GetProfile(), mxf_asset->GetTimedTextFrameRate(), mxf_asset->GetLanguageTag());
+						JobWrapTimedText *p_wrap_job = new JobWrapTimedText(mxf_asset->GetSourceFiles(), mxf_asset->GetPath().absoluteFilePath(), mxf_asset->GetEditRate(), mxf_asset->GetOriginalDuration(), mxf_asset->GetId(), mxf_asset->GetProfile(), mxf_asset->GetTimedTextFrameRate(), mxf_asset->GetLanguageTag());
 						connect(p_wrap_job, SIGNAL(Success()), mxf_asset.data(), SLOT(FileModified()));
 						mpJobQueue->AddJob(p_wrap_job);
 					}
@@ -351,7 +352,7 @@ void WidgetImpBrowser::ShowResourceGeneratorWavMode() {
 		/* -----Denis Manthey Beg----- */
 void WidgetImpBrowser::ShowResourceGeneratorTimedTextMode() {
 
-	WizardResourceGenerator *p_wizard_resource_generator = new WizardResourceGenerator(this);
+	WizardResourceGenerator *p_wizard_resource_generator = new WizardResourceGenerator(this, mpImfPackage->GetImpEditRates());
 	p_wizard_resource_generator->setAttribute(Qt::WA_DeleteOnClose, true);
 	p_wizard_resource_generator->SwitchMode(WizardResourceGenerator::TTMLMode);
 	p_wizard_resource_generator->resize( QSize(600, 500).expandedTo(minimumSizeHint()) );
@@ -374,18 +375,19 @@ void WidgetImpBrowser::rShowResourceGeneratorForAsset(const QUuid &rAssetId) {
 	if(mpImfPackage) {
 		QSharedPointer<AssetMxfTrack> asset = mpImfPackage->GetAsset(rAssetId).objectCast<AssetMxfTrack>();
 		if(asset && asset->Exists() == false) {
-			WizardResourceGenerator *p_wizard_resource_generator = new WizardResourceGenerator(this);
+			WizardResourceGenerator *p_wizard_resource_generator = new WizardResourceGenerator(this, mpImfPackage->GetImpEditRates());
 			p_wizard_resource_generator->setAttribute(Qt::WA_DeleteOnClose, true);
 			p_wizard_resource_generator->setField(FIELD_NAME_SELECTED_FILES, QVariant(asset->GetSourceFiles()));
 			p_wizard_resource_generator->setField(FIELD_NAME_SOUNDFIELD_GROUP, QVariant::fromValue<SoundfieldGroup>(asset->GetSoundfieldGroup()));
 			p_wizard_resource_generator->setField(FIELD_NAME_EDIT_RATE, QVariant::fromValue<EditRate>(asset->GetEditRate()));
 			//WR
 			p_wizard_resource_generator->setField(FIELD_NAME_LANGUAGETAG_WAV, QVariant::fromValue<QString>(asset->GetLanguageTag()));
-			p_wizard_resource_generator->setField(FIELD_NAME_LANGUAGETAG_TT, QVariant::fromValue<QString>(asset->GetLanguageTag()));
-			p_wizard_resource_generator->setField(FIELD_NAME_MCA_TITLE, QVariant::fromValue<QString>(asset->GetMCATitle()));
-			p_wizard_resource_generator->setField(FIELD_NAME_MCA_TITLE_VERSION, QVariant::fromValue<QString>(asset->GetMCATitleVersion()));
-			p_wizard_resource_generator->setField(FIELD_NAME_MCA_AUDIO_CONTENT_KIND, QVariant::fromValue<QString>(asset->GetMCAAudioContentKind()));
-			p_wizard_resource_generator->setField(FIELD_NAME_MCA_AUDIO_ELEMENT_KIND, QVariant::fromValue<QString>(asset->GetMCAAudioElementKind()));
+			p_wizard_resource_generator->setField(FIELD_NAME_LANGUAGETAG_TT, QVariant(asset->GetLanguageTag()));
+			p_wizard_resource_generator->setField(FIELD_NAME_MCA_TITLE, QVariant(asset->GetMCATitle()));
+			p_wizard_resource_generator->setField(FIELD_NAME_MCA_TITLE_VERSION, QVariant(asset->GetMCATitleVersion()));
+			p_wizard_resource_generator->setField(FIELD_NAME_MCA_AUDIO_CONTENT_KIND, QVariant(asset->GetMCAAudioContentKind()));
+			p_wizard_resource_generator->setField(FIELD_NAME_MCA_AUDIO_ELEMENT_KIND, QVariant(asset->GetMCAAudioElementKind()));
+			p_wizard_resource_generator->setField(FIELD_NAME_CPL_EDIT_RATE, QVariant::fromValue<EditRate>(asset->GetCplEditRate()));
 			//WR
 			p_wizard_resource_generator->setProperty(ASSET_ID_DYNAMIK_PROPERTY, QVariant(asset->GetId()));
 			p_wizard_resource_generator->show();
@@ -409,6 +411,7 @@ void WidgetImpBrowser::rResourceGeneratorAccepted() {
 		QString mca_title_version = qvariant_cast<QString>(p_resource_generator->field(FIELD_NAME_MCA_TITLE_VERSION));
 		QString mca_audio_content_kind = qvariant_cast<QString>(p_resource_generator->field(FIELD_NAME_MCA_AUDIO_CONTENT_KIND));
 		QString mca_audio_element_kind = qvariant_cast<QString>(p_resource_generator->field(FIELD_NAME_MCA_AUDIO_ELEMENT_KIND));
+		EditRate cpl_edit_rate = qvariant_cast<EditRate>(p_resource_generator->field(FIELD_NAME_CPL_EDIT_RATE));
 		//WR
 		if(mpImfPackage) {
 			QVariant asset_id = p_resource_generator->property(ASSET_ID_DYNAMIK_PROPERTY);
@@ -439,11 +442,11 @@ void WidgetImpBrowser::rResourceGeneratorAccepted() {
 					QString file_name = QString("TimedText_%1.mxf").arg(strip_uuid(id));
 					QFileInfo mxf_asset_file_path(mpImfPackage->GetRootDir().absoluteFilePath(file_name));
 					QSharedPointer<AssetMxfTrack> mxf_asset(new AssetMxfTrack(mxf_asset_file_path, id));
+					mxf_asset->SetCplEditRate(cpl_edit_rate);
 					mxf_asset->SetSourceFiles(selected_files);
-					if (mxf_asset->GetDuration().GetCount() == 0)
+					if (mxf_asset->GetDuration().GetCount() == 0) {
 						mxf_asset->SetDuration(duration);
-
-					//WR
+					}
 					mxf_asset->SetLanguageTag(language_tag_tt);
 					//WR
 					mpUndoStack->push(new AddAssetCommand(mpImfPackage, mxf_asset, mpImfPackage->GetPackingListId()));
@@ -457,8 +460,20 @@ void WidgetImpBrowser::rResourceGeneratorAccepted() {
 				QSharedPointer<AssetMxfTrack> mxf_asset = mpImfPackage->GetAsset(asset_id.toUuid()).objectCast<AssetMxfTrack>();
 				if(mxf_asset) {
 					mxf_asset->SetSourceFiles(selected_files);
-					mxf_asset->SetFrameRate(edit_rate);
 					mxf_asset->SetSoundfieldGroup(soundfield_group);
+					//WR
+					if (is_wav_file(selected_files.first())) {
+						mxf_asset->SetLanguageTag(language_tag_wav);
+						mxf_asset->SetMCATitle(mca_title);
+						mxf_asset->SetMCATitleVersion(mca_title_version);
+						mxf_asset->SetMCAAudioContentKind(mca_audio_content_kind);
+						mxf_asset->SetMCAAudioElementKind(mca_audio_element_kind);
+					}
+					if (is_ttml_file(selected_files.first())) {
+						mxf_asset->SetLanguageTag(language_tag_tt);
+						mxf_asset->SetCplEditRate(cpl_edit_rate);
+					}
+					//WR
 				}
 			}
 		}
@@ -497,34 +512,6 @@ QSharedPointer<AssetCpl> WidgetImpBrowser::GenerateEmptyCPL() {
 
 
 
-void WidgetImpBrowser::rCompositionGeneratorAccepted() {
-
-	WizardCompositionGenerator *p_composition_generator = qobject_cast<WizardCompositionGenerator *>(sender());
-	if(p_composition_generator) {
-		EditRate edit_rate = qvariant_cast<EditRate>(p_composition_generator->field(FIELD_NAME_EDIT_RATE));
-		QString title = qvariant_cast<QString>(p_composition_generator->field(FIELD_NAME_TITLE));
-		QString issuer = qvariant_cast<QString>(p_composition_generator->field(FIELD_NAME_ISSUER));
-		QString content_originator = qvariant_cast<QString>(p_composition_generator->field(FIELD_NAME_CONTENT_ORIGINATOR));
-		if(mpImfPackage) {
-			QUuid id = QUuid::createUuid();
-			QString file_name = QString("CPL_%1.xml").arg(strip_uuid(id));
-			QFileInfo mxf_cpl_file_path(mpImfPackage->GetRootDir().absoluteFilePath(file_name));
-			QSharedPointer<AssetCpl> cpl_asset(new AssetCpl(mxf_cpl_file_path, id));
-			XmlSerializationError error = WidgetComposition::WriteMinimal(mxf_cpl_file_path.absoluteFilePath(), id, edit_rate, title, issuer, content_originator);
-			if(error.IsError() == false) mpUndoStack->push(new AddAssetCommand(mpImfPackage, cpl_asset, mpImfPackage->GetPackingListId()));
-			else {
-				QString error_string = error.GetErrorMsg();
-				error.AppendErrorDescription(error_string);
-				mpMsgBox->setText(tr("XML Serialization Error"));
-				mpMsgBox->setInformativeText(error_string);
-				mpMsgBox->setStandardButtons(QMessageBox::Ok);
-				mpMsgBox->setDefaultButton(QMessageBox::Ok);
-				mpMsgBox->setIcon(QMessageBox::Critical);
-				mpMsgBox->exec();
-			}
-		}
-	}
-}
 
 void WidgetImpBrowser::rMapCurrentRowSelectionChanged(const QModelIndex &rCurrent, const QModelIndex &rPrevious) {
 
@@ -611,6 +598,7 @@ void WidgetImpBrowser::rJobQueueFinished() {
 void WidgetImpBrowser::rImpViewDoubleClicked(const QModelIndex &rIndex) {
 
 	if(mpImfPackage) {
+		qDebug() << "rImpViewDoubleClicked";
 		if(sender() == mpViewImp && rIndex.column() != ImfPackage::ColumnAnnotation) {
 			QModelIndex index = mpSortProxyModelImp->mapToSource(rIndex);
 			if(index.isValid() == true) {

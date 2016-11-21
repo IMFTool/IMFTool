@@ -48,7 +48,7 @@ public:
 	void GetAsTextDocument(QTextDocument &rDoc);
 
 	Metadata::eEssenceType					type;
-	EditRate								editRate;
+	EditRate								editRate; // EditRate to appear in the CPL
 	ASDCP::Rational							aspectRatio;
 	quint32									storedWidth;
 	quint32									storedHeight;
@@ -64,7 +64,6 @@ public:
 	QString									fileName;
 	QString									filePath;
 	QString									fileType;
-	EditRate								infoEditRate; //TT Edit Rate is based od milliseconds in this application. infoEdirRate is used for the real ER of the tt
 	QString									profile;	//Timed Text Profile
 	//WR
 	QString									languageTag;
@@ -72,6 +71,8 @@ public:
 	QString									mcaTitleVersion;
 	QString									mcaAudioContentKind;
 	QString									mcaAudioElementKind;
+	EditRate								effectiveFrameRate; // For TTML only: Effective Frame Rate of TTML1/IMSC1 file
+	Duration								originalDuration; // For TTML only: Duration of TTML1/IMSC1 file expressed in effectiveFrameRate
 	//WR
 };
 

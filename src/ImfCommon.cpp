@@ -367,11 +367,14 @@ const EditRate EditRate::EditRate120(120, 1, "120");
 const EditRate EditRate::EditRate48000(48000, 1, "48000");
 const EditRate EditRate::EditRate96000(96000, 1, "96000");
 
-EditRate::EditRate(qint32 n, qint32 d) : mNumerator(n), mDenominator(d), mName() {
+EditRate::EditRate(qint32 n, qint32 d) : mName() {
+
+	mNumerator = (d == 1000) ? n/1000 : n;
+	mDenominator = (d == 1000) ? 1 : d;
 
 	for(int i = 0; i < EditRate::mMap.size(); i++) {
 		EditRate *p_edit_rate = EditRate::mMap.at(i);
-		if(p_edit_rate && p_edit_rate->mNumerator == n && p_edit_rate->mDenominator == d) mName = p_edit_rate->mName;
+		if(p_edit_rate && p_edit_rate->mNumerator == mNumerator && p_edit_rate->mDenominator == mDenominator) mName = p_edit_rate->mName;
 	}
 }
 

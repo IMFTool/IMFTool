@@ -358,6 +358,26 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 										}
 									}
 								}
+								int count = 0;
+								for (QVector<EditRate>::iterator i=mImpEditRates.begin(); i < mImpEditRates.end(); i++) {
+									// Remove duplicate frame rates
+									while (int pos = mImpEditRates.lastIndexOf(*i) != count) {
+										mImpEditRates.remove(count);
+									}
+									count ++;
+								}
+								foreach(QSharedPointer<Asset> asset, mAssetList) {
+									// TTML XF assets only: Set Edit Rate in metadata object to CPL Edit Rate, re-calculate duration in CPL Edit Rate units
+									// Uses the first CPL Edit Rate in mImpEditRates, this can be an issue in multi-edit rate IMPs
+									QSharedPointer <AssetMxfTrack> assetMxfTrack = qSharedPointerCast<AssetMxfTrack>(asset);
+									if (assetMxfTrack){
+										if (assetMxfTrack->GetEssenceType() == Metadata::TimedText) {
+											assetMxfTrack->SetCplEditRate(mImpEditRates.first());
+											assetMxfTrack->SetEditRate(mImpEditRates.first());
+											assetMxfTrack->SetDuration(Duration(ceil(assetMxfTrack->GetOriginalDuration().GetCount() / assetMxfTrack->GetTimedTextFrameRate().GetQuotient() * assetMxfTrack->GetEditRate().GetQuotient())));
+										}
+									}
+								}
 							}
 							else {
 								qDebug() << parse_error;
@@ -1045,6 +1065,7 @@ void AssetMxfTrack::SetSourceFiles(const QStringList &rSourceFiles) {
 
 			/* -----Denis Manthey----- */
 			else if(is_ttml_file(mSourceFiles.first()) == true) {
+				mMetadataExtr.SetCplEditRate(mCplEditRate);
 				mMetadataExtr.ReadMetadata(mMetadata, mSourceFiles.first());
 				SetDefaultProxyImages();
 				emit AssetModified(this);
@@ -1058,6 +1079,10 @@ void AssetMxfTrack::SetSourceFiles(const QStringList &rSourceFiles) {
 
 void AssetMxfTrack::SetFrameRate(const EditRate &rFrameRate) {
 
+	if(Exists() == false && GetEssenceType() == Metadata::TimedText) {
+		mMetadata.editRate = rFrameRate;
+		emit AssetModified(this);
+	}
 }
 
 void AssetMxfTrack::SetSoundfieldGroup(const SoundfieldGroup &rSoundfieldGroup) {
@@ -1070,7 +1095,8 @@ void AssetMxfTrack::SetSoundfieldGroup(const SoundfieldGroup &rSoundfieldGroup) 
 
 void AssetMxfTrack::SetDuration(const Duration &rDuration) {
 
-	if(Exists() == false && GetEssenceType() == Metadata::TimedText) {
+	//if(Exists() == false && GetEssenceType() == Metadata::TimedText) {
+	if(GetEssenceType() == Metadata::TimedText) {
 		mMetadata.duration = rDuration;
 		emit AssetModified(this);
 	}

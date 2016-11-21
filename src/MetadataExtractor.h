@@ -35,6 +35,7 @@ public:
 	//! Reads MXF descriptors and writes the properties into rMetadata.
 	Error ReadMetadata(Metadata &rMetadata, const QString &rSourceFile);
 	Error ReadAncillaryResource(QByteArray &rRawData, const byte_t ResourceID[], const QString &rSourceFile);
+	void SetCplEditRate(EditRate rCplEditRate) {mCplEditRate = rCplEditRate;};
 private:
 
 	Q_DISABLE_COPY(MetadataExtractor);
@@ -47,4 +48,7 @@ private:
 	float DurationExtractor(xercesc::DOMDocument *dom_doc, float fr, int tr);
 	float GetElementDuration(xercesc::DOMElement* eleDom, float fr, int tr);
 	float ConvertTimingQStringtoDouble(QString string_time, float fr, int tr);
+	//WR
+	EditRate mCplEditRate;  // for creating TT files
+	//WR
 };

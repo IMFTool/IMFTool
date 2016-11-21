@@ -224,7 +224,9 @@ Error JobWrapTimedText::Execute() {
 	result = Parser.FillTimedTextDescriptor(TDesc);
 
 	TDesc.EditRate = ASDCP::Rational(mFrameRate.GetNumerator(), mFrameRate.GetDenominator());
-	TDesc.ContainerDuration = mDuration.GetCount()*mFrameRate.GetQuotient()/1000.;
+	//WR
+	TDesc.ContainerDuration = mDuration.GetCount();
+	//WR
 	TDesc.NamespaceName = mProfile.toStdString();
 	Kumu::GenRandomUUID(TDesc.AssetID);
 	buffer.Capacity(4*Kumu::Megabyte);

@@ -86,7 +86,6 @@ signals:
 	void rShowResourceGeneratorForSelectedRow();
 	void rShowResourceGeneratorForAsset(const QUuid &rAssetId);
 	void rResourceGeneratorAccepted();
-	void rCompositionGeneratorAccepted();
 	void rCustomMenuRequested(QPoint pos);
 	void rMapCurrentRowSelectionChanged(const QModelIndex &rCurrent, const QModelIndex &rPrevious);
 	void rJobQueueFinished();

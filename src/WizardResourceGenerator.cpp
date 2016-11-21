@@ -40,7 +40,7 @@
 #include "EmptyTimedTextGenerator.h"
 
 
-WizardResourceGenerator::WizardResourceGenerator(QWidget *pParent /*= NULL*/) :
+WizardResourceGenerator::WizardResourceGenerator(QWidget *pParent /*= NULL*/, QVector<EditRate> rEditRates /* = QVector<EditRates>()*/) :
 QWizard(pParent) {
 
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -48,6 +48,7 @@ QWizard(pParent) {
 	setWindowTitle(tr("Resource Generator"));
 	setWizardStyle(QWizard::ModernStyle);
 	setStyleSheet("QWizard QPushButton {min-width: 60 px;}");
+	mEditRates = rEditRates;
 	InitLayout();
 }
 
@@ -58,7 +59,7 @@ QSize WizardResourceGenerator::sizeHint() const {
 
 void WizardResourceGenerator::InitLayout() {
 
-	WizardResourceGeneratorPage *p_wizard_page = new WizardResourceGeneratorPage(this);
+	WizardResourceGeneratorPage *p_wizard_page = new WizardResourceGeneratorPage(this, mEditRates);
 	mPageId = addPage(p_wizard_page);
 	setOption(QWizard::HaveCustomButton1, true);
 	setButtonText(QWizard::CustomButton1, tr("Browse"));
@@ -77,12 +78,13 @@ void WizardResourceGenerator::SwitchMode(eMode mode) {
 	}
 }
 
-WizardResourceGeneratorPage::WizardResourceGeneratorPage(QWidget *pParent /*= NULL*/) :
+WizardResourceGeneratorPage::WizardResourceGeneratorPage(QWidget *pParent /*= NULL*/, QVector<EditRate> rEditRates /* = QVector<EditRate>()*/) :
 QWizardPage(pParent), mpFileDialog(NULL), mpSoundFieldGroupModel(NULL), mpTimedTextModel(NULL), mpTableViewExr(NULL), mpTableViewWav(NULL), mpTableViewTimedText(NULL), mpProxyImageWidget(NULL), mpStackedLayout(NULL), mpComboBoxEditRate(NULL),
-mpComboBoxSoundfieldGroup(NULL), mpMsgBox(NULL), mpAs02Wrapper(NULL), mpLineEditDuration(NULL) {
+mpComboBoxSoundfieldGroup(NULL), mpMsgBox(NULL), mpAs02Wrapper(NULL), mpLineEditDuration(NULL), mpComboBoxCplEditRate(NULL) {
 	mpAs02Wrapper = new MetadataExtractor(this);
 	setTitle(tr("Edit Resource"));
 	setSubTitle(tr("Select  a single (multichannel) wav file or IMSC1/TTML1 file that should build a resource."));
+	mEditRates = rEditRates;
 	InitLayout();
 }
 
@@ -129,7 +131,7 @@ void WizardResourceGeneratorPage::InitLayout() {
 	mpTableViewWav->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	mpTableViewWav->setItemDelegateForColumn(SoundFieldGroupModel::ColumnDstChannel, new DelegateComboBox(this, false, false));
 	//WR
-	//language code is two or three samll letters, region code is either two capital letters or three digits"
+	//language code is two or three lowercase letters, region code is either two uppercase letters or three digits"
 	QRegExp rx_lang("[a-z]{2,3}\-([A-Z]{2}|[0-9]{3})");
 	QRegExpValidator *v_lang = new QRegExpValidator(rx_lang, this);
 	mpLineEditLanguageTagWav = new QLineEdit(this);
@@ -150,22 +152,31 @@ void WizardResourceGeneratorPage::InitLayout() {
 	mpLineEditMCATitle->setAlignment(Qt::AlignRight);
 	mpLineEditMCATitle->setText("Default Title");
 	mpLineEditMCATitle->setValidator(v_mca_items);
-	connect(mpLineEditMCATitle, SIGNAL(textEdited(QString)), this, SLOT(mcaTitleChanged()));
+	//connect(mpLineEditMCATitle, SIGNAL(textEdited(QString)), this, SLOT(mcaTitleChanged()));
 	mpLineEditMCATitleVersion = new QLineEdit(this);
 	mpLineEditMCATitleVersion->setAlignment(Qt::AlignRight);
 	mpLineEditMCATitleVersion->setText("Domestic");
 	mpLineEditMCATitleVersion->setValidator(v_mca_items);
-	connect(mpLineEditMCATitleVersion, SIGNAL(textEdited(QString)), this, SLOT(mcaTitleVersionChanged()));
+	//connect(mpLineEditMCATitleVersion, SIGNAL(textEdited(QString)), this, SLOT(mcaTitleVersionChanged()));
 	mpLineEditMCAAudioContentKind = new QLineEdit(this);
 	mpLineEditMCAAudioContentKind->setAlignment(Qt::AlignRight);
-	mpLineEditMCAAudioContentKind->setText("Feature");
+	mpLineEditMCAAudioContentKind->setText("Master");
 	mpLineEditMCAAudioContentKind->setValidator(v_mca_items);
-	connect(mpLineEditMCAAudioContentKind, SIGNAL(textEdited(QString)), this, SLOT(mcaAudioContentKindChanged()));
+	//connect(mpLineEditMCAAudioContentKind, SIGNAL(textEdited(QString)), this, SLOT(mcaAudioContentKindChanged()));
 	mpLineEditMCAAudioElementKind = new QLineEdit(this);
 	mpLineEditMCAAudioElementKind->setAlignment(Qt::AlignRight);
 	mpLineEditMCAAudioElementKind->setText("Composite Mix");
 	mpLineEditMCAAudioElementKind->setValidator(v_mca_items);
-	connect(mpLineEditMCAAudioElementKind, SIGNAL(textEdited(QString)), this, SLOT(mcaAudioElementKindChanged()));
+	//connect(mpLineEditMCAAudioElementKind, SIGNAL(textEdited(QString)), this, SLOT(mcaAudioElementKindChanged()));
+	mpComboBoxCplEditRate = new QComboBox(this);
+	mpComboBoxCplEditRate->setWhatsThis(tr("Select a frame rate. It shall match the CPL Edit Rate"));
+	QStringListModel *p_edit_rate_group_model = new QStringListModel(this);
+	QStringList p_edit_rate_string_list;
+	for (QVector<EditRate>::iterator i=mEditRates.begin(); i < mEditRates.end(); i++) {
+		p_edit_rate_string_list << i->GetName();
+	}
+	p_edit_rate_group_model->setStringList(p_edit_rate_string_list);
+	mpComboBoxCplEditRate->setModel(p_edit_rate_group_model);
 	//WR
 
 			/* -----Denis Manthey----- */
@@ -203,7 +214,7 @@ void WizardResourceGeneratorPage::InitLayout() {
 	mpLineEditFileName->setValidator(v);
 	mpLineEditDuration = new QLineEdit(this);
 	mpLineEditDuration->setAlignment(Qt::AlignRight);
-	mpLineEditDuration->setPlaceholderText("Duration [seconds]");
+	mpLineEditDuration->setPlaceholderText("Duration [frames]");
 	mpLineEditDuration->setValidator(new QIntValidator(this));
 	mpGenerateEmpty_button = new QPushButton(this);
 	mpGenerateEmpty_button->setText(tr("Generate"));
@@ -251,10 +262,12 @@ void WizardResourceGeneratorPage::InitLayout() {
 	QGridLayout *vbox = new QGridLayout;
 	p_wrapper_layout_three->setContentsMargins(0, 0, 0, 0);
 	p_wrapper_layout_three->addWidget(new QLabel(tr("Select a Timed Text Resource (.ttml) compliant to IMSC1"), this), 0, 0, 1, 3);
-	p_wrapper_layout_three->addWidget(new QLabel(tr("RFC 5646 Language Tag (e.g. en-US):"), this), 1, 0, 1, 2);
-	p_wrapper_layout_three->addWidget(mpLineEditLanguageTagTT, 1, 2, 1, 1);
-	p_wrapper_layout_three->addWidget(mpTableViewTimedText, 2, 0, 1, 3);
-	p_wrapper_layout_three->addWidget(pGenNew, 3, 0, 1, 3);
+	p_wrapper_layout_three->addWidget(new QLabel(tr("CPL Edit Rate:"), this), 1, 0, 1, 2);
+	p_wrapper_layout_three->addWidget(mpComboBoxCplEditRate, 1, 2, 1, 1);
+	p_wrapper_layout_three->addWidget(new QLabel(tr("RFC 5646 Language Tag (e.g. en-US):"), this), 2, 0, 1, 2);
+	p_wrapper_layout_three->addWidget(mpLineEditLanguageTagTT, 2, 2, 1, 1);
+	p_wrapper_layout_three->addWidget(mpTableViewTimedText, 3, 0, 1, 3);
+	p_wrapper_layout_three->addWidget(pGenNew, 4, 0, 1, 3);
 
 	vbox->addWidget(new QLabel(tr("Set the file name of the empty tt resource:"), this), 1, 0, 1, 1);
 	vbox->addWidget(mpLineEditFileName, 1, 1, 1, 1);
@@ -292,6 +305,7 @@ void WizardResourceGeneratorPage::InitLayout() {
 	registerField(FIELD_NAME_MCA_TITLE_VERSION, this, "MCATitleVersionSelected", SIGNAL(MCATitleVersionChanged()));
 	registerField(FIELD_NAME_MCA_AUDIO_CONTENT_KIND, this, "MCAAudioContentKindSelected", SIGNAL(MCAAudioContentKindChanged()));
 	registerField(FIELD_NAME_MCA_AUDIO_ELEMENT_KIND, this, "MCAAudioElementKindSelected", SIGNAL(MCAAudioElementKindChanged()));
+	registerField(FIELD_NAME_CPL_EDIT_RATE, this, "CplEditRateSelected", SIGNAL(CplEditRateChanged()));
 	//WR
 
 	connect(mpFileDialog, SIGNAL(filesSelected(const QStringList &)), this, SLOT(SetSourceFiles(const QStringList &)));
@@ -344,7 +358,7 @@ void WizardResourceGeneratorPage::GenerateEmptyTimedText(){
 
 	QStringList filePath(tr("%1/%2.xml").arg(mpLineEditFileDir->text()).arg(mpLineEditFileName->text()));
 	QFileInfo *file = new QFileInfo(mpLineEditFileDir->text());
-	QString dur(tr("%1s").arg(mpLineEditDuration->text()));
+	QString dur(tr("%1f").arg(mpLineEditDuration->text()));
 
 	//check if filename already exists in directory
 	if (QFile::exists(filePath.at(0))) {
@@ -366,9 +380,7 @@ void WizardResourceGeneratorPage::GenerateEmptyTimedText(){
 		mpLineEditFileDir->clear();
 	}
 	else {
-		mpEmptyTt = new EmptyTimedTextGenerator(filePath.at(0), dur);
-		Metadata metadata;
-		mpAs02Wrapper->ReadMetadata(metadata, filePath.at(0));
+		mpEmptyTt = new EmptyTimedTextGenerator(filePath.at(0), dur, GetCplEditRate());
 		mpTimedTextModel->SetFile(filePath);
 		mpTableViewTimedText->resizeRowsToContents();
 		mpTableViewTimedText->resizeColumnsToContents();
@@ -446,7 +458,7 @@ void WizardResourceGeneratorPage::SetSourceFiles(const QStringList &rFiles) {
 			mpLineEditDuration = new QLineEdit(this);
 			mpLineEditDuration->setValidator(new QIntValidator(this));
 			mpLineEditDuration->setAlignment(Qt::AlignRight);
-			mpLineEditDuration->setPlaceholderText("Duration [seconds]");
+			mpLineEditDuration->setPlaceholderText("Duration [frames]");
 			QPushButton *pOk = new QPushButton("OK");
 			QPushButton *pCancel = new QPushButton("Cancel");
 
@@ -461,6 +473,7 @@ void WizardResourceGeneratorPage::SetSourceFiles(const QStringList &rFiles) {
 			connect(pCancel, SIGNAL(clicked(bool)), pEditDur, SLOT(close()));
 			connect(pOk, SIGNAL(clicked(bool)), pEditDur, SLOT(accept()));
 
+			mpAs02Wrapper->SetCplEditRate(GetCplEditRate());
 			error = mpAs02Wrapper->ReadMetadata(metadata, rFiles.at(0));
 			if(error.IsError()){
 				mpMsgBox->setText(error.GetErrorDescription());
@@ -475,7 +488,7 @@ void WizardResourceGeneratorPage::SetSourceFiles(const QStringList &rFiles) {
 				int ret = pEditDur->exec();
 				switch (ret) {
 					case 1:
-						metadata.duration = Duration(mpLineEditDuration->text().toInt()*1000);
+						metadata.duration = Duration(mpLineEditDuration->text().toInt());
 						break;
 					case 0:
 						return;
@@ -599,6 +612,11 @@ void WizardResourceGeneratorPage::SetMCAAudioElementKind(const QString &text) {
 	emit completeChanged();
 }
 
+void WizardResourceGeneratorPage::SetCplEditRate(const EditRate &rEditRate) {
+	mpComboBoxCplEditRate->setCurrentText(rEditRate.GetName());
+	emit CplEditRateChanged();
+	emit completeChanged();
+}
 //WR
 
 
@@ -609,7 +627,7 @@ EditRate WizardResourceGeneratorPage::GetEditRate() const {
 
 Duration WizardResourceGeneratorPage::GetDuration() const {
 
-	return Duration(mpLineEditDuration->text().toInt()*1000);
+	return Duration(mpLineEditDuration->text().toInt());
 }
 
 //WR
@@ -643,6 +661,12 @@ QString WizardResourceGeneratorPage::GetMCAAudioElementKind() const {
 	return mpLineEditMCAAudioElementKind->text();
 }
 //WR
+
+EditRate WizardResourceGeneratorPage::GetCplEditRate() const {
+
+	return EditRate::GetEditRate(mpComboBoxCplEditRate->currentText());
+}
+
 
 
 bool WizardResourceGeneratorPage::isComplete() const {

@@ -238,6 +238,7 @@ public:
 	qint32 GetNumerator() const { return mNumerator; }
 	qint32 GetDenominator() const { return mDenominator; }
 	QString GetName() const { return mName; }
+	QString GetRoundedName() const { return QString::number(GetRoundendQuotient()); }
 	bool IsValid() const { return (mNumerator > 0 && mDenominator > 0); }
 	bool operator==(const EditRate& rhs) const;
 	bool operator!=(const EditRate& rhs) const;

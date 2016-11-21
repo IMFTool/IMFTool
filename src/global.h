@@ -87,6 +87,7 @@
 #define FIELD_NAME_MCA_TITLE_VERSION "MCATitleVersion"
 #define FIELD_NAME_MCA_AUDIO_CONTENT_KIND "MCAAudioContentKind"
 #define FIELD_NAME_MCA_AUDIO_ELEMENT_KIND "MCAAudioElementKind"
+#define FIELD_NAME_CPL_EDIT_RATE "CplEditRate"
 //WR
 
 enum eUserEventType {

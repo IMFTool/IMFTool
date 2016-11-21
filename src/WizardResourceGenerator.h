@@ -51,7 +51,7 @@ public:
 		WavMode,
 		TTMLMode
 	};
-	WizardResourceGenerator(QWidget *pParent = NULL);
+	WizardResourceGenerator(QWidget *pParent = NULL, QVector<EditRate> rEditRates = QVector<EditRate>());
 	virtual ~WizardResourceGenerator() {}
 	virtual QSize sizeHint() const;
 	void SwitchMode(eMode mode);
@@ -60,6 +60,7 @@ private:
 	Q_DISABLE_COPY(WizardResourceGenerator);
 	void	InitLayout();
 	int		mPageId;
+	QVector<EditRate> mEditRates;
 };
 
 
@@ -77,10 +78,11 @@ class WizardResourceGeneratorPage : public QWizardPage {
 		Q_PROPERTY(QString MCATitleVersionSelected READ GetMCATitleVersion WRITE SetMCATitleVersion NOTIFY MCATitleVersionChanged)
 		Q_PROPERTY(QString MCAAudioContentKindSelected READ GetMCAAudioContentKind WRITE SetMCAAudioContentKind NOTIFY MCAAudioContentKindChanged)
 		Q_PROPERTY(QString MCAAudioElementKindSelected READ GetMCAAudioElementKind WRITE SetMCAAudioElementKind NOTIFY MCAAudioElementKindChanged)
+		Q_PROPERTY(EditRate CplEditRateSelected READ GetCplEditRate WRITE SetCplEditRate NOTIFY CplEditRateChanged)
 		//WR
 
 public:
-	WizardResourceGeneratorPage(QWidget *pParent = NULL);
+	WizardResourceGeneratorPage(QWidget *pParent = NULL, 	QVector<EditRate> rEditRates = QVector<EditRate>());
 	virtual ~WizardResourceGeneratorPage() {}
 	void SwitchMode(WizardResourceGenerator::eMode mode);
 	QStringList GetFilesList() const;
@@ -94,6 +96,7 @@ public:
 	QString GetMCATitleVersion() const;
 	QString GetMCAAudioContentKind() const;
 	QString GetMCAAudioElementKind() const;
+	EditRate GetCplEditRate() const;
 	//WR
 
 protected:
@@ -110,6 +113,8 @@ signals:
 	void MCATitleVersionChanged();
 	void MCAAudioContentKindChanged();
 	void MCAAudioElementKindChanged();
+	void CplEditRateChanged();
+
 	//WR
 
 	public slots:
@@ -124,6 +129,7 @@ signals:
 	void SetMCATitleVersion(const QString &rLanguageTag);
 	void SetMCAAudioContentKind(const QString &rLanguageTag);
 	void SetMCAAudioElementKind(const QString &rLanguageTag);
+	void SetCplEditRate(const EditRate &rEditRate);
 	//WR
 	void ChangeSoundfieldGroup(const QString &rName);
 	void ShowFileDialog();
@@ -145,6 +151,7 @@ private:
 		TTMLIndex
 	};
 	Q_DISABLE_COPY(WizardResourceGeneratorPage);
+	QVector<EditRate> mEditRates;
 	void InitLayout();
 
 	QFileDialog	*mpFileDialog;
@@ -158,6 +165,7 @@ private:
 	QComboBox	*mpComboBoxEditRate;
 	QComboBox *mpComboBoxSoundfieldGroup;
 	//WR
+	QComboBox *mpComboBoxCplEditRate;
 	QLineEdit *mpLineEditLanguageTagWav;
 	QLineEdit *mpLineEditLanguageTagTT;
 	QLineEdit *mpLineEditMCATitle;
@@ -235,6 +243,9 @@ public:
 	virtual QVariant data(const QModelIndex &rIndex, int role = Qt::DisplayRole) const;
 	virtual bool setData(const QModelIndex &rIndex, const QVariant &rValue, int role = Qt::EditRole);
 	void ChangeSoundfieldGroup(const QString &rName);
+	//WR
+	//void SetLanguageTagWav(const QString &rLanguageTag);
+	//WR
 
 private:
 	Q_DISABLE_COPY(SoundFieldGroupModel);
@@ -266,6 +277,14 @@ public:
 	virtual int rowCount(const QModelIndex &rParent = QModelIndex()) const;
 	virtual int columnCount(const QModelIndex &rParent = QModelIndex()) const;
 	virtual QVariant data(const QModelIndex &rIndex, int role = Qt::DisplayRole) const;
+	//WR
+	void SetLanguageTagTT(const QString &rLanguageTag);
+	void SetMCATitle(const QString &rString);
+	void SetMCATitleVersion(const QString &rString);
+	void SetMCAAudioContentKind(const QString &rString);
+	void SetMCAAudioElementKind(const QString &rString);
+	void SetCplEditRate(const EditRate &rEditRate);
+	//WR
 
 private:
 	Q_DISABLE_COPY(TimedTextModel);

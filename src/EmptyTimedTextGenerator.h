@@ -35,6 +35,9 @@
 #include <xercesc/dom/DOMLSSerializer.hpp>
 #include <xercesc/dom/DOMLSOutput.hpp>
 
+//WR
+#include "ImfCommon.h"
+//WR
 using namespace xercesc;
 
 //!this class helps to convert char* to XMLString by using X(char*) instead of XMLString::transcode(char*).
@@ -57,7 +60,7 @@ class EmptyTimedTextGenerator : public QObject {
 
 public:
 	EmptyTimedTextGenerator();
-	EmptyTimedTextGenerator(QString filePath, QString dur);
+	EmptyTimedTextGenerator(QString filePath, QString dur, EditRate rEditRate);
 	virtual ~EmptyTimedTextGenerator();
 
 	Q_SIGNALS:
@@ -71,5 +74,6 @@ private:
 
 	QString *mpFilePath;
 	QString *mpDur;
+	EditRate mEditRate;
 };
 

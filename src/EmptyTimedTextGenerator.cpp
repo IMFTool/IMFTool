@@ -18,11 +18,12 @@
 
 
 
-EmptyTimedTextGenerator::EmptyTimedTextGenerator(QString filePath, QString dur){
+EmptyTimedTextGenerator::EmptyTimedTextGenerator(QString filePath, QString dur, EditRate rEditRate){
 
 	int error;
 	mpFilePath = &filePath;
 	mpDur = &dur;
+	mEditRate = rEditRate;
 	error = GenerateEmptyXml();
 	if (error > 0)
 		QFile::remove(mpFilePath->at(0));
@@ -68,7 +69,13 @@ int EmptyTimedTextGenerator::GenerateEmptyXml()
 
                 rootElem->setAttribute(X("xml:lang"), X("en"));
                 rootElem->setAttribute(X("ttp:profile"), X("http://www.w3.org/ns/ttml/profile/imsc1/text"));
-
+                //WR
+                bool isFractional = (mEditRate.GetQuotient() != round(mEditRate.GetQuotient()));
+                rootElem->setAttribute(X("ttp:frameRate"), X(mEditRate.GetRoundedName().toLatin1().data()));
+                if (isFractional) {
+                	rootElem->setAttribute(X("ttp:frameRateMultiplier"), X("1000 1001"));
+                }
+                //WR
 
                 // <head>
                 DOMElement* headElem = doc->createElement(X("head"));
@@ -94,7 +101,7 @@ int EmptyTimedTextGenerator::GenerateEmptyXml()
                 DOMElement* divElem = doc->createElement(X("div"));
                 bodyElem->appendChild(divElem);
 
-                divElem->setAttribute(X("begin"), X("0s"));
+                divElem->setAttribute(X("begin"), X("0f"));
                 divElem->setAttribute(X("end"), X(mpDur->toStdString().c_str()));
 
                 OutputXML(doc);

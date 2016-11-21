@@ -89,6 +89,9 @@ public:
 	bool AddAsset(const QSharedPointer<Asset> &rAsset, const QUuid &rPackingListId);
 	//! Returns next best Packing List if index is 0.
 	QUuid GetPackingListId(int index = 0);
+	//WR
+	QVector<EditRate> GetImpEditRates() const {return mImpEditRates;}
+	//WR
 
 	//! Model View related.
 	virtual int rowCount(const QModelIndex &rParent = QModelIndex()) const;
@@ -350,15 +353,18 @@ public:
 	bool HasSourceFiles() const { return !mSourceFiles.empty(); }
 	SoundfieldGroup GetSoundfieldGroup() const { return mMetadata.soundfieldGroup; }
 	EditRate GetEditRate() const { return mMetadata.editRate; }
+	void SetEditRate(const EditRate rEditRate) { mMetadata.editRate = rEditRate; }
 	//WR
 	QString GetLanguageTag() const { return mMetadata.languageTag; }
 	QString GetMCATitle() const { return mMetadata.mcaTitle; }
 	QString GetMCATitleVersion() const { return mMetadata.mcaTitleVersion; }
 	QString GetMCAAudioContentKind() const { return mMetadata.mcaAudioContentKind; }
 	QString GetMCAAudioElementKind() const { return mMetadata.mcaAudioElementKind; }
+	EditRate GetCplEditRate() const { return mCplEditRate; }
+	Duration GetOriginalDuration() const { return mMetadata.originalDuration; }
 	Duration GetDuration() const { return mMetadata.duration; }
 	QString GetProfile() const { return mMetadata.profile; }
-	EditRate GetTimedTextFrameRate() const {return mMetadata.infoEditRate;};
+	EditRate GetTimedTextFrameRate() const {return mMetadata.effectiveFrameRate;};
 	QImage GetProxyImage() const { return mFirstProxyImage; }
 	//WR begin
 	//Getter methods for the corresponding members
@@ -381,6 +387,7 @@ public:
 	void SetMCATitleVersion(const QString &rText) {mMetadata.mcaTitleVersion = rText;};
 	void SetMCAAudioContentKind(const QString &rText) {mMetadata.mcaAudioContentKind = rText;};
 	void SetMCAAudioElementKind(const QString &rText) {mMetadata.mcaAudioElementKind = rText;};
+	void SetCplEditRate(const EditRate &rCplEditRate) { mCplEditRate = rCplEditRate;};
 	//This method extracts the essence descriptor from rFilePath and writes it into mEssenceDescriptor
 	Error ExtractEssenceDescriptor(const QString &filePath);
 	bool GetIsNew() {return mIsNew;}
@@ -406,5 +413,6 @@ private:
 	cpl::EssenceDescriptorBaseType* mEssenceDescriptor;
 	QUuid mSourceEncoding;
 	bool mIsNew;
+	EditRate mCplEditRate;
 //WR end
 };

@@ -331,9 +331,14 @@ Error MetadataExtractor::ReadTimedTextMxfDescriptor(Metadata &rMetadata, const Q
 				return error;
 			}
 
-			metadata.infoEditRate = tt_descriptor->SampleRate;
-			metadata.editRate = EditRate(1000, 1);
-			metadata.duration = Duration(ceil(tt_descriptor->ContainerDuration*1000./metadata.infoEditRate.GetQuotient()));
+			//WR
+			metadata.effectiveFrameRate = tt_descriptor->SampleRate;
+			metadata.editRate = mCplEditRate;
+			metadata.originalDuration = Duration(tt_descriptor->ContainerDuration);
+			if ( metadata.editRate.IsValid() ) {  // duration and editRate will be set afterwards in ImfPackage::ParseAssetMap()
+				metadata.duration = Duration(ceil(tt_descriptor->ContainerDuration / metadata.effectiveFrameRate.GetQuotient() * metadata.editRate.GetQuotient()));
+			}
+			//WR
 			metadata.profile = QString::fromStdString(tt_descriptor->NamespaceURI);
 			const unsigned short IdentBufferLen = 128;
 			char identbuf[IdentBufferLen];
@@ -421,27 +426,18 @@ float MetadataExtractor::ConvertTimingQStringtoDouble(QString string_time, float
 	else if (string_time.right(1) == "t")
 		time = string_time.remove(QChar('t'), Qt::CaseInsensitive).toFloat() / tr;
 
-	else if (string_time.left(9).right(1) == "."){
+	else if (string_time.left(9).right(1) == "."){ // Time expression with fractions of seconds, e.g. 00:00:20.1
 		h = string_time.left(2).toFloat();
 		min = string_time.left(5).right(2).toFloat();
 		sec = string_time.left(8).right(2).toFloat();
 		msec = string_time.remove(0, 7).replace(0, 2, "0.").toFloat();
 		time = (h*60*60)+(min*60)+sec+msec;
 	}
-
-	else{
-		if(tr > 0){
-			h = string_time.left(2).toFloat();
-			min = string_time.left(5).right(2).toFloat();
-			sec = string_time.left(8).right(2).toFloat() + (string_time.remove(0, 9).toFloat() / tr);
-			time = (h*60*60)+(min*60)+sec;
-		}
-		else {
-			h = string_time.left(2).toFloat();
-			min = string_time.left(5).right(2).toFloat();
-			sec = string_time.left(8).right(2).toFloat() + (string_time.remove(0, 9).toFloat() / fr);
-			time = (h*60*60)+(min*60)+sec;
-		}
+	else{  // Time expression with frames e.g. 00:00:00:15
+		h = string_time.left(2).toFloat();
+		min = string_time.left(5).right(2).toFloat();
+		sec = string_time.left(8).right(2).toFloat() + (string_time.remove(0, 9).toFloat() / fr);
+		time = (h*60*60)+(min*60)+sec;
 	}
 	return time;
 }
@@ -689,11 +685,11 @@ Error MetadataExtractor::ReadTimedTextMetadata(Metadata &rMetadata, const QFileI
 
 		//Frame Rate Multiplier Extractor
 		QString mult = XMLString::transcode(tteleDom->getAttribute(XMLString::transcode("ttp:frameRateMultiplier")));
-		float num = 1000;
-		float den = 1000;
+		float num = 1;
+		float den = 1;
 		if (!mult.isEmpty()){
-			num = mult.left(4).toInt();
-			den = mult.right(4).toInt();
+			num = mult.section(" ", 0, 0).toInt();
+			den = mult.section(" ", 1, 1).toInt();
 		}
 
 		//Frame Rate Extractor
@@ -702,11 +698,21 @@ Error MetadataExtractor::ReadTimedTextMetadata(Metadata &rMetadata, const QFileI
 		float framerate = 30*(num/den);		//framerate is for calculating the duration, we need the fractal editrate!
 		if(!fr.isEmpty()){
 			framerate = fr.toFloat()*(num/den);
-			editrate = fr.toInt();}
+			editrate = fr.toInt();
+		}
+
+		//Sub-framerate Extractor - we'll ignore it, since Subframerate is prohibited in IMSC1!
+		int subFrameRate = 1;
+		//QString sfr = XMLString::transcode(tteleDom->getAttribute(XMLString::transcode("ttp:subFrameRate")));
+		//if (!sfr.isEmpty()) subFrameRate = sfr.toInt();
 
 		//Tick Rate Extractor
+		int tickrate = 1; //TTML1 section 6.2.10
 		QString tr = XMLString::transcode(tteleDom->getAttribute(XMLString::transcode("ttp:tickRate")));
-		int tickrate = tr.toInt();
+		if (!tr.isEmpty())
+			tickrate = tr.toInt();
+		else if (!fr.isEmpty())  //TTML1 section 6.2.10
+			tickrate = ceil (framerate * subFrameRate);
 
 		//Duration Extractor
 		DOMNodeList	*bodyitem = dom_doc->getElementsByTagName(XMLString::transcode("body"));
@@ -718,8 +724,9 @@ Error MetadataExtractor::ReadTimedTextMetadata(Metadata &rMetadata, const QFileI
 		float duration;
 		duration = DurationExtractor(dom_doc,framerate,tickrate);
 
-		metadata.editRate = ASDCP::Rational(1000, 1);
-		metadata.infoEditRate = ASDCP::Rational(editrate*num, den);
+		metadata.effectiveFrameRate = EditRate(editrate*num, den);  // Eff. FrameRate in IMSC1 and MXF
+		metadata.originalDuration = Duration(ceil(duration * metadata.effectiveFrameRate.GetQuotient())); // MXF Duration
+		metadata.editRate = mCplEditRate;
 		metadata.duration = Duration(ceil(duration * metadata.editRate.GetQuotient()));
 
 	}
