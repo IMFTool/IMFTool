@@ -1,4 +1,4 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel
+/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
  *
  * This program is free software : you can redistribute it and / or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #include <QObject>
 #include <QPair>
 #include <QVector>
-
+#include "openjpeg.h"
 
 class Duration;
 namespace ASDCP {
@@ -312,6 +312,7 @@ public:
 	qint64 GetHours() const { return (mFramesCount >= 0 && mEditRate.IsValid() ? mFramesCount / (3600 * mEditRate.GetRoundendQuotient()) % 60 : 0); }
 	qint64 GetMinutes() const { return (mFramesCount >= 0 && mEditRate.IsValid() ? mFramesCount / (60 * mEditRate.GetRoundendQuotient()) % 60 : 0); }
 	qint64 GetSeconds() const { return (mFramesCount >= 0 && mEditRate.IsValid() ? mFramesCount / mEditRate.GetRoundendQuotient() % 60 : 0); }
+	float GetSecondsF() const { return (mFramesCount / mEditRate.GetQuotient()); } // (k)
 	qint64 GetFrames() const { return (mFramesCount >= 0 && mEditRate.IsValid() ? mFramesCount % mEditRate.GetRoundendQuotient() : 0); }
 	qint64 GetOverallFrames() const { return mFramesCount; }
 	//! The frame this time code points at. 
@@ -344,8 +345,60 @@ private:
 	qint64 mFramesCount;
 };
 
+typedef struct {
+	QString id;
+	bool valid; // true: struct is initialized
+	bool error; // some error ocurred with the content (e.g. no image found)
+	bool alwaysActive;
+	float origin[2]; // %
+	float extent[2]; // %
+	QImage bgImage; // background image
+	QImage bgImageScaled;
+	QColor bgColor; // background color
+	QString styleCss;
+} TTMLRegion;
 
-Q_DECLARE_METATYPE(EditRate)
-Q_DECLARE_METATYPE(SoundfieldGroup)
-Q_DECLARE_METATYPE(Timecode)
-Q_DECLARE_METATYPE(Duration)
+typedef struct {
+	int type; // 0 = text, 1 = image
+	bool error; // some error ocurred with the content (e.g. no image found)
+	QImage bgImage;
+	float beg; // (sec. rel. to timeline)
+	float end; // (sec. rel. to timeline)
+	QString text;
+	TTMLRegion region;
+} TTMLelem;
+
+typedef struct {
+	float timeline_in; // e.g. 3.123 seconds
+	float timeline_out;
+	float in; // e.g. 0.123 seconds
+	float out;
+	float frameRate;
+	QVector<TTMLelem> items;
+} TTMLtimelineSegment;
+
+class FrameRequest {
+public:
+	FrameRequest() {};
+	QString path; // asset
+	qint64 frameNr; // current frame in asset
+	qint64 frame_total; // total frame to be played
+	int decode_layer; // 0 - 5
+	QByteArray raw_data; // extracted data from MXF
+	QImage decoded; // decoded image
+	int decode_time;
+	bool done;
+};
+	
+typedef struct {
+	int decoded_total = 0;
+	int pending_requests = 0;
+	int decoded_cycle = 0;
+} DecodedFrames;
+
+// (k) - end
+
+Q_DECLARE_METATYPE(EditRate);
+Q_DECLARE_METATYPE(SoundfieldGroup);
+Q_DECLARE_METATYPE(Timecode);
+Q_DECLARE_METATYPE(Duration);

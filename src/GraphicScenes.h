@@ -1,4 +1,4 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel
+/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
  *
  * This program is free software : you can redistribute it and / or modify
  * it under the terms of the GNU General Public License as published by
@@ -177,8 +177,11 @@ signals:
 	void FrameInicatorActive(bool active);
 	void MoveSegmentRequest(const QUuid &rSegment, const QUuid &rTargetSegment);
 
-	private slots:
-	void rXPosChanged(qreal xPos) { emit CurrentFrameChanged(Timecode(GetCplEditRate(), xPos)); }
+private slots:
+	void rXPosChanged(qreal xPos) { 
+		emit CurrentFrameChanged(Timecode(GetCplEditRate(), xPos)); 
+		// "cursor" position changed -> emit signal for current frame to be loaded:
+	}
 	void rTimelineGeometryChanged();
 
 protected:

@@ -1,4 +1,4 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel
+/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
  *
  * This program is free software : you can redistribute it and / or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,18 @@
 #include <xercesc/validators/common/Grammar.hpp>
 #include <xercesc/sax2/XMLReaderFactory.hpp>
 #include <xercesc/sax2/SAX2XMLReader.hpp>
+
+#include <xercesc/util/PlatformUtils.hpp>
+#include <xercesc/util/XMLString.hpp>
+#include <xercesc/dom/DOM.hpp>
+#include <xercesc/util/OutOfMemoryException.hpp>
+#include <xercesc/framework/XMLFormatter.hpp>
+#include <xercesc/framework/LocalFileFormatTarget.hpp>
+#include <xercesc/dom/DOMDocument.hpp>
+#include <xercesc/dom/DOMImplementation.hpp>
+#include <xercesc/dom/DOMImplementationRegistry.hpp>
+#include <xercesc/dom/DOMLSSerializer.hpp>
+#include <xercesc/dom/DOMLSOutput.hpp>
 
 #include <string>
 #include <QCryptographicHash>
@@ -121,6 +133,9 @@ Error MetadataExtractor::ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileI
 			error = Error(Error::UnknownDuration, QString(), true);
 		}
 		metadata.duration = Duration(frame_count);
+		ASDCP::UL TransferCharacteristic; // (k)
+		ASDCP::UL ColorPrimaries; // (k)
+
 		if(rgba_descriptor) {
 			metadata.colorEncoding = Metadata::RGBA;
 			metadata.editRate = EditRate(rgba_descriptor->SampleRate.Numerator, rgba_descriptor->SampleRate.Denominator);
@@ -135,6 +150,8 @@ Error MetadataExtractor::ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileI
 			metadata.storedWidth = rgba_descriptor->StoredWidth;
 			metadata.horizontalSubsampling = 1;
 			if(rgba_descriptor->ComponentMaxRef.empty() == false)metadata.componentDepth = log10(rgba_descriptor->ComponentMaxRef.get() + 1) / log10(2.);
+			TransferCharacteristic = rgba_descriptor->TransferCharacteristic; // (k)
+			ColorPrimaries = rgba_descriptor->ColorPrimaries; // (k)
 		}
 		else if(cdci_descriptor) {
 			metadata.colorEncoding = Metadata::CDCI;
@@ -150,7 +167,69 @@ Error MetadataExtractor::ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileI
 			metadata.storedWidth = cdci_descriptor->StoredWidth;
 			metadata.horizontalSubsampling = 2;
 			metadata.componentDepth = cdci_descriptor->ComponentDepth;
+			TransferCharacteristic = cdci_descriptor->TransferCharacteristic; // (k)
+			ColorPrimaries = cdci_descriptor->ColorPrimaries; // (k)
 		}
+
+		// (k) - start
+		metadata.colorSpace = Metadata::eColorSpace::Unknown; // default
+		metadata.lutIndex = 0;
+		char buf[64];
+	
+		if (ColorPrimaries.HasValue()) {
+			QString CP = ColorPrimaries.EncodeString(buf, 64);
+			CP = CP.toUpper();
+			CP = CP.replace(".", "");
+
+			if (CP == "060E2B34040101060401010103030000") { // ITU709
+				if (rgba_descriptor) {
+					metadata.colorSpace = Metadata::eColorSpace::RGB709;
+					metadata.lutIndex = 1;
+				}
+				else if (cdci_descriptor) {
+					metadata.colorSpace = Metadata::eColorSpace::YUV_709;
+					metadata.lutIndex = 4;
+				}
+			}else if (CP == "060E2B340401010D0401010103040000") { // ITU2020_UNKNOWN
+				if (rgba_descriptor) {
+					metadata.colorSpace = Metadata::eColorSpace::RGB_2020_PQ;
+					metadata.lutIndex = 2;
+				}
+				else if (cdci_descriptor) {
+					metadata.colorSpace = Metadata::eColorSpace::YUV_2020_PQ;
+					metadata.lutIndex = 6;
+				}
+			}else if(CP == "060E2B340401010D0401010103060000"){ // P3D65
+				metadata.colorSpace = Metadata::eColorSpace::RGB_P3D65;
+				metadata.lutIndex = 3;
+			}
+			else {
+				qDebug() << CP;
+			}
+		}
+
+		// try TransferCharacteristic
+		if (metadata.colorSpace == Metadata::eColorSpace::Unknown && TransferCharacteristic.HasValue()){
+			QString TC = TransferCharacteristic.EncodeString(buf, 64);
+			TC = TC.toUpper();
+			TC = TC.replace(".", "");
+
+			if (TC == "060E2B34040101010401010101020000") { // ITU709
+				metadata.colorSpace = Metadata::eColorSpace::YUV_709;
+				metadata.lutIndex = 4;
+			}else if (TC == "060E2B340401010E0401010101090000") { // ITU2020_LIN
+				metadata.colorSpace = Metadata::eColorSpace::YUV_2020_LIN;
+				metadata.lutIndex = 5;
+			}
+			else if (TC == "060E2B340401010D04010101010A0000") { // ITU2020_PQ
+				metadata.colorSpace = Metadata::eColorSpace::YUV_2020_PQ;
+				metadata.lutIndex = 6;
+			}
+			else {
+				qDebug() << TC;
+			}
+		}
+		// (k) - end
 	}
 	else {
 		error = Error(result);

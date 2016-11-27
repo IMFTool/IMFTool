@@ -1,4 +1,4 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel
+/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
  *
  * This program is free software : you can redistribute it and / or modify
  * it under the terms of the GNU General Public License as published by
@@ -308,9 +308,14 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 													QSharedPointer<AssetMxfTrack> mxf_track(new AssetMxfTrack(new_asset_path, am_asset, pkl_asset));
 													AddAsset(mxf_track, ImfXmlHelper::Convert(packing_list->getId()));
 													//WR
+//#define DEBUG_NOESSENCE_DESCRIPTOR
+#ifdef DEBUG_NOESSENCE_DESCRIPTOR
+													mxf_track->SetEssenceDescriptor("<DEBUG_NOESSENCE_DESCRIPTOR/>");
+#else
 													JobExtractEssenceDescriptor *p_ed_job = new JobExtractEssenceDescriptor(mxf_track->GetPath().absoluteFilePath());
 													connect(p_ed_job, SIGNAL(Result(const QString&, const QVariant&)), mxf_track.data(), SLOT(SetEssenceDescriptor(const QString&)));
 													mpJobQueue->AddJob(p_ed_job);
+#endif
 													//WR
 												}
 												else if(pkl_asset.getType().compare(MIME_TYPE_XML) == 0) {

@@ -1,4 +1,4 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel
+/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
  *
  * This program is free software : you can redistribute it and / or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@
 #include <QStatusBar>
 #include <QDir>
 
+#include <Qshortcut> //(k)
 
 
 
@@ -53,9 +54,12 @@ void MainWindow::InitLayout() {
 	mpMsgBox->setIcon(QMessageBox::Warning);
 
 	mpCentralWidget = new WidgetCentral(this);
-
+	mpStatusBar = new QStatusBar(this); // (k)
 	setCentralWidget(mpCentralWidget);
-	setStatusBar(new QStatusBar(this));
+	setStatusBar(mpStatusBar);
+
+	new QShortcut(QKeySequence(Qt::Key_Right), mpCentralWidget, SLOT(rNextFrame())); // (k)
+	new QShortcut(QKeySequence(Qt::Key_Left), mpCentralWidget, SLOT(rPrevFrame())); // (k)
 
 
 
@@ -162,6 +166,7 @@ void MainWindow::InitMenuAndToolbar() {
 	p_tool_bar->addAction(p_action_redo);
 
 	connect(mpCentralWidget, SIGNAL(UndoStackChanged(QUndoStack*)), mpUndoGroup, SLOT(setActiveStack(QUndoStack*)));
+	connect(mpCentralWidget, SIGNAL(UpdateStatusBar(const QString &)), mpStatusBar, SLOT(showMessage(const QString &)));
 }
 
 			/* -----Denis Manthey Beg----- */

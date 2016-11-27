@@ -1,4 +1,4 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel
+/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
  *
  * This program is free software : you can redistribute it and / or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ displayHeight(0),
 colorEncoding(Metadata::Unknown_Color_Encoding),
 horizontalSubsampling(0),
 componentDepth(0),
+colorSpace(Metadata::eColorSpace::Unknown), // (k)
 duration(),
 audioChannelCount(0),
 audioQuantization(0),
@@ -149,6 +150,15 @@ void Metadata::GetAsTextDocument(QTextDocument &rDoc) {
 		else																															table->cellAt(3, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Color Mode: Unknown"), Qt::ElideRight, column_text_width));
 		if(componentDepth != 0)																						table->cellAt(3, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Color Depth: %1 bit").arg(componentDepth), Qt::ElideRight, column_text_width));
 		else																															table->cellAt(3, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Color Depth: Unknown"), Qt::ElideRight, column_text_width));
+
+		// (k) - start
+		if (colorSpace != Metadata::eColorSpace::Unknown) {
+			if (colorSpace == Metadata::eColorSpace::YUV_2020_LIN) table->cellAt(4, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Primaries: ITU-R.BT2020-LIN"), Qt::ElideRight, column_text_width));
+		}
+		else {
+			table->cellAt(4, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Primaries: Unknown"), Qt::ElideRight, column_text_width));
+		}
+		// (k) - end
 	}
 	else if(type == Metadata::Pcm) {
 

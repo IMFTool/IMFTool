@@ -1,4 +1,4 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel
+/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
  *
  * This program is free software : you can redistribute it and / or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,6 +15,11 @@
  */
 #include "WidgetCentral.h"
 #include "WidgetComposition.h"
+//#ifdef ARCHIVIST
+#include "WidgetVideoPreview.h" // (k)
+#include "TTMLDetails.h" // (k)
+#include "TimelineParser.h" // (k)
+//#endif
 #include "WidgetCompositionInfo.h"
 #include "ImfPackage.h"
 #include "ImfCommon.h"
@@ -52,6 +57,16 @@ void WidgetCentral::InitLyout() {
 	p_tab_widget_frame_layout->addWidget(mpTabWidget);
 	p_tab_widget_frame->setLayout(p_tab_widget_frame_layout);
 
+//#ifdef ARCHIVIST
+	QFrame *p_preview_widget_frame = new QFrame(this);
+	p_preview_widget_frame->setFrameStyle(QFrame::StyledPanel);
+
+	mpPreview = new WidgetVideoPreview(this); // p_preview_widget_frame
+	QHBoxLayout *p_preview_widget_frame_layout = new QHBoxLayout();
+	p_preview_widget_frame_layout->setContentsMargins(0, 0, 0, 0);
+	p_preview_widget_frame_layout->addWidget(mpPreview);
+	p_preview_widget_frame->setLayout(p_preview_widget_frame_layout);
+//#endif
 
 	mpDetailsWidget = new WidgetCompositionInfo(this);
 	mpDetailsWidget->setDisabled(true);
@@ -62,20 +77,53 @@ void WidgetCentral::InitLyout() {
 	p_details_widget_frame_layout->addWidget(mpDetailsWidget);
 	p_details_widget_frame->setLayout(p_details_widget_frame_layout);
 
+	// (k) - start
+	tpThread = new QThread(); // create widget Thread
+	timelineParser = new TimelineParser();
+	timelineParserTime = new QTime();
+	timelineParserTime->start(); // initialize
+
+	timelineParser->moveToThread(tpThread);
+	connect(tpThread, SIGNAL(started()), timelineParser, SLOT(run()));
+	connect(timelineParser, SIGNAL(PlaylistFinished()), this, SLOT(rPlaylistFinished()));
+
+	// create tabs
+	mpTabDetailTTML = new QTabWidget(this);
+	mpTabDetailTTML->addTab(mpDetailsWidget, "Details"); // add to layout
+	mpTTMLDetailsWidget = new TTMLDetails(this);
+	mpTabDetailTTML->addTab(mpTTMLDetailsWidget, "TTML"); // add to layout
+	connect(mpTTMLDetailsWidget->show_regions, SIGNAL(stateChanged(int)), mpPreview, SIGNAL(regionOptionsChanged(int)));
+
+	p_details_widget_frame_layout->addWidget(mpTabDetailTTML);
+	connect(mpTabDetailTTML, SIGNAL(currentChanged(int)), this, SLOT(rToggleTTML(int)));
+	connect(mpPreview, SIGNAL(ttmlChanged(const QVector<QString>&,QString,int)), mpTTMLDetailsWidget, SLOT(rShowTTML(const QVector<QString>&,QString,int)));
+	// (k) - end
+
 	QSplitter *p_inner_splitter = new QSplitter(this);
 	p_inner_splitter->setOrientation(Qt::Horizontal);
 	p_inner_splitter->setChildrenCollapsible(false);
 	p_inner_splitter->setOpaqueResize(true);
 	p_inner_splitter->addWidget(p_details_widget_frame);
+//#ifdef ARCHIVIST
+	p_inner_splitter->addWidget(p_preview_widget_frame);
+//#endif
 
 	QSplitter *p_outer_splitter = new QSplitter(this);
 	p_outer_splitter->setOrientation(Qt::Vertical);
 	p_outer_splitter->setChildrenCollapsible(false);
 	p_outer_splitter->setOpaqueResize(true);
-	p_outer_splitter->addWidget(p_details_widget_frame);
+//#ifdef ARCHIVIST
+	p_outer_splitter->addWidget(p_inner_splitter);
+//#else
+//	p_outer_splitter->addWidget(p_details_widget_frame);
+//#endif
 	p_outer_splitter->addWidget(p_tab_widget_frame);
 	QList<int> sizes;
+//#ifdef ARCHIVIST
+	//sizes << mpPreview->sizeHint().height() << -1;
+//#else
 	sizes << mpDetailsWidget->sizeHint().height() << -1;
+//#endif
 	p_outer_splitter->setSizes(sizes);
 	p_outer_splitter->setStretchFactor(1, 1);
 
@@ -88,14 +136,98 @@ void WidgetCentral::InitLyout() {
 	connect(mpTabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(rTabCloseRequested(int)));
 }
 
+// (k) - start
+void WidgetCentral::rUpdatePlaylist() {
+
+	emit UpdateStatusBar("updating playlist...");
+
+	WidgetComposition *p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->currentWidget());
+	if (p_composition) {
+	
+		p_composition->setVerticalIndicator(0);
+
+		if (tpThread->isRunning()) {
+			playListUpdateSuccess = false;
+			emit UpdateStatusBar("The thread is currently in use :(");
+		}
+		else {
+			playListUpdateSuccess = true;
+			ttmls = QVector<TTMLtimelineSegment>(); // clear ttml list
+			playlist = QVector<PlayListElement>(); // clear video playlist
+
+			timelineParser->composition = p_composition->GetComposition();
+			timelineParser->ttmls = &ttmls;
+			timelineParser->playlist = &playlist;
+
+			timelineParserTime->restart();
+			tpThread->start();
+		}
+	}
+	else {
+		emit UpdateStatusBar("no composition found!");
+	}
+}
+
+void WidgetCentral::rPlaylistFinished() {
+
+	if (!playListUpdateSuccess) {
+		rUpdatePlaylist(); // try again
+		return; // abort
+	}
+
+	WidgetComposition *p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->currentWidget());
+	if (p_composition) {
+
+		mpPreview->setPlaylist(playlist, ttmls); // forward playlist to mpPreview
+		p_composition->getVerticalIndicator();
+		
+		emit UpdateStatusBar(QString("updating took %1 ms").arg(timelineParserTime->elapsed()));
+	}
+}
+
+
+void WidgetCentral::rNextFrame() {
+	qDebug() << "next";
+	WidgetComposition *p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->currentWidget());
+	if (p_composition) { // cpl loaded
+		p_composition->setVerticalIndicator(p_composition->lastPosition.GetOverallFrames() + 1);
+	}
+}
+
+void WidgetCentral::rPrevFrame() {
+	qDebug() << "prev";
+	WidgetComposition *p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->currentWidget());
+	if (p_composition) { // cpl loaded
+		if (p_composition->lastPosition.GetOverallFrames() > 0) {
+			p_composition->setVerticalIndicator(p_composition->lastPosition.GetOverallFrames() - 1);
+		}
+	}
+}
+
+void WidgetCentral::rToggleTTML(int tabWidgetIndex) {
+
+}
+// (k) - end
+
 void WidgetCentral::rCurrentChanged(int tabWidgetIndex) {
 
 	WidgetComposition *p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->currentWidget());
 	if(p_composition) {
+		// (k) - start
+		rUpdatePlaylist(); // update playlist
+		disconnect(p_composition->GetUndoStack(), SIGNAL(indexChanged(int)), this, SLOT(rUpdatePlaylist())); // (k)
+		disconnect(p_composition, SIGNAL(CurrentVideoChanged(const QSharedPointer<AssetMxfTrack>&, const Duration&, const Timecode&, const int&)), mpPreview, SLOT(xPosChanged(const QSharedPointer<AssetMxfTrack>&, const Duration&, const Timecode&, const int&)));
+		disconnect(mpPreview, SIGNAL(currentPlayerPosition(qint64)), p_composition, SLOT(setVerticalIndicator(qint64))); // (k)
+		// (k) - end
 	}
 	p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->widget(tabWidgetIndex));
 	if(p_composition) {
 		mpDetailsWidget->SetComposition(p_composition);
+		// (k) - start
+		connect(p_composition->GetUndoStack(), SIGNAL(indexChanged(int)), this, SLOT(rUpdatePlaylist()));
+		connect(p_composition, SIGNAL(CurrentVideoChanged(const QSharedPointer<AssetMxfTrack>&, const Duration&, const Timecode&, const int&)), mpPreview, SLOT(xPosChanged(const QSharedPointer<AssetMxfTrack>&, const Duration&, const Timecode&, const int&)));
+		connect(mpPreview, SIGNAL(currentPlayerPosition(qint64)), p_composition, SLOT(setVerticalIndicator(qint64)));
+		// (k) - end
 	}
 }
 
@@ -117,6 +249,7 @@ void WidgetCentral::rTabCloseRequested(int index) {
 		}
 		mpTabWidget->removeTab(mpTabWidget->indexOf(p_composition));
 		p_composition->deleteLater();
+		mpPreview->Clear(); // (k) - clear preview window
 	}
 }
 
@@ -163,9 +296,14 @@ void WidgetCentral::InstallImp(const QSharedPointer<ImfPackage> &rImfPackage) {
 	UninstallImp();
 	mpImfPackage = rImfPackage;
 	mpDetailsWidget->setEnabled(true);
+	mpPreview->InstallImp(); // set IMP in player (k)
 }
 
 void WidgetCentral::UninstallImp() {
+
+	if (!mpImfPackage.isNull()) {
+		mpPreview->UninstallImp();
+	}
 
 	mpDetailsWidget->setDisabled(true);
 	mpDetailsWidget->Clear();
@@ -175,6 +313,9 @@ void WidgetCentral::UninstallImp() {
 		}
 	}
 	mpImfPackage.clear();
+	ttmls = QVector<TTMLtimelineSegment>(); // (k) clear ttml list
+	playlist = QVector<PlayListElement>(); // (k) clear video playlist
+	mpPreview->setPlaylist(playlist, ttmls); // forward empty playlist to mpPreview
 }
 
 int WidgetCentral::GetIndex(const QUuid &rCplAssetId) {

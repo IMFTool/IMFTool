@@ -1,4 +1,4 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel
+/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
  *
  * This program is free software : you can redistribute it and / or modify
  * it under the terms of the GNU General Public License as published by
@@ -79,7 +79,7 @@ void WidgetCompositionInfo::InitLayout() {
 	p_layout->addWidget(p_edit_rate, 5, 1, 1, 1);
 	p_layout->addWidget(new QLabel(tr("Issue Date:")), 6, 0, 1, 1);
 	p_layout->addWidget(p_issue_date, 6, 1, 1, 1);
-	p_layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding), 6, 0, 1, 2);
+	p_layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding), 7, 0, 1, 2);
 	setLayout(p_layout);
 }
 

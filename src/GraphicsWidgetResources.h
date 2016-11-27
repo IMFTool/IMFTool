@@ -1,4 +1,4 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel
+/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
  *
  * This program is free software : you can redistribute it and / or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 #include "ImfPackageCommon.h"
 #include "ImfPackage.h"
 #include "GraphicsViewScaleable.h"
-
+#include "JP2K_Preview.h" // (k)
 
 class GraphicsWidgetSequence;
 
@@ -31,6 +31,8 @@ public:
 		Left = 0,
 		Right
 	};
+	int timline_index; // (k)
+	bool InOutChanged = true; // (k)
 
 private:
 	class TrimHandle : public QGraphicsItem, public AbstractViewTransformNotifier {
@@ -215,7 +217,7 @@ class GraphicsWidgetVideoResource : public GraphicsWidgetFileResource {
 
 public:
 	//! Import existing Resource. pResource is owned by this.
-	GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, cpl::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL));
+	GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, cpl::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL), int video_timeline_index = 0);
 	//! Creates new Resource.
 	GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, const QSharedPointer<AssetMxfTrack> &rAsset);
 	virtual ~GraphicsWidgetVideoResource() {}
@@ -225,7 +227,7 @@ public:
 	void RefreshProxy();
 
 	private slots:
-	void rShowProxyImage(const QImage &rImage, const QVariant &rIdentifier = QVariant());
+	void rShowProxyImage(const QImage&, const QImage&);
 	void rSourceDurationChanged();
 	void rEntryPointChanged();
 
@@ -239,9 +241,12 @@ private:
 	void RefreshFirstProxy();
 	void RefreshSecondProxy();
 
+	JP2K_Preview *mpJP2K; // (k) JP2K decoder
+	QThread *decodeProxyThread;
 	QImage mLeftProxyImage;
 	QImage mRightProxyImage;
 	bool mTrimActive;
+	bool proxysVisible = false; // default
 };
 
 

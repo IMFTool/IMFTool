@@ -1,4 +1,4 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel
+/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
  *
  * This program is free software : you can redistribute it and / or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #include <QStyleOptionGraphicsItem>
 #include <QMenu>
 #include <QToolTip>
-
+#include "JP2K_Preview.h"
 
 AbstractGraphicsWidgetResource::AbstractGraphicsWidgetResource(GraphicsWidgetSequence *pParent, cpl::BaseResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/, const QColor &rColor /*= QColor(Qt::white)*/) :
 GraphicsWidgetBase(pParent), mpData(pResource), mAssset(rAsset), mColor(rColor), mOldEntryPoint(), mOldSourceDuration(-1), mpLeftTrimHandle(NULL), mpRightTrimHandle(NULL), mpDurationIndicator(NULL), mpVerticalIndicator(NULL) {
@@ -112,7 +112,7 @@ void AbstractGraphicsWidgetResource::SetEntryPoint(const Duration &rEntryPoint) 
 	else if(rEntryPoint > GetEntryPoint() + current_source_duration - samples_factor) new_entry_point = GetEntryPoint() + current_source_duration - samples_factor;
 	mpData->setSourceDuration(xml_schema::NonNegativeInteger(current_source_duration.GetCount() - (new_entry_point.GetCount() - GetEntryPoint().GetCount())));
 	mpData->setEntryPoint(xml_schema::NonNegativeInteger(new_entry_point.GetCount()));
-	if(current_entry_point != new_entry_point) emit EntryPointChanged(current_entry_point, new_entry_point);
+	if (current_entry_point != new_entry_point) emit EntryPointChanged(current_entry_point, new_entry_point); InOutChanged = true;
 	if(current_source_duration != GetSourceDuration()) emit SourceDurationChanged(current_source_duration, GetSourceDuration());
 	updateGeometry();
 	QRectF rect = boundingRect();
@@ -130,7 +130,7 @@ void AbstractGraphicsWidgetResource::SetSourceDuration(const Duration &rSourceDu
 	if(new_source_duration < rounded_samples_factor) new_source_duration = rounded_samples_factor;
 	else if(new_source_duration > GetIntrinsicDuration() - GetEntryPoint()) new_source_duration = GetIntrinsicDuration() - GetEntryPoint();
 	mpData->setSourceDuration(xml_schema::NonNegativeInteger(new_source_duration.GetCount()));
-	if(new_source_duration != current_source_duration) emit SourceDurationChanged(current_source_duration, new_source_duration);
+	if (new_source_duration != current_source_duration) emit SourceDurationChanged(current_source_duration, new_source_duration); InOutChanged = true;
 	updateGeometry();
 	QRectF rect = boundingRect();
 	rect.setWidth(qint64((GetIntrinsicDuration().GetCount()) / samples_factor));
@@ -717,13 +717,26 @@ std::auto_ptr<cpl::BaseResourceType> GraphicsWidgetFileResource::Write() const {
 }
 
 
-GraphicsWidgetVideoResource::GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, cpl::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/) :
+GraphicsWidgetVideoResource::GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, cpl::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/, int video_timeline_index) :
+mpJP2K(), // (k)
 GraphicsWidgetFileResource(pParent, pResource, rAsset, QColor(CPL_COLOR_VIDEO_RESOURCE)), mLeftProxyImage(":/proxy_film.png"), mRightProxyImage(":/proxy_film.png"), mTrimActive(false) {
 
 
+
+	mpJP2K = new JP2K_Preview(); // (k)
+	mpJP2K->asset = mAssset; // (k)
+	decodeProxyThread = new QThread();
+	connect(decodeProxyThread, SIGNAL(started()), mpJP2K, SLOT(getProxy()));
+	connect(mpJP2K, SIGNAL(finished()), decodeProxyThread, SLOT(quit()));
+	mpJP2K->moveToThread(decodeProxyThread);
+
+	connect(mpJP2K, SIGNAL(proxyFinished(const QImage&, const QImage&)), this, SLOT(rShowProxyImage(const QImage&, const QImage&)));
 	connect(this, SIGNAL(SourceDurationChanged(const Duration&, const Duration&)), this, SLOT(rSourceDurationChanged()));
 	connect(this, SIGNAL(EntryPointChanged(const Duration&, const Duration&)), this, SLOT(rEntryPointChanged()));
-	RefreshProxy();
+
+	this->timline_index = video_timeline_index; // (k)
+	//qDebug() << "creating timeline element nr" << video_timeline_index;
+	//RefreshProxy();
 }
 
 GraphicsWidgetVideoResource::GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, const QSharedPointer<AssetMxfTrack> &rAsset) :
@@ -731,7 +744,7 @@ GraphicsWidgetFileResource(pParent, rAsset, QColor(CPL_COLOR_VIDEO_RESOURCE)), m
 
 	connect(this, SIGNAL(SourceDurationChanged(const Duration&, const Duration&)), this, SLOT(rSourceDurationChanged()));
 	connect(this, SIGNAL(EntryPointChanged(const Duration&, const Duration&)), this, SLOT(rEntryPointChanged()));
-	RefreshProxy();
+	//RefreshProxy();
 }
 
 void GraphicsWidgetVideoResource::paint(QPainter *pPainter, const QStyleOptionGraphicsItem *pOption, QWidget *pWidget /*= NULL*/) {
@@ -757,8 +770,9 @@ void GraphicsWidgetVideoResource::paint(QPainter *pPainter, const QStyleOptionGr
 		visible_rect.adjust(0, 0, -1. / pPainter->transform().m11(), -1. / pPainter->transform().m22());
 		if(visible_rect.isEmpty() == true) continue;
 
-		QImage left_proxy_image = mLeftProxyImage.scaledToHeight(boundingRect().height() - 3);
-		QImage right_proxy_image = mRightProxyImage.scaledToHeight(boundingRect().height() - 3);
+		// scale proxy images (k)
+		QImage left_proxy_image = mLeftProxyImage.scaledToHeight(boundingRect().height() - 3, Qt::SmoothTransformation);
+		QImage right_proxy_image = mRightProxyImage.scaledToHeight(boundingRect().height() - 3, Qt::SmoothTransformation);
 
 		QTransform transf = pPainter->transform();
 
@@ -768,6 +782,13 @@ void GraphicsWidgetVideoResource::paint(QPainter *pPainter, const QStyleOptionGr
 		if(left_proxy_image_rect.right() <= right_proxy_image_rect.left()) {
 			if(visible_rect.intersects(left_proxy_image_rect)) pPainter->drawImage(left_proxy_image_rect, left_proxy_image);
 			if(visible_rect.intersects(right_proxy_image_rect))	pPainter->drawImage(right_proxy_image_rect, right_proxy_image);
+		
+			// (k) - start
+			if (!proxysVisible) {
+				proxysVisible = true; // (so proxies don't get loaded twice...)
+				RefreshProxy();
+			}
+			// (k) - end
 		}
 		else {
 			left_proxy_image_rect.setWidth(0);
@@ -822,19 +843,11 @@ double GraphicsWidgetVideoResource::ResourceErPerCompositionEr(const EditRate &r
 	return 1;
 }
 
-void GraphicsWidgetVideoResource::rShowProxyImage(const QImage &rImage, const QVariant &rIdentifier /*= QVariant()*/) {
+void GraphicsWidgetVideoResource::rShowProxyImage(const QImage &firstProxy, const QImage &secondProxy) {
 
-	if(rIdentifier.canConvert<Timecode>() == true) {
-		Timecode timecode = qvariant_cast<Timecode>(rIdentifier);
-		if(timecode == GetFirstVisibleFrame()) {
-			mLeftProxyImage = rImage;
-			update();
-		}
-		else if(timecode == GetLastVisibleFrame()) {
-			mRightProxyImage = rImage;
-			update();
-		}
-	}
+	mLeftProxyImage = firstProxy;
+	mRightProxyImage = secondProxy;
+	update();
 }
 
 GraphicsWidgetVideoResource* GraphicsWidgetVideoResource::Clone() const {
@@ -851,7 +864,8 @@ GraphicsWidgetVideoResource* GraphicsWidgetVideoResource::Clone() const {
 void GraphicsWidgetVideoResource::rSourceDurationChanged() {
 
 	if(mTrimActive == false) {
-		RefreshSecondProxy();
+		RefreshProxy();
+		//RefreshSecondProxy();
 	}
 }
 
@@ -874,14 +888,30 @@ void GraphicsWidgetVideoResource::TrimHandleInUse(eTrimHandlePosition pos, bool 
 void GraphicsWidgetVideoResource::rEntryPointChanged() {
 
 	if(mTrimActive == false) {
-		RefreshFirstProxy();
+		RefreshProxy();
+		//RefreshFirstProxy();
 	}
 }
 
 void GraphicsWidgetVideoResource::RefreshProxy() {
 
-	RefreshFirstProxy();
-	RefreshSecondProxy();
+	// first proxy
+	QVariant timecode_first_frame;
+	Timecode first_frame = GetFirstVisibleFrame();
+	timecode_first_frame.setValue<Timecode>(first_frame);
+	mpJP2K->first_proxy = first_frame.GetTargetFrame(); // set frame number
+		
+	// second proxy
+	QVariant timecode_last_frame;
+	Timecode last_frame = GetLastVisibleFrame();
+	timecode_last_frame.setValue<Timecode>(last_frame);
+	mpJP2K->second_proxy = last_frame.GetTargetFrame(); // set frame number
+
+	// start decoding process
+	qDebug() << "starting proxy thread";
+	decodeProxyThread->start(QThread::LowPriority);
+	//RefreshFirstProxy();
+	//RefreshSecondProxy();
 }
 
 void GraphicsWidgetVideoResource::RefreshFirstProxy() {
@@ -997,8 +1027,12 @@ GraphicsWidgetFileResource(pParent, pResource, rAsset, QColor(CPL_COLOR_TIMED_TE
 GraphicsWidgetTimedTextResource::GraphicsWidgetTimedTextResource(GraphicsWidgetSequence *pParent, const QSharedPointer<AssetMxfTrack> &rAsset) :
 GraphicsWidgetFileResource(pParent, rAsset, QColor(CPL_COLOR_TIMED_TEXT_RESOURCE)) {
 
-	if(mAssset) mpData->setEditRate(ImfXmlHelper::Convert(mAssset->GetEditRate()));
+	//if(mAssset) mpData->setEditRate(ImfXmlHelper::Convert(mAssset->GetEditRate()));
 
+	if(mAssset) {mpData->setEditRate(ImfXmlHelper::Convert(mAssset->GetEditRate()));
+	mpData->setEditRate(ImfXmlHelper::Convert(GetEditRate()));
+	//mpData->setSourceDuration(mAssset->GetDuration().GetCount() * GetCplEditRate().GetQuotient()/mAssset->GetEditRate().GetQuotient());
+	}
 }
 
 void GraphicsWidgetTimedTextResource::paint(QPainter *pPainter, const QStyleOptionGraphicsItem *pOption, QWidget *pWidget /*= NULL*/) {
@@ -1035,7 +1069,7 @@ void GraphicsWidgetTimedTextResource::paint(QPainter *pPainter, const QStyleOpti
 			QString duration(font_metrics.elidedText(tr("Dur.: %1").arg(MapToCplTimeline(GetSourceDuration()).GetCount()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
 			QString file_name;
 			if(mAssset && mAssset->HasAffinity()) {
-				if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+				if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first.append(" [ %1 ]").arg(mAssset->GetAnnotationText().first), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
 				else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
 			}
 			else {

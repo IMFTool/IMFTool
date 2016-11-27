@@ -1,4 +1,4 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel
+/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
  *
  * This program is free software : you can redistribute it and / or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@
 #include "GraphicsWidgetSequence.h"
 #include "GraphicsWidgetSegment.h"
 #include "GraphicsWidgetResources.h"
+#include "WidgetVideoPreview.h" // (k)
 #include "CompositionPlaylistCommands.h"
 
 #include <QMessageBox>
@@ -136,6 +137,14 @@ void WidgetComposition::InitLayout() {
 	connect(mpTimelineGraphicsWidget, SIGNAL(NewSegmentRequest(int)), this, SLOT(AddNewSegmentRequest(int)));
 	connect(mpTimelineGraphicsWidget, SIGNAL(DeleteSegmentRequest(const QUuid&)), this, SLOT(DeleteSegmentRequest(const QUuid&)));
 }
+
+// (k) - start
+// let's the player update the current-frame-indicator shown in the timeline
+void WidgetComposition::setVerticalIndicator(qint64 frameNr) {
+	//qDebug() << "set player postion" << frameNr;
+	mpTimelineScene->GetCurrentFrameIndicator()->SetXPos(frameNr);
+}
+// (k) - end
 
 bool WidgetComposition::eventFilter(QObject *pObj, QEvent *pEvt) {
 
@@ -612,6 +621,8 @@ ImfError WidgetComposition::ParseCpl() {
 
 	ImfError error;
 	XmlParsingError parse_error;
+	ImageSequenceIndex = -1; // (k)
+
 	// ---Parse Cpl---
 	std::auto_ptr<cpl::CompositionPlaylistType> cpl;
 	try {
@@ -730,8 +741,10 @@ ImfError WidgetComposition::ParseCpl() {
 					cpl::TrackFileResourceType *p_file_resource = dynamic_cast<cpl::TrackFileResourceType*>(&(*resource_iter));
 					if(p_file_resource) {
 						switch(p_graphics_sequence->GetType()) {
-							case MainImageSequence:
-								if(mImp) p_graphics_sequence->AddResource(new GraphicsWidgetVideoResource(p_graphics_sequence, p_file_resource->_clone(), mImp->GetAsset(ImfXmlHelper::Convert(p_file_resource->getTrackFileId())).objectCast<AssetMxfTrack>()), p_graphics_sequence->GetResourceCount());
+							case MainImageSequence: 
+								//qDebug() << "MainImageSequence";
+								ImageSequenceIndex++;
+								if (mImp) p_graphics_sequence->AddResource(new GraphicsWidgetVideoResource(p_graphics_sequence, p_file_resource->_clone(), mImp->GetAsset(ImfXmlHelper::Convert(p_file_resource->getTrackFileId())).objectCast<AssetMxfTrack>(), ImageSequenceIndex), p_graphics_sequence->GetResourceCount());
 								else p_graphics_sequence->AddResource(new GraphicsWidgetVideoResource(p_graphics_sequence, p_file_resource->_clone()), p_graphics_sequence->GetResourceCount());
 								break;
 							case MainAudioSequence:
@@ -1008,6 +1021,8 @@ int WidgetComposition::GetLastTrackDetailIndexForType(eSequenceType type) const 
 
 void WidgetComposition::rCurrentFrameChanged(const Timecode &rCplTimecode) {
 
+	lastPosition = rCplTimecode; // (k)
+
 	GraphicsWidgetSegment *p_segment = mpCompositionScene->GetSegmentAt(rCplTimecode);
 	if(p_segment) {
 		QUuid audio_track_id;
@@ -1035,7 +1050,9 @@ void WidgetComposition::rCurrentFrameChanged(const Timecode &rCplTimecode) {
 				}
 				else if(p_seq->GetTrackId() == video_track_id) {
 					AbstractGraphicsWidgetResource *p_resource = resources_list.at(i);
-					emit CurrentVideoChanged(p_resource->GetAsset(), (p_resource->MapToCplTimeline(Timecode()) - rCplTimecode).AsPositiveDuration(), rCplTimecode);
+					// error: invalid index after removing items from timeline?
+					emit CurrentVideoChanged(p_resource->GetAsset(), (p_resource->MapToCplTimeline(Timecode()) - rCplTimecode).AsPositiveDuration(), rCplTimecode, p_resource->timline_index);
+					//qDebug() << "playlist index" << p_resource->timline_index; // (k)
 				}
 			}
 		}

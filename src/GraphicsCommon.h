@@ -1,4 +1,4 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel
+/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
  *
  * This program is free software : you can redistribute it and / or modify
  * it under the terms of the GNU General Public License as published by
@@ -156,6 +156,7 @@ private:
 };
 
 
+// vertical timeline frame indicator
 class GraphicsObjectVerticalIndicator : public GraphicsObjectBase, public AbstractViewTransformNotifier {
 
 	Q_OBJECT
@@ -209,7 +210,7 @@ public:
 signals:
 	void XPosChanged(qreal xPos);
 
-	public slots:
+public slots:
 	void SetXPos(qreal xPos);
 
 protected:

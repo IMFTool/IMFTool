@@ -1,4 +1,4 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel
+/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
  *
  * This program is free software : you can redistribute it and / or modify
  * it under the terms of the GNU General Public License as published by
@@ -206,6 +206,8 @@ void WizardResourceGeneratorPage::InitLayout() {
 	QPushButton *pBrowseDir = new QPushButton(this);
 	pBrowseDir->setText(tr("Browse"));
 	pBrowseDir->setAutoDefault(false);
+	//connect(pBrowseDir, SIGNAL(clicked(bool)), this, SLOT(ShowDirDialog()));
+	connect(mpDirDialog, SIGNAL(fileSelected(const QString &)), mpLineEditFileDir, SLOT(setText(const QString &)));
 	QRegExp rx("[A-Za-z0-9-_]+");
 	QRegExpValidator *v = new QRegExpValidator(rx, this);
 	mpLineEditFileName = new QLineEdit(this);
@@ -227,6 +229,21 @@ void WizardResourceGeneratorPage::InitLayout() {
 	connect(mpLineEditFileName, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
 	connect(mpLineEditFileDir, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
 	connect(mpGenerateEmpty_button, SIGNAL(clicked(bool)), this, SLOT(GenerateEmptyTimedText()));
+	QLabel *GenNew = new QLabel(this);
+	GenNew->setStyleSheet("font: bold; text-decoration: underline");
+	GenNew->setText("Generate Empty Timed Text Resource");
+	mpTimedTextModel = new TimedTextModel(this);
+	mpTableViewTimedText = new QTableView(this);
+	mpTableViewTimedText->setModel(mpTimedTextModel);
+	mpTableViewTimedText->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	mpTableViewTimedText->setSelectionBehavior(QAbstractItemView::SelectRows);
+	mpTableViewTimedText->setSelectionMode(QAbstractItemView::SingleSelection);
+	mpTableViewTimedText->setShowGrid(false);
+	mpTableViewTimedText->horizontalHeader()->setHidden(true);
+	mpTableViewTimedText->horizontalHeader()->setStretchLastSection(true);
+	mpTableViewTimedText->verticalHeader()->setHidden(true);
+	mpTableViewTimedText->resizeRowsToContents();
+	mpTableViewTimedText->resizeColumnsToContents();
 
 			/* -----Denis Manthey----- */
 
@@ -281,7 +298,7 @@ void WizardResourceGeneratorPage::InitLayout() {
 	mpGroupBox->setLayout(vbox);
 	mpGroupBox->hide();
 
-	p_wrapper_layout_three->addWidget(mpGroupBox, 4, 0, 1, 3);
+	p_wrapper_layout_three->addWidget(mpGroupBox, 3, 0, 1, 3);
 	p_wrapper_widget_three->setLayout(p_wrapper_layout_three);
 
 

@@ -1,4 +1,4 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel
+/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
  *
  * This program is free software : you can redistribute it and / or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 #include <QUndoCommand>
 #include <QVector>
 
+#include "JP2K_Preview.h"
 
 class Asset;
 class AssetMap;
@@ -45,6 +46,9 @@ class QMessageBox;
 class QProgressDialog;
 class JobQueue;
 //WR
+class JPEG2000; // (k)
+
+
 
 class ImfPackage : public QAbstractTableModel {
 
@@ -362,6 +366,8 @@ public:
 	QString GetMCAAudioElementKind() const { return mMetadata.mcaAudioElementKind; }
 	EditRate GetCplEditRate() const { return mCplEditRate; }
 	Duration GetOriginalDuration() const { return mMetadata.originalDuration; }
+	QImage extractFrame(Timecode tc); // (k)
+
 	Duration GetDuration() const { return mMetadata.duration; }
 	QString GetProfile() const { return mMetadata.profile; }
 	EditRate GetTimedTextFrameRate() const {return mMetadata.effectiveFrameRate;};
@@ -404,6 +410,7 @@ private:
 	Q_DISABLE_COPY(AssetMxfTrack);
 	void SetDefaultProxyImages();
 
+	JPEG2000 *mpJP2K; // (k) JP2K decoder
 	Metadata		mMetadata;
 	QStringList mSourceFiles;
 	QImage			mFirstProxyImage;
@@ -416,3 +423,19 @@ private:
 	EditRate mCplEditRate;
 //WR end
 };
+
+
+// (k) - start
+struct PlayListElement {
+	QSharedPointer<AssetMxfTrack> asset;
+	//QString path; // asset
+	qint64 in; // in-point
+	qint64 out; // out-point
+	//int colorEncoding; // Unknown = 0, CDCI = 1, RGB = 2
+	//int colorSpace; // Unknown = 0
+	//qreal editRate;
+	//int displayWidth; // image width
+	//int displayHeight; // image height
+};
+// (k) - end
+

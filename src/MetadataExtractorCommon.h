@@ -1,4 +1,4 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel
+/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
  *
  * This program is free software : you can redistribute it and / or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,6 +41,18 @@ public:
 		RGBA
 	};
 
+	// (k) - start
+	enum eColorSpace {
+		Unknown = 0,
+		RGB709, // ["ITU-R.BT709 Color Primaries" in SMPTE RP 224]
+		RGB_2020_PQ, // ["SMPTE ST 2084 Transfer Characteristic" in SMPTE RP 224]
+		RGB_P3D65, // ["P3D65 Color Primaries" in SMPTE RP 224]
+		YUV_709, // ["ITU-R.BT709 Color Primaries" in SMPTE RP 224]
+		YUV_2020_LIN, // ["ITU-R.BT2020 Transfer Characteristic" in SMPTE RP 224]
+		YUV_2020_PQ // ["SMPTE ST 2084 Transfer Characteristic" in SMPTE RP 224]
+	};
+	// (k) - end
+
 	Metadata(Metadata::eEssenceType type = Metadata::Unknown_Type);
 	~Metadata() {}
 	bool IsWellKnownType() { return type; }
@@ -55,6 +67,8 @@ public:
 	quint32									displayWidth;
 	quint32									displayHeight;
 	eColorEncoding							colorEncoding;
+	eColorSpace								colorSpace; // (k)
+	int										lutIndex; // (k)
 	quint32									horizontalSubsampling;
 	quint32									componentDepth;
 	Duration								duration;

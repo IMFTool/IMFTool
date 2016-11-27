@@ -1,4 +1,4 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel
+/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
  *
  * This program is free software : you can redistribute it and / or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,8 @@ class QTabWidget;
 class WidgetVideoPreview;
 class QMessageBox;	
 class WidgetCompositionInfo;
-
+class TTMLDetails;
+class TimelineParser;
 
 class WidgetCentral : public QWidget {
 
@@ -44,6 +45,9 @@ public:
 	//WR begin
 	QSharedPointer<ImfPackage> GetMpImfPackage() const {return mpImfPackage;}
 
+	//WidgetVideoPreview *mpPreview; // (k)
+	QVector<PlayListElement> playlist; // (k) make private?
+	QVector<TTMLtimelineSegment> ttmls; // (K) make private?
 signals:
 	void UndoStackChanged(QUndoStack *pStack);
 	void CplSaveStateChanged(bool isDirty);
@@ -52,10 +56,16 @@ signals:
 //WR end;
 
 
+	void UpdateStatusBar(const QString &); // (k)
 private slots:
-void rCurrentChanged(int tabWidgetIndex);
-void rTabCloseRequested(int index);
-
+	void rCurrentChanged(int tabWidgetIndex);
+	void rToggleTTML(int tabWidgetIndex);
+	void rTabCloseRequested(int index);
+public slots:
+	void rUpdatePlaylist(); // (k)
+	void rPlaylistFinished(); // (k)
+	void rPrevFrame(); // (k)
+	void rNextFrame(); // (k)
 private:
 	Q_DISABLE_COPY(WidgetCentral);
 	void InitLyout();
@@ -63,8 +73,15 @@ private:
 
 	QSharedPointer<ImfPackage> mpImfPackage;
 	QSharedPointer<AssetCpl> mpDestination;
+	//QSharedPointer<AssetCpl> mpDestination; delete?
 	QMessageBox *mpMsgBox;
 	QTabWidget *mpTabWidget;
 	WidgetVideoPreview *mpPreview;
+	QTabWidget *mpTabDetailTTML; // (k)
+	TTMLDetails *mpTTMLDetailsWidget;
 	WidgetCompositionInfo *mpDetailsWidget;
+	QThread *tpThread; // (k)
+	TimelineParser *timelineParser; // (k)
+	bool playListUpdateSuccess = true; // (k)
+	QTime *timelineParserTime;
 };

@@ -1,4 +1,4 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel
+/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
  *
  * This program is free software : you can redistribute it and / or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,4 +51,16 @@ private:
 	//WR
 	EditRate mCplEditRate;  // for creating TT files
 	//WR
+};
+
+struct RateInfo
+{
+	ASDCP::UL ul;
+	double bitrate;
+	std::string label;
+
+	RateInfo(const ASDCP::UL& u, const double& b, const std::string& l) {
+		ul = u; bitrate = b; label = l;
+	}
+
 };

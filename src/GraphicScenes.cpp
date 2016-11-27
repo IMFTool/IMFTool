@@ -1,4 +1,4 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel
+/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
  *
  * This program is free software : you can redistribute it and / or modify
  * it under the terms of the GNU General Public License as published by
@@ -834,6 +834,8 @@ GraphicsSceneBase(rCplEditRate, pParent), mpCurrentFrameIndicator(NULL), mpSnapI
 	addItem(mpSnapIndicator);
 	mpSnapIndicator->setZValue(2);
 	mpSnapIndicator->hide();
+
+	// create current frame indicator
 	QPixmap indicator_head(":/indicator.png");
 	mpCurrentFrameIndicator = new GraphicsObjectVerticalIndicator(2, indicator_head.height(), QColor(CPL_COLOR_CURRENT_FRAME_INDICATOR), NULL);
 	mpCurrentFrameIndicator->SetHeadImage(indicator_head);
@@ -852,6 +854,7 @@ void GraphicsSceneTimeline::mousePressEvent(QGraphicsSceneMouseEvent *pEvent) {
 	GraphicsSceneBase::mousePressEvent(pEvent);
 	if(mouseGrabberItem() == NULL) {
 		emit FrameInicatorActive(true);
+		mpCurrentFrameIndicator->setX((qint64)(pEvent->scenePos().x() + .5)); // (k)
 	}
 }
 

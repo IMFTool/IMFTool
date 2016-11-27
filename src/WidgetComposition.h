@@ -1,4 +1,4 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel
+/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
  *
  * This program is free software : you can redistribute it and / or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,8 @@
 #include <QFrame>
 #include <QSplitter>
 #include <QDateTime>
-
+#include <QVector> // (k)
+#include "TTMLParser.h" // (k)
 
 class AbstractWidgetTrackDetails;
 class GraphicsViewScaleable;
@@ -34,6 +35,7 @@ class QUndoStack;
 class QToolBar;
 class QAction;
 class QButtonGroup;
+class WidgetVideoPreview; // (k)
 
 class WidgetComposition : public QFrame {
 
@@ -84,13 +86,21 @@ public:
 	bool DoesTrackExist(eSequenceType type) const;
 	int GetTrackCount(eSequenceType type) const;
 
+	QVector<PlayListElement> *playlist; // (k)
+	QVector<TTMLtimelineSegment> *ttmls; // (k)
+	int ImageSequenceIndex; // (k)
+	int SubtitlesSequenceIndex; // (k)
+	Timecode lastPosition; // (k)
+	GraphicsWidgetComposition* GetComposition() { return mpCompositionScene->GetComposition(); } // (k)
+
 	//! Writes a minimalistic CPL
 	static XmlSerializationError WriteMinimal(const QString &rDestination, const QUuid &rId, const EditRate &rEditRate, const UserText &rContentTitle, const UserText &rIssuer = UserText(), const UserText &rContentOriginator = UserText());
 
 signals:
 	void FrameInicatorActive(bool active);
 	void CurrentAudioChanged(const QSharedPointer<AssetMxfTrack> &rAsset, const Duration &rOffset, const Timecode &rTimecode);
-	void CurrentVideoChanged(const QSharedPointer<AssetMxfTrack> &rAsset, const Duration &rOffset, const Timecode &rTimecode);
+	void CurrentVideoChanged(const QSharedPointer<AssetMxfTrack> &rAsset, const Duration &rOffset, const Timecode &rTimecode, const int &playlist_index);
+	void PlaylistFinished();
 
 	public slots:
 	void AddNewSegmentRequest(int segmentIndex);
@@ -101,7 +111,8 @@ signals:
 	void AddNewTrackRequest(eSequenceType type);
 	void DeleteTrackRequest(int trackIndex);
 	void DeleteTrackRequest(const QUuid &rId);
-
+	void setVerticalIndicator(qint64); // (k)
+	void getVerticalIndicator() { rCurrentFrameChanged(lastPosition); }; // (k)
 
 	private slots:
 	void rCurrentFrameChanged(const Timecode &rCplTimecode);

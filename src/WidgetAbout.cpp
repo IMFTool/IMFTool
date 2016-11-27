@@ -41,7 +41,7 @@ QString third_party = QString("Third Party:\n\n"
 															"Marker Icon: This icon is provided by icons8.com as Creative Commons Attribution-NoDerivs 3.0 Unported\n\n"
 															).arg(QT_VERSION_STR).arg(ASDCP::Version());
 
-QString notice(PROJECT_NAME" Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel\n"
+QString notice(PROJECT_NAME" Copyright(C) 2016 Björn Stresing, Denis Manthey, Krispin Weiss, Wolfgang Ruppel\n"
 							 "This program comes with ABSOLUTELY NO WARRANTY.\n"
 							 "This is free software, and you are welcome to redistribute it\n"
 							 "under certain conditions.\n\n"

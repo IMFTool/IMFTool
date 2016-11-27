@@ -1,4 +1,4 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel
+/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
  *
  * This program is free software : you can redistribute it and / or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 #include "ImfPackage.h"
 #include <QtWidgets/QMainWindow>
 #include <QCloseEvent>
+#include <QKeyEvent> // (k)
 
 class QFileDialog;
 class QDockWidget;
@@ -36,7 +37,7 @@ public:
 
 signals:
 	void SettingsSaved();
-
+	void KeyStroke(int); // (k)
 public slots:
 	void ShowWidgetAbout();
 	void ShowWorkspaceLauncher();
@@ -72,6 +73,9 @@ private:
 	bool checkUndoStack();
 
 	QMessageBox	*mpMsgBox;
+//#ifdef ARCHIVIST
+	QDockWidget *mpDockWidgetImagePreview;
+//#endif
 	WidgetImpBrowser *mpWidgetImpBrowser;
 	WidgetCentral	*mpCentralWidget;
 	QUndoGroup *mpUndoGroup;
@@ -80,4 +84,5 @@ private:
 	QAction	*mpActionSaveAsNewCPL;
 	QList <QString> mpUnwrittenCPLs;
 	QString mpRootDirection;
+	QStatusBar *mpStatusBar;
 };
