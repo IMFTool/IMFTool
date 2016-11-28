@@ -24,10 +24,10 @@ void TimelineParser::run() {
 			for (int ii = 0; ii < p_segment->GetSequenceCount(); ii++) {
 				GraphicsWidgetSequence *p_sequence = p_segment->GetSequence(ii);
 
-				if (p_sequence) {
-	
-					cpl::SequenceType_ResourceListType resource_list;
-					cpl::SequenceType_ResourceListType::ResourceSequence &resource_sequence = resource_list.getResource();
+				if (p_sequence && !p_sequence->IsEmpty() && p_sequence != nullptr) {
+
+					//cpl::SequenceType_ResourceListType resource_list;
+					//cpl::SequenceType_ResourceListType::ResourceSequence &resource_sequence = resource_list.getResource();
 					for (int iii = 0; iii < p_sequence->GetResourceCount(); iii++) {
 						AbstractGraphicsWidgetResource *p_resource = p_sequence->GetResource(iii);
 						if (p_resource->type() == GraphicsWidgetVideoResourceType) {

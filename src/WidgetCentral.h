@@ -1,4 +1,4 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
+/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel
  *
  * This program is free software : you can redistribute it and / or modify
  * it under the terms of the GNU General Public License as published by
@@ -83,5 +83,6 @@ private:
 	QThread *tpThread; // (k)
 	TimelineParser *timelineParser; // (k)
 	bool playListUpdateSuccess = true; // (k)
+	bool uninstalling_imp = false;
 	QTime *timelineParserTime;
 };

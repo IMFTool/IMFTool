@@ -33,6 +33,12 @@
 class JP2K_Player;
 class JP2K_Decoder;
 
+class FrameRequest {
+public:
+	qint64 frameNr; // current frame in asset
+	QImage decoded; // decoded image
+	bool done;
+};
 
 class JP2K_Player : public QObject{
 	Q_OBJECT
@@ -119,7 +125,6 @@ private:
 	int fps;
 	
 	int ms_wait = 1000;
-	int decode_layer = 3; // 0 = best
 	void playLoop();
 	void clean();
 

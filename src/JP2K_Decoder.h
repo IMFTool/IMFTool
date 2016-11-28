@@ -30,6 +30,8 @@
 #include "ImfPackage.h"
 #include "JP2K_Player.h"
 
+class FrameRequest;
+
 class JP2K_Decoder : public QObject, public QRunnable{
 
 	Q_OBJECT
@@ -43,6 +45,7 @@ public:
 	Metadata::eColorSpace ColorSpace;
 	int prec, prec_shift, max;
 	float adjustYCbCr;
+	int layer = 3; // default
 
 private:
 

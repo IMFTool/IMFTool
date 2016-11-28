@@ -376,19 +376,6 @@ typedef struct {
 	float frameRate;
 	QVector<TTMLelem> items;
 } TTMLtimelineSegment;
-
-class FrameRequest {
-public:
-	FrameRequest() {};
-	QString path; // asset
-	qint64 frameNr; // current frame in asset
-	qint64 frame_total; // total frame to be played
-	int decode_layer; // 0 - 5
-	QByteArray raw_data; // extracted data from MXF
-	QImage decoded; // decoded image
-	int decode_time;
-	bool done;
-};
 	
 typedef struct {
 	int decoded_total = 0;

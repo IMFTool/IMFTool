@@ -21,35 +21,24 @@
 #include <QDesktopWidget>
 #include "openjpeg.h"
 #include <QOpenGLTexture>
+#include <QFileDialog>
 
 WidgetImagePreview::WidgetImagePreview() {
 
 	InitLayout();
 	Clear();
-	//mpCtlWrapper = new ColorTransformation(this, true);
-	//connect(mpCtlWrapper, SIGNAL(TransformationFinished(const QImage&, const QVariant&)), this, SLOT(ReceiveImage(const QImage&, const QVariant&)));
 }
 
-void WidgetImagePreview::ShowImageFile(QFileInfo file) {
+void WidgetImagePreview::saveImage() {
 
-	//mLastFile = file;
-	//mpSpinner->start();
-	//mpCtlWrapper->FlushThreadPoolQueue();
-	//mpCtlWrapper->TransformRawImage(file, QVariant(file.absoluteFilePath()));
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), QString("export.bmp"),
+		tr("Images (*.png *.bmp *.jpg)"));
+
+	mImage.save(fileName);
 }
 
 void WidgetImagePreview::InitLayout() {
-	/*
-	mpSpinner = new QtWaitingSpinner(this);
-	mpSpinner->setMinimumTrailOpacity(15.0);
-	mpSpinner->setTrailFadePercentage(70.0);
-	mpSpinner->setNumberOfLines(15);
-	mpSpinner->setLineLength(15);
-	mpSpinner->setLineWidth(5);
-	mpSpinner->setInnerRadius(15);
-	mpSpinner->setRevolutionsPerSecond(2);
-	mpSpinner->setColor(QColor(255, 255, 255));
-	*/
+
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	setAutoFillBackground(false);
 }
@@ -198,15 +187,7 @@ void WidgetImagePreview::mouseDoubleClickEvent(QMouseEvent *pEvent) {
 		showNormal();
 	}
 }
-/*
-void WidgetImagePreview::ShowImage(const FrameRequest &request) {
 
-	qDebug() << "image received -> show it!" << request.frameNr << "size" << request.decoded.byteCount();
-	mImage = request.decoded;
-	//request.clear();
-	repaint();
-}
-*/
 void WidgetImagePreview::ShowImage(const QImage &rImage) {
 	//qDebug() << "image received -> show it!" << rImage.byteCount();
 	mImage = rImage;
@@ -232,7 +213,7 @@ void WidgetImagePreview::setScaling(bool rscale) {
 
 void WidgetImagePreview::setExtract(int rextract) {
 	extract_area = rextract;
-	qDebug() << "extract" << extract_area;
+	//qDebug() << "extract" << extract_area;
 	repaint();
 }
 

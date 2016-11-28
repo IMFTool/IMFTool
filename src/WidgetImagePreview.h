@@ -43,17 +43,18 @@ public:
 	void setSmoothing(bool);
 	void setScaling(bool);
 	void setExtract(int);
-	
+	void saveImage();
+
 	QVector<TTMLRegion> ttml_regions; // list of TTML regions
 
-	public slots:
+public slots:
 
-	void ShowImageFile(QFileInfo file);
 	void ShowImage(const QImage&);
 	void paintRegions(QPainter &painter, const QRect rect_viewport, const QSize frame_size);
 	void InitLayout();
 	void regionOptionsChanged(int);
 protected:
+
 	virtual void initializeGL();
 	virtual void mouseDoubleClickEvent(QMouseEvent *pEvent);
 
@@ -66,14 +67,12 @@ private:
 	QSize frame_size;
 	QRect draw_rect;
 
-	bool show_ttml_regions = true; // default
-	QImage						tempImage;
-	QImage						mImage;
-	QFileInfo					mLastFile;
+	QImage mImage;
+	QFileInfo mLastFile;
 	QImage nullimage;
 
 	bool smooth = true;
 	bool scaling = true;
-
+	bool show_ttml_regions = true; // default
 	int extract_area = 0; // default (top-left)
 };

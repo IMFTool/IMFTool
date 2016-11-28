@@ -50,7 +50,7 @@ void JP2K_Decoder::run() {
 	pStream = opj_stream_create_default_memory_stream(&pMemoryStream, OPJ_TRUE);
 
 	pDecompressor = OPENJPEG_H::opj_create_decompress(OPJ_CODEC_J2K); // create new decompresser
-	params.cp_reduce = request->decode_layer;
+	params.cp_reduce = layer; // set current layer
 
 	// Setup the decoder
 	if (!OPENJPEG_H::opj_setup_decoder(pDecompressor, &params)) {

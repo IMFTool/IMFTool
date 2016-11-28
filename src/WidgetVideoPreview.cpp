@@ -158,6 +158,11 @@ void WidgetVideoPreview::InitLayout() {
 	processing_extract_actions[3]->setData(3);
 	menuProcessing->addAction(processing_extract_actions[3]);
 
+	// save image
+	processing_extract_actions[4] = new QAction(tr("save image"));
+	processing_extract_actions[4]->setData(4);
+	menuProcessing->addAction(processing_extract_actions[4]);
+
 	// extract
 	processing_extract = menuProcessing->addMenu("extract");
 	processing_extract->setObjectName("extractMenu");
@@ -174,8 +179,8 @@ void WidgetVideoPreview::InitLayout() {
 	processing_extract_names->append("bottom right");
 
 	// add actions
-	for (int i = 4; i < (processing_extract_names->length() + 4); i++) {
-		processing_extract_actions[i] = new QAction(processing_extract_names->at((i - 4)));
+	for (int i = 5; i < (processing_extract_names->length() + 5); i++) {
+		processing_extract_actions[i] = new QAction(processing_extract_names->at((i - 5)));
 		processing_extract_actions[i]->setCheckable(true);
 		processing_extract_actions[i]->setData(i); // set index
 		if (i == 0) processing_extract_actions[i]->setChecked(true); // default
@@ -271,6 +276,8 @@ void WidgetVideoPreview::xPosChanged(const QSharedPointer<AssetMxfTrack> &rAsset
 	xCurrentTime = rTimecode.GetSecondsF();
 	currentAsset = rAsset;
 
+	if (showTTML) getTTML(); // TTML
+
 	if (decodingFrame != xSliderFrame) {
 
 		current_playlist_index = playlist_index;
@@ -293,9 +300,6 @@ void WidgetVideoPreview::xPosChanged(const QSharedPointer<AssetMxfTrack> &rAsset
 			decoders[run]->frameNr = xSliderFrame; // set current frame number in decoder								 
 			decodingThreads[run]->start(QThread::HighestPriority); // start decoder
 			decoding_time->setText("loading...");
-				
-			// TTML
-			if (showTTML) getTTML();
 		}
 	}
 }
@@ -368,6 +372,7 @@ void WidgetVideoPreview::InstallImp() {
 }
 
 void WidgetVideoPreview::UninstallImp() {
+	menuQuality->clear(); // clear prev. resolutions from menu
 	mpImagePreview->Clear();
 }
 
@@ -490,8 +495,8 @@ void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 		}
 		else {
 			mpImagePreview->setScaling(false); // scaling is off
-			processing_extract_actions[8]->setChecked(true); // center center is ON
-			processing_extract_action = 8;
+			processing_extract_actions[9]->setChecked(true); // center center is ON
+			processing_extract_action = 9;
 			mpImagePreview->setExtract(4);
 		}
 		break;
@@ -513,9 +518,12 @@ void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 		decodingThreads[(int)(now_running)]->start(QThread::HighestPriority); // start decoder (again)
 
 		break;
+	case 4: // save image
+		mpImagePreview->saveImage();
+		break;
 	}
 
-	if (nr >= 4) {
+	if (nr >= 5) {
 		if (action->isChecked()) {
 			processing_extract_actions[1]->setChecked(false); // scaling is off
 			mpImagePreview->setScaling(false); // scaling is off
@@ -528,7 +536,7 @@ void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 		// extract action!
 		if(processing_extract_action != nr) processing_extract_actions[processing_extract_action]->setChecked(false); // uncheck 'old' option
 		processing_extract_action = nr;
-		mpImagePreview->setExtract((nr - 4));
+		mpImagePreview->setExtract((nr - 5));
 	}
 }
 

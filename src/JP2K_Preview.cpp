@@ -69,6 +69,10 @@ void JP2K_Preview::setUp() {
 			oetf[i] = pow(((input + (alpha - 1)) / alpha), 2.222); // 0.45 th root of x: pow(val, 1.0 / 0.45) = pow(val, 2.222~)
 		}
 
+		// EOTF -> delinearize (mirrored reverse of oetf)
+		eotf[4095 - i] = 1 - oetf[i];
+
+		/*
 		// EOTF -> delinearize
 		if (input < beta) { // linear part!
 			eotf[i] = input * 4.5;
@@ -76,7 +80,15 @@ void JP2K_Preview::setUp() {
 		else { // exp. part!
 			eotf[i] = alpha * pow(input, 0.45) - (alpha - 1);
 		}
+		*/
 	}
+
+	/*
+	for (int i = 0; i < 4096; i++) {
+		float input = (float)i / 4095;
+		qDebug() << input << oetf[i] << eotf[i];
+	}
+	*/
 }
 
 void JP2K_Preview::getProxy() {
@@ -199,6 +211,7 @@ bool JP2K_Preview::extractFrame(qint64 frameNr) {
 		err = true;
 		return false;
 	}
+
 
 	// calculate neccessary buffer size
 	Result_t result_f1 = reader->AS02IndexReader().Lookup(frameNr, f1); // current frame

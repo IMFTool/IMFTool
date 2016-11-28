@@ -99,7 +99,7 @@ private:
 	QMenu *processing_extract;
 
 	QStringList *processing_extract_names;
-	QAction *processing_extract_actions[13];
+	QAction *processing_extract_actions[14];
 	int processing_extract_action = 3; // default
 
 	QPushButton *mpStopButton;

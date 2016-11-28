@@ -81,7 +81,7 @@ void WidgetCentral::InitLyout() {
 	tpThread = new QThread(); // create widget Thread
 	timelineParser = new TimelineParser();
 	timelineParserTime = new QTime();
-	timelineParserTime->start(); // initialize
+	timelineParserTime->start(); // initialize timer
 
 	timelineParser->moveToThread(tpThread);
 	connect(tpThread, SIGNAL(started()), timelineParser, SLOT(run()));
@@ -143,7 +143,6 @@ void WidgetCentral::rUpdatePlaylist() {
 
 	WidgetComposition *p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->currentWidget());
 	if (p_composition) {
-	
 		p_composition->setVerticalIndicator(0);
 
 		if (tpThread->isRunning()) {
@@ -211,19 +210,24 @@ void WidgetCentral::rToggleTTML(int tabWidgetIndex) {
 
 void WidgetCentral::rCurrentChanged(int tabWidgetIndex) {
 
+	// disconnect
 	WidgetComposition *p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->currentWidget());
 	if(p_composition) {
 		// (k) - start
-		rUpdatePlaylist(); // update playlist
 		disconnect(p_composition->GetUndoStack(), SIGNAL(indexChanged(int)), this, SLOT(rUpdatePlaylist())); // (k)
 		disconnect(p_composition, SIGNAL(CurrentVideoChanged(const QSharedPointer<AssetMxfTrack>&, const Duration&, const Timecode&, const int&)), mpPreview, SLOT(xPosChanged(const QSharedPointer<AssetMxfTrack>&, const Duration&, const Timecode&, const int&)));
 		disconnect(mpPreview, SIGNAL(currentPlayerPosition(qint64)), p_composition, SLOT(setVerticalIndicator(qint64))); // (k)
 		// (k) - end
 	}
+
+	if (uninstalling_imp) return; // (k)
+
+	// connect
 	p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->widget(tabWidgetIndex));
 	if(p_composition) {
 		mpDetailsWidget->SetComposition(p_composition);
 		// (k) - start
+		rUpdatePlaylist(); // update playlist
 		connect(p_composition->GetUndoStack(), SIGNAL(indexChanged(int)), this, SLOT(rUpdatePlaylist()));
 		connect(p_composition, SIGNAL(CurrentVideoChanged(const QSharedPointer<AssetMxfTrack>&, const Duration&, const Timecode&, const int&)), mpPreview, SLOT(xPosChanged(const QSharedPointer<AssetMxfTrack>&, const Duration&, const Timecode&, const int&)));
 		connect(mpPreview, SIGNAL(currentPlayerPosition(qint64)), p_composition, SLOT(setVerticalIndicator(qint64)));
@@ -254,6 +258,8 @@ void WidgetCentral::rTabCloseRequested(int index) {
 }
 
 int WidgetCentral::ShowCplEditor(const QUuid &rCplAssetId) {
+
+	uninstalling_imp = false; // (k)
 
 	for(int i = 0; i < mpTabWidget->count(); i++) {
 		WidgetComposition *p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->widget(i));
@@ -301,17 +307,21 @@ void WidgetCentral::InstallImp(const QSharedPointer<ImfPackage> &rImfPackage) {
 
 void WidgetCentral::UninstallImp() {
 
+	uninstalling_imp = true; // (k)
+
 	if (!mpImfPackage.isNull()) {
 		mpPreview->UninstallImp();
 	}
 
 	mpDetailsWidget->setDisabled(true);
 	mpDetailsWidget->Clear();
+	
 	for(int i = 0; i < mpTabWidget->count(); i++) {
 		if(QWidget *p_widget = mpTabWidget->widget(i)) {
 			p_widget->deleteLater();
 		}
 	}
+
 	mpImfPackage.clear();
 	ttmls = QVector<TTMLtimelineSegment>(); // (k) clear ttml list
 	playlist = QVector<PlayListElement>(); // (k) clear video playlist

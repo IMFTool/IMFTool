@@ -33,6 +33,7 @@ QString third_party = QString("Third Party:\n\n"
 															"Recipients who would like to receive a copy of such source code should submit a request by email, at wolfgang.ruppel@hs-rm.de\n"
 															"QT (Version: %1): The Qt Toolkit is Copyright (C) 2015 The Qt Company Ltd and other contributors.\n"
 															"Contact: http ://www.qt.io/licensing/\n\n"
+															"OpenJPEG: Copyright (c) 2002-2014, Universite catholique de Louvain (UCL), Belgium.\n\n"
 															"AS-DCP lib. (Version %2): is Copyright (c) 2003-2012, John Hurst All rights reserved.\n\n"
 															"regxmllib: Copyright (c) 2014, Pierre-Anthony Lemieux (pal@sandflow.com) All rights reserved.\n\n"
 															"Window Icon: Toma4025 http://toma4025.deviantart.com/art/RumixIP-107029752\n\n"
@@ -79,7 +80,7 @@ void WidgetAbout::InitLayout() {
 	p_text_third_party->setText(third_party);
 	QLabel *p_label_name = new QLabel(PROJECT_NAME, this);
 	p_label_name->setFont(QFont("Arial", 20, QFont::Bold));
-	QLabel *p_label_author = new QLabel(tr("Author: ").append("Björn Stresing, Denis Manthey, Wolfgang Ruppel"), this);
+	QLabel *p_label_author = new QLabel(tr("Author: ").append("Björn Stresing, Denis Manthey, Krispin Weiß, Wolfgang Ruppel"), this);
 	QLabel *p_label_version = new QLabel(tr("Version: ").append(VERSION_MAJOR"." VERSION_MINOR"." SVN_REV), this);
 	QLabel *p_label_notice = new QLabel(notice, this);
 	QLabel *p_label_icon = new QLabel(this);

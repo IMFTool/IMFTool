@@ -59,6 +59,7 @@ void JP2K_Player::startPlay(){
 
 void JP2K_Player::stop() {
 
+	playing = false;
 	emit playerInfo("Playback stopped!");
 	clean();
 
@@ -136,6 +137,8 @@ void JP2K_Player::setPos(int frameNr, int TframeNr, int playlist_index) {
 	playing = false;
 
 	if (playlist_index > -1 && playlist_index < playlist.length()) {
+
+		if (!playlist[playlist_index].asset) return; // asset is invalid!
 
 		decoding_ple_index = playlist_index;
 		ple_decoding = playlist[playlist_index];
@@ -261,7 +264,6 @@ void JP2K_Player::playLoop(){
 			
 			int request_index = requested_frames_total % 50;
 			request_queue[request_index]->frameNr = decoding_frame;
-			request_queue[request_index]->decode_layer = decode_layer;
 			request_queue[request_index]->done = false;
 			threadPool->start(decoder_queue[request_index], QThread::HighestPriority);
 
@@ -334,7 +336,7 @@ void JP2K_Player::setPlaylist(QVector<PlayListElement> &rPlaylist) {
 	qDebug() << "playlist items:" << rPlaylist.length();
 	playlist = rPlaylist;
 
-	if (rPlaylist.length() > 0) {
+	if (rPlaylist.length() > 0 && rPlaylist.at(0).asset) {
 		
 		video_framerate = playlist[0].asset->GetMetadata().editRate.GetQuotient();
 		if(playlist.length() > 0) setPos(playlist[0].in, 0, 0);
@@ -365,7 +367,13 @@ void JP2K_Player::setFps(int set_fps){
 }
 
 void JP2K_Player::setLayer(int layer){
-	decode_layer = layer;
+
 	emit playerInfo(QString("Set decoding layer to: %1").arg(layer));
+
+	// set layer in decoders
+	for (int i = 0; i < 50; i++) {
+		decoder_queue[i]->layer = layer;
+	}
+
 	clean();
 }
