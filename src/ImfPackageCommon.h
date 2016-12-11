@@ -17,6 +17,8 @@
 #include "SMPTE-429-8-2014-AM.h"
 #include "SMPTE-429-8-2006-PKL.h"
 #include "SMPTE-2067-3-2013-CPL.h"
+#include "st2067-2b-2016-PKL.h"
+#include "st2067-3a-2016-CPL.h"
 #include "SafeBool.h"
 #include "global.h"
 #include "ImfCommon.h"
@@ -284,13 +286,13 @@ public:
 		return ::UserText(rText.c_str(), rText.getLanguage().c_str());
 	}
 
-	static QUuid Convert(const pkl::UUID &rUuid) {
+	static QUuid Convert(const pkl2016::UUID &rUuid) {
 
 		QString uuid(rUuid.c_str());
 		return QUuid(uuid.split(':').last());
 	}
 
-	static ::UserText Convert(const pkl::UserText &rText) {
+	static ::UserText Convert(const pkl2016::UserText &rText) {
 
 		return ::UserText(rText.c_str(), rText.getLanguage().c_str());
 	}
@@ -332,17 +334,21 @@ public:
 		return edit_rate;
 	}
 
-	static cpl::MarkerType_LabelType Convert(const ::MarkerLabel &rMarkerLabel) {
+	static cpl2016::MarkerType_LabelType Convert(const ::MarkerLabel &rMarkerLabel) {
 
-		cpl::MarkerType_LabelType marker(rMarkerLabel.GetLabel().toStdString());
+		cpl2016::MarkerType_LabelType marker(rMarkerLabel.GetLabel().toStdString());
 		marker.setScope(rMarkerLabel.GetScope().toStdString());
 		return marker;
 	}
 
-	static ::MarkerLabel Convert(const cpl::MarkerType_LabelType &rMarkerLabel) {
+	static ::MarkerLabel Convert(const cpl2016::MarkerType_LabelType &rMarkerLabel) {
 
 		MarkerLabel ret;
+		const cpl2016::MarkerType_LabelType::ScopeType markerScope2016(WELL_KNOWN_MARKER_LABEL_SCOPE_2016);
 		if(rMarkerLabel.getScope().compare(rMarkerLabel.getScopeDefaultValue()) == 0) {
+			ret = MarkerLabel::GetMarker(QString(rMarkerLabel.c_str()));
+		}
+		else if(rMarkerLabel.getScope().compare(markerScope2016) == 0) {
 			ret = MarkerLabel::GetMarker(QString(rMarkerLabel.c_str()));
 		}
 		else {
@@ -351,9 +357,9 @@ public:
 		return ret;
 	}
 	//WR
-	static ::UserText Convert(const cpl::ContentKindType &rContentKindType) {
+	static ::UserText Convert(const cpl2016::ContentKindType &rContentKindType) {
 
 		return ::UserText(rContentKindType.c_str(), "");
 	}
-	//WR
+	static std::auto_ptr<pkl2016::PackingListType> Convert(std::auto_ptr<pkl::PackingListType> rPackingList2013);
 };

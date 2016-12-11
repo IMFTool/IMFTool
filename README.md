@@ -1,6 +1,16 @@
 # IMFTool
 A tool for editing IMF CPLs and creating new versions of an existing IMF package
 
+
+This branch contains IMF-Tool with a beta version of JPEG2000 decoding and IMSC1 decoding.
+###Features new to this beta version:
+- JPEG 2000 decoding of all profiles supported in App #2 and App #2E for preview purposes
+- Decoding and rendering of IMSC1 text profile in a separate window. (TTML tab)
+- Ingest of IMF 1.0 (PKL ST 429-8 and CPL ST 2067-3:2013) and IMF 1.1 (PKL ST 2067-2:2016 and CPL ST 2067-3:2016)
+- Outgest will be IMF 1.1 only
+- Requires OpenJPEG 2.2 (with multi-threading support), available at https://github.com/uclouvain/openjpeg
+
+
 ##What is IMF Tool
 IMF Tool supports browsing and limited editing of IMF [1] packages (IMPs).
 In particular, it supports the addition and deletion of audio tracks and subtitle tracks (versioning).

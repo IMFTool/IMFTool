@@ -72,7 +72,9 @@ set(tool_src ${tool_src} global.h MainWindow.h KMQtLogSink.h QtWaitingSpinner.h
 	)
 
 set(synthesis_src synthesis/dcmlTypes.cpp synthesis/SMPTE-429-8-2006-PKL.cpp synthesis/SMPTE-429-8-2014-AM.cpp synthesis/SMPTE-2067-2-2013-Core.cpp 
-	synthesis/SMPTE-2067-3-2013-CPL.cpp synthesis/SMPTE-2067-100a-2014-OPL.cpp synthesis/xml.cpp synthesis/xmldsig-core-schema.cpp)
+	synthesis/SMPTE-2067-3-2013-CPL.cpp synthesis/SMPTE-2067-100a-2014-OPL.cpp synthesis/xml.cpp synthesis/xmldsig-core-schema.cpp
+	synthesis/st2067-2a-2016-Core.cpp synthesis/st2067-2b-2016-PKL.cpp synthesis/st2067-3a-2016-CPL.cpp
+	)
 
 source_group("Resource Files" FILES ${qt_rcc_resources} ${win_resources} ${open_cl_src})
 source_group("Synthesis Files" FILES ${synthesis_src})

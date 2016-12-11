@@ -117,9 +117,17 @@ void JP2K_Player::setReader() {
 		adjustYCbCr = 512.0f;
 		max = 1023;
 		break;
+	case 14:
+		adjustYCbCr = 1024.0f;
+		max = 2047;
+		break;
+	case 16:
+		adjustYCbCr = 2048.0f;
+		max = 4095;
+		break;
 	}
 
-	// set reader in decoders
+	// set reader/params in decoders
 	for (int i = 0; i < 50; i++) {
 		decoder_queue[i]->reader = reader_shared;
 		decoder_queue[i]->ColorEncoding = ColorEncoding;
@@ -359,6 +367,7 @@ void JP2K_Player::setPlaylist(QVector<PlayListElement> &rPlaylist) {
 }
 
 void JP2K_Player::setFps(int set_fps){
+
 	//qDebug() << "set fps to" << set_fps;
 	ms_wait = qRound(1000 / (double)set_fps);
 	fps = set_fps;

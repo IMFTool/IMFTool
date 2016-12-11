@@ -482,10 +482,18 @@ const MarkerLabel MarkerLabel::MarkerLabelFFCO("FFCO", "First Frame of Candidate
 const MarkerLabel MarkerLabel::MarkerLabelLFCO("LFCO", "Last Frame of Candidate Overlay. Last frame of a sequence of frames where overlays, e.g. commercial overlays, may be placed.");
 const MarkerLabel MarkerLabel::MarkerLabelFFOA("FFOA", "Audio First Frame. First frame of audio ring-in/ring-out where the video is in black.");
 const MarkerLabel MarkerLabel::MarkerLabelLFOA("LFOA", "Audio Last Frame. Last frame of audio ring-in/ring-out where the video is in black.");
+//Markers from ST 2067-3:2016
+const MarkerLabel MarkerLabel::MarkerLabelFFDC("FFDC", "First Frame of Dubbing Credits. First displayable frame of content that contains any intensity of dubbing credits.", WELL_KNOWN_MARKER_LABEL_SCOPE_2016);
+const MarkerLabel MarkerLabel::MarkerLabelLFDC("LFDC", "Last Frame of Dubbing credits: Last displayable frame of content that contains any intensity of dubbing credits.", WELL_KNOWN_MARKER_LABEL_SCOPE_2016);
 
 bool MarkerLabel::IsWellKnown() const {
+	bool retValue = false;
+	if (mScope.compare(WELL_KNOWN_MARKER_LABEL_SCOPE_2013) == 0 && GetMarker(this->GetLabel()).GetLabel().compare(MarkerLabel::MarkerLabelNone.GetLabel()) != 0)
+		retValue = true;
+	if (mScope.compare(WELL_KNOWN_MARKER_LABEL_SCOPE_2016) == 0 && GetMarker(this->GetLabel()).GetLabel().compare(MarkerLabel::MarkerLabelNone.GetLabel()) != 0)
+		retValue = true;
 
-	return mScope.compare(WELL_KNOWN_MARKER_LABEL_SCOPE) == 0 && GetMarker(this->GetLabel()).GetLabel().compare(MarkerLabel::MarkerLabelNone.GetLabel()) != 0;
+	return retValue; //mScope.compare(WELL_KNOWN_MARKER_LABEL_SCOPE) == 0 && GetMarker(this->GetLabel()).GetLabel().compare(MarkerLabel::MarkerLabelNone.GetLabel()) != 0;
 }
 
 QStringList MarkerLabel::GetMarkerLabels() {

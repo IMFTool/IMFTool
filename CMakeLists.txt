@@ -15,13 +15,13 @@ if (SVN_EXECUTABLE)
       EXECUTE_PROCESS(COMMAND ${SVN_EXECUTABLE} info ${dir}
         OUTPUT_VARIABLE ${variable}
         OUTPUT_STRIP_TRAILING_WHITESPACE)
-      STRING(REGEX REPLACE "^(.*\n)?Revision: ([^\n]+).*"
+      STRING(REGEX REPLACE "^(.*\n)?Last Changed Rev: ([^\n]+).*"
         "\\2" ${variable} "${${variable}}")
     ENDMACRO(Subversion_GET_REVISION)
 
     Subversion_GET_REVISION(${CMAKE_SOURCE_DIR} SVN_REV)
 endif ()
-message(STATUS "SVN Revision Number is ${SVN_REV}")
+message(STATUS "SVN Last Changed Revision Number is ${SVN_REV}")
 
 # The version number.
 set(VERSION_MAJOR 0)

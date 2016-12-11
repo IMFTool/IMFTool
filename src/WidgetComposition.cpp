@@ -35,6 +35,8 @@
 #include <QMenu>
 #include <fstream>
 #include <QPropertyAnimation>
+#include <QTemporaryFile>
+
 
 
 WidgetComposition::WidgetComposition(const QSharedPointer<ImfPackage> &rImp, const QUuid &rCplAssetId, QWidget *pParent /*= NULL*/) :
@@ -42,7 +44,7 @@ QFrame(pParent), mpCompositionView(NULL), mpCompositionScene(NULL), mpTimelineVi
 mpLeftInnerSplitter(NULL), mpRightInnerSplitter(NULL), mpOuterSplitter(NULL), mpTrackSplitter(NULL), mpCompositionGraphicsWidget(NULL),
 mpTimelineGraphicsWidget(NULL), mpUndoStack(NULL), mpToolBar(NULL),
 mAssetCpl(rImp->GetAsset(rCplAssetId).objectCast<AssetCpl>()), mImp(rImp), mpSoloButtonGroup(NULL),
-mData(ImfXmlHelper::Convert(QUuid::createUuid()), ImfXmlHelper::Convert(QDateTime::currentDateTimeUtc()), ImfXmlHelper::Convert(UserText(tr("Unnamed"))), ImfXmlHelper::Convert(EditRate::EditRate24), cpl::CompositionPlaylistType::SegmentListType()) {
+mData(ImfXmlHelper::Convert(QUuid::createUuid()), ImfXmlHelper::Convert(QDateTime::currentDateTimeUtc()), ImfXmlHelper::Convert(UserText(tr("Unnamed"))), ImfXmlHelper::Convert(EditRate::EditRate24), cpl2016::CompositionPlaylistType::SegmentListType()) {
 
 	mpUndoStack = new QUndoStack(this);
 	InitLayout();
@@ -297,15 +299,15 @@ ImfError WidgetComposition::Write(const QString &rDestination /*= QString()*/) {
 	cpl_namespace["ds"].name = XML_NAMESPACE_DS;
 	cpl_namespace["xs"].name = XML_NAMESPACE_XS;
 
-	cpl::CompositionPlaylistType cpl(mData);
+	cpl2016::CompositionPlaylistType cpl(mData);
 	cpl.setCreator(ImfXmlHelper::Convert(UserText(CREATOR_STRING)));
 	cpl.setIssueDate(ImfXmlHelper::Convert(QDateTime::currentDateTimeUtc()));
-	cpl::CompositionPlaylistType_SegmentListType segment_list;
-	cpl::CompositionPlaylistType_SegmentListType::SegmentSequence &segment_sequence = segment_list.getSegment();
+	cpl2016::CompositionPlaylistType_SegmentListType segment_list;
+	cpl2016::CompositionPlaylistType_SegmentListType::SegmentSequence &segment_sequence = segment_list.getSegment();
 	//WR begin
 	//Essence descriptor variables
-	cpl::CompositionPlaylistType_EssenceDescriptorListType essence_descriptor_list;
-	cpl::CompositionPlaylistType_EssenceDescriptorListType::EssenceDescriptorSequence &essence_descriptor_sequence = essence_descriptor_list.getEssenceDescriptor();
+	cpl2016::CompositionPlaylistType_EssenceDescriptorListType essence_descriptor_list;
+	cpl2016::CompositionPlaylistType_EssenceDescriptorListType::EssenceDescriptorSequence &essence_descriptor_sequence = essence_descriptor_list.getEssenceDescriptor();
 	essence_descriptor_sequence.clear();
 	//List of UUIDs of resources with essence descriptor
 	QStringList resourceIDs;
@@ -313,21 +315,21 @@ ImfError WidgetComposition::Write(const QString &rDestination /*= QString()*/) {
 	for(int i = 0; i < mpCompositionGraphicsWidget->GetSegmentCount(); i++) {
 		GraphicsWidgetSegment *p_segment = mpCompositionGraphicsWidget->GetSegment(i);
 		if(p_segment) {
-			cpl::SegmentType_SequenceListType sequence_list;
-			cpl::SegmentType_SequenceListType::AnySequence &r_any_sequence(sequence_list.getAny());
+			cpl2016::SegmentType_SequenceListType sequence_list;
+			cpl2016::SegmentType_SequenceListType::AnySequence &r_any_sequence(sequence_list.getAny());
 			xercesc::DOMDocument &doc = sequence_list.getDomDocument();
 			for(int ii = 0; ii < p_segment->GetSequenceCount(); ii++) {
 				GraphicsWidgetSequence *p_sequence = p_segment->GetSequence(ii);
 				if(p_sequence) {
-					cpl::SequenceType_ResourceListType resource_list;
-					cpl::SequenceType_ResourceListType::ResourceSequence &resource_sequence = resource_list.getResource();
+					cpl2016::SequenceType_ResourceListType resource_list;
+					cpl2016::SequenceType_ResourceListType::ResourceSequence &resource_sequence = resource_list.getResource();
 					for(int iii = 0; iii < p_sequence->GetResourceCount(); iii++) {
 						AbstractGraphicsWidgetResource *p_resource = p_sequence->GetResource(iii);
 						if(p_resource) {
-							std::auto_ptr<cpl::BaseResourceType> resource = p_resource->Write();
+							std::auto_ptr<cpl2016::BaseResourceType> resource = p_resource->Write();
 							//WR begin
 							// Test if resource is a track file resource
-							cpl::TrackFileResourceType *p_file_resource = dynamic_cast<cpl::TrackFileResourceType*>(&(*resource));
+							cpl2016::TrackFileResourceType *p_file_resource = dynamic_cast<cpl2016::TrackFileResourceType*>(&(*resource));
 							//Get corresponding AssetMxfTrack object
 							QSharedPointer<AssetMxfTrack> mxffile = p_resource->GetAsset().objectCast<AssetMxfTrack>();
 							if (p_file_resource && mxffile){
@@ -345,7 +347,7 @@ ImfError WidgetComposition::Write(const QString &rDestination /*= QString()*/) {
 						}
 					}
 					if(p_sequence->GetType() == MarkerSequence) {
-						cpl::SequenceType sequence(ImfXmlHelper::Convert(p_sequence->GetId()), ImfXmlHelper::Convert(p_sequence->GetTrackId()), resource_list);
+						cpl2016::SequenceType sequence(ImfXmlHelper::Convert(p_sequence->GetId()), ImfXmlHelper::Convert(p_sequence->GetTrackId()), resource_list);
 						sequence_list.setMarkerSequence(sequence);
 					}
 					else {
@@ -382,7 +384,7 @@ ImfError WidgetComposition::Write(const QString &rDestination /*= QString()*/) {
 								qWarning() << "Default case";
 								break;
 						}
-						cpl::SequenceType sequence(ImfXmlHelper::Convert(p_sequence->GetId()), ImfXmlHelper::Convert(p_sequence->GetTrackId()), resource_list);
+						cpl2016::SequenceType sequence(ImfXmlHelper::Convert(p_sequence->GetId()), ImfXmlHelper::Convert(p_sequence->GetTrackId()), resource_list);
 						if(p_dom_element && p_sequence->GetType() != Unknown) {
 							// Import namespaces from map for wildcard content.
 							for(xml_schema::NamespaceInfomap::iterator iter = cpl_namespace.begin(); iter != cpl_namespace.end(); ++iter) {
@@ -399,7 +401,7 @@ ImfError WidgetComposition::Write(const QString &rDestination /*= QString()*/) {
 					}
 				}
 			}
-			cpl::SegmentType segment(ImfXmlHelper::Convert(p_segment->GetId()), sequence_list);
+			cpl2016::SegmentType segment(ImfXmlHelper::Convert(p_segment->GetId()), sequence_list);
 			if(p_segment->GetAnnotationText().IsEmpty() == false) segment.setAnnotation(ImfXmlHelper::Convert(p_segment->GetAnnotationText()));
 			segment_sequence.push_back(segment);
 		}
@@ -416,7 +418,7 @@ ImfError WidgetComposition::Write(const QString &rDestination /*= QString()*/) {
 		XmlSerializationError serialization_error;
 		std::ofstream cpl_ofs(destination.toStdString().c_str(), std::ofstream::out);
 		try {
-			cpl::serializeCompositionPlaylist(cpl_ofs, cpl, cpl_namespace, "UTF-8", xml_schema::Flags::dont_initialize);
+			cpl2016::serializeCompositionPlaylist(cpl_ofs, cpl, cpl_namespace, "UTF-8", xml_schema::Flags::dont_initialize);
 		}
 		catch(xml_schema::Serialization &e) { serialization_error = XmlSerializationError(e); }
 		catch(xml_schema::UnexpectedElement &e) { serialization_error = XmlSerializationError(e); }
@@ -453,14 +455,14 @@ ImfError WidgetComposition::WriteNew(const QString &rDestination /*= QString()*/
 	cpl_namespace["ds"].name = XML_NAMESPACE_DS;
 	cpl_namespace["xs"].name = XML_NAMESPACE_XS;
 
-	cpl::CompositionPlaylistType cpl(mData);
+	cpl2016::CompositionPlaylistType cpl(mData);
 	cpl.setCreator(ImfXmlHelper::Convert(UserText(CREATOR_STRING)));
 	cpl.setIssueDate(ImfXmlHelper::Convert(QDateTime::currentDateTimeUtc()));
-	cpl::CompositionPlaylistType_SegmentListType segment_list;
-	cpl::CompositionPlaylistType_SegmentListType::SegmentSequence &segment_sequence = segment_list.getSegment();
+	cpl2016::CompositionPlaylistType_SegmentListType segment_list;
+	cpl2016::CompositionPlaylistType_SegmentListType::SegmentSequence &segment_sequence = segment_list.getSegment();
 	//WR begin
-	cpl::CompositionPlaylistType_EssenceDescriptorListType essence_descriptor_list;
-	cpl::CompositionPlaylistType_EssenceDescriptorListType::EssenceDescriptorSequence &essence_descriptor_sequence = essence_descriptor_list.getEssenceDescriptor();
+	cpl2016::CompositionPlaylistType_EssenceDescriptorListType essence_descriptor_list;
+	cpl2016::CompositionPlaylistType_EssenceDescriptorListType::EssenceDescriptorSequence &essence_descriptor_sequence = essence_descriptor_list.getEssenceDescriptor();
 	essence_descriptor_sequence.clear();
 	QStringList resourceIDs;
 	//WR end
@@ -483,23 +485,23 @@ ImfError WidgetComposition::WriteNew(const QString &rDestination /*= QString()*/
 	for(int i = 0; i < mpCompositionGraphicsWidget->GetSegmentCount(); i++) {
 		GraphicsWidgetSegment *p_segment = mpCompositionGraphicsWidget->GetSegment(i);
 		if(p_segment) {
-			cpl::SegmentType_SequenceListType sequence_list;
-			cpl::SegmentType_SequenceListType::AnySequence &r_any_sequence(sequence_list.getAny());
+			cpl2016::SegmentType_SequenceListType sequence_list;
+			cpl2016::SegmentType_SequenceListType::AnySequence &r_any_sequence(sequence_list.getAny());
 			xercesc::DOMDocument &doc = sequence_list.getDomDocument();
 			for(int ii = 0; ii < p_segment->GetSequenceCount(); ii++) {
 				GraphicsWidgetSequence *p_sequence = p_segment->GetSequence(ii);
 				if(p_sequence) {
-					cpl::SequenceType_ResourceListType resource_list;
-					cpl::SequenceType_ResourceListType::ResourceSequence &resource_sequence = resource_list.getResource();
+					cpl2016::SequenceType_ResourceListType resource_list;
+					cpl2016::SequenceType_ResourceListType::ResourceSequence &resource_sequence = resource_list.getResource();
 					for(int iii = 0; iii < p_sequence->GetResourceCount(); iii++) {
 						AbstractGraphicsWidgetResource *p_resource = p_sequence->GetResource(iii);
 						if(p_resource) {
-							std::auto_ptr<cpl::BaseResourceType> resource = p_resource->Write();
+							std::auto_ptr<cpl2016::BaseResourceType> resource = p_resource->Write();
 							// Create a new UUID for all resources
 							resource->setId(ImfXmlHelper::Convert(QUuid::createUuid()));
 							//WR begin
 							// Test if resource is a track file resource
-							cpl::TrackFileResourceType *p_file_resource = dynamic_cast<cpl::TrackFileResourceType*>(&(*resource));
+							cpl2016::TrackFileResourceType *p_file_resource = dynamic_cast<cpl2016::TrackFileResourceType*>(&(*resource));
 							//Get corresponding AssetMxfTrack object
 							QSharedPointer<AssetMxfTrack> mxffile = p_resource->GetAsset().objectCast<AssetMxfTrack>();
 							if (p_file_resource && mxffile){
@@ -520,7 +522,7 @@ ImfError WidgetComposition::WriteNew(const QString &rDestination /*= QString()*/
 					if(p_sequence->GetType() == MarkerSequence) {
 
 						//Track ID: compare p_sequence->GetTrackId with QStringList oldTrackIDs and get the index i. insert QList newTrackIDs.at(i)!
-						cpl::SequenceType sequence(ImfXmlHelper::Convert(QUuid::createUuid()), ImfXmlHelper::Convert(newTrackIDs.at(oldTrackIDs.indexOf(p_sequence->GetTrackId().toString()))), resource_list);
+						cpl2016::SequenceType sequence(ImfXmlHelper::Convert(QUuid::createUuid()), ImfXmlHelper::Convert(newTrackIDs.at(oldTrackIDs.indexOf(p_sequence->GetTrackId().toString()))), resource_list);
 						sequence_list.setMarkerSequence(sequence);
 					}
 					else {
@@ -558,7 +560,7 @@ ImfError WidgetComposition::WriteNew(const QString &rDestination /*= QString()*/
 								break;
 						}
 						//Track ID: compare p_sequence->GetTrackId with QStringList oldTrackIDs and get the index i. insert QList newTrackIDs.at(i)!
-						cpl::SequenceType sequence(ImfXmlHelper::Convert(QUuid::createUuid()), ImfXmlHelper::Convert(newTrackIDs.at(oldTrackIDs.indexOf(p_sequence->GetTrackId().toString()))), resource_list);
+						cpl2016::SequenceType sequence(ImfXmlHelper::Convert(QUuid::createUuid()), ImfXmlHelper::Convert(newTrackIDs.at(oldTrackIDs.indexOf(p_sequence->GetTrackId().toString()))), resource_list);
 						if(p_dom_element && p_sequence->GetType() != Unknown) {
 							// Import namespaces from map for wildcard content.
 							for(xml_schema::NamespaceInfomap::iterator iter = cpl_namespace.begin(); iter != cpl_namespace.end(); ++iter) {
@@ -575,7 +577,7 @@ ImfError WidgetComposition::WriteNew(const QString &rDestination /*= QString()*/
 					}
 				}
 			}
-			cpl::SegmentType segment(ImfXmlHelper::Convert(QUuid::createUuid()), sequence_list);
+			cpl2016::SegmentType segment(ImfXmlHelper::Convert(QUuid::createUuid()), sequence_list);
 			if(p_segment->GetAnnotationText().IsEmpty() == false) segment.setAnnotation(ImfXmlHelper::Convert(p_segment->GetAnnotationText()));
 			segment_sequence.push_back(segment);
 		}
@@ -592,7 +594,7 @@ ImfError WidgetComposition::WriteNew(const QString &rDestination /*= QString()*/
 		XmlSerializationError serialization_error;
 		std::ofstream cpl_ofs(destination.toStdString().c_str(), std::ofstream::out);
 		try {
-			cpl::serializeCompositionPlaylist(cpl_ofs, cpl, cpl_namespace, "UTF-8", xml_schema::Flags::dont_initialize);
+			cpl2016::serializeCompositionPlaylist(cpl_ofs, cpl, cpl_namespace, "UTF-8", xml_schema::Flags::dont_initialize);
 		}
 		catch(xml_schema::Serialization &e) { serialization_error = XmlSerializationError(e); }
 		catch(xml_schema::UnexpectedElement &e) { serialization_error = XmlSerializationError(e); }
@@ -624,9 +626,9 @@ ImfError WidgetComposition::ParseCpl() {
 	ImageSequenceIndex = -1; // (k)
 
 	// ---Parse Cpl---
-	std::auto_ptr<cpl::CompositionPlaylistType> cpl;
+	std::auto_ptr<cpl2016::CompositionPlaylistType> cpl;
 	try {
-		cpl = cpl::parseCompositionPlaylist(mAssetCpl->GetPath().absoluteFilePath().toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize);
+		cpl = cpl2016::parseCompositionPlaylist(mAssetCpl->GetPath().absoluteFilePath().toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize);
 	}
 	catch(const xml_schema::Parsing &e) { parse_error = XmlParsingError(e); }
 	catch(const xml_schema::ExpectedElement &e) { parse_error = XmlParsingError(e); }
@@ -639,13 +641,87 @@ ImfError WidgetComposition::ParseCpl() {
 	catch(const xml_schema::NoPrefixMapping &e) { parse_error = XmlParsingError(e); }
 	catch(...) { parse_error = XmlParsingError(XmlParsingError::Unknown); }
 
+	if(parse_error.IsError() == true) {  //probably a 2013 CPL ?
+		XmlParsingError parse_error2;
+		std::auto_ptr<cpl::CompositionPlaylistType> cpl2013;
+		try {
+			cpl2013 = cpl::parseCompositionPlaylist(mAssetCpl->GetPath().absoluteFilePath().toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize);
+		}
+		catch(const xml_schema::Parsing &e) { parse_error2 = XmlParsingError(e); }
+		catch(const xml_schema::ExpectedElement &e) { parse_error2 = XmlParsingError(e); }
+		catch(const xml_schema::UnexpectedElement &e) { parse_error2 = XmlParsingError(e); }
+		catch(const xml_schema::ExpectedAttribute &e) { parse_error2 = XmlParsingError(e); }
+		catch(const xml_schema::UnexpectedEnumerator &e) { parse_error2 = XmlParsingError(e); }
+		catch(const xml_schema::ExpectedTextContent &e) { parse_error2 = XmlParsingError(e); }
+		catch(const xml_schema::NoTypeInfo &e) { parse_error2 = XmlParsingError(e); }
+		catch(const xml_schema::NotDerived &e) { parse_error2 = XmlParsingError(e); }
+		catch(const xml_schema::NoPrefixMapping &e) { parse_error2 = XmlParsingError(e); }
+		catch(...) { parse_error2 = XmlParsingError(XmlParsingError::Unknown); }
+		if (parse_error2.IsError() == false) {
+			qDebug()  << "CPl 2013 detected!";
+			QString tempFile = nullptr;
+			bool conversionError = false;
+			try {
+				// This is a Q&D hack to convert ST 2067-3:2013 CPLs into ST 2067-3:2016 CPLs,
+				// pending a sophisticated solution using proper XLS Transformation.
+				// QTemporaryFile was causing issues under Windows, the delete cpl2016_file_tmp command is required for WIndows
+				QTemporaryFile* cpl2016_file_tmp = new QTemporaryFile();
+				if (!cpl2016_file_tmp->open()) {
+					qDebug() << "Cant't create temp file at " << cpl2016_file_tmp->fileName();
+					conversionError = true;
+				}
+				QFile f_in(mAssetCpl->GetPath().absoluteFilePath());
+				if (!f_in.open(QFile::ReadOnly | QFile::Text)) conversionError = true;
+				QTextStream in(&f_in);
+				QString tempCPL = in.readAll();
+				// Markers should remain in 2013 namespace
+				tempCPL.replace("http://www.smpte-ra.org/schemas/2067-3/2013#standard-markers", "markersscope2013xx");
+				// ContentKind should remain in 2013 namespace
+				tempCPL.replace("http://www.smpte-ra.org/schemas/2067-3/2013#content-kind", "contentkind2013xx");
+				tempCPL.replace("http://www.smpte-ra.org/schemas/2067-3/2013", "http://www.smpte-ra.org/schemas/2067-3/2016");
+				tempCPL.replace("http://www.smpte-ra.org/schemas/2067-2/2013", "http://www.smpte-ra.org/schemas/2067-2/2016");
+				tempCPL.replace("markersscope2013xx", "http://www.smpte-ra.org/schemas/2067-3/2013#standard-markers");
+				tempCPL.replace("contentkind2013xx", "http://www.smpte-ra.org/schemas/2067-3/2013#content-kind");
+				cpl2016_file_tmp->write(tempCPL.toUtf8());
+				tempFile = cpl2016_file_tmp->fileName();
+				cpl2016_file_tmp->setAutoRemove(false);
+				if (!cpl2016_file_tmp->flush()) {
+					qDebug() << "Cant't flush to temp file at " << cpl2016_file_tmp->fileName();
+					conversionError = true;
+				}
+				cpl2016_file_tmp->close();
+				delete cpl2016_file_tmp;
+			}
+			catch (...) { qDebug() << "Transformation of 2013 CPL to 2016 CPL failed"; conversionError = true; }
+			if (!conversionError) {
+				parse_error = XmlParsingError();
+				try { cpl = cpl2016::parseCompositionPlaylist(tempFile.toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize); }
+				catch (const xml_schema::Parsing &e) { parse_error = XmlParsingError(e); }
+				catch (const xml_schema::ExpectedElement &e) { parse_error = XmlParsingError(e); }
+				catch (const xml_schema::UnexpectedElement &e) { parse_error = XmlParsingError(e); }
+				catch (const xml_schema::ExpectedAttribute &e) { parse_error = XmlParsingError(e); }
+				catch (const xml_schema::UnexpectedEnumerator &e) { parse_error = XmlParsingError(e); }
+				catch (const xml_schema::ExpectedTextContent &e) { parse_error = XmlParsingError(e); }
+				catch (const xml_schema::NoTypeInfo &e) { parse_error = XmlParsingError(e); }
+				catch (const xml_schema::NotDerived &e) { parse_error = XmlParsingError(e); }
+				catch (const xml_schema::NoPrefixMapping &e) { parse_error = XmlParsingError(e); }
+				catch (...) { qDebug() << "Parsing transformed 2016 CPL failed"; }
+				qDebug() << parse_error;
+				//cleanup
+				try { QFile::remove(tempFile); }
+				catch (...) {} // just ignore..
+			}
+		}
+
+	}
+
 	if(parse_error.IsError() == false) {
 		mData = *cpl;
 		mpCompositionScene->SetCplEditRate(GetEditRate());
 		mpTimelineScene->SetCplEditRate(GetEditRate());
 		// Iterate segments.
 		for(unsigned int i = 0; i < mData.getSegmentList().getSegment().size(); i++) {
-			cpl::CompositionPlaylistType_SegmentListType::SegmentType &r_segment = mData.getSegmentList().getSegment().at(i);
+			cpl2016::CompositionPlaylistType_SegmentListType::SegmentType &r_segment = mData.getSegmentList().getSegment().at(i);
 			// Add graphics segment and segment indicator
 			GraphicsWidgetSegmentIndicator *p_graphics_segment_indicator = new GraphicsWidgetSegmentIndicator(mpTimelineGraphicsWidget, GraphicsHelper::GetSegmentColor(i), ImfXmlHelper::Convert(r_segment.getId()));
 			GraphicsWidgetSegment *p_graphics_segment = new GraphicsWidgetSegment(mpCompositionGraphicsWidget, GraphicsHelper::GetSegmentColor(i, true), ImfXmlHelper::Convert(r_segment.getId()), ImfXmlHelper::Convert(r_segment.getAnnotation().present() ? r_segment.getAnnotation().get() : dcml::UserTextType()));
@@ -654,11 +730,11 @@ ImfError WidgetComposition::ParseCpl() {
 			mpTimelineGraphicsWidget->AddSegmentIndicator(p_graphics_segment_indicator, i);
 			mpCompositionGraphicsWidget->AddSegment(p_graphics_segment, i);
 
-			cpl::SegmentType::SequenceListType &r_sequence_list = r_segment.getSequenceList();
-			cpl::SegmentType_SequenceListType::MarkerSequenceOptional &r_marker_sequence = r_sequence_list.getMarkerSequence();
+			cpl2016::SegmentType::SequenceListType &r_sequence_list = r_segment.getSequenceList();
+			cpl2016::SegmentType_SequenceListType::MarkerSequenceOptional &r_marker_sequence = r_sequence_list.getMarkerSequence();
 			// Add marker sequence if present.
 			if(r_marker_sequence.present() == true) {
-				cpl::SequenceType &r_sequence(r_marker_sequence.get());
+				cpl2016::SequenceType &r_sequence(r_marker_sequence.get());
 				AbstractWidgetTrackDetails *p_track_detail = GetTrackDetail(ImfXmlHelper::Convert(r_sequence.getTrackId()));
 				GraphicsWidgetSequence *p_graphics_sequence = new GraphicsWidgetSequence(p_graphics_segment, MarkerSequence, ImfXmlHelper::Convert(r_sequence.getTrackId()), ImfXmlHelper::Convert(r_sequence.getId()));
 				if(p_track_detail == NULL) {
@@ -669,8 +745,8 @@ ImfError WidgetComposition::ParseCpl() {
 				p_graphics_segment->AddSequence(p_graphics_sequence, p_graphics_segment->GetSequenceCount());
 
 				// Iterate marker resources.
-				for(cpl::SequenceType_ResourceListType::ResourceIterator resource_iter(r_sequence.getResourceList().getResource().begin()); resource_iter != r_sequence.getResourceList().getResource().end(); ++resource_iter) {
-					cpl::MarkerResourceType *p_marker_resource = dynamic_cast<cpl::MarkerResourceType*>(&(*resource_iter));
+				for(cpl2016::SequenceType_ResourceListType::ResourceIterator resource_iter(r_sequence.getResourceList().getResource().begin()); resource_iter != r_sequence.getResourceList().getResource().end(); ++resource_iter) {
+					cpl2016::MarkerResourceType *p_marker_resource = dynamic_cast<cpl2016::MarkerResourceType*>(&(*resource_iter));
 					if(p_marker_resource) {
 						p_graphics_sequence->AddResource(new GraphicsWidgetMarkerResource(p_graphics_sequence, p_marker_resource->_clone()), p_graphics_sequence->GetResourceCount());
 					}
@@ -684,10 +760,10 @@ ImfError WidgetComposition::ParseCpl() {
 				}
 			}
 			// Iterate "any" sequences.
-			cpl::SegmentType_SequenceListType::AnySequence &r_any_sequence(r_sequence_list.getAny());
-			for(cpl::SegmentType_SequenceListType::AnySequence::iterator sequence_iter(r_any_sequence.begin()); sequence_iter != r_any_sequence.end(); ++sequence_iter) {
+			cpl2016::SegmentType_SequenceListType::AnySequence &r_any_sequence(r_sequence_list.getAny());
+			for(cpl2016::SegmentType_SequenceListType::AnySequence::iterator sequence_iter(r_any_sequence.begin()); sequence_iter != r_any_sequence.end(); ++sequence_iter) {
 				xercesc::DOMElement& element(*sequence_iter);
-				cpl::SequenceType sequence(element);
+				cpl2016::SequenceType sequence(element);
 				std::string name(xsd::cxx::xml::transcode<char>(element.getLocalName()));
 				std::string name_space(xsd::cxx::xml::transcode<char>(element.getNamespaceURI()));
 				AbstractWidgetTrackDetails *p_track_detail = GetTrackDetail(ImfXmlHelper::Convert(sequence.getTrackId()));
@@ -737,12 +813,11 @@ ImfError WidgetComposition::ParseCpl() {
 				p_graphics_segment->AddSequence(p_graphics_sequence, p_graphics_segment->GetSequenceCount());
 
 				// Iterate resources.
-				for(cpl::SequenceType_ResourceListType::ResourceIterator resource_iter(sequence.getResourceList().getResource().begin()); resource_iter != sequence.getResourceList().getResource().end(); ++resource_iter) {
-					cpl::TrackFileResourceType *p_file_resource = dynamic_cast<cpl::TrackFileResourceType*>(&(*resource_iter));
+				for(cpl2016::SequenceType_ResourceListType::ResourceIterator resource_iter(sequence.getResourceList().getResource().begin()); resource_iter != sequence.getResourceList().getResource().end(); ++resource_iter) {
+					cpl2016::TrackFileResourceType *p_file_resource = dynamic_cast<cpl2016::TrackFileResourceType*>(&(*resource_iter));
 					if(p_file_resource) {
 						switch(p_graphics_sequence->GetType()) {
 							case MainImageSequence: 
-								//qDebug() << "MainImageSequence";
 								ImageSequenceIndex++;
 								if (mImp) p_graphics_sequence->AddResource(new GraphicsWidgetVideoResource(p_graphics_sequence, p_file_resource->_clone(), mImp->GetAsset(ImfXmlHelper::Convert(p_file_resource->getTrackFileId())).objectCast<AssetMxfTrack>(), ImageSequenceIndex), p_graphics_sequence->GetResourceCount());
 								else p_graphics_sequence->AddResource(new GraphicsWidgetVideoResource(p_graphics_sequence, p_file_resource->_clone()), p_graphics_sequence->GetResourceCount());
@@ -1068,11 +1143,11 @@ XmlSerializationError WidgetComposition::WriteMinimal(const QString &rDestinatio
 	cpl_namespace["ds"].name = XML_NAMESPACE_DS;
 	cpl_namespace["xs"].name = XML_NAMESPACE_XS;
 
-	cpl::CompositionPlaylistType_SegmentListType segment_list;
-	cpl::CompositionPlaylistType_SegmentListType::SegmentSequence &segment_sequence = segment_list.getSegment();
+	cpl2016::CompositionPlaylistType_SegmentListType segment_list;
+	cpl2016::CompositionPlaylistType_SegmentListType::SegmentSequence &segment_sequence = segment_list.getSegment();
 
-	cpl::SegmentType_SequenceListType sequence_list;
-	cpl::SegmentType_SequenceListType::AnySequence &r_any_sequence(sequence_list.getAny());
+	cpl2016::SegmentType_SequenceListType sequence_list;
+	cpl2016::SegmentType_SequenceListType::AnySequence &r_any_sequence(sequence_list.getAny());
 	xercesc::DOMDocument &doc = sequence_list.getDomDocument();
 	xercesc::DOMElement* p_dom_element = NULL;
 	p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("cc")->second.name).c_str(), (xsd::cxx::xml::string("cc:MainImageSequence").c_str()));
@@ -1086,15 +1161,15 @@ XmlSerializationError WidgetComposition::WriteMinimal(const QString &rDestinatio
 			}
 			p_dom_element->setAttributeNS(xsd::cxx::xml::string(XML_NAMESPACE_NS).c_str(), xsd::cxx::xml::string(ns.toStdString()).c_str(), xsd::cxx::xml::string(iter->second.name).c_str());
 		}
-		cpl::SequenceType::ResourceListType resources;
-		cpl::SequenceType sequence(ImfXmlHelper::Convert(QUuid::createUuid()), ImfXmlHelper::Convert(QUuid::createUuid()), resources);
+		cpl2016::SequenceType::ResourceListType resources;
+		cpl2016::SequenceType sequence(ImfXmlHelper::Convert(QUuid::createUuid()), ImfXmlHelper::Convert(QUuid::createUuid()), resources);
 		*p_dom_element << sequence;
 		r_any_sequence.push_back(p_dom_element);
 	}
-	cpl::SegmentType segment(ImfXmlHelper::Convert(QUuid::createUuid()), sequence_list);
+	cpl2016::SegmentType segment(ImfXmlHelper::Convert(QUuid::createUuid()), sequence_list);
 	segment_sequence.push_back(segment);
 
-	cpl::CompositionPlaylistType cpl(ImfXmlHelper::Convert(rId), ImfXmlHelper::Convert(QDateTime::currentDateTimeUtc()), ImfXmlHelper::Convert(rContentTitle), ImfXmlHelper::Convert(rEditRate), segment_list);
+	cpl2016::CompositionPlaylistType cpl(ImfXmlHelper::Convert(rId), ImfXmlHelper::Convert(QDateTime::currentDateTimeUtc()), ImfXmlHelper::Convert(rContentTitle), ImfXmlHelper::Convert(rEditRate), segment_list);
 	cpl.setCreator(ImfXmlHelper::Convert(UserText(CREATOR_STRING)));
 	if(rIssuer.IsEmpty() == false) cpl.setIssuer(ImfXmlHelper::Convert(rIssuer));
 	if(rContentOriginator.IsEmpty() == false) cpl.setContentOriginator(ImfXmlHelper::Convert(rIssuer));
@@ -1102,7 +1177,7 @@ XmlSerializationError WidgetComposition::WriteMinimal(const QString &rDestinatio
 	XmlSerializationError serialization_error;
 	std::ofstream cpl_ofs(rDestination.toStdString().c_str(), std::ofstream::out);
 	try {
-		cpl::serializeCompositionPlaylist(cpl_ofs, cpl, cpl_namespace, "UTF-8", xml_schema::Flags::dont_initialize);
+		cpl2016::serializeCompositionPlaylist(cpl_ofs, cpl, cpl_namespace, "UTF-8", xml_schema::Flags::dont_initialize);
 	}
 	catch(xml_schema::Serialization &e) { serialization_error = XmlSerializationError(e); }
 	catch(xml_schema::UnexpectedElement &e) { serialization_error = XmlSerializationError(e); }

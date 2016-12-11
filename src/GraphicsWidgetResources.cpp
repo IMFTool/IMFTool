@@ -25,7 +25,7 @@
 #include <QToolTip>
 #include "JP2K_Preview.h"
 
-AbstractGraphicsWidgetResource::AbstractGraphicsWidgetResource(GraphicsWidgetSequence *pParent, cpl::BaseResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/, const QColor &rColor /*= QColor(Qt::white)*/) :
+AbstractGraphicsWidgetResource::AbstractGraphicsWidgetResource(GraphicsWidgetSequence *pParent, cpl2016::BaseResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/, const QColor &rColor /*= QColor(Qt::white)*/) :
 GraphicsWidgetBase(pParent), mpData(pResource), mAssset(rAsset), mColor(rColor), mOldEntryPoint(), mOldSourceDuration(-1), mpLeftTrimHandle(NULL), mpRightTrimHandle(NULL), mpDurationIndicator(NULL), mpVerticalIndicator(NULL) {
 
 	mpLeftTrimHandle = new TrimHandle(this, Left);
@@ -692,32 +692,32 @@ void GraphicsWidgetDummyResource::paint(QPainter *pPainter, const QStyleOptionGr
 	}
 }
 
-GraphicsWidgetFileResource::GraphicsWidgetFileResource(GraphicsWidgetSequence *pParent, cpl::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/, const QColor &rColor /*= QColor(Qt::white)*/) :
+GraphicsWidgetFileResource::GraphicsWidgetFileResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/, const QColor &rColor /*= QColor(Qt::white)*/) :
 AbstractGraphicsWidgetResource(pParent, pResource, rAsset, rColor) {
 
 }
 
 GraphicsWidgetFileResource::GraphicsWidgetFileResource(GraphicsWidgetSequence *pParent, const QSharedPointer<AssetMxfTrack> &rAsset, const QColor &rColor /*= QColor(Qt::white)*/) :
 AbstractGraphicsWidgetResource(pParent,
-new cpl::TrackFileResourceType(ImfXmlHelper::Convert(QUuid::createUuid()), rAsset ? rAsset->GetDuration().GetCount() : 0, ImfXmlHelper::Convert(QUuid::createUuid()) /*not used*/, rAsset ? ImfXmlHelper::Convert(rAsset->GetId()) : ImfXmlHelper::Convert(QUuid())),
+new cpl2016::TrackFileResourceType(ImfXmlHelper::Convert(QUuid::createUuid()), rAsset ? rAsset->GetDuration().GetCount() : 0, ImfXmlHelper::Convert(QUuid::createUuid()) /*not used*/, rAsset ? ImfXmlHelper::Convert(rAsset->GetId()) : ImfXmlHelper::Convert(QUuid())),
 rAsset, rColor) {
 
 }
 
 GraphicsWidgetFileResource* GraphicsWidgetFileResource::Clone() const {
 
-	cpl::TrackFileResourceType intermediate_resource(*(static_cast<cpl::TrackFileResourceType*>(mpData)));
+	cpl2016::TrackFileResourceType intermediate_resource(*(static_cast<cpl2016::TrackFileResourceType*>(mpData)));
 	intermediate_resource.setId(ImfXmlHelper::Convert(QUuid::createUuid()));
 	return new GraphicsWidgetFileResource(NULL, intermediate_resource._clone(), mAssset, GetColor());
 }
 
-std::auto_ptr<cpl::BaseResourceType> GraphicsWidgetFileResource::Write() const {
+std::auto_ptr<cpl2016::BaseResourceType> GraphicsWidgetFileResource::Write() const {
 
-	return std::auto_ptr<cpl::BaseResourceType>(mpData->_clone());
+	return std::auto_ptr<cpl2016::BaseResourceType>(mpData->_clone());
 }
 
 
-GraphicsWidgetVideoResource::GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, cpl::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/, int video_timeline_index) :
+GraphicsWidgetVideoResource::GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/, int video_timeline_index) :
 mpJP2K(), // (k)
 GraphicsWidgetFileResource(pParent, pResource, rAsset, QColor(CPL_COLOR_VIDEO_RESOURCE)), mLeftProxyImage(":/proxy_film.png"), mRightProxyImage(":/proxy_film.png"), mTrimActive(false) {
 
@@ -852,7 +852,7 @@ void GraphicsWidgetVideoResource::rShowProxyImage(const QImage &firstProxy, cons
 
 GraphicsWidgetVideoResource* GraphicsWidgetVideoResource::Clone() const {
 
-	cpl::TrackFileResourceType intermediate_resource(*(static_cast<cpl::TrackFileResourceType*>(mpData)));
+	cpl2016::TrackFileResourceType intermediate_resource(*(static_cast<cpl2016::TrackFileResourceType*>(mpData)));
 	intermediate_resource.setId(ImfXmlHelper::Convert(QUuid::createUuid()));
 	GraphicsWidgetVideoResource *p_resource = new GraphicsWidgetVideoResource(NULL, intermediate_resource._clone(), mAssset);
 	p_resource->mLeftProxyImage = mLeftProxyImage;
@@ -922,7 +922,7 @@ void GraphicsWidgetVideoResource::RefreshSecondProxy() {
 
 }
 
-GraphicsWidgetAudioResource::GraphicsWidgetAudioResource(GraphicsWidgetSequence *pParent, cpl::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/) :
+GraphicsWidgetAudioResource::GraphicsWidgetAudioResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/) :
 GraphicsWidgetFileResource(pParent, pResource, rAsset, QColor(CPL_COLOR_AUDIO_RESOURCE)) {
 
 }
@@ -1008,7 +1008,7 @@ double GraphicsWidgetAudioResource::ResourceErPerCompositionEr(const EditRate &r
 
 GraphicsWidgetAudioResource* GraphicsWidgetAudioResource::Clone() const {
 
-	cpl::TrackFileResourceType intermediate_resource(*(static_cast<cpl::TrackFileResourceType*>(mpData)));
+	cpl2016::TrackFileResourceType intermediate_resource(*(static_cast<cpl2016::TrackFileResourceType*>(mpData)));
 	intermediate_resource.setId(ImfXmlHelper::Convert(QUuid::createUuid()));
 	return new GraphicsWidgetAudioResource(NULL, intermediate_resource._clone(), mAssset);
 }
@@ -1019,7 +1019,7 @@ SoundfieldGroup GraphicsWidgetAudioResource::GetSoundfieldGroup() const {
 	return SoundfieldGroup::SoundFieldGroupNone;
 }
 
-GraphicsWidgetTimedTextResource::GraphicsWidgetTimedTextResource(GraphicsWidgetSequence *pParent, cpl::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/) :
+GraphicsWidgetTimedTextResource::GraphicsWidgetTimedTextResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/) :
 GraphicsWidgetFileResource(pParent, pResource, rAsset, QColor(CPL_COLOR_TIMED_TEXT_RESOURCE)) {
 
 }
@@ -1105,7 +1105,7 @@ void GraphicsWidgetTimedTextResource::paint(QPainter *pPainter, const QStyleOpti
 
 GraphicsWidgetTimedTextResource* GraphicsWidgetTimedTextResource::Clone() const {
 
-	cpl::TrackFileResourceType intermediate_resource(*(static_cast<cpl::TrackFileResourceType*>(mpData)));
+	cpl2016::TrackFileResourceType intermediate_resource(*(static_cast<cpl2016::TrackFileResourceType*>(mpData)));
 	intermediate_resource.setId(ImfXmlHelper::Convert(QUuid::createUuid()));
 	return new GraphicsWidgetTimedTextResource(NULL, intermediate_resource._clone(), mAssset);
 }
@@ -1115,7 +1115,7 @@ double GraphicsWidgetTimedTextResource::ResourceErPerCompositionEr(const EditRat
 	return GetEditRate().GetNumerator() * rCompositionEditRate.GetDenominator() / double(rCompositionEditRate.GetNumerator() * GetEditRate().GetDenominator());
 }
 
-GraphicsWidgetAncillaryDataResource::GraphicsWidgetAncillaryDataResource(GraphicsWidgetSequence *pParent, cpl::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/) :
+GraphicsWidgetAncillaryDataResource::GraphicsWidgetAncillaryDataResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/) :
 GraphicsWidgetFileResource(pParent, pResource, rAsset, QColor(CPL_COLOR_ANC_RESOURCE)) {
 
 }
@@ -1196,7 +1196,7 @@ void GraphicsWidgetAncillaryDataResource::paint(QPainter *pPainter, const QStyle
 
 GraphicsWidgetAncillaryDataResource* GraphicsWidgetAncillaryDataResource::Clone() const {
 
-	cpl::TrackFileResourceType intermediate_resource(*(static_cast<cpl::TrackFileResourceType*>(mpData)));
+	cpl2016::TrackFileResourceType intermediate_resource(*(static_cast<cpl2016::TrackFileResourceType*>(mpData)));
 	intermediate_resource.setId(ImfXmlHelper::Convert(QUuid::createUuid()));
 	return new GraphicsWidgetAncillaryDataResource(NULL, intermediate_resource._clone(), mAssset);
 }
@@ -1206,7 +1206,7 @@ double GraphicsWidgetAncillaryDataResource::ResourceErPerCompositionEr(const Edi
 	return GetEditRate().GetNumerator() * rCompositionEditRate.GetDenominator() / double(rCompositionEditRate.GetNumerator() * GetEditRate().GetDenominator());
 }
 
-GraphicsWidgetMarkerResource::GraphicsWidgetMarkerResource(GraphicsWidgetSequence *pParent, cpl::MarkerResourceType *pResource) :
+GraphicsWidgetMarkerResource::GraphicsWidgetMarkerResource(GraphicsWidgetSequence *pParent, cpl2016::MarkerResourceType *pResource) :
 AbstractGraphicsWidgetResource(pParent, pResource, QSharedPointer<AssetMxfTrack>(NULL), QColor(CPL_COLOR_MARKER_RESOURCE)), mActiveMarkerOldPosition(-1, -1),
 mOldSourceDuration(-1), mOldIntrinsicDuration(-1) {
 
@@ -1219,7 +1219,7 @@ mOldSourceDuration(-1), mOldIntrinsicDuration(-1) {
 
 GraphicsWidgetMarkerResource::GraphicsWidgetMarkerResource(GraphicsWidgetSequence *pParent) :
 AbstractGraphicsWidgetResource(pParent,
-new cpl::MarkerResourceType(ImfXmlHelper::Convert(QUuid::createUuid()), pParent && pParent->GetSegment() ? pParent->GetSegment()->GetDuration().GetCount() : 1),
+new cpl2016::MarkerResourceType(ImfXmlHelper::Convert(QUuid::createUuid()), pParent && pParent->GetSegment() ? pParent->GetSegment()->GetDuration().GetCount() : 1),
 QSharedPointer<AssetMxfTrack>(NULL), QColor(CPL_COLOR_MARKER_RESOURCE)), mActiveMarkerOldPosition(-1, -1),
 mOldSourceDuration(-1), mOldIntrinsicDuration(-1) {
 
@@ -1229,28 +1229,28 @@ mOldSourceDuration(-1), mOldIntrinsicDuration(-1) {
 	setAcceptHoverEvents(false);
 }
 
-std::auto_ptr<cpl::BaseResourceType> GraphicsWidgetMarkerResource::Write() const {
+std::auto_ptr<cpl2016::BaseResourceType> GraphicsWidgetMarkerResource::Write() const {
 
-	cpl::MarkerResourceType *p_marker_resource = static_cast<cpl::MarkerResourceType*>(mpData->_clone());
-	cpl::MarkerResourceType::MarkerSequence marker_sequence;
+	cpl2016::MarkerResourceType *p_marker_resource = static_cast<cpl2016::MarkerResourceType*>(mpData->_clone());
+	cpl2016::MarkerResourceType::MarkerSequence marker_sequence;
 	QList<QGraphicsItem*> child_items = childItems();
 	for(int i = 0; i < child_items.size(); i++) {
 		GraphicsWidgetMarker *p_marker = dynamic_cast<GraphicsWidgetMarker*>(child_items.at(i));
 		if(p_marker) {
-			cpl::MarkerType marker(ImfXmlHelper::Convert(p_marker->GetMarkerLabel()), p_marker->pos().x() * ResourceErPerCompositionEr(GetCplEditRate()));
+			cpl2016::MarkerType marker(ImfXmlHelper::Convert(p_marker->GetMarkerLabel()), p_marker->pos().x() * ResourceErPerCompositionEr(GetCplEditRate()));
 			if(p_marker->GetAnnotation().IsEmpty() == false) marker.setAnnotation(ImfXmlHelper::Convert(p_marker->GetAnnotation()));
 			marker_sequence.push_back(marker);
 		}
 	}
 	p_marker_resource->setMarker(marker_sequence);
-	return std::auto_ptr<cpl::BaseResourceType>(p_marker_resource);
+	return std::auto_ptr<cpl2016::BaseResourceType>(p_marker_resource);
 }
 
 GraphicsWidgetMarkerResource* GraphicsWidgetMarkerResource::Clone() const {
 
-	std::auto_ptr<cpl::BaseResourceType> intermediate = Write();
+	std::auto_ptr<cpl2016::BaseResourceType> intermediate = Write();
 	intermediate->setId(ImfXmlHelper::Convert(QUuid::createUuid()));
-	return new GraphicsWidgetMarkerResource(NULL, static_cast<cpl::MarkerResourceType*>(intermediate.release()));
+	return new GraphicsWidgetMarkerResource(NULL, static_cast<cpl2016::MarkerResourceType*>(intermediate.release()));
 }
 
 double GraphicsWidgetMarkerResource::ResourceErPerCompositionEr(const EditRate &rCompositionEditRate) const {
@@ -1260,8 +1260,8 @@ double GraphicsWidgetMarkerResource::ResourceErPerCompositionEr(const EditRate &
 
 void GraphicsWidgetMarkerResource::InitMarker() {
 
-	cpl::MarkerResourceType *p_marker_resource = static_cast<cpl::MarkerResourceType*>(mpData);
-	const cpl::MarkerResourceType::MarkerSequence &r_marker_sequence = p_marker_resource->getMarker();
+	cpl2016::MarkerResourceType *p_marker_resource = static_cast<cpl2016::MarkerResourceType*>(mpData);
+	const cpl2016::MarkerResourceType::MarkerSequence &r_marker_sequence = p_marker_resource->getMarker();
 	for(unsigned int i = 0; i < r_marker_sequence.size(); i++) {
 		GraphicsWidgetMarker *p_marker = new GraphicsWidgetMarker(this, 1, boundingRect().height(), ImfXmlHelper::Convert(r_marker_sequence.at(i).getLabel()), QColor(CPL_COLOR_DEFAULT_MARKER));
 		p_marker->setPos((qint64)(r_marker_sequence.at(i).getOffset() / ResourceErPerCompositionEr(GetCplEditRate())), 1);

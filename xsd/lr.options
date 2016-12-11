@@ -1,0 +1,23 @@
+--location-map "http://www.w3.org/2001/03/xml.xsd=xml.xsd" 
+--location-map "http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd=xmldsig-core-schema.xsd" 
+--location-map "http://www.w3.org/2001/XMLSchema.dtd=xmldsig-core-schema.dtd"
+
+--namespace-map "http://www.smpte-ra.org/schemas/400/2012=lr"
+
+--anonymous-regex %.* .* (.+)/(.+)%$1_$2Type%
+
+--generate-polymorphic
+--polymorphic-type BaseResourceType
+--polymorphic-type MacroType
+
+--generate-serialization
+--generate-ostream
+--generate-wildcard
+
+--type-naming java
+--function-naming java
+
+--hxx-suffix .h
+--cxx-suffix .cpp
+
+--root-element LabelsRegister

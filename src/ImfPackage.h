@@ -174,14 +174,14 @@ class PackingList : public QObject {
 
 public:
 	//! Import Asset Map.
-	PackingList(ImfPackage *pParent, const QFileInfo &rFilePath, const pkl::PackingListType &rPackingList);
+	PackingList(ImfPackage *pParent, const QFileInfo &rFilePath, const pkl2016::PackingListType &rPackingList);
 	//! Creates new Asset Map.
 	PackingList(ImfPackage *pParent, const QFileInfo &rFilePath, const QUuid &rId, const QUuid &rIconId = QUuid(), const QUuid &rGroupId = QUuid(), const UserText &rAnnotationText = QString(), const UserText &rIssuer = QString());
 	virtual ~PackingList() {};
 	//! Check if Packing List physically exists on file system.
 	bool Exists() const { return mFilePath.exists() && mFilePath.isFile() && !mFilePath.isSymLink(); }
 	QFileInfo GetFilePath() const { return mFilePath; }
-	const pkl::PackingListType& Write();
+	const pkl2016::PackingListType& Write();
 
 	QUuid GetId() const { return ImfXmlHelper::Convert(mData.getId()); }
 	UserText GetAnnotationText() const { if(mData.getAnnotationText().present() == true) return ImfXmlHelper::Convert(mData.getAnnotationText().get()); else return UserText(); }
@@ -196,7 +196,7 @@ public:
 	void SetGroupId(const QUuid &rGroupId) { mData.setGroupId(ImfXmlHelper::Convert(rGroupId)); }
 
 	const QFileInfo				mFilePath;
-	pkl::PackingListType	mData;
+	pkl2016::PackingListType	mData;
 };
 
 
@@ -214,7 +214,7 @@ public:
 		unknown
 	};
 	//! Import existing Asset
-	Asset(eAssetType type, const QFileInfo &rFilePath, const am::AssetType &rAsset, std::auto_ptr<pkl::AssetType> assetType = std::auto_ptr<pkl::AssetType>(NULL));
+	Asset(eAssetType type, const QFileInfo &rFilePath, const am::AssetType &rAsset, std::auto_ptr<pkl2016::AssetType> assetType = std::auto_ptr<pkl2016::AssetType>(NULL));
 	//! Creates new Asset. rFilePath must be the PROSPECTIVE path of the asset (collisions must be avoided). If the asset doesn't exist on the file system when ImfPackage::Outgest() is invoked the asset will be ignored.
 	Asset(eAssetType type, const QFileInfo &rFilePath, const QUuid &rId, const UserText &rAnnotationText = UserText());
 	virtual ~Asset() {}
@@ -229,7 +229,7 @@ public:
 	//! Call this function to receive the Dom Tree for serialization.
 	const am::AssetType& WriteAm();
 	//! Call this function to receive the Dom Tree for serialization.
-	const std::auto_ptr<pkl::AssetType>& WritePkl();
+	const std::auto_ptr<pkl2016::AssetType>& WritePkl();
 	QFileInfo GetPath() { return mFilePath; }
 
 	QUuid GetId() const { return ImfXmlHelper::Convert(mAmData.getId()); }
@@ -278,7 +278,7 @@ private:
 	eAssetType										mType;
 	QFileInfo											mFilePath;
 	am::AssetType									mAmData;
-	std::auto_ptr<pkl::AssetType>	mpPklData;
+	std::auto_ptr<pkl2016::AssetType>	mpPklData;
 	bool mFileNeedsNewHash;
 };
 
@@ -306,7 +306,7 @@ class AssetCpl : public Asset {
 
 public:
 	//! Import CPL.
-	AssetCpl(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl::AssetType &rPklAsset);
+	AssetCpl(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl2016::AssetType &rPklAsset);
 	//! Create New CPL.
 	AssetCpl(const QFileInfo &rFilePath, const QUuid &rId, const UserText &rAnnotationText = QString());
 	virtual ~AssetCpl() {}
@@ -328,7 +328,7 @@ class AssetOpl : public Asset {
 
 public:
 	//! Import Opl.
-	AssetOpl(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl::AssetType &rPklAsset);
+	AssetOpl(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl2016::AssetType &rPklAsset);
 	//! Create New Opl.
 	AssetOpl(const QFileInfo &rFilePath, const QUuid &rId, const UserText &rAnnotationText = QString());
 	virtual ~AssetOpl() {}
@@ -344,7 +344,7 @@ class AssetMxfTrack : public Asset {
 
 public:
 	//! Import Mxf Track. All imported Tracks are finalized.
-	AssetMxfTrack(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl::AssetType &rPklAsset);
+	AssetMxfTrack(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl2016::AssetType &rPklAsset);
 	//! Create New Mxf Track.
 	AssetMxfTrack(const QFileInfo &rFilePath, const QUuid &rId, const UserText &rAnnotationText = QString());
 	virtual ~AssetMxfTrack() {}
@@ -374,7 +374,7 @@ public:
 	QImage GetProxyImage() const { return mFirstProxyImage; }
 	//WR begin
 	//Getter methods for the corresponding members
-	cpl::EssenceDescriptorBaseType* GetEssenceDescriptor() { return mEssenceDescriptor;};
+	cpl2016::EssenceDescriptorBaseType* GetEssenceDescriptor() { return mEssenceDescriptor;};
 	QUuid GetSourceEncoding() const {return mSourceEncoding;};
 	//WR end
 	//! Set the Wav or Aces files that should be wrapped into Mxf. Does nothing if finalized. WARNING: overwrites old frame rate, soundfield group.
@@ -417,7 +417,7 @@ private:
 	MetadataExtractor mMetadataExtr;
 //WR begin
 	//These are member variables for the corresponding CPL elements
-	cpl::EssenceDescriptorBaseType* mEssenceDescriptor;
+	cpl2016::EssenceDescriptorBaseType* mEssenceDescriptor;
 	QUuid mSourceEncoding;
 	bool mIsNew;
 	EditRate mCplEditRate;

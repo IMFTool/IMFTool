@@ -18,6 +18,7 @@
 #include "AS_DCP_internal.h"
 #include "AS_02.h"
 #include "PCMParserList.h"
+#include "LabelsRegister.h" // (k)
 #include <KM_fileio.h>
 #include <cmath>
 #include <QtCore>
@@ -172,6 +173,27 @@ Error MetadataExtractor::ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileI
 		}
 
 		// (k) - start
+
+		// (k)
+		// SETUP XERCES
+		xercesc::XercesDOMParser *parser = new xercesc::XercesDOMParser();
+		parser->parse("D:/Master/Thesis/Repository/Phase2/Labels.xml");
+
+		xercesc::DOMDocument *dom_doc = parser->getDocument();
+		const xercesc::DOMElement *dom_el = dynamic_cast<xercesc::DOMElement*>(dom_doc);
+
+
+		//std::auto_ptr<lr::LabelsRegister> labels_register(xercesc::DOMElement(&dom_el));
+		//std::auto_ptr<lr::LabelsRegister> labels_register();
+		//std::auto_ptr<lr::LabelsRegister> labels_register = register("");
+
+		//try {
+		//labels_register = lr::parseLabelsRegister("", xml_schema::Flags::extract_content);
+		//}
+		//catch (...) {}
+		// (k)
+
+
 		metadata.colorSpace = Metadata::eColorSpace::Unknown; // default
 		metadata.lutIndex = 0;
 		char buf[64];

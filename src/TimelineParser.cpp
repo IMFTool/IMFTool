@@ -18,16 +18,16 @@ void TimelineParser::run() {
 		GraphicsWidgetSegment *p_segment = composition->GetSegment(i);
 
 		if (p_segment) {
-			cpl::SegmentType_SequenceListType sequence_list;
-			cpl::SegmentType_SequenceListType::AnySequence &r_any_sequence(sequence_list.getAny());
+			cpl2016::SegmentType_SequenceListType sequence_list;
+			cpl2016::SegmentType_SequenceListType::AnySequence &r_any_sequence(sequence_list.getAny());
 			//xercesc::DOMDocument &doc = sequence_list.getDomDocument();
 			for (int ii = 0; ii < p_segment->GetSequenceCount(); ii++) {
 				GraphicsWidgetSequence *p_sequence = p_segment->GetSequence(ii);
 
 				if (p_sequence && !p_sequence->IsEmpty() && p_sequence != nullptr) {
 
-					//cpl::SequenceType_ResourceListType resource_list;
-					//cpl::SequenceType_ResourceListType::ResourceSequence &resource_sequence = resource_list.getResource();
+					//cpl2016::SequenceType_ResourceListType resource_list;
+					//cpl2016::SequenceType_ResourceListType::ResourceSequence &resource_sequence = resource_list.getResource();
 					for (int iii = 0; iii < p_sequence->GetResourceCount(); iii++) {
 						AbstractGraphicsWidgetResource *p_resource = p_sequence->GetResource(iii);
 						if (p_resource->type() == GraphicsWidgetVideoResourceType) {
@@ -58,9 +58,9 @@ void TimelineParser::run() {
 
 							// new sequence?
 							if (ii != last_sequence) sequence_offset = 0;
-
-							ttmlTimelineSegment.in = ((float)timelineWidget->GetFirstVisibleFrame().GetTargetFrame() / 1000);
-							ttmlTimelineSegment.out = ((float)timelineWidget->GetLastVisibleFrame().GetTargetFrame() / 1000);
+							Timecode test = timelineWidget->GetLastVisibleFrame();
+							ttmlTimelineSegment.in = (float)timelineWidget->GetFirstVisibleFrame().GetSecondsF();
+							ttmlTimelineSegment.out = (float)timelineWidget->GetLastVisibleFrame().GetSecondsF();
 							ttmlTimelineSegment.timeline_in = sequence_offset;
 							ttmlTimelineSegment.timeline_out = (ttmlTimelineSegment.out - ttmlTimelineSegment.in) + sequence_offset;
 

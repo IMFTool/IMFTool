@@ -71,6 +71,12 @@ private:
 	QFileInfo mLastFile;
 	QImage nullimage;
 
+	int px_ratio = 1;
+	int viewport_width;
+	int viewport_height;
+	int frame_width;
+	int frame_height;
+
 	bool smooth = true;
 	bool scaling = true;
 	bool show_ttml_regions = true; // default

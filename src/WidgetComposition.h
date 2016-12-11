@@ -160,7 +160,7 @@ private:
 	QSharedPointer<AssetCpl> mAssetCpl;
 	QSharedPointer<ImfPackage> mImp;
 	QButtonGroup *mpSoloButtonGroup;
-	cpl::CompositionPlaylistType mData;
+	cpl2016::CompositionPlaylistType mData;
 	// QActions
 	QAction *mpAddMarkerTrackAction;
 	QAction *mpAddAncillaryDataTrackAction;

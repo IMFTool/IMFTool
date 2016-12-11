@@ -1,0 +1,16 @@
+This folder contains patches (file replacements) for asdcplib-2.6.17
+asdcplib can be downloaded from www.cinecert.com
+
+Instructions:
+
+- Download and unpack asdcplib-2.6.17.tar.gz from www.cincert.com
+
+- Copy the files in this directory into the <asdcplib>/src/ folder.
+
+- Follow the build instructions in README.cmake in the root folder of the asdcplib distribution
+
+List of patches files:
+AS_02_TimedText.cpp	Contains an extension to read the essence element of TTML MXF files with broken indes table. This replacement is optional.
+
+asdcplib is (c) John Hurst, portions (c) Robert Scheler, Heiko Sparenberg Fraunhofer IIS, and John Hurst
+

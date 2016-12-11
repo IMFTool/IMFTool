@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.smpte-ra.org/schemas/400/2012" targetNamespace="http://www.smpte-ra.org/schemas/400/2012" version="1.0">
+	<xs:element name="LabelsRegister">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Entries" form="qualified" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Entry" type="tns:LabelEntry" form="qualified" minOccurs="0" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="LabelEntry">
+		<xs:sequence>
+			<xs:element name="Register" type="xs:string" form="qualified" minOccurs="0"/>
+			<xs:element name="NamespaceName" type="xs:string" form="qualified"/>
+			<xs:element name="Symbol" type="xs:string" form="qualified"/>
+			<xs:element name="UL" type="xs:string" form="qualified"/>
+			<xs:element name="Kind" form="qualified" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="NODE"/>
+						<xs:enumeration value="LEAF"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Name" type="xs:string" form="qualified" minOccurs="0"/>
+			<xs:element name="Definition" type="xs:string" form="qualified" minOccurs="0"/>
+			<xs:element name="Applications" type="xs:string" form="qualified" minOccurs="0"/>
+			<xs:element name="Notes" type="xs:string" form="qualified" minOccurs="0"/>
+			<xs:element name="DefiningDocument" type="xs:string" form="qualified" minOccurs="0"/>
+			<xs:element name="IsDeprecated" type="xs:boolean" form="qualified"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

@@ -101,3 +101,28 @@ QDebug operator<<(QDebug dbg, const XmlSerializationError &rError) {
 	dbg.nospace() << "XML Serialization Error: " << rError.GetErrorMsg() << " Detail: " << rError.GetErrorDescription();
 	return dbg.space();
 }
+//WR
+std::auto_ptr<pkl2016::PackingListType> ImfXmlHelper::Convert(std::auto_ptr<pkl::PackingListType> rPackingList2013) {
+
+	pkl2016::PackingListType::AssetListType rAssetList;
+	pkl2016::PackingListType_AssetListType::AssetSequence seq;
+	pkl::PackingListType_AssetListType::AssetSequence::iterator i;
+
+	for (i = rPackingList2013->getAssetList().getAsset().begin(); i < rPackingList2013->getAssetList().getAsset().end(); i++) {
+		pkl::AssetType asset = *i;
+		const pkl2016::AssetType asset2016(asset.getId(), asset.getHash(), asset.getSize(), asset.getType(),
+				pkl2016::AssetType::HashAlgorithmType(ds::CanonicalizationMethodType::AlgorithmType("http://www.w3.org/2000/09/xmldsig#sha1")));
+		seq.push_back(asset2016);
+	}
+	rAssetList.setAsset(seq);
+	//const pkl2016::PackingListType::IdType uuid = ImfXmlHelper::Convert(QUuid::createUuid());
+	const pkl2016::PackingListType::IdType uuid = rPackingList2013->getId();
+	const pkl2016::PackingListType::IssueDateType date(0,0,0,0,0,0);
+	std::auto_ptr<pkl2016::PackingListType> rPackingList2016(new pkl2016::PackingListType(rPackingList2013->getId(), date,
+			(const pkl2016::PackingListType::IssuerType&)"Issuer", (const pkl2016::PackingListType::CreatorType&)"Creator",
+			(const pkl2016::PackingListType::AssetListType&)rAssetList
+			));
+	return rPackingList2016;
+}
+
+//WR

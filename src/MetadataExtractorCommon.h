@@ -49,7 +49,13 @@ public:
 		RGB_P3D65, // ["P3D65 Color Primaries" in SMPTE RP 224]
 		YUV_709, // ["ITU-R.BT709 Color Primaries" in SMPTE RP 224]
 		YUV_2020_LIN, // ["ITU-R.BT2020 Transfer Characteristic" in SMPTE RP 224]
-		YUV_2020_PQ // ["SMPTE ST 2084 Transfer Characteristic" in SMPTE RP 224]
+		YUV_2020_PQ, // ["SMPTE ST 2084 Transfer Characteristic" in SMPTE RP 224]
+		// ...
+		COLOR_3, // UHD (8, 10 bit), 4K (8, 10 bit)
+		COLOR_4, // UHD (8, 10 bit), xvYCC709 (BT.709)
+		COLOR_5, // UHD (10, 12 bit), 4K (10, 12 bit), YCbCr (BT.2020), NON-CONST-Y
+		COLOR_6, // 4K (10, 12, 16 bit), P3D65, CONST-Y
+		COLOR_7, // UHD (10, 12, 16 bit), 4K (10, 12, 16 bit), YCbCr, NON-CONST-Y
 	};
 	// (k) - end
 

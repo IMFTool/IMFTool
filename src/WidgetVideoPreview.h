@@ -83,7 +83,7 @@ private:
 	QVector<TTMLtimelineSegment> ttmls;
 	QTime ttml_search_time;
 
-	cpl::CompositionPlaylistType mData;
+	cpl2016::CompositionPlaylistType mData;
 
 	WidgetImagePreview *mpImagePreview;
 	QMessageBox *mpMsgBox;

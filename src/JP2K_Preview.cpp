@@ -1,18 +1,18 @@
 /* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
- *
- * This program is free software : you can redistribute it and / or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.If not, see <http://www.gnu.org/licenses/>.
- */
+*
+* This program is free software : you can redistribute it and / or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program.If not, see <http://www.gnu.org/licenses/>.
+*/
 #include "JP2K_Preview.h"
 #include <QThread>
 #include <QTime>
@@ -29,8 +29,8 @@ JP2K_Preview::~JP2K_Preview()
 	reader->Close();
 	reader->~MXFReader();
 	buff->~FrameBuffer();
-	delete eotf;
-	delete oetf;
+	delete eotf_NonLin;
+	delete oetf_NonLin;
 }
 
 void JP2K_Preview::setUp() {
@@ -54,52 +54,66 @@ void JP2K_Preview::setUp() {
 	// create lookup tables
 	float alpha = 1.099;
 	float beta = 0.018;
-	eotf = new float[4096];
-	oetf = new float[4096];
+	eotf_NonLin = new float[4096];
+	oetf_NonLin = new float[4096];
 
+	float m1 = 0.1593017578125;
+	float m2 = 78.84375;
+	float c1 = 0.8359375;
+	float c2 = 18.8515625;
+	float c3 = 18.6875;
+	eotf_Lin = new float[4096];
+	oetf_Lin = new float[4096];
+	
 	for (int i = 0; i < 4096; i++) {
 
-		float input = (float) i / 4095; // convert input to value between 0...1
+		float input = (float)i / 4095; // convert input to value between 0...1
 
+		// non linear
 		// OETF -> linearize
 		if (input < (4.5 * beta)) { // linear part!
-			oetf[i] = input / 4.5;
+			oetf_NonLin[i] = input / 4.5;
 		}
 		else { // exp. part!
-			oetf[i] = pow(((input + (alpha - 1)) / alpha), 2.222); // 0.45 th root of x: pow(val, 1.0 / 0.45) = pow(val, 2.222~)
+			oetf_NonLin[i] = pow(((input + (alpha - 1)) / alpha), 2.222); // 0.45 th root of x: pow(x, 1.0 / 0.45) = pow(x, 2.222~)
 		}
 
 		// EOTF -> delinearize (mirrored reverse of oetf)
-		eotf[4095 - i] = 1 - oetf[i];
+		eotf_NonLin[4095 - i] = 1 - oetf_NonLin[i];
+
+		// linear
+		eotf_Lin[i] = pow(( (pow(input, 1.0 / m2) - c1) / ((c2 - c3) * pow(input, 1.0 / m2) )), 1.0 / m1);
+		oetf_Lin[4095 - i] = 1 - eotf_Lin[i]; // (mirrored reverse of oetf)
 
 		/*
 		// EOTF -> delinearize
 		if (input < beta) { // linear part!
-			eotf[i] = input * 4.5;
+		eotf[i] = input * 4.5;
 		}
 		else { // exp. part!
-			eotf[i] = alpha * pow(input, 0.45) - (alpha - 1);
+		eotf[i] = alpha * pow(input, 0.45) - (alpha - 1);
 		}
 		*/
 	}
 
 	/*
 	for (int i = 0; i < 4096; i++) {
-		float input = (float)i / 4095;
-		qDebug() << input << oetf[i] << eotf[i];
+	float input = (float)i / 4095;
+	qDebug() << input << oetf_NonLin[i] << eotf_NonLin[i] << oetf_Lin[i] << eotf_Lin[i];
 	}
 	*/
 }
 
 void JP2K_Preview::getProxy() {
 
+	convert_to_709 = false; // (default for proxys)
 	params.cp_reduce = 4; // (default for proxy)
 	QImage p1 = QImage(":/proxy_unknown.png");
 	QImage p2 = QImage(":/proxy_unknown.png");
 
 	setAsset(); // initialize reader
 
-	// FIRST PROXY
+				// FIRST PROXY
 	if (extractFrame(first_proxy)) { // frame extraction was successfull -> decode frame
 		if (decodeImage()) { // try to decode image
 			p1 = DataToQImage();
@@ -136,6 +150,29 @@ void JP2K_Preview::setAsset() {
 
 		current_asset = asset;
 
+		// get metadata
+		prec = current_asset->GetMetadata().componentDepth;
+		prec_shift = prec - 8;
+		max = pow(2, prec);
+
+		switch (prec) {
+		case 8:
+			adjustYCbCr = 128;
+			break;
+		case 10:
+			adjustYCbCr = 256;
+			break;
+		case 12:
+			adjustYCbCr = 512;
+			break;
+		case 14:
+			adjustYCbCr = 1024;
+			break;
+		case 16:
+			adjustYCbCr = 2048;
+			break;
+		}
+
 		// get color space
 		ColorEncoding = asset->GetMetadata().colorEncoding;
 		ColorSpace = asset->GetMetadata().colorSpace;
@@ -145,7 +182,7 @@ void JP2K_Preview::setAsset() {
 			convert_neccessary = false;
 		}
 		else {
-			convert_neccessary = true;
+			convert_neccessary = false;
 		}
 
 		if (mxf_path != "") { // close old asset/reader
@@ -155,7 +192,7 @@ void JP2K_Preview::setAsset() {
 
 		mxf_path = asset->GetPath().absoluteFilePath(); // get new path
 
-														 // create new reader
+														// create new reader
 		reader = new AS_02::JP2K::MXFReader();
 
 		Result_t result_o = reader->OpenRead(mxf_path.toStdString()); // open file for reading
@@ -181,11 +218,11 @@ void JP2K_Preview::decode() {
 
 	if (extractFrame(frameNr) && !err) { // frame extraction was successfull -> decode frame
 
-		// try to decode image
+										 // try to decode image
 		if (decodeImage() && !err) {
 			emit ShowFrame(DataToQImage());
 
-			if(!err) msg = QString("Decoded frame %1 in %2 ms").arg(frameNr).arg(decode_time.elapsed()); // no error
+			if (!err) msg = QString("Decoded frame %1 in %2 ms").arg(frameNr).arg(decode_time.elapsed()); // no error
 
 			emit decodingStatus(frameNr, msg);
 			QApplication::processEvents();
@@ -300,11 +337,11 @@ void JP2K_Preview::cleanUp() {
 	OPENJPEG_H::opj_stream_destroy(pStream);
 	OPENJPEG_H::opj_destroy_codec(pDecompressor);
 	OPENJPEG_H::opj_image_destroy(psImage); // free allocated memory
-	//psImage = NULL; // reset decoded output stream
+											//psImage = NULL; // reset decoded output stream
 
 	pDecompressor = OPENJPEG_H::opj_create_decompress(OPJ_CODEC_J2K); // create new decompresser
 
-	// Setup the decoder (again)
+																	  // Setup the decoder (again)
 	if (!OPENJPEG_H::opj_setup_decoder(pDecompressor, &params)) {
 		qDebug() << "Error setting up decoder!";
 		opj_destroy_codec(pDecompressor);
@@ -341,22 +378,7 @@ QImage JP2K_Preview::DataToQImage()
 
 	w = psImage->comps->w;
 	h = psImage->comps->h;
-	prec = psImage->comps->prec; // 8 bit, 10 bit...
-	prec_shift = prec - 8;
-	float max = pow(2, prec);
 
-	int adjustYCbCr;
-	if (prec == 8) {
-		adjustYCbCr = 128;
-	}
-	else if (prec == 10) {
-		adjustYCbCr = 512;
-	}
-	else if (prec == 12) {
-		adjustYCbCr = 1024;
-	}
-
-	xpos, buff_pos;
 	QImage image(w, h, QImage::Format_RGB888); // create image
 
 	bytes_per_line = w * 3;
@@ -372,13 +394,13 @@ QImage JP2K_Preview::DataToQImage()
 					xpos = (int)(y*w + x) / 2; // don't calculate twice
 					buff_pos = x * 3; // don't calculate 3 times
 
-					// get Yuv & convert to RGB
+					// get Yuv & convert to RGB																
 					Y = (float)psImage->comps[0].data[(int)(y*w + x)];
 					Cb = (float)psImage->comps[1].data[xpos];
 					Cr = (float)psImage->comps[2].data[xpos];
 
 					r = (Y + 1.402 * (Cr - adjustYCbCr));
-					g = (Y - 0.3441 * (Cb - adjustYCbCr) - (0.7141 * (Cr - adjustYCbCr))); 
+					g = (Y - 0.3441 * (Cb - adjustYCbCr) - (0.7141 * (Cr - adjustYCbCr)));
 					b = (Y + 1.772 * (Cb - adjustYCbCr));
 
 					// clamp between 0... (2^n) - 1
@@ -390,9 +412,9 @@ QImage JP2K_Preview::DataToQImage()
 					else if (out_b > max) { out_b = max; }
 
 					// linearize (results in values between 0...1)
-					r = oetf[(int)((r / max) * 4095.0f)];
-					g = oetf[(int)((g / max) * 4095.0f)];
-					b = oetf[(int)((b / max) * 4095.0f)];
+					r = oetf_NonLin[(int)((r / max) * 4095.0f)];
+					g = oetf_NonLin[(int)((g / max) * 4095.0f)];
+					b = oetf_NonLin[(int)((b / max) * 4095.0f)];
 
 					// Inverse of BT.2020 -> BT.709
 					out_r = r*1.6605 + g*-0.5877 + b*-0.0728;
@@ -408,9 +430,9 @@ QImage JP2K_Preview::DataToQImage()
 					else if (out_b > 1) { out_b = 1; }
 
 					// unlinearize
-					out_r = eotf[(int)(out_r * 4095.0f)] * max;
-					out_g = eotf[(int)(out_g * 4095.0f)] * max;
-					out_b = eotf[(int)(out_b * 4095.0f)] * max;
+					out_r = eotf_NonLin[(int)(out_r * 4095.0f)] * max;
+					out_g = eotf_NonLin[(int)(out_g * 4095.0f)] * max;
+					out_b = eotf_NonLin[(int)(out_b * 4095.0f)] * max;
 
 					// convert to 8 bit
 					out_r8 = (int)out_r >> prec_shift;
@@ -426,7 +448,7 @@ QImage JP2K_Preview::DataToQImage()
 					else if (out_b8 > 255) { out_b8 = 255; }
 
 					// set data
-					img_buff[buff_pos]     = (unsigned char)out_r8;
+					img_buff[buff_pos] = (unsigned char)out_r8;
 					img_buff[buff_pos + 1] = (unsigned char)out_g8;
 					img_buff[buff_pos + 2] = (unsigned char)out_b8;
 				}
@@ -469,7 +491,7 @@ QImage JP2K_Preview::DataToQImage()
 					xpos = (int)(y*w + x) / 2; // don't calculate twice
 					buff_pos = x * 3; // don't calculate 3 times
 
-					// get Yuv & convert x bit -> 8 bit
+									  // get Yuv & convert x bit -> 8 bit
 					Y = psImage->comps[0].data[(int)(y*w + x)] >> prec_shift;
 					Cb = psImage->comps[1].data[xpos] >> prec_shift;
 					Cr = psImage->comps[2].data[xpos] >> prec_shift;
@@ -508,16 +530,16 @@ OPJ_SIZE_T JP2K_Preview::opj_memory_stream_read(void * p_buffer, OPJ_SIZE_T p_nb
 	opj_memory_stream* l_memory_stream = (opj_memory_stream*)p_user_data;//Our data.
 	OPJ_SIZE_T l_nb_bytes_read = p_nb_bytes;//Amount to move to buffer.
 
-	//Check if the current offset is outside our data buffer.
+											//Check if the current offset is outside our data buffer.
 	if (l_memory_stream->offset >= l_memory_stream->dataSize) return (OPJ_SIZE_T)-1;
 
 	//Check if we are reading more than we have.
 	if (p_nb_bytes > (l_memory_stream->dataSize - l_memory_stream->offset))
 		l_nb_bytes_read = l_memory_stream->dataSize - l_memory_stream->offset;//Read all we have.
 
-		//Copy the data to the internal buffer.
-		memcpy(p_buffer, &(l_memory_stream->pData[l_memory_stream->offset]), l_nb_bytes_read);
-		l_memory_stream->offset += l_nb_bytes_read;//Update the pointer to the new location.
+																			  //Copy the data to the internal buffer.
+	memcpy(p_buffer, &(l_memory_stream->pData[l_memory_stream->offset]), l_nb_bytes_read);
+	l_memory_stream->offset += l_nb_bytes_read;//Update the pointer to the new location.
 
 	return l_nb_bytes_read;
 }
@@ -528,14 +550,14 @@ OPJ_SIZE_T JP2K_Preview::opj_memory_stream_write(void * p_buffer, OPJ_SIZE_T p_n
 	opj_memory_stream* l_memory_stream = (opj_memory_stream*)p_user_data;//Our data.
 	OPJ_SIZE_T l_nb_bytes_write = p_nb_bytes;//Amount to move to buffer.
 
-	//Check if the current offset is outside our data buffer.
+											 //Check if the current offset is outside our data buffer.
 	if (l_memory_stream->offset >= l_memory_stream->dataSize) return (OPJ_SIZE_T)-1;
 
 	//Check if we are write more than we have space for.
 	if (p_nb_bytes > (l_memory_stream->dataSize - l_memory_stream->offset))
 		l_nb_bytes_write = l_memory_stream->dataSize - l_memory_stream->offset;//Write the remaining space.
 
-	//Copy the data from the internal buffer.
+																			   //Copy the data from the internal buffer.
 	memcpy(&(l_memory_stream->pData[l_memory_stream->offset]), p_buffer, l_nb_bytes_write);
 
 	l_memory_stream->offset += l_nb_bytes_write;//Update the pointer to the new location.
@@ -552,11 +574,11 @@ OPJ_OFF_T JP2K_Preview::opj_memory_stream_skip(OPJ_OFF_T p_nb_bytes, void * p_us
 
 	l_nb_bytes = (OPJ_SIZE_T)p_nb_bytes;//Allowed because it is positive.
 
-	// Do not allow jumping past the end.
+										// Do not allow jumping past the end.
 	if (l_nb_bytes > l_memory_stream->dataSize - l_memory_stream->offset)
 		l_nb_bytes = l_memory_stream->dataSize - l_memory_stream->offset;//Jump the max.
 
-	//Make the jump.
+																		 //Make the jump.
 	l_memory_stream->offset += l_nb_bytes;
 
 	//Returm how far we jumped.
@@ -568,7 +590,7 @@ OPJ_BOOL JP2K_Preview::opj_memory_stream_seek(OPJ_OFF_T p_nb_bytes, void * p_use
 {
 	opj_memory_stream* l_memory_stream = (opj_memory_stream*)p_user_data;
 	if (p_nb_bytes < 0) return OPJ_FALSE;//No before the buffer.
-	if (p_nb_bytes > (OPJ_OFF_T)l_memory_stream->dataSize) return OPJ_FALSE;//No after the buffer.
+	if (p_nb_bytes >(OPJ_OFF_T)l_memory_stream->dataSize) return OPJ_FALSE;//No after the buffer.
 	l_memory_stream->offset = (OPJ_SIZE_T)p_nb_bytes;//Move to new position.
 
 	return OPJ_TRUE;

@@ -143,7 +143,7 @@ void WidgetCentral::rUpdatePlaylist() {
 
 	WidgetComposition *p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->currentWidget());
 	if (p_composition) {
-		p_composition->setVerticalIndicator(0);
+		//p_composition->setVerticalIndicator(0); // reset frame indicator to first frame
 
 		if (tpThread->isRunning()) {
 			playListUpdateSuccess = false;

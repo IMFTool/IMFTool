@@ -25,6 +25,8 @@
 #include <QMessageBox>
 #include <QProgressDialog>
 #include <QProcess>
+#include <QTemporaryFile>
+
 #include "JobQueue.h"
 #include "Jobs.h"
 #include <xercesc/parsers/XercesDOMParser.hpp>
@@ -142,9 +144,9 @@ ImfError ImfPackage::Outgest() {
 	for(int i = 0; i < mPackingLists.size(); i++) {
 		if(mPackingLists.at(i)) {
 
-			pkl::PackingListType packing_list(mPackingLists.at(i)->Write());
-			packing_list.setAssetList(pkl::PackingListType_AssetListType());
-			packing_list.getAssetList().setAsset(pkl::PackingListType_AssetListType::AssetSequence());
+			pkl2016::PackingListType packing_list(mPackingLists.at(i)->Write());
+			packing_list.setAssetList(pkl2016::PackingListType_AssetListType());
+			packing_list.getAssetList().setAsset(pkl2016::PackingListType_AssetListType::AssetSequence());
 			for(int ii = 0; ii < mAssetList.size(); ii++) {
 				// Pkl Asset must not be written in Packing List
 				if(mAssetList.at(ii)->GetType() != Asset::pkl) {
@@ -161,7 +163,7 @@ ImfError ImfPackage::Outgest() {
 
 			std::ofstream pkl_ofs(mPackingLists.at(i)->GetFilePath().absoluteFilePath().toStdString().c_str(), std::ofstream::out);
 			try {
-				pkl::serializePackingList(pkl_ofs, packing_list, pkl_namespace, "UTF-8", xml_schema::Flags::dont_initialize);
+				pkl2016::serializePackingList(pkl_ofs, packing_list, pkl_namespace, "UTF-8", xml_schema::Flags::dont_initialize);
 			}
 			catch(xml_schema::Serialization &e) { serialization_error = XmlSerializationError(e); }
 			catch(xml_schema::UnexpectedElement &e) { serialization_error = XmlSerializationError(e); }
@@ -273,21 +275,32 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 						qDebug() << QDir::toNativeSeparators(packing_list_path.absoluteFilePath());
 						if(packing_list_path.exists() == true) {
 							// ---Parse Packing List---
-							std::auto_ptr<pkl::PackingListType> packing_list;
+							std::auto_ptr<pkl::PackingListType> packing_list2013;
+							std::auto_ptr<pkl2016::PackingListType> packing_list;
 							try {
-								packing_list = (pkl::parsePackingList(QDir::toNativeSeparators(packing_list_path.absoluteFilePath()).toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize));
+								packing_list2013 = (pkl::parsePackingList(QDir::toNativeSeparators(packing_list_path.absoluteFilePath()).toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize));
+								qDebug() << "Parsing 2013 PKL";
 							}
-							catch(const xml_schema::Parsing &e) { parse_error = XmlParsingError(e); }
-							catch(const xml_schema::ExpectedElement &e) { parse_error = XmlParsingError(e); }
-							catch(const xml_schema::UnexpectedElement &e) { parse_error = XmlParsingError(e); }
-							catch(const xml_schema::ExpectedAttribute &e) { parse_error = XmlParsingError(e); }
-							catch(const xml_schema::UnexpectedEnumerator &e) { parse_error = XmlParsingError(e); }
-							catch(const xml_schema::ExpectedTextContent &e) { parse_error = XmlParsingError(e); }
-							catch(const xml_schema::NoTypeInfo &e) { parse_error = XmlParsingError(e); }
-							catch(const xml_schema::NotDerived &e) { parse_error = XmlParsingError(e); }
-							catch(const xml_schema::NoPrefixMapping &e) { parse_error = XmlParsingError(e); }
 							catch(...) { parse_error = XmlParsingError(XmlParsingError::Unknown); }
-
+							if(parse_error.IsError() == false) {
+								packing_list = ImfXmlHelper::Convert(packing_list2013);
+								qDebug() << "Success: Parsing 2013 PKL";
+							} else {
+								parse_error = XmlParsingError();
+								try {
+									packing_list = (pkl2016::parsePackingList(QDir::toNativeSeparators(packing_list_path.absoluteFilePath()).toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize));
+								}
+								catch(const xml_schema::Parsing &e) { parse_error = XmlParsingError(e); }
+								catch(const xml_schema::ExpectedElement &e) { parse_error = XmlParsingError(e); }
+								catch(const xml_schema::UnexpectedElement &e) { parse_error = XmlParsingError(e); }
+								catch(const xml_schema::ExpectedAttribute &e) { parse_error = XmlParsingError(e); }
+								catch(const xml_schema::UnexpectedEnumerator &e) { parse_error = XmlParsingError(e); }
+								catch(const xml_schema::ExpectedTextContent &e) { parse_error = XmlParsingError(e); }
+								catch(const xml_schema::NoTypeInfo &e) { parse_error = XmlParsingError(e); }
+								catch(const xml_schema::NotDerived &e) { parse_error = XmlParsingError(e); }
+								catch(const xml_schema::NoPrefixMapping &e) { parse_error = XmlParsingError(e); }
+								catch(...) { parse_error = XmlParsingError(XmlParsingError::Unknown); }
+							}
 							if(parse_error.IsError() == false) {
 								// XML parsing succeeds
 								PackingList *p_new_packing_list = new PackingList(this, packing_list_path, *packing_list.get()); // add new Packing list
@@ -296,7 +309,7 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 								AddAsset(QSharedPointer<AssetPkl>(new AssetPkl(packing_list_path, asset)), QUuid()); // PKL Id doesn't matter. It's a new Packing List which cannot be added to an existing PKL.
 								// Add all Assets found in Packing List
 								for(unsigned int i = 0; i < packing_list->getAssetList().getAsset().size(); i++) {
-									pkl::AssetType pkl_asset = packing_list->getAssetList().getAsset().at(i);
+									pkl2016::AssetType pkl_asset = packing_list->getAssetList().getAsset().at(i);
 									// Find equivalent Asset in Asset Map
 									for(unsigned int ii = 0; ii < asset_map->getAssetList().getAsset().size(); ii++) {
 										am::AssetType am_asset = asset_map->getAssetList().getAsset().at(ii);
@@ -323,9 +336,65 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 													// We have to parse the file to determine the type (opl or cpl)
 													bool is_opl = true;
 													bool is_cpl = true;
-													std::auto_ptr< cpl::CompositionPlaylistType> cpl_data;
-													try { cpl_data = cpl::parseCompositionPlaylist(new_asset_path.absoluteFilePath().toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize); }
+													bool is_cpl2013 = true;
+													std::auto_ptr< cpl2016::CompositionPlaylistType> cpl_data;
+													std::auto_ptr< cpl::CompositionPlaylistType> cpl2013_data;
+													try { cpl_data = cpl2016::parseCompositionPlaylist(new_asset_path.absoluteFilePath().toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize); }
 													catch(...) { is_cpl = false; }
+													try { cpl2013_data = cpl::parseCompositionPlaylist(new_asset_path.absoluteFilePath().toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize); }
+													catch(...) {is_cpl2013 = false;}
+													if (is_cpl2013) {
+														QString tempFile = nullptr;
+														bool conversionError = false;
+															try {
+																// This is a Q&D hack to convert ST 2067-3:2013 CPLs into ST 2067-3:2016 CPLs,
+																// pending a more sophisticated solution using proper XLS Transformation.
+																// QTemporaryFile was causing issues under Windows, the delete cpl2016_file_tmp command is required for Windows
+																QTemporaryFile* cpl2016_file_tmp = new QTemporaryFile();
+																if (!cpl2016_file_tmp->open()) {
+																	qDebug() << "Cant't create temp file at " << cpl2016_file_tmp->fileName();
+																	conversionError = true;
+																	break;
+																}
+																QFile f_in(new_asset_path.absoluteFilePath());
+																if (!f_in.open(QFile::ReadOnly | QFile::Text)) break;
+																QTextStream in(&f_in);
+																QString tempCPL = in.readAll();
+																tempCPL.replace("http://www.smpte-ra.org/schemas/2067-3/2013", "http://www.smpte-ra.org/schemas/2067-3/2016");
+																tempCPL.replace("http://www.smpte-ra.org/schemas/2067-2/2013", "http://www.smpte-ra.org/schemas/2067-2/2016");
+																cpl2016_file_tmp->write(tempCPL.toUtf8());
+																tempFile = cpl2016_file_tmp->fileName();
+																cpl2016_file_tmp->setAutoRemove(false);
+																if (!cpl2016_file_tmp->flush()) {
+																	qDebug() << "Cant't flush to temp file at " << cpl2016_file_tmp->fileName();
+																	conversionError = true;
+																	break;
+																}
+																cpl2016_file_tmp->close();
+																//if the QTemporaryFile instance is not explicitely deleted, it won't be accesible on Windows (weird)
+																delete cpl2016_file_tmp;
+																if (!conversionError)
+																	is_cpl = true;
+															}
+															catch (...) { is_cpl = false; conversionError = true;  qDebug() << "Transformation of 2013 CPL to 2016 CPL failed"; }
+															if (!conversionError) {
+																parse_error = XmlParsingError();
+																try { cpl_data = cpl2016::parseCompositionPlaylist(tempFile.toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize); }
+																catch (const xml_schema::Parsing &e) { is_cpl = false; parse_error = XmlParsingError(e); }
+																catch (const xml_schema::ExpectedElement &e) { is_cpl = false; parse_error = XmlParsingError(e); }
+																catch (const xml_schema::UnexpectedElement &e) { is_cpl = false; parse_error = XmlParsingError(e); }
+																catch (const xml_schema::ExpectedAttribute &e) { is_cpl = false; parse_error = XmlParsingError(e); }
+																catch (const xml_schema::UnexpectedEnumerator &e) { is_cpl = false; parse_error = XmlParsingError(e); }
+																catch (const xml_schema::ExpectedTextContent &e) { is_cpl = false; parse_error = XmlParsingError(e); }
+																catch (const xml_schema::NoTypeInfo &e) { is_cpl = false; parse_error = XmlParsingError(e); }
+																catch (const xml_schema::NotDerived &e) { is_cpl = false; parse_error = XmlParsingError(e); }
+																catch (const xml_schema::NoPrefixMapping &e) { is_cpl = false; parse_error = XmlParsingError(e); }
+																catch (...) { is_cpl = false; qDebug() << "Parsing transformed 2016 CPL failed"; }
+																qDebug() << parse_error;
+																try { QFile::remove(tempFile); }
+																catch (...) {} // just ignore..
+															}
+													}
 													try { opl::parseOutputProfileList(new_asset_path.absoluteFilePath().toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize); }
 													catch(...) { is_opl = false; }
 													if(is_cpl && !is_opl) {
@@ -345,14 +414,14 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 													else {
 														qDebug() << "Unknown " MIME_TYPE_XML " Asset found: " << ImfXmlHelper::Convert(am_asset.getId());
 														error = ImfError(ImfError::UnknownAsset, am_asset.getId().c_str(), true);
-														QSharedPointer<Asset> unknown(new Asset(Asset::unknown, new_asset_path, am_asset, std::auto_ptr<pkl::AssetType>(new pkl::AssetType(pkl_asset))));
+														QSharedPointer<Asset> unknown(new Asset(Asset::unknown, new_asset_path, am_asset, std::auto_ptr<pkl2016::AssetType>(new pkl2016::AssetType(pkl_asset))));
 														AddAsset(unknown, ImfXmlHelper::Convert(packing_list->getId()));
 													}
 												}
 												else {
 													qWarning() << "Unsupported Asset type element " << pkl_asset.getType().c_str() << " found: " << ImfXmlHelper::Convert(am_asset.getId());
 													error = ImfError(ImfError::UnknownAsset, am_asset.getId().c_str(), true);
-													QSharedPointer<Asset> unknown(new Asset(Asset::unknown, new_asset_path, am_asset, std::auto_ptr<pkl::AssetType>(new pkl::AssetType(pkl_asset))));
+													QSharedPointer<Asset> unknown(new Asset(Asset::unknown, new_asset_path, am_asset, std::auto_ptr<pkl2016::AssetType>(new pkl2016::AssetType(pkl_asset))));
 													AddAsset(unknown, ImfXmlHelper::Convert(packing_list->getId()));
 												}
 											}
@@ -375,7 +444,7 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 									// TTML XF assets only: Set Edit Rate in metadata object to CPL Edit Rate, re-calculate duration in CPL Edit Rate units
 									// Uses the first CPL Edit Rate in mImpEditRates, this can be an issue in multi-edit rate IMPs
 									QSharedPointer <AssetMxfTrack> assetMxfTrack = qSharedPointerCast<AssetMxfTrack>(asset);
-									if (assetMxfTrack){
+									if (assetMxfTrack && !mImpEditRates.isEmpty()){
 										if (assetMxfTrack->GetEssenceType() == Metadata::TimedText) {
 											assetMxfTrack->SetCplEditRate(mImpEditRates.first());
 											assetMxfTrack->SetEditRate(mImpEditRates.first());
@@ -812,10 +881,10 @@ const am::AssetMapType& AssetMap::Write() {
 }
 
 
-PackingList::PackingList(ImfPackage *pParent, const QFileInfo &rFilePath, const pkl::PackingListType &rPackingList) :
+PackingList::PackingList(ImfPackage *pParent, const QFileInfo &rFilePath, const pkl2016::PackingListType &rPackingList) :
 QObject(pParent), mFilePath(rFilePath), mData(rPackingList) {
 
-	mData.setAssetList(pkl::PackingListType_AssetListType());
+	mData.setAssetList(pkl2016::PackingListType_AssetListType());
 	if(mData.getSigner().present() == true) qWarning() << "Signer is in Packing List not supported.";
 	if(mData.getSignature().present() == true) qWarning() << "Signature is in Packing List not supported.";
 }
@@ -826,7 +895,7 @@ mData(ImfXmlHelper::Convert(rId),
 ImfXmlHelper::Convert(QDateTime::currentDateTimeUtc()),
 ImfXmlHelper::Convert(UserText(rIssuer)),
 ImfXmlHelper::Convert(UserText(CREATOR_STRING)),
-pkl::PackingListType_AssetListType()
+pkl2016::PackingListType_AssetListType()
 ) {
 
 	if(rAnnotationText.IsEmpty() == false) SetAnnotationText(rAnnotationText);
@@ -834,7 +903,7 @@ pkl::PackingListType_AssetListType()
 	if(rGroupId.isNull() == false) mData.setGroupId(ImfXmlHelper::Convert(rGroupId));
 }
 
-const pkl::PackingListType& PackingList::Write() {
+const pkl2016::PackingListType& PackingList::Write() {
 
 	// Update values before serialization.
 	mData.setCreator(ImfXmlHelper::Convert(UserText(CREATOR_STRING)));
@@ -853,11 +922,14 @@ mAmData(ImfXmlHelper::Convert(QUuid() /*empty*/), am::AssetType_ChunkListType() 
 mpPklData(NULL), mFileNeedsNewHash(true) {
 
 	if(mType != pkl) {
-		mpPklData = std::auto_ptr<pkl::AssetType>(new pkl::AssetType(
+		mpPklData = std::auto_ptr<pkl2016::AssetType>(new pkl2016::AssetType(
 			ImfXmlHelper::Convert(QUuid() /*empty*/),
 			ImfXmlHelper::Convert(QByteArray() /*empty*/),
 			xml_schema::PositiveInteger(0) /*empty*/,
-			mType == mxf ? xml_schema::String(MIME_TYPE_MXF) : xml_schema::String(MIME_TYPE_XML)));
+			mType == mxf ? xml_schema::String(MIME_TYPE_MXF) : xml_schema::String(MIME_TYPE_XML),
+			pkl2016::AssetType::HashAlgorithmType(ds::CanonicalizationMethodType::AlgorithmType("http://www.w3.org/2000/09/xmldsig#sha1"))
+			)
+		);
 	}
 
 	QUuid id;
@@ -883,7 +955,7 @@ mpPklData(NULL), mFileNeedsNewHash(true) {
 }
 
 // Import existing Asset
-Asset::Asset(eAssetType type, const QFileInfo &rFilePath, const am::AssetType &rAsset, std::auto_ptr<pkl::AssetType> assetType /*= std::auto_ptr<pkl::AssetType>(NULL)*/) :
+Asset::Asset(eAssetType type, const QFileInfo &rFilePath, const am::AssetType &rAsset, std::auto_ptr<pkl2016::AssetType> assetType /*= std::auto_ptr<pkl2016::AssetType>(NULL)*/) :
 QObject(NULL), mpAssetMap(NULL), mpPackageList(NULL), mType(type), mFilePath(rFilePath), mAmData(rAsset), mpPklData(assetType), mFileNeedsNewHash(false) {
 
 	connect(this, SIGNAL(AssetModified(Asset*)), this, SLOT(rAssetModified(Asset*)));
@@ -907,7 +979,7 @@ const am::AssetType& Asset::WriteAm() {
 	return mAmData;
 }
 
-const std::auto_ptr<pkl::AssetType>& Asset::WritePkl() {
+const std::auto_ptr<pkl2016::AssetType>& Asset::WritePkl() {
 
 	return mpPklData;
 }
@@ -1001,8 +1073,8 @@ Asset(Asset::pkl, rFilePath, rId, rAnnotationText) {
 
 }
 
-AssetCpl::AssetCpl(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl::AssetType &rPklAsset) :
-Asset(Asset::cpl, rFilePath, rAmAsset, std::auto_ptr<pkl::AssetType>(new pkl::AssetType(rPklAsset))) {
+AssetCpl::AssetCpl(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl2016::AssetType &rPklAsset) :
+Asset(Asset::cpl, rFilePath, rAmAsset, std::auto_ptr<pkl2016::AssetType>(new pkl2016::AssetType(rPklAsset))) {
 //WR begin
 	mIsNewOrModified = false;
 //WR end
@@ -1017,8 +1089,8 @@ Asset(Asset::cpl, rFilePath, rId, rAnnotationText) {
 	mIsNew = false;
 }
 
-AssetOpl::AssetOpl(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl::AssetType &rPklAsset) :
-Asset(Asset::opl, rFilePath, rAmAsset, std::auto_ptr<pkl::AssetType>(new pkl::AssetType(rPklAsset))) {
+AssetOpl::AssetOpl(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl2016::AssetType &rPklAsset) :
+Asset(Asset::opl, rFilePath, rAmAsset, std::auto_ptr<pkl2016::AssetType>(new pkl2016::AssetType(rPklAsset))) {
 
 }
 
@@ -1027,15 +1099,15 @@ Asset(Asset::opl, rFilePath, rId, rAnnotationText) {
 
 }
 
-AssetMxfTrack::AssetMxfTrack(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl::AssetType &rPklAsset) :
-Asset(Asset::mxf, rFilePath, rAmAsset, std::auto_ptr<pkl::AssetType>(new pkl::AssetType(rPklAsset))), mMetadata(), mSourceFiles(), mFirstProxyImage(), mMetadataExtr() {
+AssetMxfTrack::AssetMxfTrack(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl2016::AssetType &rPklAsset) :
+Asset(Asset::mxf, rFilePath, rAmAsset, std::auto_ptr<pkl2016::AssetType>(new pkl2016::AssetType(rPklAsset))), mMetadata(), mSourceFiles(), mFirstProxyImage(), mMetadataExtr() {
 	mMetadataExtr.ReadMetadata(mMetadata, rFilePath.absoluteFilePath());
 	SetDefaultProxyImages();
 	//WR begin
 	//New UUID for SourceENcoding
 	mSourceEncoding = QUuid::createUuid();
 	//new ED with SourceEncoding as ID
-	mEssenceDescriptor = new cpl::EssenceDescriptorBaseType(ImfXmlHelper::Convert(mSourceEncoding));
+	mEssenceDescriptor = new cpl2016::EssenceDescriptorBaseType(ImfXmlHelper::Convert(mSourceEncoding));
 	mIsNew = false;
 	//WR end
 }
@@ -1043,7 +1115,7 @@ Asset(Asset::mxf, rFilePath, rAmAsset, std::auto_ptr<pkl::AssetType>(new pkl::As
 AssetMxfTrack::AssetMxfTrack(const QFileInfo &rFilePath, const QUuid &rId, const UserText &rAnnotationText /*= QString()*/) :
 Asset(Asset::mxf, rFilePath, rId, rAnnotationText), mMetadata(), mSourceFiles(), mFirstProxyImage() {
 	mSourceEncoding = QUuid::createUuid();
-	mEssenceDescriptor = new cpl::EssenceDescriptorBaseType(ImfXmlHelper::Convert(mSourceEncoding));
+	mEssenceDescriptor = new cpl2016::EssenceDescriptorBaseType(ImfXmlHelper::Convert(mSourceEncoding));
 	//leave ED empty because file does not exist yet on the file system
 
 
@@ -1177,8 +1249,8 @@ Error AssetMxfTrack::ExtractEssenceDescriptor(const QString &filePath) {
 
 void AssetMxfTrack::SetEssenceDescriptor(const QString& qresult) {
 	if (!qresult.isEmpty()) {
-		cpl::EssenceDescriptorBaseType* rEssenceDescriptor = this->GetEssenceDescriptor();
-		cpl::EssenceDescriptorBaseType::AnySequence &r_any_sequence(rEssenceDescriptor->getAny());
+		cpl2016::EssenceDescriptorBaseType* rEssenceDescriptor = this->GetEssenceDescriptor();
+		cpl2016::EssenceDescriptorBaseType::AnySequence &r_any_sequence(rEssenceDescriptor->getAny());
 		xercesc::DOMElement * p_dom_element;
 		xercesc::DOMNode * node;
 		xercesc::XercesDOMParser * parser = new xercesc::XercesDOMParser();

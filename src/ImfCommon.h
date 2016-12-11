@@ -179,12 +179,17 @@ public:
 	static const MarkerLabel MarkerLabelLFCO;
 	static const MarkerLabel MarkerLabelFFOA;
 	static const MarkerLabel MarkerLabelLFOA;
+	//WR
+	static const MarkerLabel MarkerLabelFFDC;
+	static const MarkerLabel MarkerLabelLFDC;
 
 	//! Initialized with MarkerLabelNone.
 	MarkerLabel() { *this = MarkerLabelNone; }
 	//! Used for custom marker label.
 	MarkerLabel(const QString &rLabel, const QString &rDescription, const QString &rScope) :
-		mLabel(rLabel), mDescription(rDescription), mScope(rScope) {}
+		mLabel(rLabel), mDescription(rDescription), mScope(rScope) {
+		MarkerLabel::mMap.push_back(this);
+	}
 	~MarkerLabel() {}
 	QString GetLabel() const { return mLabel; }
 	QString GetDescription() const { return mDescription; }
@@ -196,7 +201,7 @@ public:
 	static MarkerLabel GetMarker(const QString &rMarkerLabel);
 private:
 	MarkerLabel(const QString &rLabel, const QString &rDescription) :
-		mLabel(rLabel), mDescription(rDescription), mScope(WELL_KNOWN_MARKER_LABEL_SCOPE) {
+		mLabel(rLabel), mDescription(rDescription), mScope(WELL_KNOWN_MARKER_LABEL_SCOPE_2013) {
 
 		MarkerLabel::mMap.push_back(this);
 	}

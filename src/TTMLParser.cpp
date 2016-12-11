@@ -269,10 +269,8 @@ bool elem::processTimedElement() {
 
 		if (parser->is_wrapped) {
 
-			AS_02::TimedText::Type5UUIDFilenameResolver NameToKumuUUID;
 			// create UUID from file name e.g. track5-frag0-sample1-subs4.png -> 0c209959-84e2-5a63-86ad-bd5406b068d1
-			Kumu::UUID id;// = NameToKumuUUID.NameToKumuID(image.toStdString());
-			NameToKumuUUID.PngNameToType5UUID(image.toStdString(), id);
+			Kumu::UUID id = AS_02::TimedText::CreatePNGNameId(image.toStdString());
 			if (!parser->anc_resources[id].isNull()) { // anc asset found!
 				ttml_timed.bgImage = parser->anc_resources[id];
 			}

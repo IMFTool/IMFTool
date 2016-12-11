@@ -81,7 +81,7 @@ private:
 
 public:
 	//! Import existing Resource. pResource is owned by this.
-	AbstractGraphicsWidgetResource(GraphicsWidgetSequence *pParent, cpl::BaseResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL), const QColor &rColor = QColor(Qt::white));
+	AbstractGraphicsWidgetResource(GraphicsWidgetSequence *pParent, cpl2016::BaseResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL), const QColor &rColor = QColor(Qt::white));
 	virtual ~AbstractGraphicsWidgetResource() { delete mpData; }
 	QUuid GetId() const;
 	UserText GetAnnotation() const;
@@ -95,7 +95,7 @@ public:
 	void SetEntryPoint(const Duration &rEntryPoint);
 	void SetSourceDuration(const Duration &rSourceDuration);
 	void SetID (QUuid id);
-	virtual std::auto_ptr<cpl::BaseResourceType> Write() const = 0;
+	virtual std::auto_ptr<cpl2016::BaseResourceType> Write() const = 0;
 	GraphicsWidgetSequence* GetSequence() const;
 	QColor GetColor() const { return mColor; }
 	//! Should return a copy of this but with different Ids and no parent assigned. The object is not owned by this.
@@ -156,7 +156,7 @@ protected:
 	//! Reacts on Cpl edit rate changes. Just calls QGraphicsWidget::updateGeometry().
 	virtual void CplEditRateChanged();
 
-	cpl::BaseResourceType* mpData;
+	cpl2016::BaseResourceType* mpData;
 	QSharedPointer<AssetMxfTrack> mAssset;
 
 private:
@@ -178,14 +178,14 @@ class GraphicsWidgetFileResource : public AbstractGraphicsWidgetResource {
 
 public:
 	//! Import existing Resource. pResource is owned by this.
-	GraphicsWidgetFileResource(GraphicsWidgetSequence *pParent, cpl::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL), const QColor &rColor = QColor(Qt::white));
+	GraphicsWidgetFileResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL), const QColor &rColor = QColor(Qt::white));
 	//! Creates new Resource.
 	GraphicsWidgetFileResource(GraphicsWidgetSequence *pParent, const QSharedPointer<AssetMxfTrack> &rAsset, const QColor &rColor = QColor(Qt::white));
 	virtual ~GraphicsWidgetFileResource() {}
 	virtual int type() const { return GraphicsWidgetFileResourceType; }
-	QUuid GetTrackFileId() const { return ImfXmlHelper::Convert(static_cast<cpl::TrackFileResourceType*>(mpData)->getTrackFileId()); }
+	QUuid GetTrackFileId() const { return ImfXmlHelper::Convert(static_cast<cpl2016::TrackFileResourceType*>(mpData)->getTrackFileId()); }
 	virtual GraphicsWidgetFileResource* Clone() const;
-	virtual std::auto_ptr<cpl::BaseResourceType> Write() const;
+	virtual std::auto_ptr<cpl2016::BaseResourceType> Write() const;
 
 private:
 	Q_DISABLE_COPY(GraphicsWidgetFileResource);
@@ -217,7 +217,7 @@ class GraphicsWidgetVideoResource : public GraphicsWidgetFileResource {
 
 public:
 	//! Import existing Resource. pResource is owned by this.
-	GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, cpl::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL), int video_timeline_index = 0);
+	GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL), int video_timeline_index = 0);
 	//! Creates new Resource.
 	GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, const QSharedPointer<AssetMxfTrack> &rAsset);
 	virtual ~GraphicsWidgetVideoResource() {}
@@ -254,7 +254,7 @@ class GraphicsWidgetAudioResource : public GraphicsWidgetFileResource {
 
 public:
 	//! Import existing Resource. pResource is owned by this.
-	GraphicsWidgetAudioResource(GraphicsWidgetSequence *pParent, cpl::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL));
+	GraphicsWidgetAudioResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL));
 	//! Creates new Resource.
 	GraphicsWidgetAudioResource(GraphicsWidgetSequence *pParent, const QSharedPointer<AssetMxfTrack> &rAsset);
 	virtual ~GraphicsWidgetAudioResource() {}
@@ -275,7 +275,7 @@ class GraphicsWidgetTimedTextResource : public GraphicsWidgetFileResource {
 
 public:
 	//! Import existing Resource. pResource is owned by this.
-	GraphicsWidgetTimedTextResource(GraphicsWidgetSequence *pParent, cpl::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL));
+	GraphicsWidgetTimedTextResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL));
 	//! Creates new Resource.
 	GraphicsWidgetTimedTextResource(GraphicsWidgetSequence *pParent, const QSharedPointer<AssetMxfTrack> &rAsset);
 	virtual ~GraphicsWidgetTimedTextResource() {}
@@ -295,7 +295,7 @@ class GraphicsWidgetAncillaryDataResource : public GraphicsWidgetFileResource {
 
 public:
 	//! Import existing Resource. pResource is owned by this.
-	GraphicsWidgetAncillaryDataResource(GraphicsWidgetSequence *pParent, cpl::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL));
+	GraphicsWidgetAncillaryDataResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL));
 	//! Creates new Resource.
 	GraphicsWidgetAncillaryDataResource(GraphicsWidgetSequence *pParent, const QSharedPointer<AssetMxfTrack> &rAsset);
 	virtual ~GraphicsWidgetAncillaryDataResource() {}
@@ -343,13 +343,13 @@ private:
 
 public:
 	//! Import existing Resource. pResource is owned by this.
-	GraphicsWidgetMarkerResource(GraphicsWidgetSequence *pParent, cpl::MarkerResourceType *pResource);
+	GraphicsWidgetMarkerResource(GraphicsWidgetSequence *pParent, cpl2016::MarkerResourceType *pResource);
 	//! Creates new Resource.
 	GraphicsWidgetMarkerResource(GraphicsWidgetSequence *pParent);
 	virtual ~GraphicsWidgetMarkerResource() {}
 	virtual int type() const { return GraphicsWidgetMarkerResourceType; }
 	virtual GraphicsWidgetMarkerResource* Clone() const;
-	virtual std::auto_ptr<cpl::BaseResourceType> Write() const;
+	virtual std::auto_ptr<cpl2016::BaseResourceType> Write() const;
 	void SetIntrinsicDuaration(const Duration &rIntrinsicDuration);
 
 protected:

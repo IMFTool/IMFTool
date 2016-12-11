@@ -35,7 +35,7 @@ using namespace xercesc;
 
 
 WidgetVideoPreview::WidgetVideoPreview(QWidget *pParent) : QWidget(pParent),
-mData(ImfXmlHelper::Convert(QUuid::createUuid()), ImfXmlHelper::Convert(QDateTime::currentDateTimeUtc()), ImfXmlHelper::Convert(UserText(tr("Unnamed"))), ImfXmlHelper::Convert(EditRate::EditRate24), cpl::CompositionPlaylistType::SegmentListType()) {
+mData(ImfXmlHelper::Convert(QUuid::createUuid()), ImfXmlHelper::Convert(QDateTime::currentDateTimeUtc()), ImfXmlHelper::Convert(UserText(tr("Unnamed"))), ImfXmlHelper::Convert(EditRate::EditRate24), cpl2016::CompositionPlaylistType::SegmentListType()) {
 
 	// ############## - create 2 single frame extractors - ###################
 	for (int i = 0; i <= 1; i++) {
@@ -154,7 +154,7 @@ void WidgetVideoPreview::InitLayout() {
 
 	processing_extract_actions[3] = new QAction(tr("convert to REC.709"));
 	processing_extract_actions[3]->setCheckable(true);
-	processing_extract_actions[3]->setChecked(true); // default
+	processing_extract_actions[3]->setChecked(false); // default
 	processing_extract_actions[3]->setData(3);
 	menuProcessing->addAction(processing_extract_actions[3]);
 
@@ -442,14 +442,19 @@ void WidgetVideoPreview::setPlaylist(QVector<PlayListElement> &rPlayList, QVecto
 
 void WidgetVideoPreview::rChangeSpeed(QAction *action) {
 	
+	int decode_speed_index = decode_speed;
+	if (decode_speed > 30) decode_speed_index = 30 + (decode_speed - 30) / 5;
+
 	if (decode_speed != action->data().value<int>()) { // value has changed
 
-		speeds[decode_speed]->setChecked(false); // uncheck 'old' value
+		speeds[decode_speed_index]->setChecked(false); // uncheck 'old' value
 		decode_speed = action->data().value<int>();
+		decode_speed_index = decode_speed;
 		player->setFps(decode_speed);
 	}
 	else {
-		speeds[decode_speed]->setChecked(true); // check again!
+		if (decode_speed > 30) decode_speed_index = (decode_speed - 30) / 5;
+		speeds[decode_speed_index]->setChecked(true); // check again!
 	}
 }
 
@@ -541,7 +546,7 @@ void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 }
 
 void WidgetVideoPreview::getTTML() {
-	
+
 	if (!currentAsset) return; // current asset is not valid
 
 	ttml_search_time.start();
@@ -556,6 +561,8 @@ void WidgetVideoPreview::getTTML() {
 	float frac_sec;
 	double seconds;
 
+	QString h, m, s, f;
+
 	for (int i = 0; i < ttmls.length(); i++) {
 
 		if (time > ttmls[i].timeline_in && time <= ttmls[i].timeline_out) {
@@ -564,12 +571,11 @@ void WidgetVideoPreview::getTTML() {
 			double rel_time = (time - ttmls[i].timeline_in) + ttmls[i].in;
 			frac_sec = modf(rel_time, &seconds);
 
-			timeString.append(
-				QString("%1:%2:%3:%4")
-				.arg((int)(seconds / 3600)) // hours
-				.arg((int)(seconds / 60)) // minutes
-				.arg(seconds) // seconds
-				.arg(QString::number(qRound(frac_sec * ttmls[i].frameRate * (float)100) / (float)100, 'f', 2))); // frames
+			h = QString("%1").arg((int)(seconds / 3600.0f), 2, 10, QChar('0')); // hours
+			m = QString("%1").arg((int)(seconds / 60.0f), 2, 10, QChar('0')); // minutes
+			s = QString("%1").arg((int)(seconds) % 60, 2, 10, QChar('0')); // seconds
+			f = QString::number(qRound(frac_sec * ttmls[i].frameRate * (float)100) / (float)100, 'f', 2);
+			timeString.append(QString("%1:%2:%3:%4").arg(h).arg(m).arg(s).arg(f)); // ttml timecode
 
 			for (int z = 0; z < ttmls[i].items.length(); z++) {
 				if (rel_time > (ttmls[i].items[z].beg) && rel_time <= (ttmls[i].items[z].end)) {
@@ -589,6 +595,7 @@ void WidgetVideoPreview::getTTML() {
 			}
 		}
 	}
-	
+
 	emit ttmlChanged(timeString, text, ttml_search_time.elapsed());
 }
+

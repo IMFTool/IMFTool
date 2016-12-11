@@ -35,15 +35,16 @@
 #define CREATOR_STRING PROJECT_NAME VERSION_MAJOR "." VERSION_MINOR "." VERSION_PATCH
 #define MIME_TYPE_MXF "application/mxf"
 #define MIME_TYPE_XML "text/xml"
-#define WELL_KNOWN_MARKER_LABEL_SCOPE "http://www.smpte-ra.org/schemas/2067-3/2013#standard-markers"
+#define WELL_KNOWN_MARKER_LABEL_SCOPE_2013 "http://www.smpte-ra.org/schemas/2067-3/2013#standard-markers"
+#define WELL_KNOWN_MARKER_LABEL_SCOPE_2016 "http://www.smpte-ra.org/schemas/2067-3/2016#standard-markers"
 #define CUSTOM_MARKER_LABEL_SCOPE "http://www.hsrm.de/schemas/2015#markers"
 #define IMFTOOL
 
-#define XML_NAMESPACE_CPL "http://www.smpte-ra.org/schemas/2067-3/2013"
+#define XML_NAMESPACE_CPL "http://www.smpte-ra.org/schemas/2067-3/2016"
 #define XML_NAMESPACE_AM "http://www.smpte-ra.org/schemas/429-9/2007/AM"
-#define XML_NAMESPACE_PKL "http://www.smpte-ra.org/schemas/429-8/2007/PKL"
+#define XML_NAMESPACE_PKL "http://www.smpte-ra.org/schemas/2067-2/2016/PKL"
 #define XML_NAMESPACE_DCML "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/"
-#define XML_NAMESPACE_CC "http://www.smpte-ra.org/schemas/2067-2/2013"
+#define XML_NAMESPACE_CC "http://www.smpte-ra.org/schemas/2067-2/2016"
 #define XML_NAMESPACE_DS "http://www.w3.org/2000/09/xmldsig#"
 #define XML_NAMESPACE_XS "http://www.w3.org/2001/XMLSchema"
 #define XML_NAMESPACE_NS "http://www.w3.org/2000/xmlns/"

@@ -46,13 +46,15 @@ private:
 	void setUp();
 
 	// luts
-	float *oetf;
-	float *eotf;
+	float *oetf_NonLin;
+	float *eotf_NonLin;
+	float *oetf_Lin;
+	float *eotf_Lin;
 
 	// data to qimage
 	unsigned char *img_buff;
-	int w, h, prec, prec_shift, xpos, buff_pos, x, y, bytes_per_line;
-	float Y, Cb, Cr, r, g, b, out_r, out_g, out_b, out_r8, out_g8, out_b8;
+	int w, h, prec, prec_shift, xpos, buff_pos, x, y, bytes_per_line, adjustYCbCr;
+	float Y, Cb, Cr, r, g, b, out_r, out_g, out_b, out_r8, out_g8, out_b8, max;
 	QImage DataToQImage(); // converts opj_image_t -> QImage
 
 	// info methods

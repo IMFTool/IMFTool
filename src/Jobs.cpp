@@ -220,7 +220,7 @@ Error JobWrapTimedText::Execute() {
 	QString dirCopyPath = QDir::currentPath();
 	QDir::setCurrent(file_info.absolutePath());
 
-	Result_t result = Parser.OpenRead(file_info.absoluteFilePath().toStdString());
+	Result_t result = Parser.OpenRead(file_info.absoluteFilePath().toStdString(), mProfile.toStdString());
 	result = Parser.FillTimedTextDescriptor(TDesc);
 
 	TDesc.EditRate = ASDCP::Rational(mFrameRate.GetNumerator(), mFrameRate.GetDenominator());

@@ -70,6 +70,8 @@ bool WidgetImagePreview::hasHeightForWidth() const {
 
 void WidgetImagePreview::resizeGL(int w, int h) {
 
+	px_ratio = QApplication::desktop()->devicePixelRatio();
+
 	f = QOpenGLContext::currentContext()->functions();
 	f->glViewport(0, 0, (GLint)w, (GLint)h);
 	repaint();
@@ -85,10 +87,10 @@ void WidgetImagePreview::paintGL() {
 
 	if(smooth) painter.setRenderHint(QPainter::SmoothPixmapTransform);
 	
-	rect_viewport = painter.viewport();
-	frame_size = mImage.size();
+	// scale frame & viewport according to clients dpi settings
+	frame_size = QSize((int)(mImage.width() ), (int)(mImage.height() ));
+	rect_viewport = QRect(0, 0, (int)(painter.viewport().width()/px_ratio ), (int)(painter.viewport().height()/px_ratio ));
 
-	
 	if (scaling) {
 		frame_size.scale(rect_viewport.size(), Qt::KeepAspectRatio); // scale image to fit preview-window
 		draw_rect = QRect(QPoint((rect_viewport.width() - frame_size.width()) / 2, (rect_viewport.height() - frame_size.height()) / 2), frame_size);
