@@ -38,6 +38,8 @@ public:
 	qint64 frameNr; // current frame in asset
 	QImage decoded; // decoded image
 	bool done;
+	bool error;
+	QString errorMsg;
 };
 
 class JP2K_Player : public QObject{
@@ -51,13 +53,15 @@ public:
 	void setLayer(int layer); // layer to decode
 	void setPlaylist(QVector<PlayListElement> &rPlaylist);
 	void setPos(int frameNr, int frame_total, int playlist_index);
+	void convert_to_709(bool convert);
 
 	bool playing = false;
 	float playing_frame = 0; // starting at startpos
 	float decoding_frame = 0; // starting at startpos
 	int playing_count = 0;
 	float playing_frame_total = 0;
-	bool realspeed = false;
+	bool realspeed = false; // default
+	bool show_subtitles = false; // default
 
 private:
 
@@ -128,6 +132,14 @@ private:
 	void playLoop();
 	void clean();
 
+	// luts
+	static const int bitdepth = 16;
+	int max_f; // (float)pow(2, bitdepth)
+	float max_f_; // max_f - 1;
+	float *oetf_709;
+	float *eotf_2020;
+	float *eotf_PQ;
+
 signals:
 	void ShowMsgBox(const QString&, int);
 	void getFrames(); // int, int, int
@@ -136,6 +148,7 @@ signals:
 	void showFrame(const QImage&);
 	void currentPlayerPosition(qint64);
 	void playbackEnded();
+	void playTTML();
 
 	public slots:
 	void startPlay(); // starts playback

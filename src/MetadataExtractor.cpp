@@ -18,7 +18,7 @@
 #include "AS_DCP_internal.h"
 #include "AS_02.h"
 #include "PCMParserList.h"
-#include "LabelsRegister.h" // (k)
+#include "SMPTE_Labels.h" // (k)
 #include <KM_fileio.h>
 #include <cmath>
 #include <QtCore>
@@ -153,6 +153,8 @@ Error MetadataExtractor::ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileI
 			if(rgba_descriptor->ComponentMaxRef.empty() == false)metadata.componentDepth = log10(rgba_descriptor->ComponentMaxRef.get() + 1) / log10(2.);
 			TransferCharacteristic = rgba_descriptor->TransferCharacteristic; // (k)
 			ColorPrimaries = rgba_descriptor->ColorPrimaries; // (k)
+			if(rgba_descriptor->ComponentMinRef.empty() == false) metadata.componentMinRef = rgba_descriptor->ComponentMinRef;
+			if(rgba_descriptor->ComponentMaxRef.empty() == false) metadata.componentMaxRef = rgba_descriptor->ComponentMaxRef;
 		}
 		else if(cdci_descriptor) {
 			metadata.colorEncoding = Metadata::CDCI;
@@ -173,83 +175,24 @@ Error MetadataExtractor::ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileI
 		}
 
 		// (k) - start
-
-		// (k)
-		// SETUP XERCES
-		xercesc::XercesDOMParser *parser = new xercesc::XercesDOMParser();
-		parser->parse("D:/Master/Thesis/Repository/Phase2/Labels.xml");
-
-		xercesc::DOMDocument *dom_doc = parser->getDocument();
-		const xercesc::DOMElement *dom_el = dynamic_cast<xercesc::DOMElement*>(dom_doc);
-
-
-		//std::auto_ptr<lr::LabelsRegister> labels_register(xercesc::DOMElement(&dom_el));
-		//std::auto_ptr<lr::LabelsRegister> labels_register();
-		//std::auto_ptr<lr::LabelsRegister> labels_register = register("");
-
-		//try {
-		//labels_register = lr::parseLabelsRegister("", xml_schema::Flags::extract_content);
-		//}
-		//catch (...) {}
-		// (k)
-
-
-		metadata.colorSpace = Metadata::eColorSpace::Unknown; // default
-		metadata.lutIndex = 0;
 		char buf[64];
-	
-		if (ColorPrimaries.HasValue()) {
-			QString CP = ColorPrimaries.EncodeString(buf, 64);
-			CP = CP.toUpper();
-			CP = CP.replace(".", "");
 
-			if (CP == "060E2B34040101060401010103030000") { // ITU709
-				if (rgba_descriptor) {
-					metadata.colorSpace = Metadata::eColorSpace::RGB709;
-					metadata.lutIndex = 1;
-				}
-				else if (cdci_descriptor) {
-					metadata.colorSpace = Metadata::eColorSpace::YUV_709;
-					metadata.lutIndex = 4;
-				}
-			}else if (CP == "060E2B340401010D0401010103040000") { // ITU2020_UNKNOWN
-				if (rgba_descriptor) {
-					metadata.colorSpace = Metadata::eColorSpace::RGB_2020_PQ;
-					metadata.lutIndex = 2;
-				}
-				else if (cdci_descriptor) {
-					metadata.colorSpace = Metadata::eColorSpace::YUV_2020_PQ;
-					metadata.lutIndex = 6;
-				}
-			}else if(CP == "060E2B340401010D0401010103060000"){ // P3D65
-				metadata.colorSpace = Metadata::eColorSpace::RGB_P3D65;
-				metadata.lutIndex = 3;
-			}
-			else {
-				qDebug() << CP;
-			}
+		// get ColorPrimaries
+		QString CP;
+		if (ColorPrimaries.HasValue()) {
+
+			CP = ColorPrimaries.EncodeString(buf, 64);
+			CP = CP.toUpper().replace(".", "");
+			metadata.colorPrimaries = SMPTE::ColorPrimariesMap[CP];
 		}
 
-		// try TransferCharacteristic
-		if (metadata.colorSpace == Metadata::eColorSpace::Unknown && TransferCharacteristic.HasValue()){
-			QString TC = TransferCharacteristic.EncodeString(buf, 64);
-			TC = TC.toUpper();
-			TC = TC.replace(".", "");
+		// get TransferCharacteristic
+		QString TC;
+		if (TransferCharacteristic.HasValue()){
+			TC = TransferCharacteristic.EncodeString(buf, 64);
+			TC = TC.toUpper().replace(".", "");
+			metadata.transferCharcteristics = SMPTE::TransferCharacteristicMap[TC];
 
-			if (TC == "060E2B34040101010401010101020000") { // ITU709
-				metadata.colorSpace = Metadata::eColorSpace::YUV_709;
-				metadata.lutIndex = 4;
-			}else if (TC == "060E2B340401010E0401010101090000") { // ITU2020_LIN
-				metadata.colorSpace = Metadata::eColorSpace::YUV_2020_LIN;
-				metadata.lutIndex = 5;
-			}
-			else if (TC == "060E2B340401010D04010101010A0000") { // ITU2020_PQ
-				metadata.colorSpace = Metadata::eColorSpace::YUV_2020_PQ;
-				metadata.lutIndex = 6;
-			}
-			else {
-				qDebug() << TC;
-			}
 		}
 		// (k) - end
 	}

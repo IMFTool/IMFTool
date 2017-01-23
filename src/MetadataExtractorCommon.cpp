@@ -18,7 +18,7 @@
 #include <QTextTable>
 #include <QFontMetrics>
 #include <QAbstractTextDocumentLayout>
-
+#include "SMPTE_Labels.h"
 
 Metadata::Metadata(eEssenceType type /*= Unknown_Type*/) :
 type(type),
@@ -42,7 +42,9 @@ profile(),
 //WR
 languageTag(""),
 effectiveFrameRate(),
-originalDuration()
+originalDuration(),
+componentMinRef(0),
+componentMaxRef(0)
 //WR
 {
 }
@@ -152,11 +154,12 @@ void Metadata::GetAsTextDocument(QTextDocument &rDoc) {
 		else																															table->cellAt(3, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Color Depth: Unknown"), Qt::ElideRight, column_text_width));
 
 		// (k) - start
-		if (colorSpace != Metadata::eColorSpace::Unknown) {
-			if (colorSpace == Metadata::eColorSpace::YUV_2020_LIN) table->cellAt(4, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Primaries: ITU-R.BT2020-LIN"), Qt::ElideRight, column_text_width));
+		if (SMPTE::vColorPrimaries.contains(colorPrimaries)) {
+			table->cellAt(4, 0).firstCursorPosition().insertText(font_metrics.elidedText(QString("Primaries: %1").arg(SMPTE::vColorPrimaries[colorPrimaries]), Qt::ElideRight, column_text_width));
 		}
-		else {
-			table->cellAt(4, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Primaries: Unknown"), Qt::ElideRight, column_text_width));
+
+		if (SMPTE::vTransferCharacteristic.contains(transferCharcteristics)) {
+			table->cellAt(4, 1).firstCursorPosition().insertText(font_metrics.elidedText(QString("OETF: %1").arg(SMPTE::vTransferCharacteristic[transferCharcteristics]), Qt::ElideRight, column_text_width));
 		}
 		// (k) - end
 	}

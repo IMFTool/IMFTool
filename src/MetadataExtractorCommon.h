@@ -21,7 +21,7 @@
 #include <QString>
 #include <QTextDocument>
 #include <QTextOption>
-
+#include "SMPTE_Labels.h" // (k)
 
 class Metadata {
 
@@ -51,11 +51,11 @@ public:
 		YUV_2020_LIN, // ["ITU-R.BT2020 Transfer Characteristic" in SMPTE RP 224]
 		YUV_2020_PQ, // ["SMPTE ST 2084 Transfer Characteristic" in SMPTE RP 224]
 		// ...
-		COLOR_3, // UHD (8, 10 bit), 4K (8, 10 bit)
-		COLOR_4, // UHD (8, 10 bit), xvYCC709 (BT.709)
-		COLOR_5, // UHD (10, 12 bit), 4K (10, 12 bit), YCbCr (BT.2020), NON-CONST-Y
-		COLOR_6, // 4K (10, 12, 16 bit), P3D65, CONST-Y
-		COLOR_7, // UHD (10, 12, 16 bit), 4K (10, 12, 16 bit), YCbCr, NON-CONST-Y
+		COLOR_3, // UHD (8, 10 bit), 4K (8, 10 bit), YCbCr, RGB
+		COLOR_4, // UHD (8, 10 bit), xvYCC709 (BT.709), YCbCr only!
+		COLOR_5, // UHD (10, 12 bit), 4K (10, 12 bit), YCbCr, RGB, BT.2020, NON-CONST-Y
+		COLOR_6, // 4K (10, 12, 16 bit), P3D65, RGB, CONST-Y
+		COLOR_7, // UHD (10, 12, 16 bit), 4K (10, 12, 16 bit), (RGB: CONST-Y), (YCbCr: NON-CONST-Y)
 	};
 	// (k) - end
 
@@ -73,8 +73,9 @@ public:
 	quint32									displayWidth;
 	quint32									displayHeight;
 	eColorEncoding							colorEncoding;
-	eColorSpace								colorSpace; // (k)
-	int										lutIndex; // (k)
+	eColorSpace								colorSpace; // delete!
+	SMPTE::eColorPrimaries                  colorPrimaries; // (k)
+	SMPTE::eTransferCharacteristic         transferCharcteristics; // (k)
 	quint32									horizontalSubsampling;
 	quint32									componentDepth;
 	Duration								duration;
@@ -93,6 +94,8 @@ public:
 	QString									mcaAudioElementKind;
 	EditRate								effectiveFrameRate; // For TTML only: Effective Frame Rate of TTML1/IMSC1 file
 	Duration								originalDuration; // For TTML only: Duration of TTML1/IMSC1 file expressed in effectiveFrameRate
+	quint32									componentMinRef;  // J2K RGBA only
+	quint32									componentMaxRef;  // J2K RGBA only
 	//WR
 };
 

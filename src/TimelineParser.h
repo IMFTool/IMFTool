@@ -11,6 +11,7 @@ class TimelineParser : public QObject {
 public:
 	TimelineParser() {};
 	~TimelineParser() {};
+
 	GraphicsWidgetComposition *composition;
 	QVector<PlayListElement> *playlist; // (k) make private?
 	QVector<TTMLtimelineSegment> *ttmls; // (K) make private?

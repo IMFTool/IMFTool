@@ -46,13 +46,15 @@
 #include <xercesc/framework/MemBufInputSource.hpp>
 
 using namespace xercesc;
-
+//#define DEBUG_TTML
 
 //!this class helps to convert char* to XMLString by using X(char*) instead of XMLString::transcode(char*).
 class XStr
 {
 public:
-	XStr(const char* const toTranscode) { fUnicodeForm = XMLString::transcode(toTranscode); }
+	XStr(const char* const toTranscode) { 
+		fUnicodeForm = XMLString::transcode(toTranscode); 
+	}
 	~XStr() { XMLString::release(&fUnicodeForm); }
 	const XMLCh* unicodeForm() const { return fUnicodeForm; }
 
@@ -107,7 +109,6 @@ void elem::GetTimeContainer() {
 		timeContainer = parent->timeContainer;
 	}
 
-
 	// check for timing attributes
 	QString timeContainerVal = XMLString::transcode(el->getAttribute(XMLString::transcode("timeContainer")));
 	if (timeContainerVal.length() > 0) { // found timeContainer!
@@ -121,19 +122,6 @@ void elem::GetTimeContainer() {
 			timeContainer = 1;
 		}
 	}
-
-	/*
-	if (parent && parent->timeContainer == 2 && timeContainer == 2) {
-		// current element and parent are seq
-	}
-	else if (parent && parent->timeContainer == 1 && timeContainer == 2) {
-		// current element is par, parent is seq
-	}
-	else if (timeContainer != 0) {
-		// no parent but timeContainer is set
-
-	}
-	*/
 
 	// timing is either par or seq
 	if (is_timed) {
@@ -181,18 +169,22 @@ void elem::GetRegion() {
 
 	if (parent && parent->regionName.length() > 0) { // parent element has region -> pass it on!
 		regionName = parent->regionName;
-		qDebug() << "parent region" << regionName;
+#ifdef DEBUG_TTML
+		qDebug() << "parent region found:" << regionName;
+#endif
 	}
 	else { // check if current element has region
-
-		//DOMElement *el = dynamic_cast<DOMElement*>(node);
 		QString regVal = XMLString::transcode(el->getAttribute(XMLString::transcode("region")));
 		if (regVal.length() > 0) { // found region!
+#ifdef DEBUG_TTML
 			qDebug() << "region used" << regVal;
+#endif
 			regionName = regVal;
 		}
 		else if(is_timed) {
+#ifdef DEBUG_TTML
 			qDebug() << "no region found";
+#endif
 		}
 	}
 }
@@ -200,14 +192,14 @@ void elem::GetRegion() {
 void elem::GetStyle() {
 
 	// get style from parent
-	if (parent && parent->css.length() > 0) {
-		css.append(parent->css);
+	if (parent && parent->CSS.count() > 0) {
+		CSS = mergeCss(CSS, parent->CSS);
 	}
 
 	// look for style attribute
 	QString styleVal = XMLString::transcode(el->getAttribute(XMLString::transcode("style")));
 	if (!styleVal.isEmpty()) {
-		css.append(parser->styles[styleVal]);
+		CSS = mergeCss(CSS, parser->styles[styleVal]);
 		el->removeAttribute(XMLString::transcode("style"));
 	}
 
@@ -218,13 +210,12 @@ void elem::GetStyle() {
 			DOMAttr *attr = dynamic_cast<DOMAttr*>(el->getAttributes()->item(z));
 
 			QString name = XMLString::transcode(attr->getNodeName());
-			if (!parser->cssAttr[name].isEmpty()) { // known parameter!
+			if (parser->cssAttr.contains(name)) { // known parameter!
 
 				//if (css.count(parser->cssAttr[name]) > 0) { // css param already exists through style
 				//	css.remove(QRegExp(QString("%1:[a-zA-Z0-9#]*;").arg(parser->cssAttr[name]))); // remove it
 				//}
-
-				css.append(QString("%1:%2;").arg(parser->cssAttr[name]).arg(XMLString::transcode(attr->getNodeValue())));
+				CSS[parser->cssAttr[name]] = XMLString::transcode(attr->getNodeValue());
 				//el->removeAttribute(attr->getNodeName()); // remove current attr
 			}
 		}
@@ -246,8 +237,8 @@ bool elem::processTimedElement() {
 
 	// create new timed element
 	TTMLelem ttml_timed;
-	ttml_timed.beg = timing_begin + parser->seq_timing_total_offset;
-	ttml_timed.end = timing_end + parser->seq_timing_total_offset;
+	ttml_timed.beg = (timing_begin + parser->seq_timing_total_offset);
+	ttml_timed.end = (timing_end + parser->seq_timing_total_offset);
 
 	// add offset from parent (if available)
 	if (parent) { 
@@ -265,7 +256,8 @@ bool elem::processTimedElement() {
 
 	QString image = XMLString::transcode(el->getAttribute(XMLString::transcode("smpte:backgroundImage")));
 	if (!image.isEmpty()) {
-		ttml_timed.type = 1; // image
+
+		ttml_timed.type = 1; // set type : image
 
 		if (parser->is_wrapped) {
 
@@ -275,12 +267,9 @@ bool elem::processTimedElement() {
 				ttml_timed.bgImage = parser->anc_resources[id];
 			}
 			else { // no anc asset found -> use default
-				ttml_timed.bgImage = parser->error_image; // ERROR
+				ttml_timed.bgImage = QImage(":/ttml_bg_not_found.png"); // ERROR
 				ttml_timed.error = true; // set error flag
 			}
-
-			char buf[64];
-			//qDebug() << "reading image" << image << id.EncodeString(buf, 64);
 		}
 		else {
 			// look for asset in base directory
@@ -289,25 +278,23 @@ bool elem::processTimedElement() {
 
 			ttml_timed.bgImage = QImage(image);
 			if (ttml_timed.bgImage.isNull()) {
-				ttml_timed.bgImage = parser->error_image;
+				ttml_timed.bgImage = QImage(":/ttml_bg_not_found.png");
 			}
-			qDebug() << "anc image" << ttml_timed.bgImage.byteCount();
 			QDir::setCurrent(dirCopyPath); // reset dir change
 		}
-
-		//ttml_div.append(ttml_timed); // add to QVector of timed elements
 	}
-	else { // TEXT
-		ttml_timed.text = serializeTT(processTimedElementStyle(el, true));
+	else {
 		ttml_timed.type = 0; // set type : text
 	}
 
-	// is content valid?
-	if (ttml_timed.text.length() > 0 || !ttml_timed.bgImage.isNull()) {
-		parser->this_segment->items.append(ttml_timed);
-	}
+	ttml_timed.text = serializeTT(processTimedElementStyle(el, true));
 
-	
+	// set processed style map in timed struct
+	ttml_timed.CSS = CSS;
+
+	// add timed item to list
+	parser->this_segment->items.append(ttml_timed); 
+
 	// add visible element duration to parent block duration if parent timing is seq
 	if (parent && parent->timeContainer == 2) {
 		parent->dur_used += dur;
@@ -318,29 +305,24 @@ bool elem::processTimedElement() {
 
 DOMElement* elem::processTimedElementStyle(DOMElement *rEl, bool HasTiming) {
 
-	QString css;
-
 	// timed element: get styles from parent
 	if (HasTiming) {
 
 		// get style from region
 		if (regionName.length() > 0) {
-			css.append(parser->regions[regionName].styleCss);
-			qDebug() << "region" << parser->regions[regionName].styleCss;
+			CSS = mergeCss(CSS,parser->regions[regionName].CSS);
 		}
 
 		// get style from parent
-		if (parent && parent->css.length() > 0) {
-			css.append(parent->css);
-			qDebug() << "parent" << parent->css;
+		if (parent && parent->CSS.count() > 0) {
+			CSS = mergeCss(CSS, parent->CSS);
 		}
 	}
-
 
 	// look for style attribute
 	QString style = XMLString::transcode(rEl->getAttribute(XMLString::transcode("style")));
 	if (!style.isEmpty()) {
-		css.append(parser->styles[style]);
+		CSS = mergeCss(parser->styles[style], CSS);
 		rEl->removeAttribute(XMLString::transcode("style"));
 	}
 
@@ -351,23 +333,14 @@ DOMElement* elem::processTimedElementStyle(DOMElement *rEl, bool HasTiming) {
 			DOMAttr *attr = dynamic_cast<DOMAttr*>(rEl->getAttributes()->item(z));
 
 			QString name = XMLString::transcode(attr->getNodeName());
-			if (!parser->cssAttr[name].isEmpty()) { // known parameter!
-
-				//if (css.count(parser->cssAttr[name]) > 0) { // css param already exists through style
-					//css.remove(QRegExp(QString("%1:[a-zA-Z0-9#]*;").arg(parser->cssAttr[name]))); // remove it
-				//}
-
-				css.append(QString("%1:%2;").arg(parser->cssAttr[name]).arg(XMLString::transcode(attr->getNodeValue())));
-				//el->removeAttribute(attr->getNodeName()); // remove current attr
-			}
-			else {
-				//qDebug() << "unknown attr" << name << XMLString::transcode(attr->getNodeValue());
+			if (parser->cssAttr.contains(name)) { // known parameter!
+				CSS[parser->cssAttr[name]] = XMLString::transcode(attr->getNodeValue());
 			}
 		}
 	}
 
-	if (css.length() > 0) {
-		rEl->setAttribute(XMLString::transcode("style"), XMLString::transcode(css.toStdString().c_str()));
+	if (CSS.count() > 0) { // set serialized CSS in timed element
+		rEl->setAttribute(XMLString::transcode("style"), XMLString::transcode(serializeCss(CSS).toStdString().c_str()));
 	}
 
 	// loop children (if available...)
@@ -446,12 +419,8 @@ bool elem::GetStartEndTimes() {
 
 QString elem::serializeTT(DOMElement *rEl) {
 
-	//Return the first registered implementation that has the desired features. In this case, we are after a DOM implementation that has the LS feature... or Load/Save. 
 	DOMImplementation *implementation = DOMImplementationRegistry::getDOMImplementation(X("LS"));
-
-	// Create a DOMLSSerializer which is used to serialize a DOM tree into an XML document. 
 	DOMLSSerializer *serializer = ((DOMImplementationLS*)implementation)->createLSSerializer();
-
 	return QString(XMLString::transcode(serializer->writeToString(rEl)));
 }
 
@@ -460,27 +429,7 @@ QString elem::serializeTT(DOMElement *rEl) {
 
 TTMLParser::TTMLParser() {
 	
-	// initialize values
-	cssAttr["tts:backgroundColor"] = "background-color";
-	cssAttr["tts:fontSize"] = "font-size";
-	cssAttr["tts:fontFamily"] = "font-family";
-	cssAttr["tts:fontStyle"] = "font-style";
-	cssAttr["tts:textDecoration"] = "text-decoration";
-	cssAttr["tts:textAlign"] = "text-align";
-	cssAttr["tts:fontWeight"] = "font-weight";
-	cssAttr["tts:color"] = "color";
-	cssAttr["tts:opacity"] = "opacity";
-	cssAttr["tts:direction"] = "direction";
-	cssAttr["tts:unicode-bidi"] = "unicode-bidi";
-	cssAttr["tts:padding"] = "padding";
-
-	error_image = QImage(":/ttml_bg_not_found.png");
 	nullregion.valid = false;
-
-	region_colors.append(QColor(120, 0, 244, 100)); // color 0
-	region_colors.append(QColor(0, 244, 120, 100)); // color 1
-	region_colors.append(QColor(255, 200, 0, 100)); // color 2
-	region_colors.append(QColor(100, 244, 0, 100)); // color 3
 }
 
 Error TTMLParser::open(const QString &rSourceFile, TTMLtimelineSegment &ttml_segment, bool rIsWrapped) {
@@ -504,7 +453,6 @@ Error TTMLParser::open(const QString &rSourceFile, TTMLtimelineSegment &ttml_seg
 
 			result = reader.ReadTimedTextResource(XMLDoc); // read TTML XML
 			if (ASDCP_SUCCESS(result)) {
-				Save2File(XMLDoc);
 				readAncilleryData();
 				parse(XMLDoc);
 			}
@@ -541,18 +489,24 @@ void TTMLParser::readAncilleryData() {
 			result = reader.ReadAncillaryResource((*ri).ResourceID, buffer);
 
 			if (ASDCP_SUCCESS(result)) {
+#ifdef DEBUG_TTML
 				qDebug() << "successfully read anc data";
+#endif
 				QPixmap pix;
 				pix.loadFromData(buffer.RoData(), buffer.Size(), "png");
 				anc_resources[id] = pix.toImage();
 			}
 			else {
+#ifdef DEBUG_TTML
 				qDebug() << "error reading anc";
+#endif
 			}
 		}
 	}
 	else {
+#ifdef DEBUG_TTML
 		qDebug() << "no resource list found";
+#endif
 	}
 }
 
@@ -569,7 +523,7 @@ void TTMLParser::parse(std::string xml) {
 	}
 	
 	if (is_wrapped) {
-		xercesc::MemBufInputSource memBuffInput((const XMLByte*)xml.c_str(), xml.size(), "dummy", false);
+		xercesc::MemBufInputSource memBuffInput((const XMLByte*)xml.c_str(), xml.size(), "dummy");
 		parser->parse(memBuffInput);
 	}
 	else {
@@ -577,7 +531,9 @@ void TTMLParser::parse(std::string xml) {
 			parser->parse(SourceFilePath.toLocal8Bit());
 		}
 		catch (...) {
+#ifdef DEBUG_TTML
 			qDebug() << "ERROR parsing" << SourceFilePath;
+#endif
 		}
 	}
 	
@@ -586,14 +542,18 @@ void TTMLParser::parse(std::string xml) {
 	// get metadata
 	getMetadata(dom_doc);
 
-	// set framerate in TTMLtimelineSegment
+	// set framerate & doc in TTMLtimelineSegment
 	this_segment->frameRate = framerate;
+	this_segment->doc = QString(xml.c_str());
 
 	// loop styles
 	DOMNodeList	*styleList = dom_doc->getElementsByTagName(XMLString::transcode("style"));
 	for (int i = 0; i < styleList->getLength(); i++) {
-		QVector<QString> style = attrs2Css(styleList->item(i));
-		styles[style[0]] = style[1]; // e.g. ["white_8"] = "CSS"
+		QPair<QString, QMap<QString, QString>> style = parseStyle(styleList->item(i));
+		styles[style.first] = style.second; // e.g. ["white_8"] = "CSS"
+#ifdef DEBUG_TTML
+		qDebug() << "created style" << style.first;
+#endif
 	}
 	
 	// loop regions
@@ -601,7 +561,39 @@ void TTMLParser::parse(std::string xml) {
 	for (int i = 0; i < regionList->getLength(); i++) {
 		TTMLRegion region = parseRegion(regionList->item(i));
 		regions[ region.id ] = region; // e.g. ["region1"] = TTMLRegion
+#ifdef DEBUG_TTML
 		qDebug() << "created region" << region.id;
+#endif
+	}
+
+	// check if body has styling information
+	DOMNode *body_node = dom_doc->getElementsByTagName(XMLString::transcode("body"))->item(0);
+	DOMElement *body_el = dynamic_cast<DOMElement*>(body_node);
+
+	QString body_region;
+	QMap<QString, QString> body_style;
+
+	if (body_node->hasAttributes()) {
+		for (int z = 0; z < body_node->getAttributes()->getLength(); z++) {
+
+			DOMAttr *attr = dynamic_cast<DOMAttr*>(body_node->getAttributes()->item(z));
+			QString name = XMLString::transcode(attr->getNodeName());
+			if (cssAttr.contains(name)) { // known parameter!
+				body_style[cssAttr[name]] = XMLString::transcode(attr->getNodeValue());
+			}
+		}
+
+		// get style
+		QString styleVal = XMLString::transcode(body_el->getAttribute(XMLString::transcode("style")));
+		if (!styleVal.isEmpty()) { // found style
+			body_style = mergeCss(body_style, styles[styleVal]);
+		}
+
+		// get region
+		QString regVal = XMLString::transcode(body_el->getAttribute(XMLString::transcode("region")));
+		if (regVal.length() > 0) { // found region!
+			body_region = regVal;
+		}
 	}
 
 	// loop all children of <body>
@@ -609,6 +601,9 @@ void TTMLParser::parse(std::string xml) {
 	for (int i = 0; i < body->getLength(); i++) {
 		
 		elem *newEl = new elem(body->item(i), this, NULL); // pass current parser & parent element
+		newEl->regionName = body_region;
+		newEl->CSS = body_style;
+
 		if (newEl->process() == false) { // continue processing children
 			elems.append(newEl);
 			RloopElements(newEl);
@@ -618,7 +613,10 @@ void TTMLParser::parse(std::string xml) {
 		}
 	}
 
+#ifdef DEBUG_TTML
 	print2Console(this_segment->items);
+#endif
+
 	parser->~XercesDOMParser(); // delete DOM parser
 }
 
@@ -638,7 +636,7 @@ TTMLRegion TTMLParser::parseRegion(DOMNode *node) {
 	// get style
 	QString styleVal = XMLString::transcode(el->getAttribute(XMLString::transcode("style")));
 	if (!styleVal.isEmpty()) { // found style
-		region.styleCss.append(styles[styleVal]);
+		region.CSS = mergeCss(region.CSS,styles[styleVal]);
 		el->removeAttribute(XMLString::transcode("style"));
 	}
 
@@ -697,47 +695,36 @@ TTMLRegion TTMLParser::parseRegion(DOMNode *node) {
 			DOMAttr *attr = dynamic_cast<DOMAttr*>(el->getAttributes()->item(z));
 
 			QString name = XMLString::transcode(attr->getNodeName());
-			if (!cssAttr[name].isEmpty()) { // known parameter!
-
-				//if (region.styleCss.count(cssAttr[name]) > 0) { // css param already exists through style
-					//region.styleCss.remove(QRegExp(QString("%1:[a-zA-Z0-9#]*;").arg(cssAttr[name]))); // remove it
-				//}
-
-				region.styleCss.append(QString("%1:%2;").arg(cssAttr[name]).arg(XMLString::transcode(attr->getNodeValue())));
-				//el->removeAttribute(attr->getNodeName()); // remove current attr
-			}
-			else {
-				qDebug() << "unknown attr" << name << XMLString::transcode(attr->getNodeValue());
-			}
+			if (cssAttr.contains(name)) { // known parameter!
+				region.CSS[cssAttr[name]] = XMLString::transcode(attr->getNodeValue());
+			} // else : not supported parameter
 		}
 	}
 
-	qDebug() << "region id" << region.id;
 	// check if region has a backround-color
-	if (region.styleCss.count("background-color") > 0) {
-		// use it
-		QRegExp rx("background-color:([a-zA-Z0-9#]*);");
-		int pos = rx.indexIn(region.styleCss);
-		QStringList list = rx.capturedTexts();
-		QString col = list[0].replace("background-color:", "");
-		col.replace(";", "");
-		region.bgColor.setNamedColor(col); // orange, #ff8000, #ff6 ...
-		region.bgColor.setAlpha(200);
-		qDebug() << "region color" << col << region.styleCss;
+	if (region.CSS.contains("background-color")) { // use it
+		region.bgColor.setNamedColor(region.CSS["background-color"]); // orange, #ff8000, #ff6 ...
 	}
-	else {
-		// assign one
+	else { // default region color
 		region.bgColor = QColor(120, 0, 244, 100); // default color
+	}
+
+	// check if region has opacity
+	if (region.CSS.contains("opacity")) {
+		region.bgColor.setAlpha((int)(region.CSS["opacity"].toFloat() * 255)); // use it
+	}
+	else { // default opacity (50%)
+		region.bgColor.setAlpha(127);
 	}
 
 	return region;
 }
 
 
-QVector<QString> TTMLParser::attrs2Css(DOMNode *el) {
+QPair<QString, QMap<QString, QString>> TTMLParser::parseStyle(DOMNode *el) {
 
-	QString css;
-	QVector<QString> ret(2);
+	QPair<QString, QMap<QString, QString>> result;
+	
 	// get attributes
 	if (el->hasAttributes()) { // loop them
 		for (int z = 0; z < el->getAttributes()->getLength(); z++) {
@@ -746,15 +733,14 @@ QVector<QString> TTMLParser::attrs2Css(DOMNode *el) {
 
 			QString name = XMLString::transcode(attr->getNodeName());
 			if (name == "xml:id") {
-				ret[0] = XMLString::transcode(attr->getNodeValue());
-			}else if (!cssAttr[name].isEmpty()) { // known parameter!
-				css.append(QString("%1:%2;").arg(cssAttr[name]).arg(XMLString::transcode(attr->getNodeValue())));
+				result.first = XMLString::transcode(attr->getNodeValue()); // ID
+			}else if (cssAttr.contains(name)) { // known parameter!
+				result.second[cssAttr[name]] = XMLString::transcode(attr->getNodeValue());
 			}
 		}
 	}
 
-	ret[1] = css;
-	return ret;
+	return result;
 }
 
 void TTMLParser::RloopElements(elem *el) {
@@ -786,21 +772,29 @@ void TTMLParser::RloopElements(elem *el) {
 // Code by Denis Manthey
 void TTMLParser::getMetadata(DOMDocument *rDom) {
 
+	DOMNodeList *ttitem = rDom->getElementsByTagName(XMLString::transcode("tt"));
+	//Check if <tt> is present
+	if (ttitem->getLength() == 0) {
+#ifdef DEBUG_TTML
+		qDebug() << "ERROR - no tt element found!";
+#endif
+		return;
+	}
+	//write <tt> from DOMNodelist to DOMElement
+	DOMElement* tteleDom = dynamic_cast<DOMElement*>(ttitem->item(0));
+
 	//Frame Rate Multiplier Extractor
-	DOMNodeList *multitem = rDom->getElementsByTagName(XMLString::transcode("tt"));
-	DOMElement* multeleDom = dynamic_cast<DOMElement*>(multitem->item(0));
-	QString mult = XMLString::transcode(multeleDom->getAttribute(XMLString::transcode("ttp:frameRateMultiplier")));
-	float num = 1000;
-	float den = 1000;
+	QString mult = XMLString::transcode(tteleDom->getAttribute(XMLString::transcode("ttp:frameRateMultiplier")));
+	float num = 1;
+	float den = 1;
 	if (!mult.isEmpty()) {
-		num = mult.left(4).toInt();
-		den = mult.right(4).toInt();
+		num = mult.section(" ", 0, 0).toInt();
+		den = mult.section(" ", 1, 1).toInt();
 	}
 
 	//Frame Rate Extractor
-	DOMNodeList *fritem = rDom->getElementsByTagName(XMLString::transcode("tt"));
-	DOMElement* freleDom = dynamic_cast<DOMElement*>(fritem->item(0));
-	QString fr = XMLString::transcode(freleDom->getAttribute(XMLString::transcode("ttp:frameRate")));
+	int subFrameRate = 1;
+	QString fr = XMLString::transcode(tteleDom->getAttribute(XMLString::transcode("ttp:frameRate")));
 	int editrate = 30;					//editrate is for the metadata object (expects editrate*numerator, denominator)
 	framerate = 30 * (num / den);		//framerate is for calculating the duration, we need the fractal editrate!
 	if (!fr.isEmpty()) {
@@ -809,20 +803,25 @@ void TTMLParser::getMetadata(DOMDocument *rDom) {
 	}
 
 	//Tick Rate Extractor
-	DOMNodeList *tritem = rDom->getElementsByTagName(XMLString::transcode("tt"));
-	DOMElement* treleDom = dynamic_cast<DOMElement*>(tritem->item(0));
-	QString tr = XMLString::transcode(treleDom->getAttribute(XMLString::transcode("ttp:tickRate")));
-	tickrate = tr.toInt();
+	tickrate = 1; //TTML1 section 6.2.10
+	QString tr = XMLString::transcode(tteleDom->getAttribute(XMLString::transcode("ttp:tickRate")));
+	if (!tr.isEmpty())
+		tickrate = tr.toInt();
+	else if (!fr.isEmpty())  //TTML1 section 6.2.10
+		tickrate = ceil(framerate * subFrameRate);
+
 
 	//Duration Extractor
 	float duration;
 	duration = DurationExtractor(rDom, framerate, tickrate);
 	if (duration == 0) {
+#ifdef DEBUG_TTML
 		qDebug() << "Unknown duration!";
+#endif
 	}
 
 	// get extent (e.g. tts:extent='854px 480px')
-	QString extentVal = XMLString::transcode(multeleDom->getAttribute(XMLString::transcode("tts:extent")));
+	QString extentVal = XMLString::transcode(tteleDom->getAttribute(XMLString::transcode("tts:extent")));
 	if (!extentVal.isEmpty()) {
 		if (extentVal.count("px") > 0) {
 			extentVal.replace("px", ""); // remove 'px'
@@ -833,18 +832,6 @@ void TTMLParser::getMetadata(DOMDocument *rDom) {
 	}
 }
 
-
-void TTMLParser::Save2File(std::string xml) {
-
-	QString filename = "D:/Master/Thesis/test.txt";
-	QFile file(filename);
-	if (file.open(QIODevice::ReadWrite))
-	{
-		QTextStream stream(&file);
-		stream << xml.data() << endl;
-		qDebug() << "XML saved!";
-	}
-}
 
 void TTMLParser::print2Console(const QVector<TTMLelem> &ttmls) {
 
@@ -867,8 +854,35 @@ void TTMLParser::print2Console(const QVector<TTMLelem> &ttmls) {
 }
 
 // ###################################### functions
-// Code by Denis Manthey
 
+QString TTMLFns::serializeCss(QMap<QString, QString> map) {
+
+	QString result;
+
+	// iterate over map
+	QMap<QString, QString>::iterator i;
+	for (i = map.begin(); i != map.end(); ++i) {
+		result.append(QString("%1:%2;").arg(i.key()).arg(i.value()));
+	}
+
+	return result;
+}
+
+QMap<QString, QString> TTMLFns::mergeCss(QMap<QString, QString> qm1, QMap<QString, QString> qm2) {
+	// elements from qm1 are preferred over qm2!!!
+
+	// iterate over qm2
+	QMap<QString, QString>::iterator i;
+	for (i = qm2.begin(); i != qm2.end(); ++i) {
+		if (!qm1.contains(i.key())) {
+			qm1[i.key()] = i.value();
+		}
+	}
+
+	return qm1;
+}
+
+// Code by Denis Manthey
 float TTMLFns::DurationExtractor(DOMDocument *dom_doc, float fr, int tr) {
 
 	float eleduration = 0, divduration = 0, div2duration = 0, pduration = 0, p2duration = 0, spanduration = 0, duration = 0;
@@ -1068,27 +1082,19 @@ float TTMLFns::ConvertTimingQStringtoDouble(QString string_time, float fr, int t
 	else if (string_time.right(1) == "t")
 		time = string_time.remove(QChar('t'), Qt::CaseInsensitive).toFloat() / tr;
 
-	else if (string_time.left(9).right(1) == ".") {
+	else if (string_time.left(9).right(1) == ".") { // Time expression with fractions of seconds, e.g. 00:00:20.1
 		h = string_time.left(2).toFloat();
 		min = string_time.left(5).right(2).toFloat();
 		sec = string_time.left(8).right(2).toFloat();
 		msec = string_time.remove(0, 7).replace(0, 2, "0.").toFloat();
 		time = (h * 60 * 60) + (min * 60) + sec + msec;
 	}
-
-	else {
-		if (tr > 0) {
-			h = string_time.left(2).toFloat();
-			min = string_time.left(5).right(2).toFloat();
-			sec = string_time.left(8).right(2).toFloat() + (string_time.remove(0, 9).toFloat() / tr);
-			time = (h * 60 * 60) + (min * 60) + sec;
-		}
-		else {
-			h = string_time.left(2).toFloat();
-			min = string_time.left(5).right(2).toFloat();
-			sec = string_time.left(8).right(2).toFloat() + (string_time.remove(0, 9).toFloat() / fr);
-			time = (h * 60 * 60) + (min * 60) + sec;
-		}
+	else {  // Time expression with frames e.g. 00:00:00:15
+		h = string_time.left(2).toFloat();
+		min = string_time.left(5).right(2).toFloat();
+		sec = string_time.left(8).right(2).toFloat() + (string_time.remove(0, 9).toFloat() / fr);
+		time = (h * 60 * 60) + (min * 60) + sec;
 	}
 	return time;
 }
+

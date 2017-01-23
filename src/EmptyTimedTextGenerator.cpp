@@ -49,60 +49,60 @@ int EmptyTimedTextGenerator::GenerateEmptyXml()
 
     int error = 0;
     {
-        DOMImplementation* impl =  DOMImplementationRegistry::getDOMImplementation(X("Core"));
+        DOMImplementation* impl =  DOMImplementationRegistry::getDOMImplementation(Xuni("Core"));
 
         if (impl != NULL)
         {
             try
             {
                 DOMDocument* doc = impl->createDocument(
-                		X("http://www.w3.org/ns/ttml"),					// root element namespace URI.
-                               X("tt"),									// root element name
+                		Xuni("http://www.w3.org/ns/ttml"),					// root element namespace URI.
+                               Xuni("tt"),									// root element name
                                0);										// document type object (DTD).
 
                 DOMElement* rootElem = doc->getDocumentElement();
 
-                rootElem->setAttribute(X("xmlns:ittp"), X("http://www.w3.org/ns/ttml/profile/imsc1#parameter"));
-                rootElem->setAttribute(X("xmlns:ittm"), X("http://www.w3.org/ns/ttml/profile/imsc1#metadata"));
-                rootElem->setAttribute(X("xmlns:ttm"), X("http://www.w3.org/ns/ttml#metadata"));
-                rootElem->setAttribute(X("xmlns:ttp"), X("http://www.w3.org/ns/ttml#parameter"));
+                rootElem->setAttribute(Xuni("xmlns:ittp"), Xuni("http://www.w3.org/ns/ttml/profile/imsc1#parameter"));
+                rootElem->setAttribute(Xuni("xmlns:ittm"), Xuni("http://www.w3.org/ns/ttml/profile/imsc1#metadata"));
+                rootElem->setAttribute(Xuni("xmlns:ttm"), Xuni("http://www.w3.org/ns/ttml#metadata"));
+                rootElem->setAttribute(Xuni("xmlns:ttp"), Xuni("http://www.w3.org/ns/ttml#parameter"));
 
-                rootElem->setAttribute(X("xml:lang"), X("en"));
-                rootElem->setAttribute(X("ttp:profile"), X("http://www.w3.org/ns/ttml/profile/imsc1/text"));
+                rootElem->setAttribute(Xuni("xml:lang"), Xuni("en"));
+                rootElem->setAttribute(Xuni("ttp:profile"), Xuni("http://www.w3.org/ns/ttml/profile/imsc1/text"));
                 //WR
                 bool isFractional = (mEditRate.GetQuotient() != round(mEditRate.GetQuotient()));
-                rootElem->setAttribute(X("ttp:frameRate"), X(mEditRate.GetRoundedName().toLatin1().data()));
+                rootElem->setAttribute(Xuni("ttp:frameRate"), Xuni(mEditRate.GetRoundedName().toLatin1().data()));
                 if (isFractional) {
-                	rootElem->setAttribute(X("ttp:frameRateMultiplier"), X("1000 1001"));
+                	rootElem->setAttribute(Xuni("ttp:frameRateMultiplier"), Xuni("1000 1001"));
                 }
                 //WR
 
                 // <head>
-                DOMElement* headElem = doc->createElement(X("head"));
+                DOMElement* headElem = doc->createElement(Xuni("head"));
                 rootElem->appendChild(headElem);
 
-                DOMElement* metaElem = doc->createElement(X("metadata"));
+                DOMElement* metaElem = doc->createElement(Xuni("metadata"));
                 headElem->appendChild(metaElem);
 
-                DOMElement* titleElem = doc->createElement(X("ttm:title"));
+                DOMElement* titleElem = doc->createElement(Xuni("ttm:title"));
                 metaElem->appendChild(titleElem);
-                DOMText* titleDataVal = doc->createTextNode(X("Empty imsc1 document"));
+                DOMText* titleDataVal = doc->createTextNode(Xuni("Empty imsc1 document"));
                 titleElem->appendChild(titleDataVal);
 
-                DOMElement* descElem = doc->createElement(X("ttm:desc"));
+                DOMElement* descElem = doc->createElement(Xuni("ttm:desc"));
                 metaElem->appendChild(descElem);
-                DOMText* descDataVal = doc->createTextNode(X("this document can be used to fill gaps in the IMF CPL"));
+                DOMText* descDataVal = doc->createTextNode(Xuni("this document can be used to fill gaps in the IMF CPL"));
                 descElem->appendChild(descDataVal);
 
                 // <body>
-                DOMElement* bodyElem = doc->createElement(X("body"));
+                DOMElement* bodyElem = doc->createElement(Xuni("body"));
                 rootElem->appendChild(bodyElem);
 
-                DOMElement* divElem = doc->createElement(X("div"));
+                DOMElement* divElem = doc->createElement(Xuni("div"));
                 bodyElem->appendChild(divElem);
 
-                divElem->setAttribute(X("begin"), X("0f"));
-                divElem->setAttribute(X("end"), X(mpDur->toStdString().c_str()));
+                divElem->setAttribute(Xuni("begin"), Xuni("0f"));
+                divElem->setAttribute(Xuni("end"), Xuni(mpDur->toStdString().c_str()));
 
                 OutputXML(doc);
 
@@ -142,7 +142,7 @@ void EmptyTimedTextGenerator::OutputXML(DOMDocument* pmyDOMDocument)
 {
 	QTemporaryFile file;
 
-	DOMImplementation *implementation = DOMImplementationRegistry::getDOMImplementation(X("LS"));
+	DOMImplementation *implementation = DOMImplementationRegistry::getDOMImplementation(Xuni("LS"));
     DOMLSSerializer *serializer = ((DOMImplementationLS*)implementation)->createLSSerializer();
 
     if (serializer->getDomConfig()->canSetParameter(XMLUni::fgDOMWRTFormatPrettyPrint, true))

@@ -51,7 +51,7 @@ public :
 private :
     XMLCh*   fUnicodeForm;
 };
-#define X(str) XStr(str).unicodeForm()
+#define Xuni(str) XStr(str).unicodeForm()
 
 
 class EmptyTimedTextGenerator : public QObject {

@@ -7,29 +7,27 @@
 
 void TimelineParser::run() {
 
-	float sequence_offset = 0;
-	float segment_offset = 0;
-
-	int parsing_ttml = 0; // time in ms
-	int last_sequence = 0;
+	int current_track_index = 0;
+	int last_segment = 0;
+	int last_track = 0;
+	int track_index = 0;
 
 	// loop all elements currently in timeline
 	for (int i = 0; i < composition->GetSegmentCount(); i++) {
 		GraphicsWidgetSegment *p_segment = composition->GetSegment(i);
 
 		if (p_segment) {
-			cpl2016::SegmentType_SequenceListType sequence_list;
-			cpl2016::SegmentType_SequenceListType::AnySequence &r_any_sequence(sequence_list.getAny());
-			//xercesc::DOMDocument &doc = sequence_list.getDomDocument();
 			for (int ii = 0; ii < p_segment->GetSequenceCount(); ii++) {
 				GraphicsWidgetSequence *p_sequence = p_segment->GetSequence(ii);
 
 				if (p_sequence && !p_sequence->IsEmpty() && p_sequence != nullptr) {
 
-					//cpl2016::SequenceType_ResourceListType resource_list;
-					//cpl2016::SequenceType_ResourceListType::ResourceSequence &resource_sequence = resource_list.getResource();
 					for (int iii = 0; iii < p_sequence->GetResourceCount(); iii++) {
 						AbstractGraphicsWidgetResource *p_resource = p_sequence->GetResource(iii);
+
+						//qDebug() << i << ii << iii;
+						//qDebug() << p_resource->type();
+
 						if (p_resource->type() == GraphicsWidgetVideoResourceType) {
 
 							// VideoResource found
@@ -50,52 +48,70 @@ void TimelineParser::run() {
 						}
 						else if (p_resource->type() == GraphicsWidgetTimedTextResourceType) {
 							// TTML resource found
-
 							GraphicsWidgetTimedTextResource *timelineWidget = dynamic_cast<GraphicsWidgetTimedTextResource*>(p_resource);
 
-							TTMLtimelineSegment ttmlTimelineSegment; // new segment
 							TTMLParser *parser = new TTMLParser();
 
-							// new sequence?
-							if (ii != last_sequence) sequence_offset = 0;
-							Timecode test = timelineWidget->GetLastVisibleFrame();
-							ttmlTimelineSegment.in = (float)timelineWidget->GetFirstVisibleFrame().GetSecondsF();
-							ttmlTimelineSegment.out = (float)timelineWidget->GetLastVisibleFrame().GetSecondsF();
-							ttmlTimelineSegment.timeline_in = sequence_offset;
-							ttmlTimelineSegment.timeline_out = (ttmlTimelineSegment.out - ttmlTimelineSegment.in) + sequence_offset;
+							// check for new track
+							if (ii != last_track && i == 0) {
+								track_index++;
+							}
 
-							// is asset alread wrapped in mxf?
-							if (p_resource->GetAsset() && p_resource->GetAsset()->HasSourceFiles()) { // no
-								// loop source files
-								for (int z = 0; z < p_resource->GetAsset()->GetSourceFiles().length(); z++) {
-									if (p_resource->InOutChanged) {
-										parser->open(p_resource->GetAsset()->GetSourceFiles().at(z), ttmlTimelineSegment, false);
-										//p_resource->InOutChanged = false; // don't parse again until next change
+							// create new segment
+							TTMLtimelineSegment segment; // new segment
+							segment.track_index = ii;
+							segment.in = (float)timelineWidget->GetFirstVisibleFrame().GetSecondsF();
+							segment.out = (float)timelineWidget->GetLastVisibleFrame().GetSecondsF();
+
+							// check for other segments in track
+							bool found = false; // default
+							if (ttmls->count() > 0) {
+
+								// check for other segments with same track id
+								for (int z = ttmls->length(); z > 0; z--) {
+									if (ttmls->at((z - 1)).track_index == ii) { // success!
+										segment.timeline_in = ttmls->at((z - 1)).timeline_out;
+										segment.timeline_out = (segment.out - segment.in) + segment.timeline_in;
+										found = true;
+										break; // exit loop
 									}
 								}
 							}
-							else if(p_resource->GetAsset() && p_resource->InOutChanged){ // yes
-								parser->open(p_resource->GetAsset()->GetPath().absoluteFilePath(), ttmlTimelineSegment, true);
-								//p_resource->InOutChanged = false; // don't parse again until next change
+
+							if (found == false) {
+								segment.timeline_in = 0;
+								segment.timeline_out = segment.out;
+							}
+							
+							// is asset alread wrapped in mxf?
+							if (p_resource->GetAsset() && p_resource->GetAsset()->HasSourceFiles()) { // no
+								segment.annotation = timelineWidget->GetAsset()->GetAnnotationText().first;
+								// loop source files
+								for (int z = 0; z < p_resource->GetAsset()->GetSourceFiles().length(); z++) {
+									if (p_resource->InOutChanged) {
+										parser->open(p_resource->GetAsset()->GetSourceFiles().at(z), segment, false);
+									}
+								}
+							}
+							else if (p_resource->GetAsset() && p_resource->InOutChanged) { // yes
+								segment.annotation = timelineWidget->GetAsset()->GetAnnotationText().first;
+								parser->open(p_resource->GetAsset()->GetPath().absoluteFilePath(), segment, true);
 							}
 							else { // ?
 								// asset deleted?
 							}
-							
+
 							parser->~TTMLParser();
+		
+							ttmls->append(segment);
 
-							//ttmls.append(ttml_resource);
-							sequence_offset += (ttmlTimelineSegment.out - ttmlTimelineSegment.in);
-
-							ttmls->append(ttmlTimelineSegment); // append segment to timeline
-							last_sequence = ii;
+							last_track = ii;
+							last_segment = i;
 						}
 					}
 				}
 			}
 		}
-		// update segment offset
-		//segment_offset += p_segment->GetDuration().GetCount();
 	}
 
 	emit PlaylistFinished();

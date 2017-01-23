@@ -19,6 +19,7 @@
 #include "WidgetVideoPreview.h" // (k)
 #include "TTMLDetails.h" // (k)
 #include "TimelineParser.h" // (k)
+#include "SMPTE_Labels.h" // (k)
 //#endif
 #include "WidgetCompositionInfo.h"
 #include "ImfPackage.h"
@@ -43,6 +44,9 @@ WidgetCentral::~WidgetCentral() {
 }
 
 void WidgetCentral::InitLyout() {
+
+	// temp!
+	//exportLabels *test = new exportLabels("D:/Master/Thesis/test.txt");
 
 	mpMsgBox = new QMessageBox(this);
 	mpMsgBox->setIcon(QMessageBox::Warning);
@@ -96,7 +100,8 @@ void WidgetCentral::InitLyout() {
 
 	p_details_widget_frame_layout->addWidget(mpTabDetailTTML);
 	connect(mpTabDetailTTML, SIGNAL(currentChanged(int)), this, SLOT(rToggleTTML(int)));
-	connect(mpPreview, SIGNAL(ttmlChanged(const QVector<QString>&,QString,int)), mpTTMLDetailsWidget, SLOT(rShowTTML(const QVector<QString>&,QString,int)));
+	connect(mpPreview, SIGNAL(ttmlChanged(const QVector<visibleTTtrack>&,int)), mpTTMLDetailsWidget, SLOT(rShowTTML(const QVector<visibleTTtrack>&,int)));
+	connect(mpTTMLDetailsWidget, SIGNAL(PrevNextSubClicked(bool)), mpPreview, SLOT(rPrevNextSubClicked(bool)));
 	// (k) - end
 
 	QSplitter *p_inner_splitter = new QSplitter(this);
@@ -140,16 +145,17 @@ void WidgetCentral::InitLyout() {
 void WidgetCentral::rUpdatePlaylist() {
 
 	emit UpdateStatusBar("updating playlist...");
-
 	WidgetComposition *p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->currentWidget());
 	if (p_composition) {
-		//p_composition->setVerticalIndicator(0); // reset frame indicator to first frame
 
 		if (tpThread->isRunning()) {
 			playListUpdateSuccess = false;
 			emit UpdateStatusBar("The thread is currently in use :(");
 		}
 		else {
+			mpPreview->Clear(); // (k) - clear preview
+			mpTTMLDetailsWidget->ClearTTML(); // (k) - clear ttml
+
 			playListUpdateSuccess = true;
 			ttmls = QVector<TTMLtimelineSegment>(); // clear ttml list
 			playlist = QVector<PlayListElement>(); // clear video playlist
@@ -157,7 +163,6 @@ void WidgetCentral::rUpdatePlaylist() {
 			timelineParser->composition = p_composition->GetComposition();
 			timelineParser->ttmls = &ttmls;
 			timelineParser->playlist = &playlist;
-
 			timelineParserTime->restart();
 			tpThread->start();
 		}
@@ -253,7 +258,8 @@ void WidgetCentral::rTabCloseRequested(int index) {
 		}
 		mpTabWidget->removeTab(mpTabWidget->indexOf(p_composition));
 		p_composition->deleteLater();
-		mpPreview->Clear(); // (k) - clear preview window
+		mpPreview->Clear(); // (k) - clear preview
+		mpTTMLDetailsWidget->ClearTTML(); // (k) - clear ttml
 	}
 }
 
@@ -315,6 +321,8 @@ void WidgetCentral::UninstallImp() {
 
 	mpDetailsWidget->setDisabled(true);
 	mpDetailsWidget->Clear();
+	mpTTMLDetailsWidget->ClearTTML(); // (k) - clear ttml
+
 	
 	for(int i = 0; i < mpTabWidget->count(); i++) {
 		if(QWidget *p_widget = mpTabWidget->widget(i)) {
@@ -323,6 +331,7 @@ void WidgetCentral::UninstallImp() {
 	}
 
 	mpImfPackage.clear();
+
 	ttmls = QVector<TTMLtimelineSegment>(); // (k) clear ttml list
 	playlist = QVector<PlayListElement>(); // (k) clear video playlist
 	mpPreview->setPlaylist(playlist, ttmls); // forward empty playlist to mpPreview

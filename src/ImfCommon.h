@@ -22,7 +22,8 @@
 #include <QObject>
 #include <QPair>
 #include <QVector>
-#include "openjpeg.h"
+#include "openjpeg.h" // (k)
+
 
 class Duration;
 namespace ASDCP {
@@ -360,7 +361,7 @@ typedef struct {
 	QImage bgImage; // background image
 	QImage bgImageScaled;
 	QColor bgColor; // background color
-	QString styleCss;
+	QMap<QString, QString> CSS; // ["background-color"] = "#ff8000"
 } TTMLRegion;
 
 typedef struct {
@@ -371,6 +372,7 @@ typedef struct {
 	float end; // (sec. rel. to timeline)
 	QString text;
 	TTMLRegion region;
+	QMap<QString, QString> CSS; // ["background-color"] = "#ff8000"
 } TTMLelem;
 
 typedef struct {
@@ -380,14 +382,23 @@ typedef struct {
 	float out;
 	float frameRate;
 	QVector<TTMLelem> items;
+	QString doc; // serialized ttml document
+	QString annotation;
+	int track_index;
 } TTMLtimelineSegment;
-	
+
 typedef struct {
 	int decoded_total = 0;
 	int pending_requests = 0;
 	int decoded_cycle = 0;
 } DecodedFrames;
 
+typedef struct {
+	QString formatted_time; // hh:mm:ss
+	QString fractional_frames; // ff.f
+	QVector<TTMLelem> elements;
+	TTMLtimelineSegment segment;
+} visibleTTtrack;
 // (k) - end
 
 Q_DECLARE_METATYPE(EditRate);

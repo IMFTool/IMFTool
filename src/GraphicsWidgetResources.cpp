@@ -718,7 +718,7 @@ std::auto_ptr<cpl2016::BaseResourceType> GraphicsWidgetFileResource::Write() con
 
 
 GraphicsWidgetVideoResource::GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/, int video_timeline_index) :
-mpJP2K(), // (k)
+mpJP2K(0), // (k)
 GraphicsWidgetFileResource(pParent, pResource, rAsset, QColor(CPL_COLOR_VIDEO_RESOURCE)), mLeftProxyImage(":/proxy_film.png"), mRightProxyImage(":/proxy_film.png"), mTrimActive(false) {
 
 
@@ -740,11 +740,20 @@ GraphicsWidgetFileResource(pParent, pResource, rAsset, QColor(CPL_COLOR_VIDEO_RE
 }
 
 GraphicsWidgetVideoResource::GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, const QSharedPointer<AssetMxfTrack> &rAsset) :
+mpJP2K(0), // (k)
 GraphicsWidgetFileResource(pParent, rAsset, QColor(CPL_COLOR_VIDEO_RESOURCE)), mLeftProxyImage(":/proxy_film.png"), mRightProxyImage(":/proxy_film.png"), mTrimActive(false) {
 
+
+	mpJP2K = new JP2K_Preview(); // (k)
+	mpJP2K->asset = mAssset; // (k)
+	decodeProxyThread = new QThread();
+	connect(decodeProxyThread, SIGNAL(started()), mpJP2K, SLOT(getProxy()));
+	connect(mpJP2K, SIGNAL(finished()), decodeProxyThread, SLOT(quit()));
+	mpJP2K->moveToThread(decodeProxyThread);
+
+	connect(mpJP2K, SIGNAL(proxyFinished(const QImage&, const QImage&)), this, SLOT(rShowProxyImage(const QImage&, const QImage&)));
 	connect(this, SIGNAL(SourceDurationChanged(const Duration&, const Duration&)), this, SLOT(rSourceDurationChanged()));
 	connect(this, SIGNAL(EntryPointChanged(const Duration&, const Duration&)), this, SLOT(rEntryPointChanged()));
-	//RefreshProxy();
 }
 
 void GraphicsWidgetVideoResource::paint(QPainter *pPainter, const QStyleOptionGraphicsItem *pOption, QWidget *pWidget /*= NULL*/) {

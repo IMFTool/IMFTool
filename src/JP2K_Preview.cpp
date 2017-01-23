@@ -29,14 +29,15 @@ JP2K_Preview::~JP2K_Preview()
 	reader->Close();
 	reader->~MXFReader();
 	buff->~FrameBuffer();
-	delete eotf_NonLin;
-	delete oetf_NonLin;
+	delete eotf_2020;
+	delete oetf_2020;
+	delete eotf_PQ;
+	delete oetf_PQ;
 }
 
 void JP2K_Preview::setUp() {
 
 	decode_time.start();
-	dataToQImageTime.start();
 
 	params.cp_reduce = 3; // (default)
 	buff = new ASDCP::JP2K::FrameBuffer();
@@ -52,56 +53,76 @@ void JP2K_Preview::setUp() {
 	}
 
 	// create lookup tables
-	float alpha = 1.099;
-	float beta = 0.018;
-	eotf_NonLin = new float[4096];
-	oetf_NonLin = new float[4096];
+	max_f = 1 << bitdepth;
+	max_f_ = (float)(max_f)-1.0;
+
+	eotf_709 = new float[max_f];
+	oetf_709 = new float[max_f];
+
+	float alpha = 1.09929682680944;
+	float beta = 0.018053968510807;
+	eotf_2020 = new float[max_f];
+	oetf_2020 = new float[max_f];
 
 	float m1 = 0.1593017578125;
 	float m2 = 78.84375;
 	float c1 = 0.8359375;
 	float c2 = 18.8515625;
 	float c3 = 18.6875;
-	eotf_Lin = new float[4096];
-	oetf_Lin = new float[4096];
-	
-	for (int i = 0; i < 4096; i++) {
+	eotf_PQ = new float[max_f];
+	oetf_PQ = new float[max_f];
 
-		float input = (float)i / 4095; // convert input to value between 0...1
+	for (int i = 0; i < max_f; i++) {
 
-		// non linear
-		// OETF -> linearize
-		if (input < (4.5 * beta)) { // linear part!
-			oetf_NonLin[i] = input / 4.5;
+		float input = (float)(i / max_f_); // convert input to value between 0...1
+
+										   // BT.709 - OETF
+		if (input < 0.018) {
+			oetf_709[i] = 4.5 * input;
 		}
-		else { // exp. part!
-			oetf_NonLin[i] = pow(((input + (alpha - 1)) / alpha), 2.222); // 0.45 th root of x: pow(x, 1.0 / 0.45) = pow(x, 2.222~)
+		else {
+			oetf_709[i] = 1.099 * pow(input, 0.45) - 0.099;
+		}
+		//rev_oetf_709[(int)(max_f_ - i)] = 1 - oetf_709[i];
+
+		// BT.709 - EOTF
+		if (input < (4.5 * 0.018)) {
+			eotf_709[i] = input / 4.5;
+		}
+		else {
+			eotf_709[i] = pow(((input + (alpha - 1)) / alpha), 1.0 / 0.45);
 		}
 
-		// EOTF -> delinearize (mirrored reverse of oetf)
-		eotf_NonLin[4095 - i] = 1 - oetf_NonLin[i];
+		// OETF_709(EOTF_709(i)), curve: \
+				qDebug() << i << oetf_709[(int)(eotf_709[i] * max_f_)] * max_f_;
 
-		// linear
-		eotf_Lin[i] = pow(( (pow(input, 1.0 / m2) - c1) / ((c2 - c3) * pow(input, 1.0 / m2) )), 1.0 / m1);
-		oetf_Lin[4095 - i] = 1 - eotf_Lin[i]; // (mirrored reverse of oetf)
+// BT.2020 - OETF
+		if (input < beta) {
+			oetf_2020[i] = 4.5 * input;
+		}
+		else {
+			oetf_2020[i] = alpha * pow(input, 0.45) - (alpha - 1);
+		}
 
-		/*
-		// EOTF -> delinearize
-		if (input < beta) { // linear part!
-		eotf[i] = input * 4.5;
+		// BT.2020 - EOTF
+		if (input < (4.5 * beta)) {
+			eotf_2020[i] = input / 4.5;
 		}
-		else { // exp. part!
-		eotf[i] = alpha * pow(input, 0.45) - (alpha - 1);
+		else {
+			eotf_2020[i] = pow(((input + (alpha - 1)) / alpha), 1.0 / 0.45);
 		}
-		*/
+
+
+		// PQ
+		//eotf_PQ[i] = pow(( (pow(input, 1.0 / m2) - c1) / ((c2 - c3) * pow(input, 1.0 / m2) )), 1.0 / m1);
+		eotf_PQ[i] = pow(((pow(input, (1.0 / m2)) - c1)) / (c2 - c3 *pow(input, (1.0 / m2))), 1.0 / m1) * 10000;
+		oetf_PQ[i] = pow((c1 + c2*pow(input, m1)) / (1 + c3*pow(input, m1)), m2);
+
 	}
 
-	/*
-	for (int i = 0; i < 4096; i++) {
-	float input = (float)i / 4095;
-	qDebug() << input << oetf_NonLin[i] << eotf_NonLin[i] << oetf_Lin[i] << eotf_Lin[i];
-	}
-	*/
+	eotf_PQ[0] = 0;
+	oetf_PQ[0] = 0;
+
 }
 
 void JP2K_Preview::getProxy() {
@@ -113,7 +134,7 @@ void JP2K_Preview::getProxy() {
 
 	setAsset(); // initialize reader
 
-				// FIRST PROXY
+	// FIRST PROXY
 	if (extractFrame(first_proxy)) { // frame extraction was successfull -> decode frame
 		if (decodeImage()) { // try to decode image
 			p1 = DataToQImage();
@@ -150,39 +171,41 @@ void JP2K_Preview::setAsset() {
 
 		current_asset = asset;
 
-		// get metadata
-		prec = current_asset->GetMetadata().componentDepth;
-		prec_shift = prec - 8;
-		max = pow(2, prec);
-
-		switch (prec) {
-		case 8:
-			adjustYCbCr = 128;
-			break;
-		case 10:
-			adjustYCbCr = 256;
-			break;
-		case 12:
-			adjustYCbCr = 512;
-			break;
-		case 14:
-			adjustYCbCr = 1024;
-			break;
-		case 16:
-			adjustYCbCr = 2048;
-			break;
-		}
-
 		// get color space
+		colorPrimaries = asset->GetMetadata().colorPrimaries;
+		transferCharactersitics = asset->GetMetadata().transferCharcteristics;
 		ColorEncoding = asset->GetMetadata().colorEncoding;
-		ColorSpace = asset->GetMetadata().colorSpace;
+		src_bitdepth = asset->GetMetadata().componentDepth;
+		//WR
+		ComponentMinRef = asset->GetMetadata().componentMinRef;
+		ComponentMaxRef = asset->GetMetadata().componentMaxRef;
+		//WR
 
-		// check if color space conversion is neccesary
-		if (ColorSpace == Metadata::eColorSpace::RGB709 || ColorSpace == Metadata::eColorSpace::YUV_709) {
-			convert_neccessary = false;
+		if (ComponentMinRef && ComponentMaxRef) {
+			RGBrange = ComponentMaxRef - ComponentMinRef;
+			RGBmaxcv = (1 << src_bitdepth) - 1;
 		}
-		else {
-			convert_neccessary = false;
+
+		prec_shift = src_bitdepth - 8;
+		max = (1 << src_bitdepth) - 1;
+
+		switch (colorPrimaries) {
+		case SMPTE::ColorPrimaries_ITU709:
+			// set YCbCr -> RGB conversion parameters
+			Kr = 0.2126;
+			Kg = 0.7152;
+			Kb = 0.0722;
+			break;
+		case SMPTE::ColorPrimaries_ITU2020:
+			// set YCbCr -> RGB conversion parameters
+			Kr = 0.2627;
+			Kg = 0.6780;
+			Kb = 0.0593;
+			break;
+		default:
+			msg = "Unknown color encoding"; // ERROR
+			err = true;
+			break; // abort!
 		}
 
 		if (mxf_path != "") { // close old asset/reader
@@ -192,7 +215,7 @@ void JP2K_Preview::setAsset() {
 
 		mxf_path = asset->GetPath().absoluteFilePath(); // get new path
 
-														// create new reader
+		// create new reader
 		reader = new AS_02::JP2K::MXFReader();
 
 		Result_t result_o = reader->OpenRead(mxf_path.toStdString()); // open file for reading
@@ -209,6 +232,10 @@ void JP2K_Preview::setAsset() {
 
 void JP2K_Preview::decode() {
 
+#ifdef DEBUG_JP2K
+	qDebug() << "begin decoding image nr. " << frameNr;
+#endif
+
 	err = false; // reset
 	decode_time.restart(); // start calculating decode time
 
@@ -220,6 +247,7 @@ void JP2K_Preview::decode() {
 
 										 // try to decode image
 		if (decodeImage() && !err) {
+
 			emit ShowFrame(DataToQImage());
 
 			if (!err) msg = QString("Decoded frame %1 in %2 ms").arg(frameNr).arg(decode_time.elapsed()); // no error
@@ -244,43 +272,36 @@ void JP2K_Preview::decode() {
 bool JP2K_Preview::extractFrame(qint64 frameNr) {
 
 	if (!asset) { // no asset was set -> abort
-		err = "Asset not found!";
+		msg = "Asset not found!";
 		err = true;
 		return false;
 	}
 
-
 	// calculate neccessary buffer size
-	Result_t result_f1 = reader->AS02IndexReader().Lookup(frameNr, f1); // current frame
-	if (ASDCP_SUCCESS(result_f1)) {
-		if (ASDCP_SUCCESS(reader->AS02IndexReader().Lookup((frameNr + 1), f2))) { // next frame
-			buff->Capacity((f2.StreamOffset - f1.StreamOffset) - 20); // set buffer size
-		}
-		else {
-			buff->Capacity(3000000); // default
-		}
+	if (ASDCP_SUCCESS(reader->AS02IndexReader().Lookup((frameNr + 1), IndexF2))) { // next frame
 
-		// try reading requested frame number
-		Result_t result = reader->ReadFrame(frameNr, *buff, NULL, NULL);
-		if (ASDCP_SUCCESS(result)) {
-			//&rRawData.append((const char*)buff->Data(), buff->Size()); // append data and return
-			pMemoryStream.pData = (unsigned char*)buff->Data();
-			pMemoryStream.dataSize = buff->Size();
-			return true;
+		Result_t result_f1 = reader->AS02IndexReader().Lookup(frameNr, IndexF1); // current frame
+		if (ASDCP_SUCCESS(result_f1)) {
+			buff->Capacity((IndexF2.StreamOffset - IndexF1.StreamOffset) - 20); // set buffer size
 		}
 		else {
-			error = Error(result); // error reading frame
-			qDebug() << "error reading frame" << frameNr;
-			msg = "Error reading frame!"; // ERROR
+			msg = QString("Frame does not exist: %1").arg(frameNr); // ERROR
 			err = true;
 			return false;
 		}
 	}
+
+	// try reading requested frame number
+	Result_t result = reader->ReadFrame(frameNr, *buff, NULL, NULL);
+	if (ASDCP_SUCCESS(result)) {
+
+		pMemoryStream.pData = (unsigned char*)buff->Data();
+		pMemoryStream.dataSize = buff->Size();
+		return true;
+	}
 	else {
-		qDebug() << "requested frame does not exist:" << frameNr;
-		msg = QString("Frame does not exist: %1").arg(frameNr); // ERROR
+		msg = "Error reading frame!"; // ERROR
 		err = true;
-		buff->Capacity(0);
 		return false;
 	}
 
@@ -334,10 +355,10 @@ bool JP2K_Preview::decodeImage() {
 }
 
 void JP2K_Preview::cleanUp() {
+
 	OPENJPEG_H::opj_stream_destroy(pStream);
 	OPENJPEG_H::opj_destroy_codec(pDecompressor);
 	OPENJPEG_H::opj_image_destroy(psImage); // free allocated memory
-											//psImage = NULL; // reset decoded output stream
 
 	pDecompressor = OPENJPEG_H::opj_create_decompress(OPJ_CODEC_J2K); // create new decompresser
 
@@ -349,6 +370,7 @@ void JP2K_Preview::cleanUp() {
 
 	opj_codec_set_threads(pDecompressor, cpus); // set nr. of cores in new decoder
 	delete img_buff; // clear char buffer
+	buff->Capacity(default_buffer_size); // set default size
 
 	emit finished();
 }
@@ -360,22 +382,8 @@ void JP2K_Preview::save2File() {
 	file.close();
 }
 
-void JP2K_Preview::info_callback(const char *msg, void *client_data) {
-	qDebug() << "INFO" << msg;
-}
-
-void JP2K_Preview::warning_callback(const char *msg, void *client_data) {
-	qDebug() << "WARNING" << msg;
-}
-
-void JP2K_Preview::error_callback(const char *msg, void *client_data) {
-	qDebug() << "ERROR" << msg;
-}
-
-QImage JP2K_Preview::DataToQImage()
+QImage JP2::DataToQImage()
 {
-	dataToQImageTime.restart();
-
 	w = psImage->comps->w;
 	h = psImage->comps->h;
 
@@ -384,60 +392,105 @@ QImage JP2K_Preview::DataToQImage()
 	bytes_per_line = w * 3;
 	img_buff = new unsigned char[bytes_per_line];
 
-	if (convert_to_709 && convert_neccessary) {
-		// change source encoding to REC.709
-		switch (ColorSpace) {
-		case Metadata::eColorSpace::YUV_2020_PQ:
-			for (y = 0; y < h; y++) {
-				for (x = 0; x < w; x++) {
+	int offset = 16 << (src_bitdepth - 8);
+	int maxcv = (1 << src_bitdepth) - 1;
+	int maxcv_plus_1 = maxcv + 1;
+	int range_y = 219 << (src_bitdepth - 8);
+	int range_c = (maxcv_plus_1 - 2 * offset);
+	if (convert_to_709) {
+
+		for (y = 0; y < h; y++) {
+			for (x = 0; x < w; x++) {
+
+				switch (ColorEncoding) {
+				case Metadata::RGBA:
+
+					xpos = (y*w + x); // don't calculate 3 times
+
+					// get RGB																
+					r = (float)psImage->comps[0].data[xpos];
+					g = (float)psImage->comps[1].data[xpos];
+					b = (float)psImage->comps[2].data[xpos];
+
+					//WR
+					if (ComponentMinRef && ComponentMaxRef) { // QE.2 If ComponentMinRef is != 0, it's Legal Range. Don't convert if ComponentMaxRef is (accidentally) zero, or not set.
+						r = (r - ComponentMaxRef) / (ComponentMaxRef - ComponentMinRef) * maxcv;
+						g = (g - ComponentMaxRef) / (ComponentMaxRef - ComponentMinRef) * maxcv;
+						b = (b - ComponentMaxRef) / (ComponentMaxRef - ComponentMinRef) * maxcv;
+						if (r < 0) r = 0;
+						if (g < 0) g = 0;
+						if (b < 0) b = 0;
+					}
+					//WR
+					break;
+				case Metadata::CDCI:
 
 					xpos = (int)(y*w + x) / 2; // don't calculate twice
-					buff_pos = x * 3; // don't calculate 3 times
 
-					// get Yuv & convert to RGB																
+					// get YCbCr values
 					Y = (float)psImage->comps[0].data[(int)(y*w + x)];
 					Cb = (float)psImage->comps[1].data[xpos];
 					Cr = (float)psImage->comps[2].data[xpos];
 
-					r = (Y + 1.402 * (Cr - adjustYCbCr));
-					g = (Y - 0.3441 * (Cb - adjustYCbCr) - (0.7141 * (Cr - adjustYCbCr)));
-					b = (Y + 1.772 * (Cb - adjustYCbCr));
+					// convert to rgb
+					r = (Y - offset)*maxcv / range_y + 2 * (1 - Kr)          *(Cr - maxcv_plus_1 / 2)*maxcv / range_c;
+					g = (Y - offset)*maxcv / range_y - 2 * Kb*(1 - Kb) / Kg*(Cb - maxcv_plus_1 / 2)*maxcv / range_c - 2 * Kr*(1 - Kr) / Kg*(Cr - maxcv_plus_1 / 2)*maxcv / range_c;
+					b = (Y - offset)*maxcv / range_y + 2 * (1 - Kb)          *(Cb - maxcv_plus_1 / 2)*maxcv / range_c;
 
-					// clamp between 0... (2^n) - 1
-					if (out_r < 0) { out_r = 0; }
-					else if (out_r > max) { out_r = max; }
-					if (out_g < 0) { out_g = 0; }
-					else if (out_g > max) { out_g = max; }
-					if (out_b < 0) { out_b = 0; }
-					else if (out_b > max) { out_b = max; }
+					// clamp between 0...CVmax
+					if (r < 0) { r = 0; }
+					else if (r >= maxcv) { r = maxcv; }
+					if (g < 0) { g = 0; }
+					else if (g >= maxcv) { g = maxcv; }
+					if (b < 0) { b = 0; }
+					else if (b >= maxcv) { b = maxcv; }
+					break;
+				default: return QImage(":/proxy_unknown.png"); break; // abort!
+				}
 
-					// linearize (results in values between 0...1)
-					r = oetf_NonLin[(int)((r / max) * 4095.0f)];
-					g = oetf_NonLin[(int)((g / max) * 4095.0f)];
-					b = oetf_NonLin[(int)((b / max) * 4095.0f)];
-
-					// Inverse of BT.2020 -> BT.709
-					out_r = r*1.6605 + g*-0.5877 + b*-0.0728;
-					out_g = r*-0.1246 + g*1.133 + b*-0.0084;
-					out_b = r*-0.0182 + g*-0.1006 + b*1.1187;
-
-					// clamp between 0...1
-					if (out_r < 0) { out_r = 0; }
-					else if (out_r > 1) { out_r = 1; }
-					if (out_g < 0) { out_g = 0; }
-					else if (out_g > 1) { out_g = 1; }
-					if (out_b < 0) { out_b = 0; }
-					else if (out_b > 1) { out_b = 1; }
-
-					// unlinearize
-					out_r = eotf_NonLin[(int)(out_r * 4095.0f)] * max;
-					out_g = eotf_NonLin[(int)(out_g * 4095.0f)] * max;
-					out_b = eotf_NonLin[(int)(out_b * 4095.0f)] * max;
+				// now we have rgb data -> linearize the data!
+				switch (transferCharactersitics) {
+				case SMPTE::TransferCharacteristic_ITU709:
 
 					// convert to 8 bit
-					out_r8 = (int)out_r >> prec_shift;
-					out_g8 = (int)out_g >> prec_shift;
-					out_b8 = (int)out_b >> prec_shift;
+					out_r8 = (int)r >> prec_shift;
+					out_g8 = (int)g >> prec_shift;
+					out_b8 = (int)b >> prec_shift;
+
+					// set data
+					buff_pos = x * 3; // don't calculate 3 times
+					img_buff[buff_pos] = (unsigned char)out_r8;
+					img_buff[buff_pos + 1] = (unsigned char)out_g8;
+					img_buff[buff_pos + 2] = (unsigned char)out_b8;
+
+					continue; // jump to next pixel
+
+					break;
+				case SMPTE::TransferCharacteristic_ITU2020:
+
+					r = eotf_2020[(int)((r / max) * max_f_)]; // 0...1
+					g = eotf_2020[(int)((g / max) * max_f_)]; // 0...1
+					b = eotf_2020[(int)((b / max) * max_f_)]; // 0...1
+
+					break;
+				case SMPTE::TransferCharacteristic_SMPTEST2084:
+
+					r = eotf_PQ[(int)((r / max) * max_f_)]; // 0...10 000
+					g = eotf_PQ[(int)((g / max) * max_f_)]; // 0...10 000
+					b = eotf_PQ[(int)((b / max) * max_f_)]; // 0...10 000
+
+					// convert to 0.0..100.0 ( 1.0 = 100 nits)
+					r /= 100;
+					g /= 100;
+					b /= 100;
+
+					break;
+				case SMPTE::TransferCharacteristic_IEC6196624_xvYCC:
+
+					// convert to 8 bit
+					out_r8 = (int)r >> prec_shift;
+					out_g8 = (int)g >> prec_shift;
+					out_b8 = (int)b >> prec_shift;
 
 					// clamp values between 0...255
 					if (out_r8 < 0) { out_r8 = 0; }
@@ -448,167 +501,220 @@ QImage JP2K_Preview::DataToQImage()
 					else if (out_b8 > 255) { out_b8 = 255; }
 
 					// set data
+					buff_pos = x * 3; // don't calculate 3 times
 					img_buff[buff_pos] = (unsigned char)out_r8;
 					img_buff[buff_pos + 1] = (unsigned char)out_g8;
 					img_buff[buff_pos + 2] = (unsigned char)out_b8;
+
+					continue; // jump to next pixel
+
+					break;
+				default: return QImage(":/proxy_unknown.png"); break; // abort!
 				}
-				memcpy(image.scanLine(y), img_buff, bytes_per_line);
+
+				switch (colorPrimaries) {
+				case SMPTE::ColorPrimaries_ITU2020:
+
+					// convert from BT.2020 -> BT.709
+					out_r = r*1.6605 + g*-0.5877 + b*-0.0728;
+					out_g = r*-0.1246 + g*1.1330 + b*-0.0084;
+					out_b = r*-0.0182 + g*-0.1006 + b*1.1187;
+
+					break;
+				case SMPTE::ColorPrimaries_P3D65:
+
+					// convert from DCI-P3 -> BT.709
+					out_r = r*1.2248 - g*0.2249 - b*0.0001;
+					out_g = -r*0.042 + g*1.042;
+					out_b = -r*0.0196 - g*0.0786 + b*1.0983;
+
+					break;
+				default: return QImage(":/proxy_unknown.png"); break; // abort!
+				}
+
+				// clamp between 0...1
+				if (out_r < 0) { out_r = 0; }
+				else if (out_r > 1) { out_r = 1; }
+				if (out_g < 0) { out_g = 0; }
+				else if (out_g > 1) { out_g = 1; }
+				if (out_b < 0) { out_b = 0; }
+				else if (out_b > 1) { out_b = 1; }
+
+				// unlinearize
+				out_r = oetf_709[(int)(out_r * max_f_)] * max;
+				out_g = oetf_709[(int)(out_g * max_f_)] * max;
+				out_b = oetf_709[(int)(out_b * max_f_)] * max;
+
+				// convert to 8 bit
+				out_r8 = (int)out_r >> prec_shift;
+				out_g8 = (int)out_g >> prec_shift;
+				out_b8 = (int)out_b >> prec_shift;
+
+				// clamp values between 0...255
+				if (out_r8 < 0) { out_r8 = 0; }
+				else if (out_r8 > 255) { out_r8 = 255; }
+				if (out_g8 < 0) { out_g8 = 0; }
+				else if (out_g8 > 255) { out_g8 = 255; }
+				if (out_b8 < 0) { out_b8 = 0; }
+				else if (out_b8 > 255) { out_b8 = 255; }
+
+				// set data
+				buff_pos = x * 3; // don't calculate 3 times
+				img_buff[buff_pos] = (unsigned char)out_r8;
+				img_buff[buff_pos + 1] = (unsigned char)out_g8;
+				img_buff[buff_pos + 2] = (unsigned char)out_b8;
 			}
-			break;
-		case Metadata::eColorSpace::YUV_2020_LIN:
-
-
-
-
-			break;
-		case Metadata::eColorSpace::RGB_2020_PQ:
-
-			break;
-		case Metadata::eColorSpace::RGB_P3D65:
-
-			break;
+			memcpy(image.scanLine(y), img_buff, bytes_per_line);
 		}
 	}
-	else {
+	else if (ColorEncoding == Metadata::eColorEncoding::RGBA) {
 		// RGB: keep original color encoding, or color encoding == REC.709
-		if (ColorEncoding == Metadata::eColorEncoding::RGBA) {
-			for (y = 0; y < h; y++) {
-				for (x = 0; x < w; x++) {
-					xpos = (y*w + x); // don't calculate 3 times
-					buff_pos = x * 3; // don't calculate 3 times
 
-					img_buff[buff_pos] = psImage->comps[0].data[xpos] >> prec_shift;
-					img_buff[buff_pos + 1] = psImage->comps[1].data[xpos] >> prec_shift;
-					img_buff[buff_pos + 2] = psImage->comps[2].data[xpos] >> prec_shift;
-				}
-				memcpy(image.scanLine(y), img_buff, bytes_per_line);
+		for (y = 0; y < h; y++) {
+			for (x = 0; x < w; x++) {
+				xpos = (y*w + x); // don't calculate 3 times
+				buff_pos = x * 3; // don't calculate 3 times
+
+				img_buff[buff_pos] = psImage->comps[0].data[xpos] >> prec_shift;
+				img_buff[buff_pos + 1] = psImage->comps[1].data[xpos] >> prec_shift;
+				img_buff[buff_pos + 2] = psImage->comps[2].data[xpos] >> prec_shift;
 			}
-		}
-		// Yuv:  keep original color encoding, or color encoding == REC.709
-		else if (ColorEncoding == Metadata::eColorEncoding::CDCI) {
-			for (y = 0; y < h; y++) {
-				for (x = 0; x < w; x++) {
-					xpos = (int)(y*w + x) / 2; // don't calculate twice
-					buff_pos = x * 3; // don't calculate 3 times
-
-									  // get Yuv & convert x bit -> 8 bit
-					Y = psImage->comps[0].data[(int)(y*w + x)] >> prec_shift;
-					Cb = psImage->comps[1].data[xpos] >> prec_shift;
-					Cr = psImage->comps[2].data[xpos] >> prec_shift;
-
-					// convert to rgb (http://softpixel.com/~cwright/programming/colorspace/yuv/)
-					r = (int)(Y + 1.4075 * (Cr - 128));
-					b = (int)(Y + 1.7790 * (Cb - 128));
-					g = (int)(Y - 0.3455 * (Cb - 128) - (0.7169 * (Cr - 128)));
-
-					// clamp values
-					if (r < 0) { r = 0; }
-					else if (r > 255) { r = 255; }
-					if (g < 0) { g = 0; }
-					else if (g > 255) { g = 255; }
-					if (b < 0) { b = 0; }
-					else if (b > 255) { b = 255; }
-
-					img_buff[buff_pos] = r;
-					img_buff[buff_pos + 1] = g;
-					img_buff[buff_pos + 2] = b;
-				}
-				memcpy(image.scanLine(y), img_buff, bytes_per_line);
-			}
+			memcpy(image.scanLine(y), img_buff, bytes_per_line);
 		}
 	}
+	// Yuv:  keep original color encoding, or color encoding == REC.709
+	else if (ColorEncoding == Metadata::eColorEncoding::CDCI) {
+		for (y = 0; y < h; y++) {
+			for (x = 0; x < w; x++) {
 
-	qDebug() << "DATA2RGB" << dataToQImageTime.elapsed();
+				xpos = (int)(y*w + x) / 2; // don't calculate twice
+				buff_pos = x * 3; // don't calculate 3 times
+
+				// get Yuv & convert x bit -> 8 bit
+				Y = psImage->comps[0].data[(int)(y*w + x)];
+				Cb = psImage->comps[1].data[xpos];
+				Cr = psImage->comps[2].data[xpos];
+
+				// convert to rgb
+				r = (Y - offset)*maxcv / range_y + 2 * (1 - Kr)          *(Cr - maxcv_plus_1 / 2)*maxcv / range_c;
+				g = (Y - offset)*maxcv / range_y - 2 * Kb*(1 - Kb) / Kg*(Cb - maxcv_plus_1 / 2)*maxcv / range_c - 2 * Kr*(1 - Kr) / Kg*(Cr - maxcv_plus_1 / 2)*maxcv / range_c;
+				b = (Y - offset)*maxcv / range_y + 2 * (1 - Kb)          *(Cb - maxcv_plus_1 / 2)*maxcv / range_c;
+
+
+				out_r8 = (int)r >> prec_shift;
+				out_g8 = (int)g >> prec_shift;
+				out_b8 = (int)b >> prec_shift;
+
+				// clamp values between 0...255
+				if (out_r8 < 0) { out_r8 = 0; }
+				else if (out_r8 > 255) { out_r8 = 255; }
+				if (out_g8 < 0) { out_g8 = 0; }
+				else if (out_g8 > 255) { out_g8 = 255; }
+				if (out_b8 < 0) { out_b8 = 0; }
+				else if (out_b8 > 255) { out_b8 = 255; }
+
+				// set data
+				buff_pos = x * 3; // don't calculate 3 times
+				img_buff[buff_pos] = (unsigned char)out_r8;
+				img_buff[buff_pos + 1] = (unsigned char)out_g8;
+				img_buff[buff_pos + 2] = (unsigned char)out_b8;
+			}
+			memcpy(image.scanLine(y), img_buff, bytes_per_line);
+		}
+	}
+	else { // unknown ColorEncoding
+		return QImage(":/proxy_unknown.png");
+	}
 
 	return image;
 }
 
 /* following code by Bruce Barton, see: https://groups.google.com/forum/#!searchin/openjpeg/How$20to$20replace$20file_stream$20by$20byte_stream$3F%7Csort:relevance/openjpeg/8cebr0u7JgY/NSieKiI0hVQJ */
-//This will read from our memory to the buffer.
-OPJ_SIZE_T JP2K_Preview::opj_memory_stream_read(void * p_buffer, OPJ_SIZE_T p_nb_bytes, void * p_user_data)
+// This will read from our memory to the buffer.
+OPJ_SIZE_T JP2::opj_memory_stream_read(void * p_buffer, OPJ_SIZE_T p_nb_bytes, void * p_user_data)
 {
-	opj_memory_stream* l_memory_stream = (opj_memory_stream*)p_user_data;//Our data.
-	OPJ_SIZE_T l_nb_bytes_read = p_nb_bytes;//Amount to move to buffer.
+	opj_memory_stream* l_memory_stream = (opj_memory_stream*)p_user_data; // Our data.
+	OPJ_SIZE_T l_nb_bytes_read = p_nb_bytes; // Amount to move to buffer.
 
-											//Check if the current offset is outside our data buffer.
+											 // Check if the current offset is outside our data buffer.
 	if (l_memory_stream->offset >= l_memory_stream->dataSize) return (OPJ_SIZE_T)-1;
 
-	//Check if we are reading more than we have.
+	// Check if we are reading more than we have.
 	if (p_nb_bytes > (l_memory_stream->dataSize - l_memory_stream->offset))
-		l_nb_bytes_read = l_memory_stream->dataSize - l_memory_stream->offset;//Read all we have.
+		l_nb_bytes_read = l_memory_stream->dataSize - l_memory_stream->offset; // Read all we have.
 
-																			  //Copy the data to the internal buffer.
+																			   // Copy the data to the internal buffer.
 	memcpy(p_buffer, &(l_memory_stream->pData[l_memory_stream->offset]), l_nb_bytes_read);
-	l_memory_stream->offset += l_nb_bytes_read;//Update the pointer to the new location.
+	l_memory_stream->offset += l_nb_bytes_read; // Update the pointer to the new location.
 
 	return l_nb_bytes_read;
 }
 
-//This will write from the buffer to our memory.
-OPJ_SIZE_T JP2K_Preview::opj_memory_stream_write(void * p_buffer, OPJ_SIZE_T p_nb_bytes, void * p_user_data)
+// This will write from the buffer to our memory.
+OPJ_SIZE_T JP2::opj_memory_stream_write(void * p_buffer, OPJ_SIZE_T p_nb_bytes, void * p_user_data)
 {
-	opj_memory_stream* l_memory_stream = (opj_memory_stream*)p_user_data;//Our data.
-	OPJ_SIZE_T l_nb_bytes_write = p_nb_bytes;//Amount to move to buffer.
+	opj_memory_stream* l_memory_stream = (opj_memory_stream*)p_user_data; // Our data.
+	OPJ_SIZE_T l_nb_bytes_write = p_nb_bytes; // Amount to move to buffer.
 
-											 //Check if the current offset is outside our data buffer.
+											  // Check if the current offset is outside our data buffer.
 	if (l_memory_stream->offset >= l_memory_stream->dataSize) return (OPJ_SIZE_T)-1;
 
-	//Check if we are write more than we have space for.
+	// Check if we are write more than we have space for.
 	if (p_nb_bytes > (l_memory_stream->dataSize - l_memory_stream->offset))
-		l_nb_bytes_write = l_memory_stream->dataSize - l_memory_stream->offset;//Write the remaining space.
+		l_nb_bytes_write = l_memory_stream->dataSize - l_memory_stream->offset; // Write the remaining space.
 
-																			   //Copy the data from the internal buffer.
+																				// Copy the data from the internal buffer.
 	memcpy(&(l_memory_stream->pData[l_memory_stream->offset]), p_buffer, l_nb_bytes_write);
 
-	l_memory_stream->offset += l_nb_bytes_write;//Update the pointer to the new location.
+	l_memory_stream->offset += l_nb_bytes_write; // Update the pointer to the new location.
 
 	return l_nb_bytes_write;
 }
 
 //Moves the pointer forward, but never more than we have.
-OPJ_OFF_T JP2K_Preview::opj_memory_stream_skip(OPJ_OFF_T p_nb_bytes, void * p_user_data)
+OPJ_OFF_T JP2::opj_memory_stream_skip(OPJ_OFF_T p_nb_bytes, void * p_user_data)
 {
 	opj_memory_stream* l_memory_stream = (opj_memory_stream*)p_user_data;
 	OPJ_SIZE_T l_nb_bytes;
-	if (p_nb_bytes < 0) return -1;//No skipping backwards.
+	if (p_nb_bytes < 0) return -1; // No skipping backwards.
 
-	l_nb_bytes = (OPJ_SIZE_T)p_nb_bytes;//Allowed because it is positive.
+	l_nb_bytes = (OPJ_SIZE_T)p_nb_bytes; // Allowed because it is positive.
 
-										// Do not allow jumping past the end.
+										 // Do not allow jumping past the end.
 	if (l_nb_bytes > l_memory_stream->dataSize - l_memory_stream->offset)
-		l_nb_bytes = l_memory_stream->dataSize - l_memory_stream->offset;//Jump the max.
+		l_nb_bytes = l_memory_stream->dataSize - l_memory_stream->offset; // Jump the max.
 
-																		 //Make the jump.
+																		  // Make the jump.
 	l_memory_stream->offset += l_nb_bytes;
 
-	//Returm how far we jumped.
+	// Returm how far we jumped.
 	return l_nb_bytes;
 }
 
-//Sets the pointer to anywhere in the memory.
-OPJ_BOOL JP2K_Preview::opj_memory_stream_seek(OPJ_OFF_T p_nb_bytes, void * p_user_data)
+// Sets the pointer to anywhere in the memory.
+OPJ_BOOL JP2::opj_memory_stream_seek(OPJ_OFF_T p_nb_bytes, void * p_user_data)
 {
 	opj_memory_stream* l_memory_stream = (opj_memory_stream*)p_user_data;
-	if (p_nb_bytes < 0) return OPJ_FALSE;//No before the buffer.
-	if (p_nb_bytes >(OPJ_OFF_T)l_memory_stream->dataSize) return OPJ_FALSE;//No after the buffer.
-	l_memory_stream->offset = (OPJ_SIZE_T)p_nb_bytes;//Move to new position.
+	if (p_nb_bytes < 0) return OPJ_FALSE; // No before the buffer.
+	if (p_nb_bytes >(OPJ_OFF_T)l_memory_stream->dataSize) return OPJ_FALSE; // No after the buffer.
+	l_memory_stream->offset = (OPJ_SIZE_T)p_nb_bytes; // Move to new position.
 
 	return OPJ_TRUE;
 }
 
-//The system needs a routine to do when finished, the name tells you what I want it to do.
-void JP2K_Preview::opj_memory_stream_do_nothing(void * p_user_data)
+// The system needs a routine to do when finished, the name tells you what I want it to do.
+void JP2::opj_memory_stream_do_nothing(void * p_user_data)
 {
 	OPJ_ARG_NOT_USED(p_user_data);
 }
 
-//Create a stream to use memory as the input or output.
-opj_stream_t* JP2K_Preview::opj_stream_create_default_memory_stream(opj_memory_stream* p_memoryStream, OPJ_BOOL p_is_read_stream)
+// Create a stream to use memory as the input or output.
+opj_stream_t* JP2::opj_stream_create_default_memory_stream(opj_memory_stream* p_memoryStream, OPJ_BOOL p_is_read_stream)
 {
 	opj_stream_t* l_stream;
 	if (!(l_stream = opj_stream_default_create(p_is_read_stream))) return (NULL);
 
-	//Set how to work with the frame buffer.
+	// Set how to work with the frame buffer.
 	if (p_is_read_stream)
 		opj_stream_set_read_function(l_stream, opj_memory_stream_read);
 	else
@@ -621,3 +727,17 @@ opj_stream_t* JP2K_Preview::opj_stream_create_default_memory_stream(opj_memory_s
 
 	return l_stream;
 }
+
+void JP2::info_callback(const char *msg, void *client_data) {
+	qDebug() << "INFO" << msg;
+}
+
+void JP2::warning_callback(const char *msg, void *client_data) {
+	qDebug() << "WARNING" << msg;
+}
+
+void JP2::error_callback(const char *msg, void *client_data) {
+	qDebug() << "ERROR" << msg;
+}
+
+

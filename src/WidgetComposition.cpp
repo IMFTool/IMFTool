@@ -1125,9 +1125,9 @@ void WidgetComposition::rCurrentFrameChanged(const Timecode &rCplTimecode) {
 				}
 				else if(p_seq->GetTrackId() == video_track_id) {
 					AbstractGraphicsWidgetResource *p_resource = resources_list.at(i);
-					// error: invalid index after removing items from timeline?
-					emit CurrentVideoChanged(p_resource->GetAsset(), (p_resource->MapToCplTimeline(Timecode()) - rCplTimecode).AsPositiveDuration(), rCplTimecode, p_resource->timline_index);
-					//qDebug() << "playlist index" << p_resource->timline_index; // (k)
+					if (p_resource->GetAsset()) {
+						emit CurrentVideoChanged(p_resource->GetAsset(), (p_resource->MapToCplTimeline(Timecode()) - rCplTimecode).AsPositiveDuration(), rCplTimecode, p_resource->timline_index);
+					}
 				}
 			}
 		}

@@ -145,7 +145,6 @@ void WidgetImagePreview::paintRegions(QPainter &painter, const QRect rect_viewpo
 
 		float left = (rect_viewport.width() - (float)frame_size.width()) / 2;
 		float top = (rect_viewport.height() - (float)frame_size.height()) / 2;
-		int region_color = 0;
 
 		// loop regions
 		for (int i = 0; i < ttml_regions.length(); i++) {
@@ -165,7 +164,6 @@ void WidgetImagePreview::paintRegions(QPainter &painter, const QRect rect_viewpo
 				painter.setBrush(QBrush(ttml_regions[i].bgColor));
 				QRect rect(region_left, region_top, region_width, region_height);
 				painter.drawRect(rect);
-				region_color++;
 			}
 		}
 	}

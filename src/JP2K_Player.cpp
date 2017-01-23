@@ -21,6 +21,7 @@
 #include "openjpeg.h"
 #include "AS_DCP_internal.h"
 #include <QThreadpool>  
+//#define DEBUG_MSGS
 
 JP2K_Player::JP2K_Player() {
 
@@ -29,6 +30,49 @@ JP2K_Player::JP2K_Player() {
 	timer = new QTime();
 	timer->start();
 
+	// create lookup tables
+	max_f = 1 << bitdepth;
+	max_f_ = (float)(max_f)-1.0;
+
+	oetf_709 = new float[max_f];
+
+	float alpha = 1.09929682680944;
+	float beta = 0.018053968510807;
+	eotf_2020 = new float[max_f];
+
+	float m1 = 0.1593017578125;
+	float m2 = 78.84375;
+	float c1 = 0.8359375;
+	float c2 = 18.8515625;
+	float c3 = 18.6875;
+	eotf_PQ = new float[max_f];
+
+	for (int i = 0; i < max_f; i++) {
+
+		float input = (float)(i / max_f_); // convert input to value between 0...1
+
+		// BT.709 - OETF
+		if (input < 0.018) {
+			oetf_709[i] = 4.5 * input;
+		}
+		else {
+			oetf_709[i] = 1.099 * pow(input, 0.45) - 0.099;
+		}
+
+		// BT.2020 - EOTF
+		if (input < (4.5 * beta)) {
+			eotf_2020[i] = input / 4.5;
+		}
+		else {
+			eotf_2020[i] = pow(((input + (alpha - 1)) / alpha), 1.0 / 0.45);
+		}
+
+		// PQ
+		eotf_PQ[i] = pow(((pow(input, (1.0 / m2)) - c1)) / (c2 - c3 *pow(input, (1.0 / m2))), 1.0 / m1) * 10000;
+	}
+
+	eotf_PQ[0] = 0;
+
 	threadPool = new QThreadPool();
 	reader = new AS_02::JP2K::MXFReader();
 
@@ -36,7 +80,7 @@ JP2K_Player::JP2K_Player() {
 	for (int i = 0; i < 50; i++) {
 		request_queue[i] = new FrameRequest();
 		pointer_queue[i] = static_cast<QSharedPointer<FrameRequest>>(request_queue[i]);
-		decoder_queue[i] = new JP2K_Decoder(decoded_shared, pointer_queue[i]);
+		decoder_queue[i] = new JP2K_Decoder(decoded_shared, pointer_queue[i], oetf_709, eotf_2020, eotf_PQ);
 		decoder_queue[i]->setAutoDelete(false);
 	}
 }
@@ -96,45 +140,61 @@ void JP2K_Player::setReader() {
 		emit playerInfo(QString("Failed initializing reader: %1").arg(result_o.Message()));
 	}
 
-	// check for color encoding & metadata
-	Metadata::eColorEncoding ColorEncoding = CurrentDecodingAsset->GetMetadata().colorEncoding;
-	Metadata::eColorSpace ColorSpace = CurrentDecodingAsset->GetMetadata().colorSpace;
-	int prec = CurrentDecodingAsset->GetMetadata().componentDepth;
-	int prec_shift = prec - 8;
-	float adjustYCbCr;
-	int max;
 
-	switch (prec) {
-	case 8:
-		adjustYCbCr = 128.0f;
-		max = 255;
+	// check for color encoding & metadata
+	SMPTE::eColorPrimaries colorPrimaries = CurrentDecodingAsset->GetMetadata().colorPrimaries;
+
+	int src_bitdepth = CurrentDecodingAsset->GetMetadata().componentDepth;
+	int prec_shift = src_bitdepth - 8;
+	int max = 0, RGBrange = 0, RGBmaxcv = 0;
+	float Kr = 0, Kg = 0, Kb = 0;
+	max = pow(2, src_bitdepth) - 1;
+
+	int ComponentMinRef = CurrentDecodingAsset->GetMetadata().componentMinRef;
+	int ComponentMaxRef = CurrentDecodingAsset->GetMetadata().componentMaxRef;
+
+	if (ComponentMinRef && ComponentMaxRef) {
+		RGBrange = ComponentMaxRef - ComponentMinRef;
+		RGBmaxcv = (1 << src_bitdepth) - 1;
+	}
+
+	switch (colorPrimaries) {
+	case SMPTE::ColorPrimaries_ITU709:
+		// set YCbCr -> RGB conversion parameters
+		Kr = 0.2126;
+		Kg = 0.7152;
+		Kb = 0.0722;
 		break;
-	case 10:
-		adjustYCbCr = 256.0f;
-		max = 511;
-		break;
-	case 12:
-		adjustYCbCr = 512.0f;
-		max = 1023;
-		break;
-	case 14:
-		adjustYCbCr = 1024.0f;
-		max = 2047;
-		break;
-	case 16:
-		adjustYCbCr = 2048.0f;
-		max = 4095;
+	case SMPTE::ColorPrimaries_ITU2020:
+		// set YCbCr -> RGB conversion parameters
+		Kr = 0.2627;
+		Kg = 0.6780;
+		Kb = 0.0593;
 		break;
 	}
 
 	// set reader/params in decoders
 	for (int i = 0; i < 50; i++) {
+
 		decoder_queue[i]->reader = reader_shared;
-		decoder_queue[i]->ColorEncoding = ColorEncoding;
-		decoder_queue[i]->ColorSpace = ColorSpace;
-		decoder_queue[i]->prec = prec;
+
+		// color transformation
+		decoder_queue[i]->ColorEncoding = CurrentDecodingAsset->GetMetadata().colorEncoding;
+		decoder_queue[i]->colorPrimaries = colorPrimaries;
+		decoder_queue[i]->transferCharactersitics = CurrentDecodingAsset->GetMetadata().transferCharcteristics;
+		decoder_queue[i]->src_bitdepth = src_bitdepth;
+
+		decoder_queue[i]->ComponentMinRef = ComponentMinRef;
+		decoder_queue[i]->ComponentMaxRef = ComponentMaxRef;
+		decoder_queue[i]->RGBmaxcv = RGBmaxcv;
+		decoder_queue[i]->RGBrange = RGBrange;
+
+		// YCbCr -> RGB conv. params.
+		decoder_queue[i]->Kr = Kr; 
+		decoder_queue[i]->Kg = Kg;
+		decoder_queue[i]->Kb = Kb;
+
 		decoder_queue[i]->prec_shift = prec_shift;
-		decoder_queue[i]->adjustYCbCr = adjustYCbCr;
 		decoder_queue[i]->max = max;
 	}
 }
@@ -167,9 +227,9 @@ void JP2K_Player::setPos(int frameNr, int TframeNr, int playlist_index) {
 		fps_counter = 0;
 
 		playlist_length = playlist.length() - 1; // set playlist length (indexes)
-
+#ifdef DEBUG_MSGS
 		qDebug() << "setting player position to frame" << frameNr << "(total)" << TframeNr;
-
+#endif
 		if ((playlist_index + 1) == playlist.length()) {
 			playlist_last_item = true;
 			last_frame_nr = playlist[playlist_index].out;
@@ -221,7 +281,6 @@ void JP2K_Player::playLoop(){
 				qDebug() << "LAST ASSET";
 			}
 		}else if (decoding_frame_int > ple_decoding.out && decoding_ple_index < playlist_length) {
-
 			decoding_ple_index++;
 			ple_decoding = playlist[decoding_ple_index]; // move to next section in timeline (decode)
 			decoding_frame_int = ple_decoding.in; // set decode-pointer to next section
@@ -255,7 +314,6 @@ void JP2K_Player::playLoop(){
 			decoded_shared->decoded_cycle = 0; // reset
 		}
 
-
 		if (buffer_size <= 0 && played_frames_total > 0) {
 			buffering = true; // start buffering (again)
 			emit playerInfo("buffering...");
@@ -263,7 +321,6 @@ void JP2K_Player::playLoop(){
 			buffering = false; // start playing out frames
 		}
 
-		//qDebug() << "pending requests" << decoded_shared->pending_requests << "buffer size" << buffer_size;
 
 		// request new frames
 		if (decoded_shared->pending_requests < fps || buffering) {
@@ -294,6 +351,7 @@ void JP2K_Player::playLoop(){
 			// show player position every fps nr of frames
 			if (player_position_counter >= fps) {
 				emit currentPlayerPosition(qRound(playing_frame_total)); // update every second
+				if (show_subtitles) emit playTTML();
 				player_position_counter = 0;
 			}
 			player_position_counter++;
@@ -314,6 +372,10 @@ void JP2K_Player::playLoop(){
 
 				buffer_fill_counter--;
 				played_frames_total++;
+			}
+			else if (request_queue[playing_count % 50]->error) { // an error occured during the decoding process!
+				emit playerInfo(request_queue[playing_count % 50]->errorMsg);
+				stop();
 			} // else: no frame found!
 
 			playing_count++;
@@ -323,6 +385,7 @@ void JP2K_Player::playLoop(){
 		if (playing_frame >= last_frame_nr && playlist_last_item == true) {
 
 			qDebug() << "last frame" << last_frame_nr;
+
 			emit currentPlayerPosition(playing_frame_total);
 			emit playbackEnded();
 			emit playerInfo("playback ended!");
@@ -385,4 +448,11 @@ void JP2K_Player::setLayer(int layer){
 	}
 
 	clean();
+}
+
+void JP2K_Player::convert_to_709(bool convert) {
+
+	for (int i = 0; i < 50; i++) {
+		decoder_queue[i]->convert_to_709 = convert; // set in decoder [i]
+	}
 }

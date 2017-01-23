@@ -21,23 +21,49 @@
 #include <QTextEdit>
 #include <QLabel>
 #include <QComboBox>
+#include <QListWidget>
+#include <QGridlayout>
+#include <QPushButton>
+#include <QButtonGroup>
+#include <QSplitter>
+#include <QStandardItemModel>
+#include <QTableview>
+#include <QHeaderView>
+#include "ImfCommon.h"
 
 class TTMLDetails : public QWidget {
 	Q_OBJECT
 public:
 	TTMLDetails(QWidget *pParent = NULL);
 	QCheckBox *show_regions;
+	void ClearTTML();
 private:
 	void InitLayout();
 	QTextEdit *ttml_text;
-	QLabel *ttml_time;
+	QListWidget *ttml_times;
 	QLabel *ttml_search_time;
-	QComboBox *render_style;
 	QCheckBox *wrap_text;
+	bool wrap_text_enabled = true; // default
+	QPushButton *next;
+	QPushButton *prev;
 	QString last_tt = "";
-	int lastStyle = 0; // default
-	public slots:
-	void rShowTTML(const QVector<QString>&, QString, int);
-	void renderStyleChanged(int);
+	QSplitter *splitter;
+	QStandardItemModel *tableModel;
+	QTableView *tableView;
+	const QVector<visibleTTtrack> *ttmls;
+	QFont font_small;
+	QFont font_medium;
+	int render_style = 2; // 0 : TEXT, 1 : pTEXT, 2 : HTML
+	void createButton(int, int, int, int, bool);
+	QVector<QPushButton*> highlighted_btns;
+	void showSelection(int, int, int);
+private slots:
+	void prevClicked(bool);
+	void nextClicked(bool);
+public slots:
+	void rShowTTML(const QVector<visibleTTtrack>&, int);
 	void wrapTextChanged(int);
+	void pushButtonClicked();
+signals:
+	void PrevNextSubClicked(bool);
 };

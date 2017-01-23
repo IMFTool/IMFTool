@@ -57,11 +57,13 @@ public:
 signals: // ?
 	void currentPlayerPosition(qint64);
 	void ShowImage(const QImage&);
-	void ttmlChanged(const QVector<QString>&, QString, int);
+	void ttmlChanged(const QVector<visibleTTtrack>&, int);
 	void regionOptionsChanged(int);
 public slots :
 	void xPosChanged(const QSharedPointer<AssetMxfTrack>&, const Duration&, const Timecode&, const int&);
 	void rShowMsgBox(const QString&, int);
+	void rPrevNextSubClicked(bool);
+	void getTTML();
 private slots:
 	void rChangeSpeed(QAction*);
 	void rChangeQuality(QAction*);
@@ -79,9 +81,13 @@ private:
 
 	// TTML
 	bool showTTML = true;
-	void getTTML();
-	QVector<TTMLtimelineSegment> ttmls;
+	QVector<TTMLtimelineSegment> *ttmls;
+	QVector<visibleTTtrack> current_tt; // currently visible timed text elements
+	QMap<int, QVector<TTMLtimelineSegment>> ttml_tracks;
+
 	QTime ttml_search_time;
+	qint64 next_ttml;
+	qint64 prev_ttml;
 
 	cpl2016::CompositionPlaylistType mData;
 
@@ -99,7 +105,7 @@ private:
 	QMenu *processing_extract;
 
 	QStringList *processing_extract_names;
-	QAction *processing_extract_actions[14];
+	QAction *processing_extract_actions[15];
 	int processing_extract_action = 3; // default
 
 	QPushButton *mpStopButton;

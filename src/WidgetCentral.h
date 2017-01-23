@@ -17,7 +17,6 @@
 #include "ImfPackage.h"
 #include <QWidget>
 
-
 class QTabWidget;
 class WidgetVideoPreview;
 class QMessageBox;	
@@ -47,7 +46,8 @@ public:
 
 	//WidgetVideoPreview *mpPreview; // (k)
 	QVector<PlayListElement> playlist; // (k) make private?
-	QVector<TTMLtimelineSegment> ttmls; // (K) make private?
+	QVector<TTMLtimelineSegment> ttmls;
+
 signals:
 	void UndoStackChanged(QUndoStack *pStack);
 	void CplSaveStateChanged(bool isDirty);
@@ -78,7 +78,7 @@ private:
 	QTabWidget *mpTabWidget;
 	WidgetVideoPreview *mpPreview;
 	QTabWidget *mpTabDetailTTML; // (k)
-	TTMLDetails *mpTTMLDetailsWidget;
+	TTMLDetails *mpTTMLDetailsWidget; // (k)
 	WidgetCompositionInfo *mpDetailsWidget;
 	QThread *tpThread; // (k)
 	TimelineParser *timelineParser; // (k)
