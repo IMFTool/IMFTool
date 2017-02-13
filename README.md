@@ -25,10 +25,11 @@ An introductory video is available on YouTube [2].
 -	Set edit points and markers
 -	Export the IMP
 -	Export all new MXF files and new CPL(s) as Partial IMP 
+-       Editing of the ContentVersionList element, including custom LabelText entries
 
 ##Workflows supported soon (under development):
--	Editing of the ContentVersionList element, including custom LabelText entries
 -	Audio Inserts
+-	Editing of the LocaleList element
 
 ##CREDITS
 The initial development of this tool has kindly been sponsored by Netflix Inc.
