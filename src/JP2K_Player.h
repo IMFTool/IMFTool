@@ -15,17 +15,6 @@
  */
 #pragma once
 #include <QObject>
-#include <QImage>
-#include <QThreadPool>
-#include <QRunnable>
-#include <QStringList>
-#include <QFileInfo>
-#include <QVariant>
-#include "openjpeg.h"
-#include "Error.h"
-#include <QTime>
-#include <QDebug>
-#include <QTimer>
 #include <chrono>
 #include "ImfPackage.h"
 #include "JP2K_Decoder.h"
@@ -33,125 +22,106 @@
 class JP2K_Player;
 class JP2K_Decoder;
 
-class FrameRequest {
+class FrameRequest
+{
 public:
 	qint64 frameNr; // current frame in asset
+	qint64 TframeNr; // current frame in track
 	QImage decoded; // decoded image
 	bool done;
 	bool error;
 	QString errorMsg;
+	QSharedPointer<AssetMxfTrack> asset;
+	int fps;
+	int layer;
 };
 
-class JP2K_Player : public QObject{
+class JP2K_Player : public QObject
+{
 	Q_OBJECT
 public:
-	JP2K_Player(); // constructor
+	JP2K_Player();
+	~JP2K_Player();
 
 	// methods
-	void stop();
 	void setFps(int fps);
 	void setLayer(int layer); // layer to decode
-	void setPlaylist(QVector<PlayListElement> &rPlaylist);
+	void setPlaylist(QVector<VideoResource>& rPlaylist);
 	void setPos(int frameNr, int frame_total, int playlist_index);
+	void clean();
 	void convert_to_709(bool convert);
 
-	bool playing = false;
-	float playing_frame = 0; // starting at startpos
-	float decoding_frame = 0; // starting at startpos
-	int playing_count = 0;
-	float playing_frame_total = 0;
-	bool realspeed = false; // default
-	bool show_subtitles = false; // default
-
+	float frame_playing_total_float = 0; // current playing position (within track)
+	bool playing = false; // currently playing
+	bool realspeed = false; // play every frame or skip frames
+	float skip_frames = 0; // play every x frames when realspeed == true
+	bool show_subtitles = true; // display subtitles during playback
+	float frame_playing_asset_float = 0;
 private:
 
-	QThreadPool *threadPool;
-	QThread *extractFrameThread;
-	AS_02::JP2K::MXFReader *reader;
-	QSharedPointer<AS_02::JP2K::MXFReader> reader_shared;
-
-	FrameRequest *request_queue[50];
-	JP2K_Decoder *decoder_queue[50];
-	QSharedPointer<FrameRequest> pointer_queue[50];
-
-	QVector<PlayListElement> playlist;
-	int playing_ple_index = 0; // ple currently playing
-	PlayListElement ple_playing;
-
-	bool playlist_last_item = false;
-	int last_frame_nr = 0;
-
-	
-	int decoding_ple_index = 0; // decding pictures from this ple index
-	PlayListElement ple_decoding;
-	qreal video_framerate;
-	QSharedPointer<AssetMxfTrack> CurrentDecodingAsset;
-	QSharedPointer<DecodedFrames> decoded_shared;
-
-	int decoding_frame_total = 0;
-	int decoding_frame_int = 0;
-	int playing_frame_int = 0;
-
-
-	int playing_frame_mod = 0;
-
-	int buffer_size = 0; // current buffer size
-	int play_loop_delay = 0; // delay occurring in play loop
-	float actual_fps = 0; // actual fps being displayed
-
-	// fps & buffer mangement
-	QTime *buffer_fill_timer; // time it took to fill buffer in order to be able to start playback
-	int buffer_fill_counter = 0;
-
-	qint64 asset_duration;
-	int first_frame = 0;
-	//PlayerPos pos;
-	
-	int played_frames_total = 0;
-	int requested_frames_total = 0;
-	int player_position_counter = 0;
-	int playlist_length = 0;
-
-	int average_decode_time = 0;
-	int average_decode_time_total = 0;
-	int average_decode_counter = 0;
-
-	QImage nullimage;
-	//QVector<QImage>(50) frameBuffer;
-	QTime *timer;
-	QTime *fps_timer; // count how many frames are really shown
-	int fps_counter = 0;
-
-	int skipped_frames = 0;
-
-	bool buffering = true;
-	int buffer_fill_count = 0; // count play-cycles it took to fill the buffer
-	int fps;
-	
-	int ms_wait = 1000;
+	// methods
 	void playLoop();
-	void clean();
+
+	// decoders
+	static const int decoders = 50;
+	QThreadPool* threadPool; // threadpool used by the n decoders
+	FrameRequest* request_queue[decoders]; // array were n frame requests are stored
+	JP2K_Decoder* decoder_queue[decoders]; // array were n decoder instances are stored
+	QSharedPointer<FrameRequest> pointer_queue[decoders];
+	QSharedPointer<DecodedFrames> decoded_shared; // decoding status shared among player and all decoders
+
+	// player settings
+	int layer = 0; // quality layer to decode (best = 0, default = 5)
+	int frameNr = 0; // player position within asset
+	int TframeNr = 0; // player position within track
+	int playlist_index = 0; // playlist asset index
+	int fps = 0; // nr of images to play/request per second
+	int ms_wait = 1000; // default wait intervall between cycles in play-loop
+	QImage nullimage; // empty image
+	QTime* timer; // timer used for play-loop
+	qreal video_framerate = 0;
+
+	// player control
+	int last_frame_total = 0; // last frame in track
+	bool started_playing = false; // buffer was filled and playing out of frames has started
+
+	// decoding
+	float frame_decoding_asset_float = 0; // current decoding position (within asset)
+	float frame_decoding_total_float = 0; // current decoding position (within track)
+	int decoding_index = 0; // decoding asset at this playlist index
+	int request_index = 0; // [0...decoders]
+
+	// playing
+	int playing_index = 0; // playing asset at this playlist index
+	int played_frames_total = 0;  // [0...decoders]
+	int player_position_counter = 0; // count from 0...fps, then move frame indicator
+	int requested_frames_total = 0; // total requests sent during play cycle
+	int last_frame_played = 0;
+
+	// playlist
+	QVector<VideoResource> playlist; // all playlist elements
+
+	// buffer management
+	int buffer_size = 0; // current buffer size
+	bool buffering = true; // currently buffering?
+	int buffer_fill_count = 0; // play-loop cycles it took to fill the buffer to fps
 
 	// luts
 	static const int bitdepth = 16;
 	int max_f; // (float)pow(2, bitdepth)
 	float max_f_; // max_f - 1;
-	float *oetf_709;
-	float *eotf_2020;
-	float *eotf_PQ;
+	float* oetf_709;
+	float* eotf_2020;
+	float* eotf_PQ;
 
-signals:
-	void ShowMsgBox(const QString&, int);
-	void getFrames(); // int, int, int
-	void finished();
-	void playerInfo(const QString&);
-	void showFrame(const QImage&);
-	void currentPlayerPosition(qint64);
+	signals :
+	void ShowMsgBox(const QString&, int); // Show MsgBox if set playback speed exceeds processing power
+	void playerInfo(const QString&); // send QString from player to WidgetVideoPreview
+	void showFrame(const QImage&); // send QImage to WdigetImagePreview
+	void currentPlayerPosition(qint64,bool); // set frame indicator position
 	void playbackEnded();
-	void playTTML();
+	void playTTML(); // get subtitles for current frame indicator position
 
-	public slots:
+public slots:
 	void startPlay(); // starts playback
-	void setReader();
-	//void receiveDecodedImage(); // QImage, qint64, int, int
 };

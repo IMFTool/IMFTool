@@ -1102,32 +1102,40 @@ void WidgetComposition::rCurrentFrameChanged(const Timecode &rCplTimecode) {
 	if(p_segment) {
 		QUuid audio_track_id;
 		QUuid video_track_id;
+		QUuid ttml_track_id; // (k)
 		for(int i = 0; i < GetTrackDetailCount(); i++) {
 			AbstractWidgetTrackDetails *p_track_details = GetTrackDetail(i);
 			if(p_track_details) {
-				if(p_track_details->GetType() == MainAudioSequence) {
-					if(WidgetAudioTrackDetails *p_audio_track = static_cast<WidgetAudioTrackDetails*>(p_track_details)) {
-						if(p_audio_track->GetSoloButton()->isChecked() == true) audio_track_id = p_audio_track->GetId();
-					}
-				}
-				else if(p_track_details->GetType() == MainImageSequence) {
+				//if(p_track_details->GetType() == MainAudioSequence) {
+				//	if(WidgetAudioTrackDetails *p_audio_track = static_cast<WidgetAudioTrackDetails*>(p_track_details)) {
+				//		if(p_audio_track->GetSoloButton()->isChecked() == true) audio_track_id = p_audio_track->GetId();
+				//	}
+				//}
+				if(p_track_details->GetType() == MainImageSequence) {
 					video_track_id = p_track_details->GetId();
+				}
+				else if (p_track_details->GetType() == SubtitlesSequence) {
+					ttml_track_id = p_track_details->GetId();
 				}
 			}
 		}
-		QList<AbstractGraphicsWidgetResource*> resources_list = mpCompositionScene->GetResourcesAt(rCplTimecode, MainAudioSequence | MainImageSequence);
+
+		QList<AbstractGraphicsWidgetResource*> resources_list = mpCompositionScene->GetResourcesAt(rCplTimecode, SubtitlesSequence | MainAudioSequence | MainImageSequence);
 		for(int i = 0; i < resources_list.size(); i++) {
 			GraphicsWidgetSequence *p_seq = dynamic_cast<GraphicsWidgetSequence*>(resources_list.at(i)->GetSequence());
 			if(p_seq) {
-				if(p_seq->GetTrackId() == audio_track_id) {
+				//if(p_seq->GetTrackId() == audio_track_id) {
+				//	AbstractGraphicsWidgetResource *p_resource = resources_list.at(i);
+				//	emit CurrentAudioChanged(p_resource->GetAsset(), (p_resource->MapToCplTimeline(Timecode()) - rCplTimecode).AsPositiveDuration(), rCplTimecode);
+				//}
+				if(p_seq->GetTrackId() == video_track_id) {
 					AbstractGraphicsWidgetResource *p_resource = resources_list.at(i);
-					emit CurrentAudioChanged(p_resource->GetAsset(), (p_resource->MapToCplTimeline(Timecode()) - rCplTimecode).AsPositiveDuration(), rCplTimecode);
-				}
-				else if(p_seq->GetTrackId() == video_track_id) {
-					AbstractGraphicsWidgetResource *p_resource = resources_list.at(i);
-					if (p_resource->GetAsset()) {
+					if (p_resource->GetLastVisibleFrame().GetOverallFrames() > -1) { // avoids wrong signals near segment transitions
 						emit CurrentVideoChanged(p_resource->GetAsset(), (p_resource->MapToCplTimeline(Timecode()) - rCplTimecode).AsPositiveDuration(), rCplTimecode, p_resource->timline_index);
 					}
+				}else if (p_seq->GetTrackId() == ttml_track_id && video_track_id.isNull()) { // (k)
+					AbstractGraphicsWidgetResource *p_resource = resources_list.at(i);
+					emit CurrentVideoChanged(p_resource->GetAsset(), (p_resource->MapToCplTimeline(Timecode()) - rCplTimecode).AsPositiveDuration(), rCplTimecode, p_resource->timline_index);
 				}
 			}
 		}

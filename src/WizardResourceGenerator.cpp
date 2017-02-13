@@ -132,15 +132,14 @@ void WizardResourceGeneratorPage::InitLayout() {
 	mpTableViewWav->setItemDelegateForColumn(SoundFieldGroupModel::ColumnDstChannel, new DelegateComboBox(this, false, false));
 	//WR
 	//language code is two or three lowercase letters, region code is either two uppercase letters or three digits"
-	QRegExp rx_lang("[a-z]{2,3}\-([A-Z]{2}|[0-9]{3})");
+	const QRegExp rx_lang("[a-z]{2,3}\\-([A-Z]{2}|[0-9]{3})");
 	QRegExpValidator *v_lang = new QRegExpValidator(rx_lang, this);
 	mpLineEditLanguageTagWav = new QLineEdit(this);
 	mpLineEditLanguageTagWav->setAlignment(Qt::AlignRight);
 	mpLineEditLanguageTagWav->setPlaceholderText("en-US");
 	mpLineEditLanguageTagWav->setValidator(v_lang);
 	connect(mpLineEditLanguageTagWav, SIGNAL(textEdited(QString)), this, SLOT(languageTagWavChanged()));
-	QRegExp rx_lang2("[a-z]{2,3}\-([A-Z]{2}|[0-9]{3})");
-	QRegExpValidator *v_lang2 = new QRegExpValidator(rx_lang2, this);
+	QRegExpValidator *v_lang2 = new QRegExpValidator(rx_lang, this);
 	mpLineEditLanguageTagTT = new QLineEdit(this);
 	mpLineEditLanguageTagTT->setAlignment(Qt::AlignRight);
 	mpLineEditLanguageTagTT->setPlaceholderText("en-US");
@@ -342,14 +341,14 @@ void WizardResourceGeneratorPage::textChanged()
 //WR
 void WizardResourceGeneratorPage::languageTagWavChanged()
 {
-	QRegExp rx_lang("[a-z]{2,3}\-([A-Z]{2}|[0-9]{3})");
+	QRegExp rx_lang("[a-z]{2,3}\\-([A-Z]{2}|[0-9]{3})");
 	// ^$ empty string
 	//qDebug() << mpLineEditLanguageTagWav->text();
 	// TO-DO: Disable QWizard::FinishButton if string doesn't match regexp
 }
 void WizardResourceGeneratorPage::languageTagTTChanged()
 {
-	QRegExp rx_lang("[a-z]{2,3}\-([A-Z]{2}|[0-9]{3})");
+	QRegExp rx_lang("[a-z]{2,3}\\-([A-Z]{2}|[0-9]{3})");
 	// ^$ empty string
 	//qDebug() << mpLineEditLanguageTagWav->text();
 	// TO-DO: Disable QWizard::FinishButton if string doesn't match regexp
@@ -718,6 +717,8 @@ void WizardResourceGeneratorPage::SwitchMode(WizardResourceGenerator::eMode mode
 			mpFileDialog->setFileMode(QFileDialog::ExistingFile);
 			break;
 				/* -----Denis Manthey----- */
+		default:
+			break;
 	}
 }
 

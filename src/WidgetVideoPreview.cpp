@@ -15,7 +15,6 @@
  */
 #include "WidgetVideoPreview.h"
 #include "WidgetImagePreview.h"
-//#include "AudioPlayer.h"
 #include "GraphicsWidgetComposition.h" // (k)
 #include <QPushButton>
 #include <QGridLayout>
@@ -29,13 +28,9 @@
 #include <QThread>
 #include <QLineEdit>
 
-//#define DEBUG_JP2K
-#define PROPERTY_PLAY_SHOWN "Play"
-using namespace xercesc;
+ //#define DEBUG_JP2K
 
-
-WidgetVideoPreview::WidgetVideoPreview(QWidget *pParent) : QWidget(pParent),
-mData(ImfXmlHelper::Convert(QUuid::createUuid()), ImfXmlHelper::Convert(QDateTime::currentDateTimeUtc()), ImfXmlHelper::Convert(UserText(tr("Unnamed"))), ImfXmlHelper::Convert(EditRate::EditRate24), cpl2016::CompositionPlaylistType::SegmentListType()) {
+WidgetVideoPreview::WidgetVideoPreview(QWidget *pParent) : QWidget(pParent) {
 
 	// ############## - create 2 single frame extractors - ###################
 	for (int i = 0; i <= 1; i++) {
@@ -56,10 +51,10 @@ mData(ImfXmlHelper::Convert(QUuid::createUuid()), ImfXmlHelper::Convert(QDateTim
 
 	playerThread = new QThread();
 	player->moveToThread(playerThread);
+	player->setLayer(decode_layer); // set default layer
 
 	connect(playerThread, SIGNAL(started()), player, SLOT(startPlay()));
-	connect(player, SIGNAL(finished()), playerThread, SLOT(quit())); // stop thread
-	connect(player, SIGNAL(currentPlayerPosition(qint64)), this, SIGNAL(currentPlayerPosition(qint64)));
+	connect(player, SIGNAL(currentPlayerPosition(qint64, bool)), this, SLOT(forwardPlayerPosition(qint64, bool)));
 	connect(player, SIGNAL(playTTML()), this, SLOT(getTTML()));
 	connect(player, SIGNAL(playbackEnded()), this, SLOT(rPlaybackEnded())); // player -> this
 
@@ -69,11 +64,10 @@ mData(ImfXmlHelper::Convert(QUuid::createUuid()), ImfXmlHelper::Convert(QDateTim
 	connect(player, SIGNAL(ShowMsgBox(const QString&, int)), this, SLOT(rShowMsgBox(const QString&, int)));
 
 	InitLayout();
-
 }
 
 WidgetVideoPreview::~WidgetVideoPreview(){
-	player->deleteLater();
+	player->~JP2K_Player();
 }
 
 
@@ -149,7 +143,7 @@ void WidgetVideoPreview::InitLayout() {
 
 	processing_extract_actions[2] = new QAction(tr("Show subtitles"));
 	processing_extract_actions[2]->setCheckable(true);
-	processing_extract_actions[2]->setChecked(false); // default
+	processing_extract_actions[2]->setChecked(true); // default
 	processing_extract_actions[2]->setData(2);
 	menuProcessing->addAction(processing_extract_actions[2]);
 
@@ -197,7 +191,6 @@ void WidgetVideoPreview::InitLayout() {
 	// play button
 	mpPlayPauseButton = new QPushButton();
 	mpPlayPauseButton->setIcon(QIcon(":/play.png"));
-	mpPlayPauseButton->setProperty(PROPERTY_PLAY_SHOWN, true);
 	mpPlayPauseButton->setFlat(true);
 	mpPlayPauseButton->setContentsMargins(10, 10, 10, 10);
 	p_layout->addWidget(mpPlayPauseButton, 2, 2, 1, 1);
@@ -222,18 +215,28 @@ void WidgetVideoPreview::InitLayout() {
 	setLayout(p_layout);
 }
 
+void WidgetVideoPreview::forwardPlayerPosition(qint64 frameNr, bool decode_at_new_pos) {
+	if(!decode_at_new_pos) setFrameIndicator = true; // ignore next xPosChanged signal!
+	emit currentPlayerPosition(frameNr);
+}
 
 // stop playback
 void WidgetVideoPreview::stopPlayback(bool clicked) {
 
+	player->clean(); // reset player
+	if (currentPlaylist.length() > 0) player->setPos(currentPlaylist[0].in, 0, 0);
+
+	if (playerThread->isRunning()) playerThread->quit();
+
 	mpPlayPauseButton->setIcon(QIcon(":/play.png"));
-
-	player->stop(); // stop player
-	playerThread->quit();
-
+	
 	// reset preview decoder
 	if (decodingThreads[0]->isRunning()) decodingThreads[0]->quit();
 	if (decodingThreads[1]->isRunning()) decodingThreads[1]->quit();
+
+	decodingFrame = -1; // force preview refresh
+	setFrameIndicator = false;
+	emit currentPlayerPosition(0); // reset indicator to first frame
 }
 
 // show message box & handle input
@@ -268,19 +271,24 @@ void WidgetVideoPreview::rShowMsgBox(const QString &msg, int new_fps) {
 
 void WidgetVideoPreview::rPlaybackEnded() {
 	mpPlayPauseButton->setIcon(QIcon(":/play.png"));
-	playerThread->quit();
-	player->playing = false;
+	if(playerThread->isRunning()) playerThread->quit();
 }
 
 void WidgetVideoPreview::xPosChanged(const QSharedPointer<AssetMxfTrack> &rAsset, const Duration &rOffset, const Timecode &rTimecode, const int &playlist_index){
 
 	xSliderFrame = rOffset.GetCount(); // slider is pointing to this frame (within asset)
 	xSliderTotal = rTimecode.GetOverallFrames(); // slider is pointing to this frame (in timeline)
-	xSliderTime = rTimecode.GetAsString();
-	xCurrentTime = rTimecode.GetSecondsF();
 	currentAsset = rAsset;
 
-	if (player->playing) return;
+	if (setFrameIndicator) {
+		setFrameIndicator = false;
+		return; // ignore this signal (it is a response from setting the player position)
+	}
+	else if (player->playing) { // pause playback!
+		player->playing = false;
+		playerThread->quit();
+		mpPlayPauseButton->setIcon(QIcon(":/play.png"));
+	}
 
 #ifdef DEBUG_JP2K
 	qDebug() << "xpos asset:" << xSliderFrame << "total:" << xSliderTotal;
@@ -304,7 +312,6 @@ void WidgetVideoPreview::xPosChanged(const QSharedPointer<AssetMxfTrack> &rAsset
 			qDebug() << "start generating preview nr:" << xSliderFrame;
 #endif
 			decodingFrame = xSliderFrame;
-			decodingTime = xSliderTime;
 
 			decoders[run]->asset = currentAsset; // set new asset in current decoder
 			decoders[run]->frameNr = xSliderFrame; // set current frame number in decoder								 
@@ -326,7 +333,6 @@ void WidgetVideoPreview::decodingStatus(qint64 frameNr,QString status) {
 	if (decodingFrame != xSliderFrame && player->playing == false && !decodingThreads[run]->isRunning()){
 		
 		decodingFrame = xSliderFrame;
-		decodingTime = xSliderTime;
 #ifdef DEBUG_JP2K
 		qDebug() << "now start decoding nr" << xSliderFrame;
 #endif
@@ -343,32 +349,43 @@ void WidgetVideoPreview::decodingStatus(qint64 frameNr,QString status) {
 
 }
 
-
 void WidgetVideoPreview::rPlayPauseButtonClicked(bool checked) {
 	
-	if (playerThread->isRunning() && player->playing) {
-		// pause playback
+	mpImagePreview->ttml_regions.clear();
+
+	if (playerThread->isRunning() && player->playing) { // pause playback
+
 		player->playing = false;
 		playerThread->quit();
-		currentPlayerPosition((int)(player->playing_frame_total)); // set current position in timeline
 		mpPlayPauseButton->setIcon(QIcon(":/play.png"));
-		decoding_time->setText("paused!");
+
+		// set current position in timeline
+		if(player->realspeed)
+		{
+			currentPlayerPosition((int)(player->frame_playing_total_float - player->skip_frames));
+		}
+		else {
+			currentPlayerPosition((int)(player->frame_playing_total_float - 1));
+		}
 	}
 	else if (player->playing) { // player is paused
 		playerThread->start(QThread::TimeCriticalPriority); // resume playback
 		mpPlayPauseButton->setIcon(QIcon(":/pause.png"));
 	}
-	else { // start player
+	else if(currentPlaylist.length() > 0){ // start player
 		mpPlayPauseButton->setIcon(QIcon(":/pause.png"));
 		playerThread->start(QThread::TimeCriticalPriority);
 		emit ttmlChanged(QVector<visibleTTtrack>(), ttml_search_time.elapsed()); // clear subtitle preview
+	}else
+	{
+		decoding_time->setText("Player could not be started!");
 	}
 }
 
 void WidgetVideoPreview::keyPressEvent(QKeyEvent *pEvent) {
 
 	if(pEvent->key() == Qt::Key_Space) {
-		//rPlayPauseButtonClicked(false);
+		rPlayPauseButtonClicked(false);
 	}
 }
 
@@ -376,6 +393,7 @@ void WidgetVideoPreview::keyPressEvent(QKeyEvent *pEvent) {
 void WidgetVideoPreview::Clear() {
 	decoding_time->setText("");
 	mpImagePreview->Clear();
+	emit stopPlayback(true); // stop playback
 }
 
 void WidgetVideoPreview::InstallImp() {
@@ -387,7 +405,7 @@ void WidgetVideoPreview::UninstallImp() {
 	mpImagePreview->Clear();
 }
 
-void WidgetVideoPreview::setPlaylist(QVector<PlayListElement> &rPlayList, QVector<TTMLtimelineSegment> &rTTMLs) {
+void WidgetVideoPreview::setPlaylist(QVector<VideoResource> &rPlayList, QVector<TTMLtimelineResource> &rTTMLs) {
 
 	ttmls = &rTTMLs; // set timed text elements
 	currentPlaylist = rPlayList; // set playlist
@@ -396,7 +414,7 @@ void WidgetVideoPreview::setPlaylist(QVector<PlayListElement> &rPlayList, QVecto
 
 	// create array of TTMLtracks
 	int track_index = 0;
-	ttml_tracks = QMap<int, QVector<TTMLtimelineSegment>>(); // clear all previus tracks
+	ttml_tracks = QMap<int, QVector<TTMLtimelineResource>>(); // clear all previus tracks
 	QMap<int, int> track_indices;
 	for (int i = 0; i < ttmls->length(); i++) {
 		ttml_tracks[ ttmls->at(i).track_index ].append(ttmls->at(i));
@@ -404,21 +422,28 @@ void WidgetVideoPreview::setPlaylist(QVector<PlayListElement> &rPlayList, QVecto
 
 	if (rPlayList.length() > 0) {
 		
-		// check if asset is valid
-		if (!rPlayList[0].asset) {
-			decoding_time->setText("First playlist asset is not valid...");
-			return;
+		// loop playlist & set resolutions
+		int width = 0, height = 0, count = -1;
+		bool found = false;
+
+		// look for first valid asset
+		while (count < (rPlayList.length() - 1) && found == false) {
+			count++;
+			if (rPlayList.at(count).asset) {
+				found = true;
+			}
 		}
 
-		// loop playlist & set resolutions
-		int width = 0, height = 0;
-		if (rPlayList[0].asset->GetMetadata().displayWidth > 0) { // check for displayWidth
-			width = rPlayList[0].asset->GetMetadata().displayWidth;
-			height = rPlayList[0].asset->GetMetadata().displayHeight;
+		if (found == false) return; // no valid asset found in timeline
+
+		// use first valid asset to get resolution
+		if (rPlayList.at(count).asset->GetMetadata().displayWidth > 0) { // check for displayWidth
+			width = rPlayList.at(count).asset->GetMetadata().displayWidth;
+			height = rPlayList.at(count).asset->GetMetadata().displayHeight;
 		}
-		else if (rPlayList[0].asset->GetMetadata().storedWidth > 0) { // check for storedWidth
-			width = rPlayList[0].asset->GetMetadata().storedWidth;
-			height = rPlayList[0].asset->GetMetadata().storedHeight;
+		else if (rPlayList.at(count).asset->GetMetadata().storedWidth > 0) { // check for storedWidth
+			width = rPlayList.at(count).asset->GetMetadata().storedWidth;
+			height = rPlayList.at(count).asset->GetMetadata().storedHeight;
 		}
 
 		for (int i = 0; i <= 5; i++) {
@@ -443,7 +468,8 @@ void WidgetVideoPreview::setPlaylist(QVector<PlayListElement> &rPlayList, QVecto
 		if (showTTML) getTTML(); // look for TTML
 	}
 	else {
-		decoding_time->setText("Empty playlist found...");
+		decoding_time->setText("No/empty playlist!");
+		mpImagePreview->Clear();
 	}
 }
 
@@ -457,7 +483,16 @@ void WidgetVideoPreview::rChangeSpeed(QAction *action) {
 		speeds[decode_speed_index]->setChecked(false); // uncheck 'old' value
 		decode_speed = action->data().value<int>();
 		decode_speed_index = decode_speed;
+	
+		bool was_playing = player->playing;
+		if (playerThread->isRunning()) playerThread->quit();
 		player->setFps(decode_speed);
+		player->clean();
+
+		if (was_playing) {
+			player->playing = true;
+			playerThread->start(QThread::TimeCriticalPriority); // resume playback
+		}
 	}
 	else {
 		if (decode_speed > 30) decode_speed_index = (decode_speed - 30) / 5;
@@ -490,6 +525,7 @@ void WidgetVideoPreview::rChangeQuality(QAction *action) {
 void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 	
 	int nr = action->data().value<int>();
+	bool player_playing = player->playing;
 
 	switch (nr) {
 	case 0: // smoothing
@@ -519,19 +555,24 @@ void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 		}
 		break;
 	case 3: // real speed
-		if (action->isChecked()) {
-			player->realspeed = true; // realspeed = on
+		qDebug() << "real speed" << action->isChecked();
+
+		if(playerThread->isRunning()) playerThread->quit();
+		player->realspeed = action->isChecked();
+		player->clean();
+
+		if (player_playing) {
+			player->playing = true;
+			playerThread->start(QThread::TimeCriticalPriority); // resume playback
 		}
-		else {
-			player->realspeed = false; // realspeed = off
-		}
+
 		break;
 	case 4: // color space conversion
 		decoders[0]->convert_to_709 = action->isChecked(); // set in decoder 0
 		decoders[1]->convert_to_709 = action->isChecked(); // set in decoder 1
 		player->convert_to_709(action->isChecked()); // set in player
 
-		if (!player->playing) {
+		if (!player_playing) {
 			// reload current preview
 			decoding_time->setText("loading...");
 			now_running = !now_running; // use same decoder (relevant frame is still set)
@@ -563,14 +604,7 @@ void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 
 void WidgetVideoPreview::getTTML() {
 
-	float time;
-	if (!currentAsset) { // current asset is not valid -> use default timeline time
-		time = xCurrentTime * (1001.0f / 1000.0f);
-	}
-	else {
-		float video_framerate = currentAsset->GetMetadata().editRate.GetQuotient(); // get video ramerate
-		time = ((float)xSliderTotal / video_framerate) * (1001.0f / 1000.0f);
-	}
+	float time = ((float)xSliderTotal / CPLEditRate);
 
 	ttml_search_time.start();
 	current_tt = QVector<visibleTTtrack>();
@@ -582,13 +616,13 @@ void WidgetVideoPreview::getTTML() {
 	QString h, m, s, f;
 
 	// loop tracks
-	QMap<int, QVector<TTMLtimelineSegment>>::iterator x;
+	QMap<int, QVector<TTMLtimelineResource>>::iterator x;
 	for (x = ttml_tracks.begin(); x != ttml_tracks.end(); ++x) { // i.key(), i.value()
 
 		// loop segments in track
 		for (int i = 0; i < x.value().length(); i++) {
 
-			TTMLtimelineSegment segment = x.value().at(i);
+			TTMLtimelineResource segment = x.value().at(i);
 
 			// loop tt elements within segment
 			if (time > segment.timeline_in && time <= segment.timeline_out) {
@@ -633,31 +667,17 @@ void WidgetVideoPreview::getTTML() {
 
 void WidgetVideoPreview::rPrevNextSubClicked(bool direction) {
 
-	float video_framerate;
-
-	if (!currentAsset) { // look for valid asset in timeline
-		for (int i = 0; i < currentPlaylist.length(); i++) {
-			if (currentPlaylist.at(i).asset) { // asset found -> use it's framerate to calculate 
-				video_framerate = currentPlaylist.at(i).asset->GetMetadata().editRate.GetQuotient();
-				break;
-			}
-		}
-	}
-	else { // use current asset
-		video_framerate = currentAsset->GetMetadata().editRate.GetQuotient();
-	}
-
 	// calculate frame indicator time
-	float time = ((float)xSliderTotal / video_framerate) * (1001.0f / 1000.0f); // ntsc time -> real time
+	float time = ((float)xSliderTotal / CPLEditRate);
 	float next = -1, prev = -1, item_begin = 0;
 
 	// loop tracks
-	QMap<int, QVector<TTMLtimelineSegment>>::iterator x;
+	QMap<int, QVector<TTMLtimelineResource>>::iterator x;
 	for (x = ttml_tracks.begin(); x != ttml_tracks.end(); ++x) { // i.key(), i.value()
 
 		// loop segments within track
 		for (int i = 0; i < x.value().count(); i++) {
-			TTMLtimelineSegment segment = x.value().at(i);
+			TTMLtimelineResource segment = x.value().at(i);
 
 			// loop items within segment
 			for (int ii = 0; ii < segment.items.length(); ii++) {
@@ -675,7 +695,7 @@ void WidgetVideoPreview::rPrevNextSubClicked(bool direction) {
 				}
 
 				if (next == -1 && item_begin > time) {
-					if ((float)abs(time - item_begin) * video_framerate >= 1) { // make sure there is at least one frame difference to current frame
+					if (ceil((float)item_begin * CPLEditRate) > xSliderTotal) { // make sure there is at least one frame difference to current frame
 						next = item_begin; // initialize next
 #ifdef DEBUG_JP2K
 						qDebug() << "init next.";
@@ -684,7 +704,7 @@ void WidgetVideoPreview::rPrevNextSubClicked(bool direction) {
 				}
 
 				if (item_begin < time && item_begin > prev) {
-					if ((float)abs(time - item_begin) * video_framerate >= 1) { // make sure there is at least one frame difference to current frame
+					if (ceil((float)item_begin * CPLEditRate) < xSliderTotal) { // make sure there is at least one frame difference to current frame
 						prev = item_begin;
 #ifdef DEBUG_JP2K
 						qDebug() << "update prev.";
@@ -695,7 +715,7 @@ void WidgetVideoPreview::rPrevNextSubClicked(bool direction) {
 		}
 	}
 #ifdef DEBUG_JP2K
-	qDebug() << "video fps:" << video_framerate << "frame indicator" << time << "prev" << prev << "next" << next;
+	qDebug() << "CPL fps:" << CPLEditRate << "frame indicator" << time << "prev" << prev << "next" << next;
 #endif
 
 	if (next == -1) { // no next found, use last time
@@ -703,9 +723,9 @@ void WidgetVideoPreview::rPrevNextSubClicked(bool direction) {
 	}
 
 	if (direction == true) { 
-		emit currentPlayerPosition(ceil(next * video_framerate)); // next
+		emit currentPlayerPosition(ceil(next * CPLEditRate)); // next
 	}
 	else {
-		emit currentPlayerPosition(ceil(prev * video_framerate)); // previous
+		emit currentPlayerPosition(ceil(prev * CPLEditRate)); // previous
 	}
 }

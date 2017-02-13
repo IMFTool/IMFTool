@@ -22,10 +22,11 @@
 #include "AS_DCP_internal.h"
 #include <QThreadpool>  
 
+//#define DEBUG_JP2K
 
-// #################################################### MXFP_decode #######################################################
+ // #################################################### MXFP_decode #######################################################
 JP2K_Decoder::JP2K_Decoder(QSharedPointer<DecodedFrames> &rdecoded_shared, QSharedPointer<FrameRequest> &rRequest, float* &Roetf_709_shared, float* &Reotf_2020_shared, float* &Reotf_PQ_shared) {
-	
+
 	// set stuff
 	decoded_shared = rdecoded_shared;
 	request = rRequest;
@@ -36,78 +37,127 @@ JP2K_Decoder::JP2K_Decoder(QSharedPointer<DecodedFrames> &rdecoded_shared, QShar
 	max_f = 1 << bitdepth;
 	max_f_ = (float)(max_f)-1.0;
 
-	buff = new ASDCP::JP2K::FrameBuffer();
+	reader = new AS_02::JP2K::MXFReader();
 
-	buff->Capacity(default_buffer_size); // set default size
+	pDecompressor = OPENJPEG_H::opj_create_decompress(OPJ_CODEC_J2K); // create new decompresser
+
+	//register callbacks (for debugging)
+	OPENJPEG_H::opj_set_info_handler(pDecompressor, info_callback, 0);
+	OPENJPEG_H::opj_set_warning_handler(pDecompressor, warning_callback, 0);
+	OPENJPEG_H::opj_set_error_handler(pDecompressor, error_callback, 0);
 }
 
 void JP2K_Decoder::run() {
 
-	// calculate neccessary buffer size
-	if (ASDCP_SUCCESS(reader->AS02IndexReader().Lookup((request->frameNr + 1), IndexF2))) { // next frame
+	// create new frame buffer
+	buff = new ASDCP::JP2K::FrameBuffer();
 
-		Result_t result_f1 = reader->AS02IndexReader().Lookup(request->frameNr, IndexF1); // current frame
-		if (ASDCP_SUCCESS(result_f1)) {
+	//register callbacks (for debugging)
+#ifdef DEBUG_JP2K
+	OPENJPEG_H::opj_set_info_handler(pDecompressor, info_callback, 0);
+	OPENJPEG_H::opj_set_warning_handler(pDecompressor, warning_callback, 0);
+	OPENJPEG_H::opj_set_error_handler(pDecompressor, error_callback, 0);
+#endif
+
+	if (request->asset != current_asset) { // asset has changed -> update reader!
+		if (current_asset) { // close previous reader
+			reader->Close();
+			reader->~MXFReader();
+		} // else : first reader 
+
+		// create new reader
+		reader = new AS_02::JP2K::MXFReader();
+
+		Result_t result_o = reader->OpenRead(request->asset->GetPath().absoluteFilePath().toStdString()); // open file for reading
+		if (!ASDCP_SUCCESS(result_o)) {
+
+			request->errorMsg = QString("Failed to open reader: %1").arg(result_o.Label());
+			request->error = true; // an error occured processing the frame
+			return;
+		}
+		else {
+			current_asset = request->asset;
+		}
+	} // else : correct reader is alrady open
+
+	// calculate neccessary buffer size
+	Result_t f_next = reader->AS02IndexReader().Lookup((request->frameNr + 1), IndexF2);
+	if (ASDCP_SUCCESS(f_next)) { // next frame
+		Result_t f_this = reader->AS02IndexReader().Lookup(request->frameNr, IndexF1);
+		if (ASDCP_SUCCESS(f_this)) { // current frame
 			buff->Capacity((IndexF2.StreamOffset - IndexF1.StreamOffset) - 20); // set buffer size
 		}
-	} // else: stick with default bufer size
+		else {
+			buff->Capacity(default_buffer_size); // set default size
+		}
+	}
+	else {
+		buff->Capacity(default_buffer_size); // set default size
+	}
 
 	// try reading requested frame number
-	Result_t result = reader->ReadFrame(request->frameNr, *buff, NULL, NULL);
-	if (ASDCP_SUCCESS(result)) {
-
+	Result_t res = reader->ReadFrame(request->frameNr, *buff, NULL, NULL);
+	if (ASDCP_SUCCESS(res)) {
 		pMemoryStream.pData = (unsigned char*)buff->Data();
 		pMemoryStream.dataSize = buff->Size();
 	}
 	else {
-		request->errorMsg = QString("Frame %1 could no be read!").arg(request->frameNr);
+		request->errorMsg = QString("%1 -> Slow HDD? (speed: ~%2 Mb/s)").arg(res.Label()).arg((request->fps * pMemoryStream.dataSize) / 1024 / 1024);
 		request->error = true; // an error occured processing the frame
 		return;
 	}
-
+	
 	pMemoryStream.offset = 0;
 	pStream = opj_stream_create_default_memory_stream(&pMemoryStream, OPJ_TRUE);
-	params.cp_reduce = layer; // set current layer
+	params.cp_reduce = request->layer; // set current layer
 	pDecompressor = OPENJPEG_H::opj_create_decompress(OPJ_CODEC_J2K); // create new decompresser
 
 	// Setup the decoder
 	if (!OPENJPEG_H::opj_setup_decoder(pDecompressor, &params)) {
+
 		request->errorMsg = "Error setting up the decoder!";
 		request->error = true; // an error occured processing the frame
-		opj_destroy_codec(pDecompressor);
+
+		OPENJPEG_H::opj_stream_destroy(pStream);
+		OPENJPEG_H::opj_destroy_codec(pDecompressor);
 		return;
 	}
 
 	// try reading header
 	if (!OPENJPEG_H::opj_read_header(pStream, pDecompressor, &psImage)) {
-		request->errorMsg = "Failed to read JPX header";
+
+		request->errorMsg = QString("Failed to read header -> Slow HDD? (speed: ~%1 Mb/s)").arg((request->fps * pMemoryStream.dataSize) / 1024 / 1024);
 		request->error = true; // an error occured processing the frame
-		opj_stream_destroy(pStream);
-		opj_destroy_codec(pDecompressor);
-		opj_image_destroy(psImage);
+
+		OPENJPEG_H::opj_stream_destroy(pStream);
+		OPENJPEG_H::opj_destroy_codec(pDecompressor);
 		return;
 	}
 
 	// try decoding image
 	if (!OPENJPEG_H::opj_decode(pDecompressor, pStream, psImage)) {
+
 		request->errorMsg = "Failed to decode JPX image";
 		request->error = true; // an error occured processing the frame
-		opj_destroy_codec(pDecompressor);
-		opj_stream_destroy(pStream);
-		opj_image_destroy(psImage);
+
+		buff->~FrameBuffer();
+		OPENJPEG_H::opj_destroy_codec(pDecompressor);
+		OPENJPEG_H::opj_stream_destroy(pStream);
+		OPENJPEG_H::opj_image_destroy(psImage);
 		return;
 	}
 
 	// success:
 	request->decoded = DataToQImage(); // create image
 	request->done = true; // image is ready
-
+	
 	decoded_shared->decoded_total++;
 	decoded_shared->decoded_cycle++;
 	decoded_shared->pending_requests--;
-	
+
 	// clean up
+	buff->~FrameBuffer();
 	OPENJPEG_H::opj_stream_destroy(pStream);
 	OPENJPEG_H::opj_destroy_codec(pDecompressor);
-	OPENJPEG_H::opj_image_destroy(psImage);
+	OPENJPEG_H::opj_image_destroy(psImage); // free allocated memory
 }

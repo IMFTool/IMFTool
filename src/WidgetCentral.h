@@ -23,6 +23,7 @@ class QMessageBox;
 class WidgetCompositionInfo;
 class TTMLDetails;
 class TimelineParser;
+class WidgetContentVersionList; //WR
 
 class WidgetCentral : public QWidget {
 
@@ -45,8 +46,8 @@ public:
 	QSharedPointer<ImfPackage> GetMpImfPackage() const {return mpImfPackage;}
 
 	//WidgetVideoPreview *mpPreview; // (k)
-	QVector<PlayListElement> playlist; // (k) make private?
-	QVector<TTMLtimelineSegment> ttmls;
+	QVector<VideoResource> playlist; // (k) make private?
+	QVector<TTMLtimelineResource> ttmls;
 
 signals:
 	void UndoStackChanged(QUndoStack *pStack);
@@ -80,6 +81,7 @@ private:
 	QTabWidget *mpTabDetailTTML; // (k)
 	TTMLDetails *mpTTMLDetailsWidget; // (k)
 	WidgetCompositionInfo *mpDetailsWidget;
+	WidgetContentVersionList *mpContentVersionListWidget; //WR
 	QThread *tpThread; // (k)
 	TimelineParser *timelineParser; // (k)
 	bool playListUpdateSuccess = true; // (k)

@@ -51,6 +51,8 @@
         <file>vi.png</file>
         <file>vi_bw.png</file>
         <file>cutter.png</file>
+		<file>frame_error.png</file>
+		<file>frame_blank.png</file>
         <file>pause.png</file>
         <file>play.png</file>
 		<file>stop.png</file>

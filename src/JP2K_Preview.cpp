@@ -26,9 +26,17 @@ JP2K_Preview::JP2K_Preview() {
 
 JP2K_Preview::~JP2K_Preview()
 {
-	reader->Close();
-	reader->~MXFReader();
-	buff->~FrameBuffer();
+	if(!current_asset.isNull())
+	{
+		reader->Close();
+		reader->~MXFReader();
+	}else
+	{
+		qDebug() << "no reader found!";
+	}
+	
+	delete eotf_709;
+	delete oetf_709;
 	delete eotf_2020;
 	delete oetf_2020;
 	delete eotf_PQ;
@@ -40,10 +48,10 @@ void JP2K_Preview::setUp() {
 	decode_time.start();
 
 	params.cp_reduce = 3; // (default)
-	buff = new ASDCP::JP2K::FrameBuffer();
 	cpus = opj_get_num_cpus();
 
 	pDecompressor = OPENJPEG_H::opj_create_decompress(OPJ_CODEC_J2K);
+
 	opj_codec_set_threads(pDecompressor, cpus);
 
 	// Setup the decoder (first time), using user parameters
@@ -83,7 +91,6 @@ void JP2K_Preview::setUp() {
 		else {
 			oetf_709[i] = 1.099 * pow(input, 0.45) - 0.099;
 		}
-		//rev_oetf_709[(int)(max_f_ - i)] = 1 - oetf_709[i];
 
 		// BT.709 - EOTF
 		if (input < (4.5 * 0.018)) {
@@ -93,10 +100,7 @@ void JP2K_Preview::setUp() {
 			eotf_709[i] = pow(((input + (alpha - 1)) / alpha), 1.0 / 0.45);
 		}
 
-		// OETF_709(EOTF_709(i)), curve: \
-				qDebug() << i << oetf_709[(int)(eotf_709[i] * max_f_)] * max_f_;
-
-// BT.2020 - OETF
+		// BT.2020 - OETF
 		if (input < beta) {
 			oetf_2020[i] = 4.5 * input;
 		}
@@ -112,9 +116,7 @@ void JP2K_Preview::setUp() {
 			eotf_2020[i] = pow(((input + (alpha - 1)) / alpha), 1.0 / 0.45);
 		}
 
-
-		// PQ
-		//eotf_PQ[i] = pow(( (pow(input, 1.0 / m2) - c1) / ((c2 - c3) * pow(input, 1.0 / m2) )), 1.0 / m1);
+		// SMPTE ST 2084 (PQ)
 		eotf_PQ[i] = pow(((pow(input, (1.0 / m2)) - c1)) / (c2 - c3 *pow(input, (1.0 / m2))), 1.0 / m1) * 10000;
 		oetf_PQ[i] = pow((c1 + c2*pow(input, m1)) / (1 + c3*pow(input, m1)), m2);
 
@@ -127,15 +129,17 @@ void JP2K_Preview::setUp() {
 
 void JP2K_Preview::getProxy() {
 
-	convert_to_709 = false; // (default for proxys)
+	cpus = 1; // (default for proxys)
+	convert_to_709 = true; // (default for proxys)
 	params.cp_reduce = 4; // (default for proxy)
+
 	QImage p1 = QImage(":/proxy_unknown.png");
 	QImage p2 = QImage(":/proxy_unknown.png");
 
 	setAsset(); // initialize reader
 
 	// FIRST PROXY
-	if (extractFrame(first_proxy)) { // frame extraction was successfull -> decode frame
+	if (!err && extractFrame(first_proxy)) { // frame extraction was successfull -> decode frame
 		if (decodeImage()) { // try to decode image
 			p1 = DataToQImage();
 			cleanUp();
@@ -143,7 +147,7 @@ void JP2K_Preview::getProxy() {
 	}
 
 	// SECOND PROXY
-	if (extractFrame(second_proxy)) { // frame extraction was successfull -> decode frame
+	if (!err && extractFrame(second_proxy)) { // frame extraction was successfull -> decode frame
 		if (decodeImage()) { // try to decode image
 			p2 = DataToQImage();
 			cleanUp();
@@ -202,6 +206,13 @@ void JP2K_Preview::setAsset() {
 			Kg = 0.6780;
 			Kb = 0.0593;
 			break;
+		case SMPTE::ColorPrimaries_SMPTE170M:
+		case SMPTE::ColorPrimaries_ITU470_PAL:
+			// set YCbCr -> RGB conversion parameters
+			Kr = 0.299;
+			Kg = 0.587;
+			Kb = 0.114;
+			break;
 		default:
 			msg = "Unknown color encoding"; // ERROR
 			err = true;
@@ -215,8 +226,7 @@ void JP2K_Preview::setAsset() {
 
 		mxf_path = asset->GetPath().absoluteFilePath(); // get new path
 
-		// create new reader
-		reader = new AS_02::JP2K::MXFReader();
+		reader = new AS_02::JP2K::MXFReader(); // create new reader
 
 		Result_t result_o = reader->OpenRead(mxf_path.toStdString()); // open file for reading
 		if (!ASDCP_SUCCESS(result_o)) {
@@ -236,16 +246,23 @@ void JP2K_Preview::decode() {
 	qDebug() << "begin decoding image nr. " << frameNr;
 #endif
 
+	//register callbacks (for debugging)
+#ifdef DEBUG_JP2K
+	OPENJPEG_H::opj_set_info_handler(pDecompressor, info_callback, 0);
+	OPENJPEG_H::opj_set_warning_handler(pDecompressor, warning_callback, 0);
+	OPENJPEG_H::opj_set_error_handler(pDecompressor, error_callback, 0);
+#endif
+
 	err = false; // reset
 	decode_time.restart(); // start calculating decode time
 
-	if (operator!=(asset, current_asset)) { // asset changed!!
+	if (operator!=(asset, current_asset) || !asset) { // asset changed!!
 		setAsset();
 	}
 
-	if (extractFrame(frameNr) && !err) { // frame extraction was successfull -> decode frame
+	if (!err && extractFrame(frameNr)) { // frame extraction was successfull -> decode frame
 
-										 // try to decode image
+		// try to decode image
 		if (decodeImage() && !err) {
 
 			emit ShowFrame(DataToQImage());
@@ -257,13 +274,13 @@ void JP2K_Preview::decode() {
 			cleanUp();
 		}
 		else { // error decoding image
-			emit ShowFrame(QImage(":/proxy_unknown.png"));
+			emit ShowFrame(QImage(":/frame_error.png"));
 			emit decodingStatus(frameNr, msg);
 			emit finished();
 		}
 	}
 	else {
-		emit ShowFrame(QImage(":/proxy_unknown.png"));
+		emit ShowFrame(QImage(":/frame_blank.png")); // show empty image
 		emit decodingStatus(frameNr, msg);
 		emit finished();
 	}
@@ -271,18 +288,18 @@ void JP2K_Preview::decode() {
 
 bool JP2K_Preview::extractFrame(qint64 frameNr) {
 
-	if (!asset) { // no asset was set -> abort
-		msg = "Asset not found!";
-		err = true;
-		return false;
-	}
+	// create new buffer
+	buff = new ASDCP::JP2K::FrameBuffer();
 
 	// calculate neccessary buffer size
 	if (ASDCP_SUCCESS(reader->AS02IndexReader().Lookup((frameNr + 1), IndexF2))) { // next frame
+		if (ASDCP_SUCCESS(reader->AS02IndexReader().Lookup(frameNr, IndexF1))) { // current frame
+			if (!ASDCP_SUCCESS(buff->Capacity((IndexF2.StreamOffset - IndexF1.StreamOffset) - 20))) { // set buffer size
 
-		Result_t result_f1 = reader->AS02IndexReader().Lookup(frameNr, IndexF1); // current frame
-		if (ASDCP_SUCCESS(result_f1)) {
-			buff->Capacity((IndexF2.StreamOffset - IndexF1.StreamOffset) - 20); // set buffer size
+				msg = QString("Could not set FrameBuffer size to: %1").arg((IndexF2.StreamOffset - IndexF1.StreamOffset) - 20); // ERROR
+				err = true;
+				return false;
+			}
 		}
 		else {
 			msg = QString("Frame does not exist: %1").arg(frameNr); // ERROR
@@ -290,11 +307,12 @@ bool JP2K_Preview::extractFrame(qint64 frameNr) {
 			return false;
 		}
 	}
-
+	else {
+		buff->Capacity(default_buffer_size); // set default size
+	}
+	
 	// try reading requested frame number
-	Result_t result = reader->ReadFrame(frameNr, *buff, NULL, NULL);
-	if (ASDCP_SUCCESS(result)) {
-
+	if (ASDCP_SUCCESS(reader->ReadFrame(frameNr, *buff, NULL, NULL))) {
 		pMemoryStream.pData = (unsigned char*)buff->Data();
 		pMemoryStream.dataSize = buff->Size();
 		return true;
@@ -314,11 +332,6 @@ bool JP2K_Preview::decodeImage() {
 
 	pStream = opj_stream_create_default_memory_stream(&pMemoryStream, OPJ_TRUE);
 
-	//register callbacks (for debugging)
-	//OPENJPEG_H::opj_set_info_handler(pDecompressor, info_callback, 0);
-	//OPENJPEG_H::opj_set_warning_handler(pDecompressor, warning_callback);
-	//OPENJPEG_H::opj_set_error_handler(pDecompressor, error_callback);
-
 	// try reading header
 	if (!OPENJPEG_H::opj_read_header(pStream, pDecompressor, &psImage))
 	{
@@ -337,6 +350,7 @@ bool JP2K_Preview::decodeImage() {
 			OPENJPEG_H::opj_stream_destroy(pStream);
 			OPENJPEG_H::opj_destroy_codec(pDecompressor);
 			OPENJPEG_H::opj_image_destroy(psImage);
+			buff->~FrameBuffer();
 
 			psImage = NULL; // reset decoded output stream
 			pDecompressor = OPENJPEG_H::opj_create_decompress(OPJ_CODEC_J2K); // create new decompresser
@@ -345,6 +359,7 @@ bool JP2K_Preview::decodeImage() {
 			return false;
 		}
 		else {
+			buff->~FrameBuffer();
 			return true;
 		}
 	}
@@ -362,7 +377,7 @@ void JP2K_Preview::cleanUp() {
 
 	pDecompressor = OPENJPEG_H::opj_create_decompress(OPJ_CODEC_J2K); // create new decompresser
 
-																	  // Setup the decoder (again)
+	// Setup the decoder (again)
 	if (!OPENJPEG_H::opj_setup_decoder(pDecompressor, &params)) {
 		qDebug() << "Error setting up decoder!";
 		opj_destroy_codec(pDecompressor);
@@ -370,7 +385,6 @@ void JP2K_Preview::cleanUp() {
 
 	opj_codec_set_threads(pDecompressor, cpus); // set nr. of cores in new decoder
 	delete img_buff; // clear char buffer
-	buff->Capacity(default_buffer_size); // set default size
 
 	emit finished();
 }
@@ -433,9 +447,9 @@ QImage JP2::DataToQImage()
 					Cr = (float)psImage->comps[2].data[xpos];
 
 					// convert to rgb
-					r = (Y - offset)*maxcv / range_y + 2 * (1 - Kr)          *(Cr - maxcv_plus_1 / 2)*maxcv / range_c;
+					r = (Y - offset)*maxcv / range_y + 2 * (1 - Kr)*(Cr - maxcv_plus_1 / 2)*maxcv / range_c;
 					g = (Y - offset)*maxcv / range_y - 2 * Kb*(1 - Kb) / Kg*(Cb - maxcv_plus_1 / 2)*maxcv / range_c - 2 * Kr*(1 - Kr) / Kg*(Cr - maxcv_plus_1 / 2)*maxcv / range_c;
-					b = (Y - offset)*maxcv / range_y + 2 * (1 - Kb)          *(Cb - maxcv_plus_1 / 2)*maxcv / range_c;
+					b = (Y - offset)*maxcv / range_y + 2 * (1 - Kb)*(Cb - maxcv_plus_1 / 2)*maxcv / range_c;
 
 					// clamp between 0...CVmax
 					if (r < 0) { r = 0; }
@@ -445,7 +459,7 @@ QImage JP2::DataToQImage()
 					if (b < 0) { b = 0; }
 					else if (b >= maxcv) { b = maxcv; }
 					break;
-				default: return QImage(":/proxy_unknown.png"); break; // abort!
+				default: return QImage(":/frame_error.png"); break; // abort!
 				}
 
 				// now we have rgb data -> linearize the data!
@@ -509,7 +523,7 @@ QImage JP2::DataToQImage()
 					continue; // jump to next pixel
 
 					break;
-				default: return QImage(":/proxy_unknown.png"); break; // abort!
+				default: return QImage(":/frame_error.png"); break; // abort!
 				}
 
 				switch (colorPrimaries) {
@@ -529,7 +543,7 @@ QImage JP2::DataToQImage()
 					out_b = -r*0.0196 - g*0.0786 + b*1.0983;
 
 					break;
-				default: return QImage(":/proxy_unknown.png"); break; // abort!
+				default: return QImage(":/frame_error.png"); break; // abort!
 				}
 
 				// clamp between 0...1
@@ -600,7 +614,6 @@ QImage JP2::DataToQImage()
 				g = (Y - offset)*maxcv / range_y - 2 * Kb*(1 - Kb) / Kg*(Cb - maxcv_plus_1 / 2)*maxcv / range_c - 2 * Kr*(1 - Kr) / Kg*(Cr - maxcv_plus_1 / 2)*maxcv / range_c;
 				b = (Y - offset)*maxcv / range_y + 2 * (1 - Kb)          *(Cb - maxcv_plus_1 / 2)*maxcv / range_c;
 
-
 				out_r8 = (int)r >> prec_shift;
 				out_g8 = (int)g >> prec_shift;
 				out_b8 = (int)b >> prec_shift;
@@ -623,7 +636,7 @@ QImage JP2::DataToQImage()
 		}
 	}
 	else { // unknown ColorEncoding
-		return QImage(":/proxy_unknown.png");
+		return QImage(":/frame_error.png");
 	}
 
 	return image;

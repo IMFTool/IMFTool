@@ -124,6 +124,8 @@ void Metadata::GetAsTextDocument(QTextDocument &rDoc) {
 		case QTextOption::WrapAtWordBoundaryOrAnywhere:
 			column_text_width = 2000;
 			break;
+		default:
+			break;
 	}
 
 	QFontMetrics font_metrics(rDoc.defaultFont());

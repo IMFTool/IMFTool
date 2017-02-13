@@ -43,6 +43,8 @@ class WidgetComposition : public QFrame {
 
 	friend class AddTrackDetailsCommand;
 	friend class RemoveTrackDetailsCommand;
+	friend class AddContentVersionCommand;
+	friend class RemoveContentVersionCommand;
 
 private:
 	enum eButtons {
@@ -58,6 +60,7 @@ public:
 	UserText GetIssuer() const { return (mData.getIssuer().present() ? ImfXmlHelper::Convert(mData.getIssuer().get()) : UserText()); }
 	UserText GetContentOriginator() const { return (mData.getContentOriginator().present() ? ImfXmlHelper::Convert(mData.getContentOriginator().get()) : UserText()); }
 	//UserText GetContentVersionTag() const { return (mData.getContentVersionList().present() ? ImfXmlHelper::Convert(mData.getContentVersionList().get()) : UserText()); }
+	ContentVersionList GetContentVersionList() { return (mData.getContentVersionList().present() ? ImfXmlHelper::Convert(mData.getContentVersionList().get()) : ContentVersionList()); }
 	UserText GetAnnotation() const { return (mData.getAnnotation().present() ? ImfXmlHelper::Convert(mData.getAnnotation().get()) : UserText()); }
 	//WR
 	UserText GetContentKind() const { return (mData.getContentKind().present() ? ImfXmlHelper::Convert(mData.getContentKind().get()) : UserText()); }
@@ -69,6 +72,7 @@ public:
 	void SetIssuer(const UserText &rIssuer) { mData.setIssuer(ImfXmlHelper::Convert(rIssuer)); }
 	void SetContentOriginator(const UserText &rOriginator) { mData.setContentOriginator(ImfXmlHelper::Convert(rOriginator)); }
 	//void SetContentVersionTag(const UserText &rVersion) { mData.setContentVersionList(ImfXmlHelper::Convert(rVersion)); }
+	void SetContentVersionList(const ContentVersionList &rContentVersionList) { if (rContentVersionList.count() == 0)  mData.getContentVersionList().detach(); else mData.setContentVersionList(ImfXmlHelper::Convert(rContentVersionList)); }
 	void SetAnnotation(const UserText &rAnnotation) { mData.setAnnotation(ImfXmlHelper::Convert(rAnnotation)); }
 	void SetID(QUuid rID) {mData.setId(ImfXmlHelper::Convert(rID));}
 
@@ -86,8 +90,8 @@ public:
 	bool DoesTrackExist(eSequenceType type) const;
 	int GetTrackCount(eSequenceType type) const;
 
-	QVector<PlayListElement> *playlist; // (k)
-	QVector<TTMLtimelineSegment> *ttmls; // (k)
+	QVector<VideoResource> *playlist; // (k)
+	QVector<TTMLtimelineResource> *ttmls; // (k)
 	int ImageSequenceIndex; // (k)
 	int SubtitlesSequenceIndex; // (k)
 	Timecode lastPosition; // (k)

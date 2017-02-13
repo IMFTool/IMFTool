@@ -13,8 +13,8 @@ public:
 	~TimelineParser() {};
 
 	GraphicsWidgetComposition *composition;
-	QVector<PlayListElement> *playlist; // (k) make private?
-	QVector<TTMLtimelineSegment> *ttmls; // (K) make private?
+	QVector<VideoResource> *playlist; // (k) make private?
+	QVector<TTMLtimelineResource> *ttmls; // (K) make private?
 
 public slots:
 	void run();

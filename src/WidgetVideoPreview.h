@@ -21,19 +21,11 @@
 #include "JP2K_Preview.h"
 #include "JP2K_Player.h"
 #include "qcombobox.h"
-#include "global.h"
-#include <xercesc/parsers/XercesDOMParser.hpp>
-#include <xercesc/dom/DOM.hpp>
-#include <xercesc/sax/HandlerBase.hpp>
-#include <xercesc/util/XMLString.hpp>
-#include <xercesc/util/PlatformUtils.hpp>
 #include "qxmlstream.h"
 #include <QMenuBar>
 #include <QMenu>
 #include <QAction>
 #include <QTextEdit>
-#include <QCheckBox>
-#include <math.h> 
 #include "createLUTs.h"
 #include <QMessageBox>
 
@@ -49,12 +41,12 @@ public:
 	WidgetVideoPreview(QWidget *pParent = NULL);
 	void InstallImp();
 	void UninstallImp();
-	void setPlaylist(QVector<PlayListElement> &rPlayList, QVector<TTMLtimelineSegment> &rTTMLs);
+	void setPlaylist(QVector<VideoResource> &rPlayList, QVector<TTMLtimelineResource> &rTTMLs);
 	JP2K_Player *player;
 	~WidgetVideoPreview();
 	void Clear();
-
-signals: // ?
+	float CPLEditRate;
+signals:
 	void currentPlayerPosition(qint64);
 	void ShowImage(const QImage&);
 	void ttmlChanged(const QVector<visibleTTtrack>&, int);
@@ -64,6 +56,7 @@ public slots :
 	void rShowMsgBox(const QString&, int);
 	void rPrevNextSubClicked(bool);
 	void getTTML();
+	void forwardPlayerPosition(qint64 ,bool);
 private slots:
 	void rChangeSpeed(QAction*);
 	void rChangeQuality(QAction*);
@@ -81,51 +74,46 @@ private:
 
 	// TTML
 	bool showTTML = true;
-	QVector<TTMLtimelineSegment> *ttmls;
+	QVector<TTMLtimelineResource> *ttmls;
 	QVector<visibleTTtrack> current_tt; // currently visible timed text elements
-	QMap<int, QVector<TTMLtimelineSegment>> ttml_tracks;
-
+	QMap<int, QVector<TTMLtimelineResource>> ttml_tracks;
 	QTime ttml_search_time;
 	qint64 next_ttml;
 	qint64 prev_ttml;
 
-	cpl2016::CompositionPlaylistType mData;
-
+	// widgets
 	WidgetImagePreview *mpImagePreview;
-	QMessageBox *mpMsgBox;
 
-	// player
+	// player control ui
 	QMenuBar *menuBar;
 	QMenu *menuSpeed;
 	QAction *speeds[50];
 	QMenu *menuQuality;
 	QAction *qualities[5];
-
 	QMenu *menuProcessing;
 	QMenu *processing_extract;
-
 	QStringList *processing_extract_names;
 	QAction *processing_extract_actions[15];
 	int processing_extract_action = 3; // default
-
 	QPushButton *mpStopButton;
 	QPushButton *mpPlayPauseButton;
 	QLabel *labelTest;
 	QLabel *decoding_time;
 	QLabel *labelImg;
-	int current_playlist_index = 0;
-	QVector<PlayListElement> currentPlaylist;
-
-	QSharedPointer<AssetMxfTrack> currentAsset;
 	QComboBox *set_fps;
 	QComboBox *set_layer;
+	QMessageBox *mpMsgBox;
 
 	// player
 	int decode_layer = 3; // default
 	int decode_speed = 5; // default (fps in player)
-
 	QThread *playerThread;
+	int current_playlist_index = 0; // frame indicator position within the playlisqt
+	QVector<VideoResource> currentPlaylist; // playlist ressources
+	bool setFrameIndicator = false; // ignore next signal xPosChanged?
+	QSharedPointer<AssetMxfTrack> currentAsset;
 
+	// preview decoding
 	JP2K_Preview *decoders[2];
 	QThread *decodingThreads[2];
 	bool running[2];
@@ -135,8 +123,4 @@ private:
 	qint64 decodingFrame = 0; // currently decoding frame
 	qint64 xSliderFrame = 0;
 	qint64 xSliderTotal = 0;
-	float xCurrentTime = 0;
-
-	QString xSliderTime; // curent slider position
-	QString decodingTime; // current decoding position
 };

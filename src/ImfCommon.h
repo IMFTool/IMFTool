@@ -383,9 +383,8 @@ typedef struct {
 	float frameRate;
 	QVector<TTMLelem> items;
 	QString doc; // serialized ttml document
-	QString annotation;
 	int track_index;
-} TTMLtimelineSegment;
+} TTMLtimelineResource;
 
 typedef struct {
 	int decoded_total = 0;
@@ -397,7 +396,7 @@ typedef struct {
 	QString formatted_time; // hh:mm:ss
 	QString fractional_frames; // ff.f
 	QVector<TTMLelem> elements;
-	TTMLtimelineSegment segment;
+	TTMLtimelineResource segment;
 } visibleTTtrack;
 // (k) - end
 

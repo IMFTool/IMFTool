@@ -28,6 +28,7 @@
 #include <QUuid>
 #include <QStringList>
 #include <QPair>
+#include <QVector>
 
 
 
@@ -45,6 +46,22 @@ public:
 	bool operator!= (const UserText &rOther) { return first != rOther.first || second != rOther.second; }
 };
 
+//WR
+class ContentVersion : public QPair<QString, UserText> {
+
+public:
+	ContentVersion() : QPair<QString, UserText>(QString(), UserText()) {};
+	ContentVersion(const QString &rUuid, const UserText &rUserText) : QPair<QString, UserText>(rUuid, rUserText) {};
+	bool IsEmpty() const { return second.IsEmpty(); }
+	bool operator== (const ContentVersion &rOther) { return first == rOther.first && second == rOther.second; }
+	bool operator!= (const ContentVersion &rOther) { return first != rOther.first || second != rOther.second; }
+};
+
+class ContentVersionList : public QList<ContentVersion> {
+//	ContentVersionList() : QList<ContentVersion>() {};
+};
+
+//WR
 
 
 class XmlSerializationError {
@@ -248,6 +265,19 @@ public:
 		return QUuid(uuid.split(':').last());
 	}
 
+	static QString Convert(const cpl2016::ContentVersionType::IdType &rUuid) {
+
+		QString uuid(rUuid.c_str());
+		return uuid;
+	}
+
+	static cpl2016::ContentVersionType::IdType Convert(const QString &rUuid) {
+
+		cpl2016::ContentVersionType::IdType rId(rUuid.toStdString().c_str());
+		//QString uuid(rUuid.c_str());
+		return rId;
+	}
+
 	static am::UUID Convert(const QUuid &rUuid) {
 
 		xml_schema::Uri uri(QString("urn:uuid:").append(strip_uuid(rUuid)).toStdString());
@@ -362,4 +392,20 @@ public:
 		return ::UserText(rContentKindType.c_str(), "");
 	}
 	static std::auto_ptr<pkl2016::PackingListType> Convert(std::auto_ptr<pkl::PackingListType> rPackingList2013);
+
+	static ::ContentVersion Convert(const cpl2016::ContentVersionType &rContentVersion) {
+		return ::ContentVersion( Convert(rContentVersion.getId()), Convert(rContentVersion.getLabelText()) );
+		//tbd
+		//rContentVersion->getAny();
+	}
+
+	static cpl2016::ContentVersionType Convert(const ::ContentVersion &rContentVersion) {
+		cpl2016::ContentVersionType content_version(Convert(rContentVersion.first), Convert(rContentVersion.second));
+		return content_version;
+	}
+
+	static ::ContentVersionList Convert(cpl2016::CompositionPlaylistType_ContentVersionListType rContentVersionList);
+
+	static std::auto_ptr<cpl2016::CompositionPlaylistType_ContentVersionListType> Convert(const ::ContentVersionList &rContentVersionList);
+
 };

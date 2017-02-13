@@ -432,14 +432,14 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 										}
 									}
 								}
-								int count = 0;
+/*								int count = 0;
 								for (QVector<EditRate>::iterator i=mImpEditRates.begin(); i < mImpEditRates.end(); i++) {
 									// Remove duplicate frame rates
 									while (int pos = mImpEditRates.lastIndexOf(*i) != count) {
 										mImpEditRates.remove(count);
 									}
 									count ++;
-								}
+								} */ //Reason for commenting out: first() sometime crashes afterwards //WR
 								foreach(QSharedPointer<Asset> asset, mAssetList) {
 									// TTML XF assets only: Set Edit Rate in metadata object to CPL Edit Rate, re-calculate duration in CPL Edit Rate units
 									// Uses the first CPL Edit Rate in mImpEditRates, this can be an issue in multi-edit rate IMPs
@@ -1117,7 +1117,6 @@ Asset(Asset::mxf, rFilePath, rId, rAnnotationText), mMetadata(), mSourceFiles(),
 	mSourceEncoding = QUuid::createUuid();
 	mEssenceDescriptor = new cpl2016::EssenceDescriptorBaseType(ImfXmlHelper::Convert(mSourceEncoding));
 	//leave ED empty because file does not exist yet on the file system
-
 
 }
 

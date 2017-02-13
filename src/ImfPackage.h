@@ -347,6 +347,8 @@ public:
 	AssetMxfTrack(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl2016::AssetType &rPklAsset);
 	//! Create New Mxf Track.
 	AssetMxfTrack(const QFileInfo &rFilePath, const QUuid &rId, const UserText &rAnnotationText = QString());
+	//! Import existing MXF file to IMP.
+	AssetMxfTrack(const QFileInfo &rFilePath, const UserText &rAnnotationText = QString());
 	virtual ~AssetMxfTrack() {}
 	//! Returns current metadata.
 	Metadata GetMetadata() const { return mMetadata; }
@@ -426,16 +428,10 @@ private:
 
 
 // (k) - start
-struct PlayListElement {
-	QSharedPointer<AssetMxfTrack> asset;
-	//QString path; // asset
+struct VideoResource {
+	QSharedPointer<AssetMxfTrack> asset; // pointer to asset
 	qint64 in; // in-point
 	qint64 out; // out-point
-	//int colorEncoding; // Unknown = 0, CDCI = 1, RGB = 2
-	//int colorSpace; // Unknown = 0
-	//qreal editRate;
-	//int displayWidth; // image width
-	//int displayHeight; // image height
 };
 // (k) - end
 

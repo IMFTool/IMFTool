@@ -15,20 +15,9 @@
  */
 #pragma once
 #include <QObject>
-#include <QImage>
-#include <QThreadPool>
 #include <QRunnable>
-#include <QStringList>
-#include <QFileInfo>
-#include <QVariant>
-#include "openjpeg.h"
-#include "Error.h"
-#include <QTime>
 #include <QDebug>
-#include <QTimer>
-#include <chrono>
 #include "ImfPackage.h"
-#include "JP2K_Player.h"
 #include "JP2K_Preview.h"
 
 class FrameRequest;

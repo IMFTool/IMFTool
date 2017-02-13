@@ -38,6 +38,7 @@
 #include <QDir>
 
 #include <Qshortcut> //(k)
+#include <QProcess> //WR
 
 
 
@@ -46,6 +47,54 @@ QMainWindow(pParent) {
 
 	InitLayout();
 	InitMenuAndToolbar();
+	// Test for JAVA VM
+	QString qresult;
+	QProcess *myProcess = new QProcess();
+	const QString program = "java";
+	QStringList arg;
+	QString error_msg;
+	Error error(Error::None);
+	arg << "-version";
+	myProcess->start(program, arg);
+	myProcess->waitForFinished(-1);
+	if (myProcess->exitStatus() == QProcess::NormalExit) {
+		if (myProcess->exitCode() != 0) { error = Error(Error::ExitCodeNotZero); }
+	} else {
+		error = Error(Error::ExitStatusError);
+	}
+
+	try {
+		qresult = myProcess->readAllStandardError();
+		QRegularExpression re("([0-9]+)\\.([0-9]+)\\.([0-9]+)");
+		QRegularExpressionMatch match = re.match(qresult, 0);
+		if (match.hasMatch()) {
+		    QString major = match.captured(1);
+		    QString minor = match.captured(2);
+		    if ((major.toInt() != 1) || (minor.toInt() < 8)) {
+		    	error_msg = "Java version mismatch, current version is " + match.captured(0);
+				mpMsgBox->setText(tr("IMF Tool requires Java SDK 1.8 or higher - Exported CPLs will not contain Essence Descriptors!"));
+				mpMsgBox->setIcon(QMessageBox::Warning);
+				mpMsgBox->setInformativeText(error_msg);
+				mpMsgBox->setStandardButtons(QMessageBox::Ok);
+				mpMsgBox->setDefaultButton(QMessageBox::Ok);
+				mpMsgBox->exec();
+		    }
+		}
+	}
+	catch (...) {
+		error = Error(Error::Unknown);
+	}
+
+	if(error.IsError()) {
+		qDebug() << "No Java / wrong Java version" << qresult;
+		error_msg = QString("%1\n%2").arg(error.GetErrorMsg()).arg(error.GetErrorDescription());
+		mpMsgBox->setText(tr("java not available - Exported CPLs will not contain Essence Descriptors ! IMF Tool requires Java SDK 1.8 or higher."));
+		mpMsgBox->setIcon(QMessageBox::Warning);
+		mpMsgBox->setInformativeText(error_msg);
+		mpMsgBox->setStandardButtons(QMessageBox::Ok);
+		mpMsgBox->setDefaultButton(QMessageBox::Ok);
+		mpMsgBox->exec();
+	}
 }
 
 void MainWindow::InitLayout() {

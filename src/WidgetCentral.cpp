@@ -24,6 +24,7 @@
 #include "WidgetCompositionInfo.h"
 #include "ImfPackage.h"
 #include "ImfCommon.h"
+#include "WidgetContentVersionList.h" //WR
 #include <QHBoxLayout>
 #include <QSplitter>
 #include <QTabWidget>
@@ -44,9 +45,6 @@ WidgetCentral::~WidgetCentral() {
 }
 
 void WidgetCentral::InitLyout() {
-
-	// temp!
-	//exportLabels *test = new exportLabels("D:/Master/Thesis/test.txt");
 
 	mpMsgBox = new QMessageBox(this);
 	mpMsgBox->setIcon(QMessageBox::Warning);
@@ -81,6 +79,17 @@ void WidgetCentral::InitLyout() {
 	p_details_widget_frame_layout->addWidget(mpDetailsWidget);
 	p_details_widget_frame->setLayout(p_details_widget_frame_layout);
 
+	//WR
+	mpContentVersionListWidget = new WidgetContentVersionList(this);
+	mpContentVersionListWidget->setDisabled(true);
+	p_details_widget_frame = new QFrame(this);
+	p_details_widget_frame->setFrameStyle(QFrame::StyledPanel);
+	p_details_widget_frame_layout = new QHBoxLayout();
+	p_details_widget_frame_layout->setContentsMargins(0, 0, 0, 0);
+	p_details_widget_frame_layout->addWidget(mpContentVersionListWidget);
+	p_details_widget_frame->setLayout(p_details_widget_frame_layout);
+
+	//WR
 	// (k) - start
 	tpThread = new QThread(); // create widget Thread
 	timelineParser = new TimelineParser();
@@ -95,6 +104,7 @@ void WidgetCentral::InitLyout() {
 	mpTabDetailTTML = new QTabWidget(this);
 	mpTabDetailTTML->addTab(mpDetailsWidget, "Details"); // add to layout
 	mpTTMLDetailsWidget = new TTMLDetails(this);
+	mpTabDetailTTML->addTab(mpContentVersionListWidget, "ContentVersionList"); // add to layout
 	mpTabDetailTTML->addTab(mpTTMLDetailsWidget, "TTML"); // add to layout
 	connect(mpTTMLDetailsWidget->show_regions, SIGNAL(stateChanged(int)), mpPreview, SIGNAL(regionOptionsChanged(int)));
 
@@ -157,8 +167,8 @@ void WidgetCentral::rUpdatePlaylist() {
 			mpTTMLDetailsWidget->ClearTTML(); // (k) - clear ttml
 
 			playListUpdateSuccess = true;
-			ttmls = QVector<TTMLtimelineSegment>(); // clear ttml list
-			playlist = QVector<PlayListElement>(); // clear video playlist
+			ttmls = QVector<TTMLtimelineResource>(); // clear ttml list
+			playlist = QVector<VideoResource>(); // clear video playlist
 
 			timelineParser->composition = p_composition->GetComposition();
 			timelineParser->ttmls = &ttmls;
@@ -181,10 +191,8 @@ void WidgetCentral::rPlaylistFinished() {
 
 	WidgetComposition *p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->currentWidget());
 	if (p_composition) {
-
 		mpPreview->setPlaylist(playlist, ttmls); // forward playlist to mpPreview
 		p_composition->getVerticalIndicator();
-		
 		emit UpdateStatusBar(QString("updating took %1 ms").arg(timelineParserTime->elapsed()));
 	}
 }
@@ -231,7 +239,10 @@ void WidgetCentral::rCurrentChanged(int tabWidgetIndex) {
 	p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->widget(tabWidgetIndex));
 	if(p_composition) {
 		mpDetailsWidget->SetComposition(p_composition);
+
+		mpContentVersionListWidget->SetComposition(p_composition);
 		// (k) - start
+		mpPreview->CPLEditRate = p_composition->GetEditRate().GetQuotient(); // set CPL edit rate
 		rUpdatePlaylist(); // update playlist
 		connect(p_composition->GetUndoStack(), SIGNAL(indexChanged(int)), this, SLOT(rUpdatePlaylist()));
 		connect(p_composition, SIGNAL(CurrentVideoChanged(const QSharedPointer<AssetMxfTrack>&, const Duration&, const Timecode&, const int&)), mpPreview, SLOT(xPosChanged(const QSharedPointer<AssetMxfTrack>&, const Duration&, const Timecode&, const int&)));
@@ -258,8 +269,11 @@ void WidgetCentral::rTabCloseRequested(int index) {
 		}
 		mpTabWidget->removeTab(mpTabWidget->indexOf(p_composition));
 		p_composition->deleteLater();
-		mpPreview->Clear(); // (k) - clear preview
-		mpTTMLDetailsWidget->ClearTTML(); // (k) - clear ttml
+
+		mpTTMLDetailsWidget->ClearTTML(); // (k) - clear ttml view
+		ttmls = QVector<TTMLtimelineResource>(); // (k) - clear ttml list
+		playlist = QVector<VideoResource>(); // (k) - clear video playlist
+		mpPreview->setPlaylist(playlist, ttmls); // (k) - clear playlist
 	}
 }
 
@@ -308,6 +322,7 @@ void WidgetCentral::InstallImp(const QSharedPointer<ImfPackage> &rImfPackage) {
 	UninstallImp();
 	mpImfPackage = rImfPackage;
 	mpDetailsWidget->setEnabled(true);
+	mpContentVersionListWidget->setEnabled(true);
 	mpPreview->InstallImp(); // set IMP in player (k)
 }
 
@@ -321,6 +336,8 @@ void WidgetCentral::UninstallImp() {
 
 	mpDetailsWidget->setDisabled(true);
 	mpDetailsWidget->Clear();
+	mpContentVersionListWidget->setDisabled(true);
+	mpContentVersionListWidget->Clear();
 	mpTTMLDetailsWidget->ClearTTML(); // (k) - clear ttml
 
 	
@@ -332,8 +349,8 @@ void WidgetCentral::UninstallImp() {
 
 	mpImfPackage.clear();
 
-	ttmls = QVector<TTMLtimelineSegment>(); // (k) clear ttml list
-	playlist = QVector<PlayListElement>(); // (k) clear video playlist
+	ttmls = QVector<TTMLtimelineResource>(); // (k) clear ttml list
+	playlist = QVector<VideoResource>(); // (k) clear video playlist
 	mpPreview->setPlaylist(playlist, ttmls); // forward empty playlist to mpPreview
 }
 

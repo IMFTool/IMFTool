@@ -100,6 +100,8 @@ static void dbug_msg_handler(QtMsgType type, const QMessageLogContext &rContext,
 #endif
 			text += "\nApplication will be terminated due to Fatal-Error.";
 			break;
+		default:
+			break;
 	}
 
 	QTextStream tStream(&log_file);

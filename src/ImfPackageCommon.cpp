@@ -125,4 +125,28 @@ std::auto_ptr<pkl2016::PackingListType> ImfXmlHelper::Convert(std::auto_ptr<pkl:
 	return rPackingList2016;
 }
 
+ ::ContentVersionList ImfXmlHelper::Convert(cpl2016::CompositionPlaylistType_ContentVersionListType rContentVersionList) {
+	::ContentVersionList content_version_list;
+	cpl2016::CompositionPlaylistType_ContentVersionListType::ContentVersionSequence &content_version_sequence = rContentVersionList.getContentVersion();
+	cpl2016::CompositionPlaylistType_ContentVersionListType::ContentVersionSequence::iterator i;
+
+	for (i = rContentVersionList.getContentVersion().begin(); i < rContentVersionList.getContentVersion().end(); i++) {
+		cpl2016::ContentVersionType content_version = *i;
+		content_version_list.append(Convert(content_version));
+	}
+
+	return content_version_list;
+
+}
+std::auto_ptr<cpl2016::CompositionPlaylistType_ContentVersionListType> ImfXmlHelper::Convert(const ::ContentVersionList &rContentVersionList) {
+	std::auto_ptr<cpl2016::CompositionPlaylistType_ContentVersionListType> content_version_list(new cpl2016::CompositionPlaylistType_ContentVersionListType());
+	cpl2016::CompositionPlaylistType_ContentVersionListType::ContentVersionSequence &content_version_sequence = content_version_list->getContentVersion();
+	content_version_sequence.clear();
+	for (int i = 0; i < rContentVersionList.count(); i++) {
+		content_version_sequence.push_back(Convert(rContentVersionList.at(i)));
+	}
+	return content_version_list;
+}
+
+
 //WR

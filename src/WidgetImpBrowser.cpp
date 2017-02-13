@@ -147,6 +147,9 @@ void WidgetImpBrowser::InitToolbar() {
 	connect(p_add_ttml_resource, SIGNAL(triggered(bool)), this, SLOT(ShowResourceGeneratorTimedTextMode()));
 	//p_add_ttml_resource->setDisabled(true);
 	p_add_track_menu->addSeparator();
+	//QAction *p_add_mxf_resource = p_add_track_menu->addAction(QIcon(":/asset_mxf.png"), tr("MXF Resource"));
+	//connect(p_add_mxf_resource, SIGNAL(triggered(bool)), this, SLOT(ShowResourceGeneratorMxfMode()));
+
 	p_button_add_track->setMenu(p_add_track_menu);
 
 	mpToolBar->addAction(p_action_undo);
@@ -364,7 +367,17 @@ void WidgetImpBrowser::ShowResourceGeneratorTimedTextMode() {
 	connect(p_wizard_resource_generator, SIGNAL(accepted()), this, SLOT(rResourceGeneratorAccepted()));
 }
 		/* -----Denis Manthey End----- */
-
+//WR
+void WidgetImpBrowser::ShowResourceGeneratorMxfMode() {
+	mpFileDialog = new QFileDialog(this, QString(), GetWorkingDir().absolutePath());
+	mpFileDialog->setFileMode(QFileDialog::ExistingFile);
+	mpFileDialog->setViewMode(QFileDialog::Detail);
+	mpFileDialog->setNameFilters(QStringList() << "*.mxf");
+	mpFileDialog->setIconProvider(new IconProviderExrWav(this)); // TODO: Does not work.
+	connect(mpFileDialog, SIGNAL(filesSelected(const QStringList &)), this, SLOT(SetMxfFile(const QStringList &)));
+	mpFileDialog->show();
+}
+//WR
 
 void WidgetImpBrowser::rShowResourceGeneratorForSelectedRow() {
 
@@ -755,6 +768,40 @@ void WidgetImpBrowser::RecalcHashForCpls() {
 	mpJobQueue->StartQueue();
 	qDebug() << "mpJobQueue->StartQueue";
 	//mpJobQueue will send signal finished(), calling SLOT WidgetImpBrowser::rJobQueueFinished
+}
+
+void WidgetImpBrowser::SetMxfFile(const QStringList &rFiles) {
+
+	mpFileDialog->hide();
+	if(rFiles.isEmpty() == false) {
+		if(is_mxf_file(rFiles.at(0))) {
+			//determine if AS-02
+			  ASDCP::EssenceType_t EssenceType;
+			  ASDCP::Result_t result = ASDCP::EssenceType(QDir(rFiles.at(0)).absolutePath().toStdString(), EssenceType);
+			  qDebug() << rFiles.at(0);
+			  if ( ASDCP_FAILURE(result) )
+			    qDebug() << "ASDCP_FAILURE";
+;
+			  if ( EssenceType == ASDCP::ESS_AS02_JPEG_2000 )
+			    {
+				  //FileInfoWrapper<AS_02::JP2K::MXFReader, MyPictureDescriptor> wrapper;
+				  //result = wrapper.file_info(Options, "JPEG 2000 pictures");
+				  qDebug() << "ASDCP::ESS_AS02_JPEG_2000";
+			    }
+
+			//QFileInfo new_asset_path = QFileInfo(GetWorkingDir().absolutePath().append("/").append(rFiles.at(0))); //.c_str()));
+			//QSharedPointer<AssetMxfTrack> mxf_track(new AssetMxfTrack(new_asset_path));
+			//AddAsset(mxf_track, ImfXmlHelper::Convert(packing_list->getId()));
+			//JobExtractEssenceDescriptor *p_ed_job = new JobExtractEssenceDescriptor(mxf_track->GetPath().absoluteFilePath());
+			//connect(p_ed_job, SIGNAL(Result(const QString&, const QVariant&)), mxf_track.data(), SLOT(SetEssenceDescriptor(const QString&)));
+			//mpJobQueue->AddJob(p_ed_job);
+			//Determine essence type
+			//Determine size
+			//Calc hash (job)
+			//Extract Essence descriptor (job?)
+			//Add to IMP
+		}
+	}
 }
 //WR end
 

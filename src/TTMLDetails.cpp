@@ -59,7 +59,7 @@ void TTMLDetails::InitLayout() {
 	// create splitter
 	splitter = new QSplitter(Qt::Vertical);
 	splitter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	connect(splitter, SIGNAL(), this, SLOT());
+	//connect(splitter, SIGNAL(), this, SLOT());
 
 	p_layout->addWidget(splitter, 1, 0, 1, 5);
 
@@ -214,6 +214,7 @@ void TTMLDetails::rShowTTML(const QVector<visibleTTtrack> &rttmls, int search_ti
 	// display search time
 	ttml_search_time->setText(QString("found in: %1 ms").arg(search_time));
 }
+
 
 void TTMLDetails::createButton(int table_row, int track_index, int col, int item, bool highlight) {
 

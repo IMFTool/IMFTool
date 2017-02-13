@@ -61,7 +61,7 @@ QObject(pParent) {
 
 Error MetadataExtractor::ReadMetadata(Metadata &rMetadata, const QString &rSourceFile) {
 
-	Error error;
+	Error error(Error::None);
 	QFileInfo source_file(rSourceFile);
 	if(source_file.exists() && source_file.isFile() && !source_file.isSymLink()) {
 		EssenceType_t essence_type = ESS_UNKNOWN;
@@ -80,6 +80,8 @@ Error MetadataExtractor::ReadMetadata(Metadata &rMetadata, const QString &rSourc
 
 					case ASDCP::ESS_AS02_TIMED_TEXT:
 						error = ReadTimedTextMxfDescriptor(rMetadata, source_file);
+						break;
+					default:
 						break;
 				}
 			}

@@ -17,6 +17,7 @@
 #include "ImfPackage.h"
 #include <QFrame>
 #include <QTableView>
+#include <QFileDialog>
 
 class ImfPackage;
 class QToolBar;
@@ -78,6 +79,7 @@ signals:
 	void ShowResourceGeneratorTimedTextMode();
 	//WR begin
 	void RecalcHashForCpls();
+	void ShowResourceGeneratorMxfMode();
 	//WR end
 
 	private slots :
@@ -92,6 +94,9 @@ signals:
 	void rImpViewDoubleClicked(const QModelIndex &rIndex);
 	void rOpenCplTimeline();
 	void rReinstallImp();
+	//WR
+	void SetMxfFile(const QStringList &rFiles);
+	//WR
 
 protected:
 	virtual void keyPressEvent(QKeyEvent *pEvent);
@@ -117,5 +122,7 @@ private:
 	//WR
 	bool mPartialOutgestInProgress;
 	QString mPartialImpPath;
+	QFileDialog *mpFileDialog;
+
 	//WR
 };

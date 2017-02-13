@@ -16,9 +16,7 @@
 */
 #pragma once
 #include "ImfPackageCommon.h"
-#include <QObject>
 #include <QDebug>
-#include <QFileInfo>
 #include <QVector>
 #include "Error.h"
 
@@ -42,16 +40,16 @@ public:
 	TTMLParser();
 	~TTMLParser() {
 		for (int i = 0; i < elems.length(); i++) {
-			delete elems[i]; // delete elem instance
+			elems.remove(i);
 		}
 	};
 
 	QVector<elem*> elems;
-	Error open(const QString &rSourceFile, TTMLtimelineSegment &ttml_segment, bool rIsWrapped);
+	Error open(const QString &rSourceFile, TTMLtimelineResource &ttml_segment, bool rIsWrapped);
 	void parse(std::string xml);
 	QPair<QString, QMap<QString, QString>> parseStyle(xercesc::DOMNode *node);
 
-	TTMLtimelineSegment *this_segment; // current timeline segment
+	TTMLtimelineResource *this_segment; // current timeline segment
 
 	float seq_timing_total_offset = 0;
 	int tickrate;
@@ -82,7 +80,7 @@ public:
 		{ "tts:textDecoration" , "text-decoration" },
 		{ "tts:UnicodeBidi" , "unicode-bidi" },
 		{ "tts:opacity" , "opacity" }
-	}; // all known css values
+	}; // all supported css values
 
 	TTMLRegion nullregion;
 
@@ -102,7 +100,6 @@ private:
 	float extent[2];
 
 	TTMLRegion parseRegion(xercesc::DOMNode *el);
-	QVector<QString> attrs2Css(xercesc::DOMNode *node);
 	void print2Console(const QVector<TTMLelem> &ttmls);
 };
 

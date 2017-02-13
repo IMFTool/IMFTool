@@ -14,13 +14,9 @@
  * along with this program.If not, see <http://www.gnu.org/licenses/>.
  */
 #pragma once
-#include <QWidget>
-#include <QFileInfo>
 #include <QOpenGLWidget>
-#include "openjpeg.h"
 #include <QThread>
 #include "ImfCommon.h"
-#include <QTime>
 #include <QPainter>
 
 class QLabel;

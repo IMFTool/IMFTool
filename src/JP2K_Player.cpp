@@ -18,7 +18,6 @@
 #include "global.h"
 #include <QRunnable>
 #include <QTime>
-#include "openjpeg.h"
 #include "AS_DCP_internal.h"
 #include <QThreadpool>  
 //#define DEBUG_MSGS
@@ -74,10 +73,9 @@ JP2K_Player::JP2K_Player() {
 	eotf_PQ[0] = 0;
 
 	threadPool = new QThreadPool();
-	reader = new AS_02::JP2K::MXFReader();
 
 	// create request array
-	for (int i = 0; i < 50; i++) {
+	for (int i = 0; i < decoders; i++) {
 		request_queue[i] = new FrameRequest();
 		pointer_queue[i] = static_cast<QSharedPointer<FrameRequest>>(request_queue[i]);
 		decoder_queue[i] = new JP2K_Decoder(decoded_shared, pointer_queue[i], oetf_709, eotf_2020, eotf_PQ);
@@ -85,11 +83,33 @@ JP2K_Player::JP2K_Player() {
 	}
 }
 
+JP2K_Player::~JP2K_Player()
+{
+	timer->~QTime();
+	for (int i = 0; i < decoders; i++) {
+		request_queue[i]->~FrameRequest();
+		threadPool->cancel(decoder_queue[i]);
+	}
+	threadPool->~QThreadPool();
+
+	delete oetf_709;
+	delete eotf_2020;
+	delete eotf_PQ;
+}
+
 void JP2K_Player::startPlay(){
 
-	qDebug() << "playback started";
+	// reset all requests
+	for (int i = 0; i < decoders; i++) {
+		request_queue[i]->decoded = nullimage;
+		request_queue[i]->done = false;
+		request_queue[i]->error = false;
+		request_queue[i]->errorMsg.clear();
+		request_queue[i]->frameNr = -1;
+		request_queue[i]->fps = fps;
+	}
 
-	buffer_fill_counter = 0;
+	clean();
 
 	if (playlist.length() > 0) {
 		buffering = true;
@@ -97,166 +117,65 @@ void JP2K_Player::startPlay(){
 		playLoop();
 	}
 	else {
-		emit playerInfo("No/empty playlist...");
-	}
-}
-
-void JP2K_Player::stop() {
-
-	playing = false;
-	emit playerInfo("Playback stopped!");
-	clean();
-
-	// reset all values
-	if (playlist.length() > 0) {
-		setPos(playlist[0].in, 0, 0);
-		emit currentPlayerPosition(playlist[0].in);
-	}
-}
-
-void JP2K_Player::setReader() {
-
-	// check for previous asset
-	if (CurrentDecodingAsset) {
-		if (operator==(CurrentDecodingAsset, ple_decoding.asset)) {
-			return; // asset is unchanged -> abort!
-		}
-		else {
-			// close old reader
-			reader->Close();
-			reader_shared.clear(); // calls destructor of 'reader'
-		}
-	}
-
-	// set current asset 
-	CurrentDecodingAsset = ple_decoding.asset;
-
-	// create new reader
-	reader = new AS_02::JP2K::MXFReader();
-	reader_shared = static_cast<QSharedPointer<AS_02::JP2K::MXFReader>>(reader);
-
-	Result_t result_o = reader->OpenRead(CurrentDecodingAsset->GetPath().absoluteFilePath().toStdString()); // open file for reading
-	if (!ASDCP_SUCCESS(result_o)) {
-		emit playerInfo(QString("Failed initializing reader: %1").arg(result_o.Message()));
-	}
-
-
-	// check for color encoding & metadata
-	SMPTE::eColorPrimaries colorPrimaries = CurrentDecodingAsset->GetMetadata().colorPrimaries;
-
-	int src_bitdepth = CurrentDecodingAsset->GetMetadata().componentDepth;
-	int prec_shift = src_bitdepth - 8;
-	int max = 0, RGBrange = 0, RGBmaxcv = 0;
-	float Kr = 0, Kg = 0, Kb = 0;
-	max = pow(2, src_bitdepth) - 1;
-
-	int ComponentMinRef = CurrentDecodingAsset->GetMetadata().componentMinRef;
-	int ComponentMaxRef = CurrentDecodingAsset->GetMetadata().componentMaxRef;
-
-	if (ComponentMinRef && ComponentMaxRef) {
-		RGBrange = ComponentMaxRef - ComponentMinRef;
-		RGBmaxcv = (1 << src_bitdepth) - 1;
-	}
-
-	switch (colorPrimaries) {
-	case SMPTE::ColorPrimaries_ITU709:
-		// set YCbCr -> RGB conversion parameters
-		Kr = 0.2126;
-		Kg = 0.7152;
-		Kb = 0.0722;
-		break;
-	case SMPTE::ColorPrimaries_ITU2020:
-		// set YCbCr -> RGB conversion parameters
-		Kr = 0.2627;
-		Kg = 0.6780;
-		Kb = 0.0593;
-		break;
-	}
-
-	// set reader/params in decoders
-	for (int i = 0; i < 50; i++) {
-
-		decoder_queue[i]->reader = reader_shared;
-
-		// color transformation
-		decoder_queue[i]->ColorEncoding = CurrentDecodingAsset->GetMetadata().colorEncoding;
-		decoder_queue[i]->colorPrimaries = colorPrimaries;
-		decoder_queue[i]->transferCharactersitics = CurrentDecodingAsset->GetMetadata().transferCharcteristics;
-		decoder_queue[i]->src_bitdepth = src_bitdepth;
-
-		decoder_queue[i]->ComponentMinRef = ComponentMinRef;
-		decoder_queue[i]->ComponentMaxRef = ComponentMaxRef;
-		decoder_queue[i]->RGBmaxcv = RGBmaxcv;
-		decoder_queue[i]->RGBrange = RGBrange;
-
-		// YCbCr -> RGB conv. params.
-		decoder_queue[i]->Kr = Kr; 
-		decoder_queue[i]->Kg = Kg;
-		decoder_queue[i]->Kb = Kb;
-
-		decoder_queue[i]->prec_shift = prec_shift;
-		decoder_queue[i]->max = max;
+		emit playerInfo("No/empty playlist!");
 	}
 }
 
 // lets the player know where the slider is at the moment
-void JP2K_Player::setPos(int frameNr, int TframeNr, int playlist_index) {
+void JP2K_Player::setPos(int rframeNr, int rTframeNr, int rplaylist_index) {
 
-	playing = false;
+	decoding_index = rplaylist_index; 
+	playing_index = rplaylist_index; 
+	playlist_index = rplaylist_index; 
 
-	if (playlist_index > -1 && playlist_index < playlist.length()) {
+	frame_decoding_asset_float = rframeNr; 
+	frame_playing_asset_float = rframeNr;
+	frameNr = rframeNr;
 
-		if (!playlist[playlist_index].asset) return; // asset is invalid!
+	frame_playing_total_float = (float)rTframeNr; 
+	TframeNr = (float)rTframeNr;
 
-		decoding_ple_index = playlist_index;
-		ple_decoding = playlist[playlist_index];
-
-		playing_ple_index = playlist_index;
-		ple_playing = playlist[playlist_index];
-
-		decoding_frame = frameNr;
-		decoding_frame_total = TframeNr;
-
-		playing_frame = frameNr;
-		playing_frame_total = TframeNr;
-
-		video_framerate = ple_decoding.asset->GetMetadata().editRate.GetQuotient(); // set initial fps
-		played_frames_total = 0;
-		decoded_shared->decoded_total = 0;
-		decoded_shared->pending_requests = 0;
-		fps_counter = 0;
-
-		playlist_length = playlist.length() - 1; // set playlist length (indexes)
-#ifdef DEBUG_MSGS
-		qDebug() << "setting player position to frame" << frameNr << "(total)" << TframeNr;
-#endif
-		if ((playlist_index + 1) == playlist.length()) {
-			playlist_last_item = true;
-			last_frame_nr = playlist[playlist_index].out;
-		}
-
-		setReader();
-		clean();
-	}
+	clean();
 }
 
 void JP2K_Player::clean() {
 
-	// cancel all decoding processes & clear decoded images
-	for (int i = 0; i < 50; i++) {
+	playing = false;
+
+	// cancel all decoding processes
+	for (int i = 0; i < decoders; i++) {
 		threadPool->cancel(decoder_queue[i]);
-		request_queue[i]->decoded = nullimage;
 	}
 
 	// reset vars
-	requested_frames_total = 0;
-	played_frames_total = 0;
-	playing_count = 0;
-	buffering = true; // waits for buffer to fill (again)
-	decoded_shared->decoded_cycle = 0;
 	decoded_shared->decoded_total = 0;
 	decoded_shared->pending_requests = 0;
-	buffer_fill_count = 0; // reset
+	decoded_shared->decoded_cycle = 0;
+
+	player_position_counter = 0;
+	requested_frames_total = 0;
+	played_frames_total = 0;
+	request_index = 0;
+
+	if (!started_playing) { // reset values to last cursor position!
+		decoding_index = playlist_index;
+		playing_index = playlist_index;
+
+		frame_decoding_asset_float = frameNr;
+		frame_playing_asset_float = frameNr;
+
+		frame_playing_total_float = (float)TframeNr;
+		frame_decoding_total_float = (float)TframeNr;
+	}
+	else {
+		playlist_index = playing_index;
+		TframeNr = (int)frame_playing_total_float;
+		frameNr = (int)(frame_playing_asset_float);
+		frame_decoding_total_float = frame_playing_total_float;
+		frame_decoding_asset_float = frame_playing_asset_float;
+	}
+
+	started_playing = false;
 }
 
 
@@ -264,135 +183,151 @@ void JP2K_Player::playLoop(){
 	while (playing) {
 
 		timer->restart(); // measure loop cycle duration
-		
-		decoding_frame_int = (int)decoding_frame; //qRound(decoding_frame);
-
-		if (playing_frame > ple_playing.out && playing_ple_index < playlist_length) {
-			playing_ple_index++;
-			ple_playing = playlist[playing_ple_index]; // move to next section in timeline (decode)
-			playing_frame = ple_playing.in;
-			video_framerate = ple_decoding.asset->GetMetadata().editRate.GetQuotient(); // set original edit rate of video
-
-			qDebug() << "ASSET CHANGED (playing)";
-
-			if (decoding_ple_index == playlist_length) {
-				playlist_last_item = true;
-				last_frame_nr = ple_playing.out;
-				qDebug() << "LAST ASSET";
-			}
-		}else if (decoding_frame_int > ple_decoding.out && decoding_ple_index < playlist_length) {
-			decoding_ple_index++;
-			ple_decoding = playlist[decoding_ple_index]; // move to next section in timeline (decode)
-			decoding_frame_int = ple_decoding.in; // set decode-pointer to next section
-			decoding_frame = ple_decoding.in; // set decode-pointer to next section
-
-			setReader();
-			qDebug() << "ASSET CHANGED (decoding) start:" << ple_decoding.in << "end:" << ple_decoding.out << "index:" << decoding_ple_index;
-		}
-
-		buffer_size = decoded_shared->decoded_total - played_frames_total;
-		emit playerInfo(QString("buffer: %1").arg(buffer_size));
 
 		// calculate buffer fill time
-		if (decoded_shared->decoded_cycle >= fps) {
-			//qDebug() << "cycles to fill the buffer:" << buffer_fill_count << "total decoded" << decoded_shared->decoded_total;
-			if ((float)buffer_fill_count > (float)fps*1.2) { // reduce speed
+		if (decoded_shared->pending_requests >= (float)fps*1.2) {
 
-				int new_fps = ((float)fps / (float)buffer_fill_count) * (float)fps + 1;
-				if (new_fps == 0) {
-					emit ShowMsgBox(QString("No images where decoded within one second.\nPlease consider selecting a smaller resolution. This may significantly increase decoding speed!"), 0);
-				}
-				else {
-					emit ShowMsgBox(QString("Only %1 frames have been decoded instead of %2. Reduce framerate to %3?").arg(decoded_shared->decoded_cycle).arg(fps).arg(new_fps), new_fps);
-				}
-				
-				playing = false;
-				this->thread()->quit();
-				return;
+			int new_fps = fps - (decoded_shared->pending_requests - fps);
+
+			if (new_fps == 0) {
+				emit ShowMsgBox(QString("No images where decoded within one second.\nPlease consider selecting a smaller resolution. This may significantly increase decoding speed!"), 0);
 			}
-			buffer_fill_count = 0; // reset
-			decoded_shared->decoded_cycle = 0; // reset
+			else {
+				emit ShowMsgBox(QString("There are %1 pending requests! Reduce frame rate from %2 to %3?").arg(decoded_shared->pending_requests).arg(fps).arg(new_fps), new_fps);
+			}
+
+			playing = false;
+			this->thread()->quit();
+			return;
 		}
 
-		if (buffer_size <= 0 && played_frames_total > 0) {
-			buffering = true; // start buffering (again)
-			emit playerInfo("buffering...");
-		}else if (requested_frames_total >= fps) {
-			buffering = false; // start playing out frames
-		}
+		// calculate buffer size
+		buffer_size = decoded_shared->decoded_total - played_frames_total;
+		emit playerInfo(QString("Buffer: %1").arg(buffer_size));
 
+		// request new frame
+		if (buffer_size <= fps && frame_decoding_total_float <= last_frame_total) {
 
-		// request new frames
-		if (decoded_shared->pending_requests < fps || buffering) {
+			request_index = requested_frames_total % decoders;
 
-			//qDebug() << "now requesting frame nr" << decoding_frame;
-			
-			int request_index = requested_frames_total % 50;
-			request_queue[request_index]->frameNr = decoding_frame;
-			request_queue[request_index]->done = false;
-			threadPool->start(decoder_queue[request_index], QThread::HighestPriority);
+			request_queue[request_index]->frameNr = (int)(frame_decoding_asset_float);
+			request_queue[request_index]->TframeNr = (int)(frame_decoding_total_float);
+			request_queue[request_index]->error = false;
+			request_queue[request_index]->layer = layer;
+
+			// check if asset is valid
+			if (playlist.at(decoding_index).asset) { // asset is valid -> open reader!
+
+				request_queue[request_index]->asset = playlist.at(decoding_index).asset; // set asset in request
+				request_queue[request_index]->done = false;
+				threadPool->start(decoder_queue[request_index], QThread::HighPriority);
+			}
+			else { // asset is invalid? -> set error image
+				request_queue[request_index]->done = true;
+				request_queue[request_index]->decoded = QImage(":/frame_blank.png");
+
+				decoded_shared->decoded_total++;
+				decoded_shared->decoded_cycle++;
+				decoded_shared->pending_requests--;
+			}
 
 			requested_frames_total++;
 			decoded_shared->pending_requests++;
 
 			// attempt "real speed" playback?
-			if (realspeed == true) {
-				decoding_frame += (video_framerate / (double)fps);
-				decoding_frame_total++; // = qRound((video_framerate / (double)fps));
+			if (realspeed) {
+				frame_decoding_asset_float += skip_frames;
+				frame_decoding_total_float += skip_frames;
 			}
 			else { // frame by frame playback
-				decoding_frame++;
-				decoding_frame_total++;
+				frame_decoding_asset_float++;
+				frame_decoding_total_float++;
+			}
+
+			if (frame_decoding_asset_float > playlist[decoding_index].out) {
+				if (decoding_index < (playlist.length() - 1)) {
+					decoding_index++; // move on to next asset
+					frame_decoding_asset_float = (frame_decoding_asset_float - playlist.at(decoding_index - 1).out) + playlist.at(decoding_index).in;
+				}
 			}
 		}
+		else {
+			buffering = false; // start playing out frames (again)
+		}
 
-		if (!buffering && buffer_size > 0) { // buffer is filled with > 0 frames
+		// play out frames?
+		if (!buffering && (decoded_shared->decoded_total > fps || frame_decoding_total_float >= last_frame_total) && buffer_size > 0) {
 
 			// show player position every fps nr of frames
 			if (player_position_counter >= fps) {
-				emit currentPlayerPosition(qRound(playing_frame_total)); // update every second
+				emit currentPlayerPosition((int)frame_playing_total_float, false); // update every second
 				if (show_subtitles) emit playTTML();
 				player_position_counter = 0;
 			}
-			player_position_counter++;
 
-			// attempt "real speed" playback?
-			if (realspeed == true) {
-				playing_frame_total += (video_framerate / (double)fps);
-				playing_frame += (video_framerate / fps);
+			if (request_queue[played_frames_total % decoders]->done) { // frame exists -> show it
+
+				emit showFrame(request_queue[played_frames_total % decoders]->decoded);
+
+				if (frame_playing_total_float >= last_frame_total) { // last frame was played!
+					
+					if(player_position_counter > 0) emit currentPlayerPosition(last_frame_total, true); // set last position
+					emit playbackEnded();
+
+					setPos(playlist.at(0).in, 0, 0);
+
+					clean();
+					return;
+				}
+
+				if (frame_playing_asset_float > playlist[playing_index].out) {
+					if (playing_index < (playlist.length() - 1)) {
+
+						playing_index++; // move on to next asset
+						frame_playing_asset_float = (frame_playing_asset_float - playlist.at(playing_index - 1).out) + playlist.at(playing_index).in;
+					}
+				}
+
+				// attempt "real speed" playback?
+				if (realspeed) {
+					frame_playing_total_float += skip_frames;
+					frame_playing_asset_float += skip_frames;
+				}
+				else { // frame by frame playback
+					frame_playing_total_float++;
+					frame_playing_asset_float++;
+				}
 			}
-			else { // frame by frame playback
-				playing_frame_total++;
-				playing_frame++;
+			else if (request_queue[played_frames_total % decoders]->error) { // an error occured during the decoding process!
+					
+				if (player_position_counter > 0) emit currentPlayerPosition((int)frame_playing_total_float, false); // set player position
+				emit playerInfo(QString("DECODING ERROR: %1, FRAME: %2").arg(request_queue[played_frames_total % decoders]->errorMsg).arg(request_queue[played_frames_total % decoders]->frameNr));
+				emit playbackEnded();
+
+				clean();
+				return;
+			}
+			else { // frame not found!
+				emit showFrame(nullimage);
+				emit playerInfo("PLAYER ERROR: decoded frame not found!");
 			}
 
-			if (request_queue[playing_count % 50]->done) { // frame exists -> show it
-
-				emit showFrame(request_queue[playing_count % 50]->decoded);
-
-				buffer_fill_counter--;
-				played_frames_total++;
-			}
-			else if (request_queue[playing_count % 50]->error) { // an error occured during the decoding process!
-				emit playerInfo(request_queue[playing_count % 50]->errorMsg);
-				stop();
-			} // else: no frame found!
-
-			playing_count++;
+			player_position_counter++; // count to fps, then move frame indicator
+			played_frames_total++; // total number of frames played out in current play-cycle
+			started_playing = true;
 		}
+		else if (frame_playing_total_float >= last_frame_total) { // playback has ended!
 
-		// check if last frame was reached
-		if (playing_frame >= last_frame_nr && playlist_last_item == true) {
-
-			qDebug() << "last frame" << last_frame_nr;
-
-			emit currentPlayerPosition(playing_frame_total);
+			emit currentPlayerPosition(last_frame_total, true); // update every second
 			emit playbackEnded();
 			emit playerInfo("playback ended!");
-			stop();
+
+			setPos(playlist.at(0).in, 0, 0);
+
+			clean();
+			return;
 		}
 
-		buffer_fill_count++;
 		QApplication::processEvents();
 
 		if (timer->elapsed() < ms_wait) {
@@ -402,28 +337,96 @@ void JP2K_Player::playLoop(){
 }
 
 // CPL selected/changed
-void JP2K_Player::setPlaylist(QVector<PlayListElement> &rPlaylist) {
+void JP2K_Player::setPlaylist(QVector<VideoResource> &rPlaylist) {
 
-	qDebug() << "playlist items:" << rPlaylist.length();
 	playlist = rPlaylist;
+	if(playlist.length() == 0) emit playerInfo("No/empty playlist!");
 
-	if (rPlaylist.length() > 0 && rPlaylist.at(0).asset) {
-		
-		video_framerate = playlist[0].asset->GetMetadata().editRate.GetQuotient();
-		if(playlist.length() > 0) setPos(playlist[0].in, 0, 0);
+	last_frame_total = playlist.length() - 1;
 
-		// loop playlist (for testing purposes)
-		for (int i = 0; i < playlist.length(); i++) {
-			qDebug() << playlist.at(i).in << " -> " << playlist.at(i).out;
+	// loop playlist items
+	for (int i = 0; i < playlist.length(); i++) {
+		if(i == 0) setPos(playlist.at(i).in, 0, 0); // initialize player
+		last_frame_total += (playlist.at(i).out - playlist.at(i).in);
+	}
+
+	// look for first valid asset
+	int count = 0;
+	bool found = false;
+	skip_frames = 1;
+
+	while (count < rPlaylist.length() && found == false) {
+		if (rPlaylist.at(count).asset) {
+
+			video_framerate = rPlaylist.at(count).asset->GetMetadata().editRate.GetQuotient(); // set initial fps
+			skip_frames = (video_framerate / (double)fps);
+
+			found = true;
+
+			// get metadata (these values may not change within same CPL?)
+			SMPTE::eColorPrimaries colorPrimaries = rPlaylist.at(count).asset->GetMetadata().colorPrimaries;
+			int src_bitdepth = rPlaylist.at(count).asset->GetMetadata().componentDepth;
+			int prec_shift = src_bitdepth - 8;
+			int RGBrange = 0, RGBmaxcv = 0;
+			float Kr = 0, Kg = 0, Kb = 0;
+
+			int max = pow(2, src_bitdepth) - 1;
+
+			int ComponentMinRef = rPlaylist.at(count).asset->GetMetadata().componentMinRef;
+			int ComponentMaxRef = rPlaylist.at(count).asset->GetMetadata().componentMaxRef;
+
+			if (ComponentMinRef && ComponentMaxRef) {
+				RGBrange = ComponentMaxRef - ComponentMinRef;
+				RGBmaxcv = (1 << src_bitdepth) - 1;
+			}
+
+			switch (colorPrimaries) {
+			case SMPTE::ColorPrimaries_ITU709:
+				// set YCbCr -> RGB conversion parameters
+				Kr = 0.2126;
+				Kg = 0.7152;
+				Kb = 0.0722;
+				break;
+			case SMPTE::ColorPrimaries_ITU2020:
+				// set YCbCr -> RGB conversion parameters
+				Kr = 0.2627;
+				Kg = 0.6780;
+				Kb = 0.0593;
+				break;
+			case SMPTE::ColorPrimaries_SMPTE170M:
+			case SMPTE::ColorPrimaries_ITU470_PAL:
+				// set YCbCr -> RGB conversion parameters
+				Kr = 0.299;
+				Kg = 0.587;
+				Kb = 0.114;
+				break;
+			default: break;
+			}
+
+			// set params in decoders
+			for (int i = 0; i < decoders; i++) {
+
+				// color transformation
+				decoder_queue[i]->ColorEncoding = rPlaylist.at(count).asset->GetMetadata().colorEncoding;
+				decoder_queue[i]->colorPrimaries = colorPrimaries;
+				decoder_queue[i]->transferCharactersitics = rPlaylist.at(count).asset->GetMetadata().transferCharcteristics;
+				decoder_queue[i]->src_bitdepth = src_bitdepth;
+
+				decoder_queue[i]->ComponentMinRef = ComponentMinRef;
+				decoder_queue[i]->ComponentMaxRef = ComponentMaxRef;
+				decoder_queue[i]->RGBmaxcv = RGBmaxcv;
+				decoder_queue[i]->RGBrange = RGBrange;
+
+				// YCbCr -> RGB conv. params.
+				decoder_queue[i]->Kr = Kr;
+				decoder_queue[i]->Kg = Kg;
+				decoder_queue[i]->Kb = Kb;
+
+				decoder_queue[i]->prec_shift = prec_shift;
+				decoder_queue[i]->max = max;
+			}
 		}
-	}
-
-	if (rPlaylist.length() == 1) { // only (and last) playlist item!
-		playlist_last_item = true;
-		last_frame_nr = rPlaylist[0].out;
-	}
-	else {
-		playlist_last_item = false;
+		count++;
 	}
 
 	clean();
@@ -434,25 +437,18 @@ void JP2K_Player::setFps(int set_fps){
 	//qDebug() << "set fps to" << set_fps;
 	ms_wait = qRound(1000 / (double)set_fps);
 	fps = set_fps;
+	if(video_framerate > 0) skip_frames = (video_framerate / (double)fps);
+
 	emit playerInfo(QString("Set fps to: %1").arg(fps));
-	clean();
 }
 
-void JP2K_Player::setLayer(int layer){
-
-	emit playerInfo(QString("Set decoding layer to: %1").arg(layer));
-
-	// set layer in decoders
-	for (int i = 0; i < 50; i++) {
-		decoder_queue[i]->layer = layer;
-	}
-
-	clean();
+void JP2K_Player::setLayer(int rLayer){
+	layer = rLayer;
 }
 
 void JP2K_Player::convert_to_709(bool convert) {
 
-	for (int i = 0; i < 50; i++) {
+	for (int i = 0; i < decoders; i++) {
 		decoder_queue[i]->convert_to_709 = convert; // set in decoder [i]
 	}
 }

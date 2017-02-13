@@ -7,8 +7,6 @@
 
 void TimelineParser::run() {
 
-	int current_track_index = 0;
-	int last_segment = 0;
 	int last_track = 0;
 	int track_index = 0;
 
@@ -34,7 +32,7 @@ void TimelineParser::run() {
 							GraphicsWidgetVideoResource *timelineWidget = dynamic_cast<GraphicsWidgetVideoResource*>(p_resource);
 
 							// create new playlist element
-							PlayListElement playlist_element;
+							VideoResource playlist_element;
 							
 							playlist_element.in = timelineWidget->GetFirstVisibleFrame().GetOverallFrames();
 							playlist_element.out = timelineWidget->GetLastVisibleFrame().GetOverallFrames();
@@ -58,10 +56,10 @@ void TimelineParser::run() {
 							}
 
 							// create new segment
-							TTMLtimelineSegment segment; // new segment
-							segment.track_index = ii;
-							segment.in = (float)timelineWidget->GetFirstVisibleFrame().GetSecondsF();
-							segment.out = (float)timelineWidget->GetLastVisibleFrame().GetSecondsF();
+							TTMLtimelineResource resource; // new resource
+							resource.track_index = ii;
+							resource.in = (float)timelineWidget->GetFirstVisibleFrame().GetSecondsF();
+							resource.out = (float)timelineWidget->GetLastVisibleFrame().GetSecondsF();
 
 							// check for other segments in track
 							bool found = false; // default
@@ -70,8 +68,8 @@ void TimelineParser::run() {
 								// check for other segments with same track id
 								for (int z = ttmls->length(); z > 0; z--) {
 									if (ttmls->at((z - 1)).track_index == ii) { // success!
-										segment.timeline_in = ttmls->at((z - 1)).timeline_out;
-										segment.timeline_out = (segment.out - segment.in) + segment.timeline_in;
+										resource.timeline_in = ttmls->at((z - 1)).timeline_out;
+										resource.timeline_out = (resource.out - resource.in) + resource.timeline_in;
 										found = true;
 										break; // exit loop
 									}
@@ -79,23 +77,21 @@ void TimelineParser::run() {
 							}
 
 							if (found == false) {
-								segment.timeline_in = 0;
-								segment.timeline_out = segment.out;
+								resource.timeline_in = 0;
+								resource.timeline_out = resource.out;
 							}
 							
 							// is asset alread wrapped in mxf?
 							if (p_resource->GetAsset() && p_resource->GetAsset()->HasSourceFiles()) { // no
-								segment.annotation = timelineWidget->GetAsset()->GetAnnotationText().first;
 								// loop source files
 								for (int z = 0; z < p_resource->GetAsset()->GetSourceFiles().length(); z++) {
 									if (p_resource->InOutChanged) {
-										parser->open(p_resource->GetAsset()->GetSourceFiles().at(z), segment, false);
+										parser->open(p_resource->GetAsset()->GetSourceFiles().at(z), resource, false);
 									}
 								}
 							}
 							else if (p_resource->GetAsset() && p_resource->InOutChanged) { // yes
-								segment.annotation = timelineWidget->GetAsset()->GetAnnotationText().first;
-								parser->open(p_resource->GetAsset()->GetPath().absoluteFilePath(), segment, true);
+								parser->open(p_resource->GetAsset()->GetPath().absoluteFilePath(), resource, true);
 							}
 							else { // ?
 								// asset deleted?
@@ -103,10 +99,9 @@ void TimelineParser::run() {
 
 							parser->~TTMLParser();
 		
-							ttmls->append(segment);
+							ttmls->append(resource);
 
 							last_track = ii;
-							last_segment = i;
 						}
 					}
 				}

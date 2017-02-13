@@ -20,33 +20,22 @@
 #include <KM_fileio.h>
 #include <cmath>
 #include <QtCore>
-#include <QDebug>
-#include <QCryptographicHash>
-#include <cstring>
 #include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/sax/HandlerBase.hpp>
 #include <xercesc/util/XMLString.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
-#include <xercesc/validators/common/Grammar.hpp>
-#include <xercesc/sax2/XMLReaderFactory.hpp>
-#include <xercesc/sax2/SAX2XMLReader.hpp>
 
-#include <xercesc/util/PlatformUtils.hpp>
-#include <xercesc/util/XMLString.hpp>
-#include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/OutOfMemoryException.hpp>
-#include <xercesc/framework/XMLFormatter.hpp>
-#include <xercesc/framework/LocalFileFormatTarget.hpp>
 #include <xercesc/dom/DOMDocument.hpp>
 #include <xercesc/dom/DOMImplementation.hpp>
 #include <xercesc/dom/DOMImplementationRegistry.hpp>
 #include <xercesc/dom/DOMLSSerializer.hpp>
-#include <xercesc/dom/DOMLSOutput.hpp>
 #include <xercesc/framework/MemBufInputSource.hpp>
 
 using namespace xercesc;
 //#define DEBUG_TTML
+
 
 //!this class helps to convert char* to XMLString by using X(char*) instead of XMLString::transcode(char*).
 class XStr
@@ -76,7 +65,7 @@ bool elem::process() {
 	if (el) {
 
 		// check if is metadata -> ignore
-		if (XMLString::transcode(el->getTagName()) == "metadata") {
+		if (XMLString::compareIString(XMLString::transcode(el->getTagName()), "metadata") == 0) {
 			dur = 2;
 			stop = true;
 			return stop;
@@ -260,7 +249,6 @@ bool elem::processTimedElement() {
 		ttml_timed.type = 1; // set type : image
 
 		if (parser->is_wrapped) {
-
 			// create UUID from file name e.g. track5-frag0-sample1-subs4.png -> 0c209959-84e2-5a63-86ad-bd5406b068d1
 			Kumu::UUID id = AS_02::TimedText::CreatePNGNameId(image.toStdString());
 			if (!parser->anc_resources[id].isNull()) { // anc asset found!
@@ -432,7 +420,7 @@ TTMLParser::TTMLParser() {
 	nullregion.valid = false;
 }
 
-Error TTMLParser::open(const QString &rSourceFile, TTMLtimelineSegment &ttml_segment, bool rIsWrapped) {
+Error TTMLParser::open(const QString &rSourceFile, TTMLtimelineResource &ttml_segment, bool rIsWrapped) {
 
 	Error error;
 	
