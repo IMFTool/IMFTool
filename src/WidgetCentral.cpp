@@ -17,7 +17,7 @@
 #include "WidgetComposition.h"
 //#ifdef ARCHIVIST
 #include "WidgetVideoPreview.h" // (k)
-#include "TTMLDetails.h" // (k)
+#include "WidgetTimedTextPreview.h" // (k)
 #include "TimelineParser.h" // (k)
 #include "SMPTE_Labels.h" // (k)
 //#endif
@@ -25,6 +25,7 @@
 #include "ImfPackage.h"
 #include "ImfCommon.h"
 #include "WidgetContentVersionList.h" //WR
+#include "WidgetLocaleList.h" //WR
 #include <QHBoxLayout>
 #include <QSplitter>
 #include <QTabWidget>
@@ -59,7 +60,6 @@ void WidgetCentral::InitLyout() {
 	p_tab_widget_frame_layout->addWidget(mpTabWidget);
 	p_tab_widget_frame->setLayout(p_tab_widget_frame_layout);
 
-//#ifdef ARCHIVIST
 	QFrame *p_preview_widget_frame = new QFrame(this);
 	p_preview_widget_frame->setFrameStyle(QFrame::StyledPanel);
 
@@ -68,26 +68,36 @@ void WidgetCentral::InitLyout() {
 	p_preview_widget_frame_layout->setContentsMargins(0, 0, 0, 0);
 	p_preview_widget_frame_layout->addWidget(mpPreview);
 	p_preview_widget_frame->setLayout(p_preview_widget_frame_layout);
-//#endif
 
 	mpDetailsWidget = new WidgetCompositionInfo(this);
 	mpDetailsWidget->setDisabled(true);
-	QFrame *p_details_widget_frame = new QFrame(this);
+/*	QFrame *p_details_widget_frame = new QFrame(this);
 	p_details_widget_frame->setFrameStyle(QFrame::StyledPanel);
 	QHBoxLayout *p_details_widget_frame_layout = new QHBoxLayout();
 	p_details_widget_frame_layout->setContentsMargins(0, 0, 0, 0);
 	p_details_widget_frame_layout->addWidget(mpDetailsWidget);
-	p_details_widget_frame->setLayout(p_details_widget_frame_layout);
+	p_details_widget_frame->setLayout(p_details_widget_frame_layout);*/
 
 	//WR
 	mpContentVersionListWidget = new WidgetContentVersionList(this);
 	mpContentVersionListWidget->setDisabled(true);
-	p_details_widget_frame = new QFrame(this);
-	p_details_widget_frame->setFrameStyle(QFrame::StyledPanel);
-	p_details_widget_frame_layout = new QHBoxLayout();
-	p_details_widget_frame_layout->setContentsMargins(0, 0, 0, 0);
-	p_details_widget_frame_layout->addWidget(mpContentVersionListWidget);
-	p_details_widget_frame->setLayout(p_details_widget_frame_layout);
+	//QFrame *p_version_widget_frame = new QFrame(this);
+	//p_version_widget_frame->setFrameStyle(QFrame::StyledPanel);
+	//QHBoxLayout *p_version_widget_frame_layout = new QHBoxLayout();
+	//p_version_widget_frame_layout->setContentsMargins(0, 0, 0, 0);
+	//p_version_widget_frame_layout->addWidget(mpContentVersionListWidget);
+	//p_version_widget_frame->setLayout(p_version_widget_frame_layout);
+	//p_details_widget_frame_layout->addWidget(mpContentVersionListWidget);
+
+	mpLocaleListWidget = new WidgetLocaleList(this);
+	mpLocaleListWidget->setDisabled(true);
+	/*QFrame *p_locale_widget_frame = new QFrame(this);
+	p_locale_widget_frame->setFrameStyle(QFrame::StyledPanel);
+	QHBoxLayout *p_locale_widget_frame_layout = new QHBoxLayout();
+	p_locale_widget_frame_layout->setContentsMargins(0, 0, 0, 0);
+	p_locale_widget_frame_layout->addWidget(mpLocaleListWidget);
+	p_locale_widget_frame->setLayout(p_locale_widget_frame_layout);*/
+	//p_details_widget_frame_layout->addWidget(mpLocaleListWidget);
 
 	//WR
 	// (k) - start
@@ -102,13 +112,25 @@ void WidgetCentral::InitLyout() {
 
 	// create tabs
 	mpTabDetailTTML = new QTabWidget(this);
+	mpTabDetailTTML->setTabsClosable(false);
+	mpTabDetailTTML->setMovable(false);
+	QFrame *p_tab_detail_widget_frame = new QFrame(this);
+	p_tab_detail_widget_frame->setFrameStyle(QFrame::StyledPanel);
+	QHBoxLayout *p_tab_detail_widget_frame_layout = new QHBoxLayout();
+	p_tab_detail_widget_frame_layout->setContentsMargins(0, 0, 0, 0);
+	p_tab_detail_widget_frame_layout->addWidget(mpTabDetailTTML);
+	p_tab_detail_widget_frame->setLayout(p_tab_detail_widget_frame_layout);
+
+
+
 	mpTabDetailTTML->addTab(mpDetailsWidget, "Details"); // add to layout
-	mpTTMLDetailsWidget = new TTMLDetails(this);
+	mpTTMLDetailsWidget = new WidgetTimedTextPreview(this);
 	mpTabDetailTTML->addTab(mpContentVersionListWidget, "ContentVersionList"); // add to layout
+	mpTabDetailTTML->addTab(mpLocaleListWidget, "LocaleList"); // add to layout
 	mpTabDetailTTML->addTab(mpTTMLDetailsWidget, "TTML"); // add to layout
 	connect(mpTTMLDetailsWidget->show_regions, SIGNAL(stateChanged(int)), mpPreview, SIGNAL(regionOptionsChanged(int)));
 
-	p_details_widget_frame_layout->addWidget(mpTabDetailTTML);
+	//p_details_widget_frame_layout->addWidget(mpTabDetailTTML);
 	connect(mpTabDetailTTML, SIGNAL(currentChanged(int)), this, SLOT(rToggleTTML(int)));
 	connect(mpPreview, SIGNAL(ttmlChanged(const QVector<visibleTTtrack>&,int)), mpTTMLDetailsWidget, SLOT(rShowTTML(const QVector<visibleTTtrack>&,int)));
 	connect(mpTTMLDetailsWidget, SIGNAL(PrevNextSubClicked(bool)), mpPreview, SLOT(rPrevNextSubClicked(bool)));
@@ -118,27 +140,17 @@ void WidgetCentral::InitLyout() {
 	p_inner_splitter->setOrientation(Qt::Horizontal);
 	p_inner_splitter->setChildrenCollapsible(false);
 	p_inner_splitter->setOpaqueResize(true);
-	p_inner_splitter->addWidget(p_details_widget_frame);
-//#ifdef ARCHIVIST
+	p_inner_splitter->addWidget(mpTabDetailTTML);
 	p_inner_splitter->addWidget(p_preview_widget_frame);
-//#endif
 
 	QSplitter *p_outer_splitter = new QSplitter(this);
 	p_outer_splitter->setOrientation(Qt::Vertical);
 	p_outer_splitter->setChildrenCollapsible(false);
 	p_outer_splitter->setOpaqueResize(true);
-//#ifdef ARCHIVIST
 	p_outer_splitter->addWidget(p_inner_splitter);
-//#else
-//	p_outer_splitter->addWidget(p_details_widget_frame);
-//#endif
 	p_outer_splitter->addWidget(p_tab_widget_frame);
 	QList<int> sizes;
-//#ifdef ARCHIVIST
-	//sizes << mpPreview->sizeHint().height() << -1;
-//#else
 	sizes << mpDetailsWidget->sizeHint().height() << -1;
-//#endif
 	p_outer_splitter->setSizes(sizes);
 	p_outer_splitter->setStretchFactor(1, 1);
 
@@ -199,7 +211,6 @@ void WidgetCentral::rPlaylistFinished() {
 
 
 void WidgetCentral::rNextFrame() {
-	qDebug() << "next";
 	WidgetComposition *p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->currentWidget());
 	if (p_composition) { // cpl loaded
 		p_composition->setVerticalIndicator(p_composition->lastPosition.GetOverallFrames() + 1);
@@ -207,7 +218,6 @@ void WidgetCentral::rNextFrame() {
 }
 
 void WidgetCentral::rPrevFrame() {
-	qDebug() << "prev";
 	WidgetComposition *p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->currentWidget());
 	if (p_composition) { // cpl loaded
 		if (p_composition->lastPosition.GetOverallFrames() > 0) {
@@ -239,8 +249,9 @@ void WidgetCentral::rCurrentChanged(int tabWidgetIndex) {
 	p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->widget(tabWidgetIndex));
 	if(p_composition) {
 		mpDetailsWidget->SetComposition(p_composition);
-
 		mpContentVersionListWidget->SetComposition(p_composition);
+		mpLocaleListWidget->SetComposition(p_composition);
+
 		// (k) - start
 		mpPreview->CPLEditRate = p_composition->GetEditRate().GetQuotient(); // set CPL edit rate
 		rUpdatePlaylist(); // update playlist
@@ -323,6 +334,8 @@ void WidgetCentral::InstallImp(const QSharedPointer<ImfPackage> &rImfPackage) {
 	mpImfPackage = rImfPackage;
 	mpDetailsWidget->setEnabled(true);
 	mpContentVersionListWidget->setEnabled(true);
+	mpLocaleListWidget->setEnabled(true);
+
 	mpPreview->InstallImp(); // set IMP in player (k)
 }
 
@@ -338,6 +351,8 @@ void WidgetCentral::UninstallImp() {
 	mpDetailsWidget->Clear();
 	mpContentVersionListWidget->setDisabled(true);
 	mpContentVersionListWidget->Clear();
+	mpLocaleListWidget->setDisabled(true);
+	mpLocaleListWidget->Clear();
 	mpTTMLDetailsWidget->ClearTTML(); // (k) - clear ttml
 
 	

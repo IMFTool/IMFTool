@@ -318,7 +318,7 @@ void WidgetImpBrowser::Save() {
 
 						/* -----Denis Manthey Beg----- */
 					else if(mxf_asset->GetEssenceType() == Metadata::TimedText) {
-						JobWrapTimedText *p_wrap_job = new JobWrapTimedText(mxf_asset->GetSourceFiles(), mxf_asset->GetPath().absoluteFilePath(), mxf_asset->GetEditRate(), mxf_asset->GetOriginalDuration(), mxf_asset->GetId(), mxf_asset->GetProfile(), mxf_asset->GetTimedTextFrameRate(), mxf_asset->GetLanguageTag());
+						JobWrapTimedText *p_wrap_job = new JobWrapTimedText(mxf_asset->GetSourceFiles(), mxf_asset->GetPath().absoluteFilePath(), mxf_asset->GetEditRate(), mxf_asset->GetDuration(), mxf_asset->GetId(), mxf_asset->GetProfile(), mxf_asset->GetLanguageTag());
 						connect(p_wrap_job, SIGNAL(Success()), mxf_asset.data(), SLOT(FileModified()));
 						mpJobQueue->AddJob(p_wrap_job);
 					}

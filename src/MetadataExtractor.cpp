@@ -724,13 +724,29 @@ Error MetadataExtractor::ReadTimedTextMetadata(Metadata &rMetadata, const QFileI
 		DOMElement* tteleDom = dynamic_cast<DOMElement*>(ttitem->item(0));
 
 		//Profile Extractor
-		QString profile = XMLString::transcode(tteleDom->getAttribute(XMLString::transcode("ttp:profile")));
-		if (profile.isEmpty())
-			profile = "Unknown";
+		// First have a look if ttp:profile attribute is present
+		QString profile = XMLString::transcode(tteleDom->getAttributeNS(IMSC1_NS_TTP, XMLString::transcode("profile")));
+
+		//TO-DO: Checking for urn:ebu:tt:distribution:2014-01
+
+		if (profile.isEmpty()) {
+			profile = "http://www.w3.org/ns/ttml/profile/imsc1/text";
+			DOMNodeList	*divitems = dom_doc->getElementsByTagName(XMLString::transcode("div"));
+			//Check if <smpte:backgroundImage> is present
+			if (divitems->getLength() != 0) {
+				// Checking the first div element only
+				DOMElement* backgroundImage_eleDom = dynamic_cast<DOMElement*>(divitems->item(0));
+				QString backgroundImage = XMLString::transcode(backgroundImage_eleDom->getAttributeNS(IMSC1_NS_SMPTE, XMLString::transcode("backgroundImage")));
+				if (!backgroundImage.isEmpty()) {
+					qDebug() << "backgroundImage found, setting profile to imsc1/image.";
+					profile = "http://www.w3.org/ns/ttml/profile/imsc1/image";
+				}
+			}
+		}
 		metadata.profile = profile;
 
 		//Frame Rate Multiplier Extractor
-		QString mult = XMLString::transcode(tteleDom->getAttribute(XMLString::transcode("ttp:frameRateMultiplier")));
+		QString mult = XMLString::transcode(tteleDom->getAttributeNS(IMSC1_NS_TTP, XMLString::transcode("frameRateMultiplier")));
 		float num = 1;
 		float den = 1;
 		if (!mult.isEmpty()){
@@ -739,7 +755,7 @@ Error MetadataExtractor::ReadTimedTextMetadata(Metadata &rMetadata, const QFileI
 		}
 
 		//Frame Rate Extractor
-		QString fr = XMLString::transcode(tteleDom->getAttribute(XMLString::transcode("ttp:frameRate")));
+		QString fr = XMLString::transcode(tteleDom->getAttributeNS(IMSC1_NS_TTP, XMLString::transcode("frameRate")));
 		int editrate = 30;					//editrate is for the metadata object (expects editrate*numerator, denominator)
 		float framerate = 30*(num/den);		//framerate is for calculating the duration, we need the fractal editrate!
 		if(!fr.isEmpty()){

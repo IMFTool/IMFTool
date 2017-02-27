@@ -95,7 +95,7 @@ Error JobWrapWav::Execute() {
 			ASDCP::MXF::AS02_MCAConfigParser mca_config(dict);
 			int progress = 0;
 			int last_progress = 0;
-			ASDCP::Rational edit_rate;
+			//ASDCP::Rational edit_rate;
 			QFileInfo output_file(mOutputFile);
 
 			if(output_file.exists() && output_file.isFile() && !output_file.isSymLink()) QFile::remove(output_file.absoluteFilePath());
@@ -105,50 +105,44 @@ Error JobWrapWav::Execute() {
 				source_files.push_back(mSourceFiles.at(i).toStdString());
 			}
 			// set up MXF writer
-			ASDCP::PCMParserList *p_sec_parser = new ASDCP::PCMParserList;
-			Kumu::Result_t result = p_sec_parser->OpenRead(source_files, ASDCP::Rational(24, 1));
-			result = p_sec_parser->FillAudioDescriptor(audio_descriptor);
-			delete p_sec_parser;
+			Kumu::Result_t result = parser.OpenRead(source_files, ASDCP::Rational(24, 1)); // Dirty hack? We need the duration in multiples of samples.
 			if(ASDCP_SUCCESS(result)) {
-				result = parser.OpenRead(source_files, audio_descriptor.AudioSamplingRate); // Dirty hack? We need the duration in multiples of samples.
-				if(ASDCP_SUCCESS(result)) {
-					result = parser.FillAudioDescriptor(audio_descriptor);
-					audio_descriptor.EditRate = audio_descriptor.AudioSamplingRate;
-					buffer.Capacity(ASDCP::PCM::CalcFrameBufferSize(audio_descriptor));
-					essence_descriptor = new ASDCP::MXF::WaveAudioDescriptor(dict);
-					result = ASDCP::PCM_ADesc_to_MD(audio_descriptor, essence_descriptor);
-					if (mLanguageTag.isEmpty()) {
-						if(mca_config.DecodeString(mSoundFieldGoup.GetAsString().toStdString()) == false) {
-							error = Error(Error::MCAStringDecoding);
-							return error;
-						}
-					} else {
-						if(mca_config.DecodeString(mSoundFieldGoup.GetAsString().toStdString(), mLanguageTag.toStdString()) == false) {
-							error = Error(Error::MCAStringDecoding);
-							return error;
-						}
-					}
-					if(mca_config.ChannelCount() != essence_descriptor->ChannelCount) {
-						error = Error(Error::ChannelCountMismatch);
+				result = parser.FillAudioDescriptor(audio_descriptor);
+				audio_descriptor.EditRate = ASDCP::Rational(24, 1);
+				buffer.Capacity(ASDCP::PCM::CalcFrameBufferSize(audio_descriptor));
+				essence_descriptor = new ASDCP::MXF::WaveAudioDescriptor(dict);
+				result = ASDCP::PCM_ADesc_to_MD(audio_descriptor, essence_descriptor);
+				if (mLanguageTag.isEmpty()) {
+					if(mca_config.DecodeString(mSoundFieldGoup.GetAsString().toStdString()) == false) {
+						error = Error(Error::MCAStringDecoding);
 						return error;
 					}
-					ASDCP::MXF::InterchangeObject_list_t::iterator i;
-					for ( i = mca_config.begin(); i != mca_config.end(); ++i ) {
-					  if ( (*i)->GetUL() == UL(dict->ul(MDD_SoundfieldGroupLabelSubDescriptor))) {
-						  ASDCP::MXF::SoundfieldGroupLabelSubDescriptor *current_soundfield;
-						  current_soundfield = reinterpret_cast<ASDCP::MXF::SoundfieldGroupLabelSubDescriptor*>(*i);
-						  if (current_soundfield) {
-							  // Set SoundfieldGroupLabelSubDescriptor items which are mandatory per ST 2067-2
-							  if (!mMCATitle.isEmpty()) current_soundfield->MCATitle = mMCATitle.toStdString();
-							  if (!mMCATitleVersion.isEmpty()) current_soundfield->MCATitleVersion = mMCATitleVersion.toStdString();
-							  if (!mMCAAudioContentKind.isEmpty()) current_soundfield->MCAAudioContentKind = mMCAAudioContentKind.toStdString();
-							  if (!mMCAAudioElementKind.isEmpty()) current_soundfield->MCAAudioElementKind = mMCAAudioElementKind.toStdString();
-							  //current_soundfield->Dump();
-						  }
-					  }
+				} else {
+					if(mca_config.DecodeString(mSoundFieldGoup.GetAsString().toStdString(), mLanguageTag.toStdString()) == false) {
+						error = Error(Error::MCAStringDecoding);
+						return error;
 					}
-					essence_descriptor->ChannelAssignment = dict->ul(MDD_IMFAudioChannelCfg_MCA);
 				}
+				if(mca_config.ChannelCount() != essence_descriptor->ChannelCount) {
+					error = Error(Error::ChannelCountMismatch);
+					return error;
+				}
+				ASDCP::MXF::InterchangeObject_list_t::iterator i;
+				for ( i = mca_config.begin(); i != mca_config.end(); ++i ) {
+				  if ( (*i)->GetUL() == UL(dict->ul(MDD_SoundfieldGroupLabelSubDescriptor))) {
+					  ASDCP::MXF::SoundfieldGroupLabelSubDescriptor *current_soundfield;
+					  current_soundfield = reinterpret_cast<ASDCP::MXF::SoundfieldGroupLabelSubDescriptor*>(*i);
+					  if (current_soundfield) {
+						  // Set SoundfieldGroupLabelSubDescriptor items which are mandatory per ST 2067-2
+						  if (!mMCATitle.isEmpty()) current_soundfield->MCATitle = mMCATitle.toStdString();
+						  if (!mMCATitleVersion.isEmpty()) current_soundfield->MCATitleVersion = mMCATitleVersion.toStdString();
+						  if (!mMCAAudioContentKind.isEmpty()) current_soundfield->MCAAudioContentKind = mMCAAudioContentKind.toStdString();
+						  if (!mMCAAudioElementKind.isEmpty()) current_soundfield->MCAAudioElementKind = mMCAAudioElementKind.toStdString();
+						  //current_soundfield->Dump();
+					  }
+				  }
+				}
+				essence_descriptor->ChannelAssignment = dict->ul(MDD_IMFAudioChannelCfg_MCA);
 			}
 
 			if(ASDCP_SUCCESS(result)) {
@@ -159,10 +153,10 @@ Error JobWrapWav::Execute() {
 				result = parser.Reset();
 				unsigned int duration = 0;
 				for(ui32_t frame_num = 0; ASDCP_SUCCESS(result); frame_num++) {
-					if(frame_num >= audio_descriptor.ContainerDuration) {
+/*					if(frame_num >= audio_descriptor.ContainerDuration) {
 						result = RESULT_ENDOFFILE; // We mustn't wrap the WAV footer.
 						break;
-					}
+					*/
 					if(QThread::currentThread()->isInterruptionRequested()) {
 						error = Error(Error::WorkerInterruptionRequest);
 						writer.Finalize();
@@ -195,8 +189,8 @@ Error JobWrapWav::Execute() {
 
 
 
-JobWrapTimedText::JobWrapTimedText(const QStringList &rSourceFiles, const QString &rOutputFile, const EditRate &rEditRate, const Duration &rDuration, const QUuid &rAssetId, const QString &rProfile, const EditRate &rFrameRate, const QString &rLanguageTag) :
-AbstractJob(tr("Wrapping %1").arg(QFileInfo(rOutputFile).fileName())), mOutputFile(rOutputFile), mSourceFiles(rSourceFiles), mEditRate(rEditRate), mDuration(rDuration), mFrameRate(rFrameRate), mProfile(rProfile), mLanguageTag(rLanguageTag) {
+JobWrapTimedText::JobWrapTimedText(const QStringList &rSourceFiles, const QString &rOutputFile, const EditRate &rEditRate, const Duration &rDuration, const QUuid &rAssetId, const QString &rProfile, const QString &rLanguageTag) :
+AbstractJob(tr("Wrapping %1").arg(QFileInfo(rOutputFile).fileName())), mOutputFile(rOutputFile), mSourceFiles(rSourceFiles), mEditRate(rEditRate), mDuration(rDuration), mProfile(rProfile), mLanguageTag(rLanguageTag) {
 
 	convert_uuid(rAssetId, (unsigned char*)mWriterInfo.AssetUUID);
 
@@ -223,7 +217,7 @@ Error JobWrapTimedText::Execute() {
 	Result_t result = Parser.OpenRead(file_info.absoluteFilePath().toStdString(), mProfile.toStdString());
 	result = Parser.FillTimedTextDescriptor(TDesc);
 
-	TDesc.EditRate = ASDCP::Rational(mFrameRate.GetNumerator(), mFrameRate.GetDenominator());
+	TDesc.EditRate = ASDCP::Rational(mEditRate.GetNumerator(), mEditRate.GetDenominator());
 	//WR
 	TDesc.ContainerDuration = mDuration.GetCount();
 	//WR

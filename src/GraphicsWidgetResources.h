@@ -220,12 +220,8 @@ public:
 	GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL), int video_timeline_index = 0);
 	//! Creates new Resource.
 	GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, const QSharedPointer<AssetMxfTrack> &rAsset);
-	virtual ~GraphicsWidgetVideoResource()
-	{
-		decodeProxyThread->quit();
-		mpJP2K->~JP2K_Preview();
-		decodeProxyThread->deleteLater();
-	}
+	virtual ~GraphicsWidgetVideoResource(){}
+
 	virtual int type() const { return GraphicsWidgetVideoResourceType; }
 	virtual void paint(QPainter *pPainter, const QStyleOptionGraphicsItem *pOption, QWidget *pWidget = NULL);
 	virtual GraphicsWidgetVideoResource* Clone() const;

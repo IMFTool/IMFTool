@@ -55,10 +55,10 @@ set(tool_src main.cpp MainWindow.cpp KMQtLogSink.cpp QtWaitingSpinner.cpp Widget
 	ImfPackageCommands.cpp MetadataExtractor.cpp MetadataExtractorCommon.cpp WizardResourceGenerator.cpp DelegateComboBox.cpp DelegateMetadata.cpp
 	GraphicsWidgetTimeline.cpp GraphicsWidgetSegment.cpp CompositionPlaylistCommands.cpp ImfMimeData.cpp GraphicsCommon.cpp
 	CustomProxyStyle.cpp GraphicScenes.cpp GraphicsWidgetResources.cpp GraphicsViewScaleable.cpp WidgetTrackDedails.cpp GraphicsWidgetComposition.cpp
-	GraphicsWidgetSequence.cpp Events.cpp WidgetCentral.cpp WidgetSettings.cpp
+	GraphicsWidgetSequence.cpp Events.cpp WidgetCentral.cpp
 	WidgetCompositionInfo.cpp UndoProxyModel.cpp JobQueue.cpp Jobs.cpp Error.cpp EmptyTimedTextGenerator.cpp WizardPartialImpGenerator.cpp
-	WidgetVideoPreview.cpp WidgetImagePreview.cpp JP2K_Preview.cpp JP2K_Player.cpp JP2K_Decoder.cpp TTMLParser.cpp TTMLDetails.cpp TimelineParser.cpp createLUTs.cpp # (k)
-	WidgetContentVersionList.cpp WidgetContentVersionListCommands.cpp#WR
+	WidgetVideoPreview.cpp WidgetImagePreview.cpp JP2K_Preview.cpp JP2K_Player.cpp JP2K_Decoder.cpp TTMLParser.cpp WidgetTimedTextPreview.cpp TimelineParser.cpp createLUTs.cpp # (k)
+	WidgetContentVersionList.cpp WidgetContentVersionListCommands.cpp WidgetLocaleList.cpp WidgetLocaleListCommands.cpp#WR
 	)
 
 # header
@@ -67,10 +67,10 @@ set(tool_src ${tool_src} global.h MainWindow.h KMQtLogSink.h QtWaitingSpinner.h
 	ImfPackageCommands.h MetadataExtractor.h MetadataExtractorCommon.h WizardResourceGenerator.h DelegateComboBox.h DelegateMetadata.h 
 	GraphicsWidgetTimeline.h GraphicsWidgetSegment.h CompositionPlaylistCommands.h ImfMimeData.h GraphicsCommon.h
 	CustomProxyStyle.h GraphicScenes.h GraphicsWidgetResources.h GraphicsViewScaleable.h WidgetTrackDedails.h GraphicsWidgetComposition.h
-	GraphicsWidgetSequence.h Events.h WidgetCentral.h WidgetSettings.h Int24.h
+	GraphicsWidgetSequence.h Events.h WidgetCentral.h Int24.h
 	WidgetCompositionInfo.h UndoProxyModel.h SafeBool.h JobQueue.h Jobs.h Error.h EmptyTimedTextGenerator.h WizardPartialImpGenerator.h
-	WidgetVideoPreview.h WidgetImagePreview.h JP2K_Preview.h JP2K_Player.h JP2K_Decoder.h TTMLParser.h TTMLDetails.h TimelineParser.h createLUTs.h SMPTE_Labels.h # (k)
-	WidgetContentVersionList.h WidgetContentVersionListCommands.h # WR
+	WidgetVideoPreview.h WidgetImagePreview.h JP2K_Preview.h JP2K_Player.h JP2K_Decoder.h TTMLParser.h WidgetTimedTextPreview.h TimelineParser.h createLUTs.h SMPTE_Labels.h # (k)
+	WidgetContentVersionList.h WidgetContentVersionListCommands.h WidgetLocaleList.h WidgetLocaleListCommands.h# WR
 	)
 
 set(synthesis_src synthesis/dcmlTypes.cpp synthesis/SMPTE-429-8-2006-PKL.cpp synthesis/SMPTE-429-8-2014-AM.cpp synthesis/SMPTE-2067-2-2013-Core.cpp 

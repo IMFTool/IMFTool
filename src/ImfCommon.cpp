@@ -311,6 +311,14 @@ QString Timecode::GetAsString() const {
 	return ret.append(QString("%1:%2:%3:%4").arg(GetHours(), 2, 10, QChar('0')).arg(GetMinutes(), 2, 10, QChar('0')).arg(GetSeconds(), 2, 10, QChar('0')).arg(GetFrames(), 2, 10, QChar('0')));
 }
 
+QString Timecode::GetFramesAsString() const {
+
+	QString ret;
+	if(mFramesCount < 0) ret.append("-");
+	return ret.append(QString("%1").arg((mFramesCount < 0 ? 0 : mFramesCount), 6, 10, QChar('0')));
+}
+
+
 QString Timecode::GetAsString(const QString &rMarker) const {
 
 	// TODO: improve

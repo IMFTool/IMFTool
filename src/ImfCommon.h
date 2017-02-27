@@ -250,6 +250,13 @@ public:
 	bool operator!=(const EditRate& rhs) const;
 	bool operator<(const EditRate& rhs) const;
 	bool operator>(const EditRate& rhs) const;
+	EditRate& operator=(const EditRate& other) {
+		mNumerator = other.GetNumerator();
+		mDenominator = other.GetDenominator();
+		mName = other.GetName();
+	    return *this;
+	}
+
 	//! Convenience function: Returns a well known edit rate.
 	static EditRate GetEditRate(const QString &rEditRateName);
 	//! Convenience function: Returns the names of all well known frame rates.
@@ -313,6 +320,8 @@ public:
 	bool IsNull() const { return (mFramesCount == 0 ? true : false); }
 	//! A negative time code is returned as time code -00:00:00:00.
 	QString GetAsString() const;
+	//WR
+	QString GetFramesAsString() const;
 	//! Use place marker %1, %2, %3, %4. %1 = hours, %2 = minutes, %3 = seconds, %5 = frames. A negative time code is returned as time code -00:00:00:00.
 	QString GetAsString(const QString &rMarker) const;
 	qint64 GetHours() const { return (mFramesCount >= 0 && mEditRate.IsValid() ? mFramesCount / (3600 * mEditRate.GetRoundendQuotient()) % 60 : 0); }
@@ -353,8 +362,6 @@ private:
 
 typedef struct {
 	QString id;
-	bool valid; // true: struct is initialized
-	bool error; // some error ocurred with the content (e.g. no image found)
 	bool alwaysActive;
 	float origin[2]; // %
 	float extent[2]; // %
@@ -389,14 +396,13 @@ typedef struct {
 typedef struct {
 	int decoded_total = 0;
 	int pending_requests = 0;
-	int decoded_cycle = 0;
 } DecodedFrames;
 
 typedef struct {
 	QString formatted_time; // hh:mm:ss
 	QString fractional_frames; // ff.f
 	QVector<TTMLelem> elements;
-	TTMLtimelineResource segment;
+	TTMLtimelineResource resource;
 } visibleTTtrack;
 // (k) - end
 

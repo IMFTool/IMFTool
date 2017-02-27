@@ -83,7 +83,7 @@ QString third_party = QString("Third Party:\n\n"
 		"END OpenJPEG License, copied from https://github.com/uclouvain/openjpeg/LICENSE\n"
 															).arg(QT_VERSION_STR).arg(ASDCP::Version());
 
-QString notice(PROJECT_NAME" Copyright(C) 2016 Björn Stresing, Denis Manthey, Krispin Weiss, Wolfgang Ruppel\n"
+QString notice(PROJECT_NAME" Copyright(C) 2015-2017 Björn Stresing, Denis Manthey, Krispin Weiss, Wolfgang Ruppel\n"
 							 "This program comes with ABSOLUTELY NO WARRANTY.\n"
 							 "This is free software, and you are welcome to redistribute it\n"
 							 "under certain conditions.\n\n"

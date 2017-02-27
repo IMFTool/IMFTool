@@ -432,23 +432,31 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 										}
 									}
 								}
-/*								int count = 0;
-								for (QVector<EditRate>::iterator i=mImpEditRates.begin(); i < mImpEditRates.end(); i++) {
+								int count = 0;
+								// Remove dups in mImpEditRates
+								/*for (QVector<EditRate>::iterator i=mImpEditRates.begin(); i < mImpEditRates.end(); i++) {
 									// Remove duplicate frame rates
 									while (int pos = mImpEditRates.lastIndexOf(*i) != count) {
 										mImpEditRates.remove(count);
 									}
 									count ++;
-								} */ //Reason for commenting out: first() sometime crashes afterwards //WR
+								}*/
 								foreach(QSharedPointer<Asset> asset, mAssetList) {
 									// TTML XF assets only: Set Edit Rate in metadata object to CPL Edit Rate, re-calculate duration in CPL Edit Rate units
 									// Uses the first CPL Edit Rate in mImpEditRates, this can be an issue in multi-edit rate IMPs
 									QSharedPointer <AssetMxfTrack> assetMxfTrack = qSharedPointerCast<AssetMxfTrack>(asset);
 									if (assetMxfTrack && !mImpEditRates.isEmpty()){
 										if (assetMxfTrack->GetEssenceType() == Metadata::TimedText) {
+											if (!assetMxfTrack->GetTimedTextFrameRate().IsValid()) break;  //CPLs arbitrarily expose EssenceType == Metadata::TimedText
+											qDebug() << "Metadata::TimedText" << assetMxfTrack->GetId();
 											assetMxfTrack->SetCplEditRate(mImpEditRates.first());
 											assetMxfTrack->SetEditRate(mImpEditRates.first());
-											assetMxfTrack->SetDuration(Duration(ceil(assetMxfTrack->GetOriginalDuration().GetCount() / assetMxfTrack->GetTimedTextFrameRate().GetQuotient() * assetMxfTrack->GetEditRate().GetQuotient())));
+											if (assetMxfTrack->GetTimedTextFrameRate() != assetMxfTrack->GetEditRate()) {
+												assetMxfTrack->SetDuration(Duration(ceil(assetMxfTrack->GetOriginalDuration().GetCount() / assetMxfTrack->GetTimedTextFrameRate().GetQuotient() * assetMxfTrack->GetEditRate().GetQuotient())));
+												qDebug() << "SampleRate of Asset" << assetMxfTrack->GetId() << "does not match CPL EditRate!";
+											} else {
+												assetMxfTrack->SetDuration(assetMxfTrack->GetOriginalDuration());
+											}
 										}
 									}
 								}
@@ -662,7 +670,7 @@ QVariant ImfPackage::data(const QModelIndex &rIndex, int role /*= Qt::DisplayRol
 		else if(column == ImfPackage::ColumnFileSize) {
 			if(role == Qt::DisplayRole) {
 				if(mAssetList.at(row)->Exists() == true) {
-					quint32 size = mAssetList.at(row)->GetSize();
+					quint64 size = mAssetList.at(row)->GetSize();
 					if(size < 1048576) return QVariant(QString::number((double)size / 1024., 'f', 2).append(" KiB"));
 					else if(size < 1073741824) return QVariant(QString::number((double)size / 1048576., 'f', 2).append(" MiB"));
 					else return QVariant(QString::number((double)size / 1073741824., 'f', 2).append(" GiB"));

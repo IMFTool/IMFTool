@@ -61,6 +61,51 @@ class ContentVersionList : public QList<ContentVersion> {
 //	ContentVersionList() : QList<ContentVersion>() {};
 };
 
+class ContentMaturityRating {
+
+public:
+	ContentMaturityRating() {};
+	ContentMaturityRating(const QString &rAgency, const QString &rRating, const QPair<QString, QString> &rAudience = (QPair<QString, QString>()) ) { mAgency = rAgency; mRating = rRating; mAudience = rAudience; };
+	UserText getAgency() { return mAgency; };
+	UserText getRating() { return mRating; };
+	QPair<QString, QString> getAudience() { return mAudience; };
+	void setAgency(const UserText &rAgency) { mAgency = rAgency; };
+	void setRating(const UserText &rRating) { mRating = rRating; };
+	void setAudience(const QPair<QString, QString> &rAudience) { mAudience = rAudience; };
+
+private:
+	UserText mAgency;
+	UserText mRating;
+	QPair<QString, QString> mAudience; // (anyURI, String)
+};
+
+class Locale {
+
+public:
+	Locale() {};
+	Locale(const UserText &rAnnotation, const QList<QString> &rLanguageList, const QList<QString> &rRegionList, const QList<ContentMaturityRating> rContentMaturityRatingList) : mAnnotation(rAnnotation), mLanguageList(rLanguageList), mRegionList(rRegionList), mContentMaturityRatingList(rContentMaturityRatingList){};
+	bool IsEmpty() const { return mAnnotation.first.isEmpty() && mLanguageList.isEmpty() && mRegionList.isEmpty() && mContentMaturityRatingList.isEmpty(); }
+	//bool operator== (const ContentVersion &rOther) { return first == rOther.first && second == rOther.second; }
+	//bool operator!= (const ContentVersion &rOther) { return first != rOther.first || second != rOther.second; }
+	UserText getAnnotation() { return mAnnotation; };
+	QList<QString> getLanguageList() { return mLanguageList; };
+	QList<QString> getRegionList() { return mRegionList; };
+	QList<ContentMaturityRating> getContentMaturityRating() { return mContentMaturityRatingList; };
+
+private:
+	UserText mAnnotation;
+	QList<QString> mLanguageList;
+	QList<QString> mRegionList;
+	QList<ContentMaturityRating> mContentMaturityRatingList;
+
+};
+
+class LocaleList : public QList<Locale> {
+public:
+//	LocaleList() : QList<Locale>() {};
+};
+
+
 //WR
 
 
@@ -407,5 +452,23 @@ public:
 	static ::ContentVersionList Convert(cpl2016::CompositionPlaylistType_ContentVersionListType rContentVersionList);
 
 	static std::auto_ptr<cpl2016::CompositionPlaylistType_ContentVersionListType> Convert(const ::ContentVersionList &rContentVersionList);
+
+	static ::LocaleList Convert(cpl2016::CompositionPlaylistType_LocaleListType rLocaleList);
+
+	static std::auto_ptr<cpl2016::CompositionPlaylistType_LocaleListType> Convert(const ::LocaleList &rLocaleList);
+
+	static ::Locale Convert(const cpl2016::LocaleType &rLocale);
+
+	static QList<QString> Convert(cpl2016::LocaleType_LanguageListType::LanguageSequence rLanguageSequence);
+
+	//static QList<QString> Convert(cpl2016::LocaleType_RegionListType::RegionSequence& rRegionSequence);
+
+	static QList<ContentMaturityRating> Convert(cpl2016::LocaleType_ContentMaturityRatingListType::ContentMaturityRatingSequence rContentMaturityRatingSequence);
+
+	static cpl2016::LocaleType Convert(const ::Locale &rLocale) {
+		cpl2016::LocaleType locale;
+		return locale;
+	}
+
 
 };

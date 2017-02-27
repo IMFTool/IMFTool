@@ -21,7 +21,6 @@
 #include "WizardPartialImpGenerator.h"
 #include "MetadataExtractor.h"
 #include "WidgetCentral.h"
-#include "WidgetSettings.h"
 #include <QMenuBar>
 #include <QUndoGroup>
 #include <QToolBar>
@@ -191,7 +190,6 @@ void MainWindow::InitMenuAndToolbar() {
 	p_menu_file->addAction(p_action_exit);
 	QMenu *p_menu_tools = new QMenu(tr("&TOOLS"), menuBar());
 	QAction *p_action_preferences = new QAction(QIcon(":/gear.png"), tr("&Preferences"), menuBar());
-	connect(p_action_preferences, SIGNAL(triggered(bool)), this, SLOT(ShowWidgetSettings()));
 	//WR
 	p_action_preferences->setDisabled(true);
 	p_menu_tools->addAction(p_action_preferences);
@@ -447,15 +445,11 @@ void MainWindow::rFocusChanged(QWidget *pOld, QWidget *pNow) {
 	else mpUndoGroup->setActiveStack(NULL);
 }
 
-void MainWindow::ShowWidgetSettings() {
-
-	WidgetSettings *p_settings_widget = new WidgetSettings(this);
-	p_settings_widget->setAttribute(Qt::WA_DeleteOnClose);
-	p_settings_widget->AddSettingsPage(new WidgetAudioSettingsPage());
 	CenterWidget(p_settings_widget, true);
 	connect(p_settings_widget, SIGNAL(SettingsSaved()), this, SIGNAL(SettingsSaved()));
 	p_settings_widget->show();
 }
+#endif
 
 void MainWindow::CenterWidget(QWidget *pWidget, bool useSizeHint) {
 

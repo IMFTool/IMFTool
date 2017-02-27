@@ -25,7 +25,6 @@ class WidgetImpBrowser;
 class WidgetCentral;
 class QMessageBox;
 class QUndoGroup;
-class WidgetSettings;
 
 class MainWindow : public QMainWindow {
 
@@ -47,7 +46,6 @@ public slots:
 	void SaveCurrent();
 	void SaveAllCpl();
 	void SaveAsNewCPL();
-	void ShowWidgetSettings();
 	void WritePackage();
 
 

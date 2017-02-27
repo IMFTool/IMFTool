@@ -149,4 +149,73 @@ std::auto_ptr<cpl2016::CompositionPlaylistType_ContentVersionListType> ImfXmlHel
 }
 
 
+::LocaleList ImfXmlHelper::Convert(cpl2016::CompositionPlaylistType_LocaleListType rLocaleList) {
+	::LocaleList locale_list;
+	cpl2016::CompositionPlaylistType_LocaleListType::LocaleSequence &locale_sequence = rLocaleList.getLocale();
+	cpl2016::CompositionPlaylistType_LocaleListType::LocaleSequence::iterator i;
+
+	for (i = rLocaleList.getLocale().begin(); i < rLocaleList.getLocale().end(); i++) {
+		cpl2016::LocaleType locale = *i;
+		locale_list.append(Convert(locale));
+	}
+
+	return locale_list;
+
+}
+
+
+std::auto_ptr<cpl2016::CompositionPlaylistType_LocaleListType> ImfXmlHelper::Convert(const ::LocaleList &rLocaleList) {
+	std::auto_ptr<cpl2016::CompositionPlaylistType_LocaleListType> locale_list(new cpl2016::CompositionPlaylistType_LocaleListType());
+	cpl2016::CompositionPlaylistType_LocaleListType::LocaleSequence &locale_sequence = locale_list->getLocale();
+	locale_sequence.clear();
+	for (int i = 0; i < rLocaleList.count(); i++) {
+		locale_sequence.push_back(Convert(rLocaleList.at(i)));
+	}
+	return locale_list;
+}
+
+::Locale ImfXmlHelper::Convert(const cpl2016::LocaleType &rLocale) {
+	return ::Locale(
+			(rLocale.getAnnotation().present() ? Convert(rLocale.getAnnotation().get()) : UserText()),
+			(rLocale.getLanguageList().present() ? Convert(rLocale.getLanguageList().get().getLanguage()) : QList<QString>()),
+			(rLocale.getRegionList().present() ? Convert(rLocale.getRegionList().get().getRegion()) : QList<QString>()),
+			(rLocale.getContentMaturityRatingList().present() ? Convert(rLocale.getContentMaturityRatingList().get().getContentMaturityRating()) : QList<ContentMaturityRating>())
+			);
+}
+
+// Also accepts cpl2016::LocaleType_RegionListType::RegionSequence argument type
+QList<QString> ImfXmlHelper::Convert(cpl2016::LocaleType_LanguageListType::LanguageSequence rLanguageSequence) {
+	cpl2016::LocaleType_LanguageListType::LanguageSequence::iterator i;
+	QList<QString> language_list;
+	for (i = rLanguageSequence.begin(); i < rLanguageSequence.end(); i++) {
+		const cpl2016::LocaleType_LanguageListType::LanguageType language = *i;
+		language_list.append(QString(language.c_str()));
+	}
+	return language_list;
+}
+
+QList<ContentMaturityRating> ImfXmlHelper::Convert(cpl2016::LocaleType_ContentMaturityRatingListType::ContentMaturityRatingSequence rContentMaturityRatingSequence) {
+	cpl2016::LocaleType_ContentMaturityRatingListType::ContentMaturityRatingSequence::iterator i;
+	QList<ContentMaturityRating> maturity_sequence;
+	for (i = rContentMaturityRatingSequence.begin(); i < rContentMaturityRatingSequence.end(); i++) {
+		UserText agency, rating;
+		QPair<QString, QString> audience;
+		ContentMaturityRating ratingElement;
+		cpl2016::ContentMaturityRatingType cpl_ratingELement = *i;
+		agency = Convert(am::UserText(cpl_ratingELement.getAgency()));
+		cpl2016::ContentMaturityRatingType::RatingType rat;
+		//rat.string();
+		rating = Convert(am::UserText(cpl_ratingELement.getRating()));
+		if (cpl_ratingELement.getAudience().present()) {
+			audience = QPair<QString, QString>(Convert(cpl_ratingELement.getAudience().get().getScope()), QString(cpl_ratingELement.getAudience().get().c_str()));
+		}
+		ratingElement.setAgency(agency);
+		ratingElement.setRating(rating);
+		ratingElement.setAudience(audience);
+		maturity_sequence.append(ratingElement);
+	}
+	return maturity_sequence;
+}
+
+
 //WR

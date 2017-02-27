@@ -63,10 +63,9 @@ elem::elem(xercesc::DOMNode *rNode, TTMLParser *rParser, elem *rParent) {
 bool elem::process() {
 
 	if (el) {
-
-		// check if is metadata -> ignore
-		if (XMLString::compareIString(XMLString::transcode(el->getTagName()), "metadata") == 0) {
-			dur = 2;
+		// check if irrelevant element -> ignore
+		if(!tt_tags.contains(XMLString::transcode(el->getTagName()))){
+			//dur = 2; remove?
 			stop = true;
 			return stop;
 		}
@@ -78,7 +77,6 @@ bool elem::process() {
 		if (GetStartEndTimes()) {
 			is_timed = true;
 			stop = true;
-
 			processTimedElement();
 		}
 		else { // no timing attributes!
@@ -86,7 +84,6 @@ bool elem::process() {
 			GetStyle();
 		}
 	}
-
 	return stop;
 }
 
@@ -200,12 +197,7 @@ void elem::GetStyle() {
 
 			QString name = XMLString::transcode(attr->getNodeName());
 			if (parser->cssAttr.contains(name)) { // known parameter!
-
-				//if (css.count(parser->cssAttr[name]) > 0) { // css param already exists through style
-				//	css.remove(QRegExp(QString("%1:[a-zA-Z0-9#]*;").arg(parser->cssAttr[name]))); // remove it
-				//}
 				CSS[parser->cssAttr[name]] = XMLString::transcode(attr->getNodeValue());
-				//el->removeAttribute(attr->getNodeName()); // remove current attr
 			}
 		}
 	}
@@ -214,8 +206,7 @@ void elem::GetStyle() {
 bool elem::processTimedElement() {
 
 	// is element between in- and -out point?
-	if ((timing_begin < parser->timeline_in && timing_begin > parser->timeline_out)
-		|| (timing_end < parser->timeline_in && timing_end > parser->timeline_out)) {
+	if(timing_end < parser->timeline_in || timing_begin > (parser->timeline_out + parser->timeline_in)){
 		return false;
 	}
 
@@ -239,7 +230,6 @@ bool elem::processTimedElement() {
 
 		TTMLRegion new_region;
 		new_region = parser->regions[regionName]; // resolve region
-		new_region.valid = true;
 		ttml_timed.region = new_region;
 	}
 
@@ -387,11 +377,6 @@ bool elem::GetStartEndTimes() {
 		timing_end = end;
 		timing_dur = end - beg;
 
-		// dur
-		if (parent && (parent->dur_set || parent->end_set)) {
-			//parent->dur_used += end; // add current duration to total duration used in the block
-		}
-
 		return true;
 	}
 	else if(dur_found || beg_found || end_found){ // invisible element
@@ -415,10 +400,7 @@ QString elem::serializeTT(DOMElement *rEl) {
 
 // --------------------------------------------------------------------------------------------
 
-TTMLParser::TTMLParser() {
-	
-	nullregion.valid = false;
-}
+TTMLParser::TTMLParser() {}
 
 Error TTMLParser::open(const QString &rSourceFile, TTMLtimelineResource &ttml_segment, bool rIsWrapped) {
 
@@ -722,6 +704,8 @@ QPair<QString, QMap<QString, QString>> TTMLParser::parseStyle(DOMNode *el) {
 			QString name = XMLString::transcode(attr->getNodeName());
 			if (name == "xml:id") {
 				result.first = XMLString::transcode(attr->getNodeValue()); // ID
+			}else if(name == "style"){ // Chained Referential Styling
+				result.second = mergeCss(result.second, styles[XMLString::transcode(attr->getNodeValue())]);
 			}else if (cssAttr.contains(name)) { // known parameter!
 				result.second[cssAttr[name]] = XMLString::transcode(attr->getNodeValue());
 			}
@@ -798,16 +782,6 @@ void TTMLParser::getMetadata(DOMDocument *rDom) {
 	else if (!fr.isEmpty())  //TTML1 section 6.2.10
 		tickrate = ceil(framerate * subFrameRate);
 
-
-	//Duration Extractor
-	float duration;
-	duration = DurationExtractor(rDom, framerate, tickrate);
-	if (duration == 0) {
-#ifdef DEBUG_TTML
-		qDebug() << "Unknown duration!";
-#endif
-	}
-
 	// get extent (e.g. tts:extent='854px 480px')
 	QString extentVal = XMLString::transcode(tteleDom->getAttribute(XMLString::transcode("tts:extent")));
 	if (!extentVal.isEmpty()) {
@@ -857,8 +831,6 @@ QString TTMLFns::serializeCss(QMap<QString, QString> map) {
 }
 
 QMap<QString, QString> TTMLFns::mergeCss(QMap<QString, QString> qm1, QMap<QString, QString> qm2) {
-	// elements from qm1 are preferred over qm2!!!
-
 	// iterate over qm2
 	QMap<QString, QString>::iterator i;
 	for (i = qm2.begin(); i != qm2.end(); ++i) {
@@ -871,183 +843,6 @@ QMap<QString, QString> TTMLFns::mergeCss(QMap<QString, QString> qm1, QMap<QStrin
 }
 
 // Code by Denis Manthey
-float TTMLFns::DurationExtractor(DOMDocument *dom_doc, float fr, int tr) {
-
-	float eleduration = 0, divduration = 0, div2duration = 0, pduration = 0, p2duration = 0, spanduration = 0, duration = 0;
-
-	DOMNodeList	*bodyitems = dom_doc->getElementsByTagName(XMLString::transcode("body"));
-	DOMElement* bodyeleDom = dynamic_cast<DOMElement*>(bodyitems->item(0));
-	QString bodytime = XMLString::transcode(bodyeleDom->getAttribute(XMLString::transcode("timeContainer")));  //bodytime: par/seq
-
-																											   //---start with div childelements of body---
-	DOMNodeList	*divitems = dom_doc->getElementsByTagName(XMLString::transcode("div"));
-	divduration = 0;
-	for (int i = 0; i < divitems->getLength(); i++) {
-
-		DOMElement* diveleDom = dynamic_cast<DOMElement*>(divitems->item(i));
-
-		QString comp = XMLString::transcode(diveleDom->getParentNode()->getNodeName());			//look for body-child div!
-		if (comp != "div") {
-			QString divtime = XMLString::transcode(diveleDom->getAttribute(XMLString::transcode("timeContainer")));	//divtime: par/seq
-			eleduration = GetElementDuration(diveleDom, fr, tr);
-			div2duration = 0;
-			pduration = 0;
-
-			if (eleduration == 0) {
-				DOMNodeList *div2items = diveleDom->getElementsByTagName(XMLString::transcode("div"));
-				div2duration = 0;
-				for (int j = 0; j < div2items->getLength(); j++) {
-
-					DOMElement* div2eleDom = dynamic_cast<DOMElement*>(div2items->item(j));
-					QString div2time = XMLString::transcode(div2eleDom->getAttribute(XMLString::transcode("timeContainer"))); //div2time: par/seq
-
-					eleduration = GetElementDuration(div2eleDom, fr, tr);
-					p2duration = 0;
-
-					if (eleduration == 0) {
-						DOMNodeList *p2items = div2eleDom->getElementsByTagName(XMLString::transcode("p"));
-						p2duration = 0;
-						for (int k = 0; k < p2items->getLength(); k++) {
-
-							DOMElement* p2eleDom = dynamic_cast<DOMElement*>(p2items->item(k));
-							QString p2time = XMLString::transcode(p2eleDom->getAttribute(XMLString::transcode("timeContainer"))); //p2time: par/seq
-
-							eleduration = GetElementDuration(p2eleDom, fr, tr);
-							spanduration = 0;
-
-							if (eleduration == 0) {
-								DOMNodeList *spanitems = p2eleDom->getElementsByTagName(XMLString::transcode("span"));
-
-								for (int l = 0; l < spanitems->getLength(); l++) {
-
-									DOMElement* spaneleDom = dynamic_cast<DOMElement*>(spanitems->item(l));
-
-									eleduration = GetElementDuration(spaneleDom, fr, tr);
-									if (p2time == "seq")
-										spanduration = spanduration + eleduration;
-									else {
-										if (eleduration > spanduration)
-											spanduration = eleduration;
-									}
-								}
-								eleduration = 0;
-							}
-
-							if (div2time == "seq")
-								p2duration = p2duration + eleduration + spanduration;
-							else {
-								if (spanduration > p2duration)
-									p2duration = spanduration;
-
-								if (eleduration > p2duration)
-									p2duration = eleduration;
-							}
-						}
-						eleduration = 0;
-					}
-
-					if (divtime == "seq")
-						div2duration = div2duration + eleduration + p2duration;
-					else {
-						if (p2duration > div2duration)
-							div2duration = p2duration;
-
-						if (eleduration > div2duration)
-							div2duration = eleduration;
-					}
-				}
-				eleduration = 0;
-
-				DOMNodeList *pitems = diveleDom->getElementsByTagName(XMLString::transcode("p"));
-				for (int m = 0; m < pitems->getLength(); m++) {
-					DOMElement* peleDom = dynamic_cast<DOMElement*>(pitems->item(m));
-					QString comp2 = XMLString::transcode(peleDom->getParentNode()->getParentNode()->getNodeName());
-					if (comp2 == "body") {
-						QString ptime = XMLString::transcode(peleDom->getAttribute(XMLString::transcode("timeContainer")));	//ptime: par/seq
-						eleduration = GetElementDuration(peleDom, fr, tr);
-						spanduration = 0;
-
-						if (eleduration == 0) {
-							DOMNodeList *spanitems = peleDom->getElementsByTagName(XMLString::transcode("span"));
-
-							for (int n = 0; n < spanitems->getLength(); n++) {
-
-								DOMElement* spaneleDom = dynamic_cast<DOMElement*>(spanitems->item(n));
-
-								eleduration = GetElementDuration(spaneleDom, fr, tr);
-								if (ptime == "seq")
-									spanduration = spanduration + eleduration;
-								else {
-									if (eleduration > spanduration)
-										spanduration = eleduration;
-								}
-							}
-							eleduration = 0;
-						}
-
-						if (divtime == "seq")
-							pduration = pduration + eleduration + spanduration;
-						else {
-							if (spanduration > pduration)
-								pduration = spanduration;
-
-							if (eleduration > pduration)
-								pduration = eleduration;
-						}
-					}
-					eleduration = 0;
-				}
-
-				if (divtime == "seq")
-					divduration = divduration + pduration + div2duration;
-				else {
-					if (div2duration > pduration)
-						divduration = div2duration;
-					else
-						divduration = pduration;
-				}
-			}
-
-			if (bodytime == "seq")
-				duration = duration + eleduration + divduration;
-			else {
-				if (divduration > eleduration)
-					duration = divduration;
-
-				else
-					duration = eleduration;
-			}
-		}
-	}
-	return duration;
-}
-
-float TTMLFns::GetElementDuration(DOMElement* eleDom, float fr, int tr) {
-
-	float duration = 0, end = 0, beg = 0, dur = 0;
-	QString end_string = XMLString::transcode(eleDom->getAttribute(XMLString::transcode("end")));
-	if (!end_string.isEmpty())
-		end = ConvertTimingQStringtoDouble(end_string, fr, tr);
-
-	QString beg_string = XMLString::transcode(eleDom->getAttribute(XMLString::transcode("begin")));
-	if (!beg_string.isEmpty())
-		beg = ConvertTimingQStringtoDouble(beg_string, fr, tr);
-
-	QString dur_string = XMLString::transcode(eleDom->getAttribute(XMLString::transcode("dur")));
-	if (!dur_string.isEmpty())
-		dur = ConvertTimingQStringtoDouble(dur_string, fr, tr);
-
-	if (!end_string.isEmpty())
-		duration = end;
-	else
-		duration = beg + dur;
-
-	if (dur == 0 && end == 0)
-		duration = 0;
-
-	return duration;
-}
-
 float TTMLFns::ConvertTimingQStringtoDouble(QString string_time, float fr, int tr) {
 
 	float time, h, min, sec, msec;

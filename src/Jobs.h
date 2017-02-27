@@ -98,7 +98,7 @@ class JobWrapTimedText : public AbstractJob {
 	Q_OBJECT
 
 public:
-	JobWrapTimedText(const QStringList &rSourceFiles, const QString &rOutputFile, const EditRate &rEditRate, const Duration &rDuration, const QUuid &rAssetId, const QString &rProfile, const EditRate &rFrameRate, const QString &rLanguageTag);
+	JobWrapTimedText(const QStringList &rSourceFiles, const QString &rOutputFile, const EditRate &rEditRate, const Duration &rDuration, const QUuid &rAssetId, const QString &rProfile, const QString &rLanguageTag);
 	virtual ~JobWrapTimedText() {}
 
 protected:
@@ -112,7 +112,7 @@ private:
 	const QString mProfile;
 	const EditRate mEditRate; //Based on milliseconds
 	const Duration mDuration;
-	const EditRate mFrameRate; //Based on real Framerate
+	//const EditRate mFrameRate; //Based on real Framerate
 
 	Info mWriterInfo;
 	//WR

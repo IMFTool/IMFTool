@@ -85,4 +85,13 @@ namespace SMPTE {
 		{ TransferCharacteristic_SMPTEST2084, "SMPTEST2084" },
 		{ TransferCharacteristic_HLG_OETF, "HLGOETF" },
 	};
+
+static QMap<QString, QMap<QString, QString>> styles{
+	{
+		"white_8", {
+				{ "font-size", "8px"},
+				{ "color", "white"  }
+			}
+	}
+};
 };

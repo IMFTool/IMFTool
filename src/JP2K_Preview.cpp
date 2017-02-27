@@ -84,7 +84,7 @@ void JP2K_Preview::setUp() {
 
 		float input = (float)(i / max_f_); // convert input to value between 0...1
 
-										   // BT.709 - OETF
+		// BT.709 - OETF
 		if (input < 0.018) {
 			oetf_709[i] = 4.5 * input;
 		}
@@ -92,6 +92,7 @@ void JP2K_Preview::setUp() {
 			oetf_709[i] = 1.099 * pow(input, 0.45) - 0.099;
 		}
 
+		/*
 		// BT.709 - EOTF
 		if (input < (4.5 * 0.018)) {
 			eotf_709[i] = input / 4.5;
@@ -107,6 +108,7 @@ void JP2K_Preview::setUp() {
 		else {
 			oetf_2020[i] = alpha * pow(input, 0.45) - (alpha - 1);
 		}
+		*/
 
 		// BT.2020 - EOTF
 		if (input < (4.5 * beta)) {
@@ -118,7 +120,7 @@ void JP2K_Preview::setUp() {
 
 		// SMPTE ST 2084 (PQ)
 		eotf_PQ[i] = pow(((pow(input, (1.0 / m2)) - c1)) / (c2 - c3 *pow(input, (1.0 / m2))), 1.0 / m1) * 10000;
-		oetf_PQ[i] = pow((c1 + c2*pow(input, m1)) / (1 + c3*pow(input, m1)), m2);
+		//oetf_PQ[i] = pow((c1 + c2*pow(input, m1)) / (1 + c3*pow(input, m1)), m2);
 
 	}
 
@@ -133,10 +135,8 @@ void JP2K_Preview::getProxy() {
 	convert_to_709 = true; // (default for proxys)
 	params.cp_reduce = 4; // (default for proxy)
 
-	QImage p1 = QImage(":/proxy_unknown.png");
-	QImage p2 = QImage(":/proxy_unknown.png");
-
 	setAsset(); // initialize reader
+	QImage p1, p2;
 
 	// FIRST PROXY
 	if (!err && extractFrame(first_proxy)) { // frame extraction was successfull -> decode frame
@@ -144,17 +144,30 @@ void JP2K_Preview::getProxy() {
 			p1 = DataToQImage();
 			cleanUp();
 		}
+		else {
+			p1 = QImage(":/proxy_unknown.png");
+		}
 	}
-
+	else {
+		p1 = QImage(":/proxy_unknown.png");
+	}
+	
 	// SECOND PROXY
 	if (!err && extractFrame(second_proxy)) { // frame extraction was successfull -> decode frame
 		if (decodeImage()) { // try to decode image
 			p2 = DataToQImage();
 			cleanUp();
 		}
+		else {
+			p2 = QImage(":/proxy_unknown.png");
+		}
+	}
+	else {
+		p2 = QImage(":/proxy_unknown.png");
 	}
 
 	emit proxyFinished(p1, p2);
+	emit finished();
 }
 
 // set decoding layer
@@ -212,6 +225,9 @@ void JP2K_Preview::setAsset() {
 			Kr = 0.299;
 			Kg = 0.587;
 			Kb = 0.114;
+			break;
+		case SMPTE::ColorPrimaries_P3D65:
+			//P365 is 4:4:4 only
 			break;
 		default:
 			msg = "Unknown color encoding"; // ERROR
@@ -272,6 +288,7 @@ void JP2K_Preview::decode() {
 			emit decodingStatus(frameNr, msg);
 			QApplication::processEvents();
 			cleanUp();
+			emit finished();
 		}
 		else { // error decoding image
 			emit ShowFrame(QImage(":/frame_error.png"));
@@ -384,9 +401,6 @@ void JP2K_Preview::cleanUp() {
 	}
 
 	opj_codec_set_threads(pDecompressor, cpus); // set nr. of cores in new decoder
-	delete img_buff; // clear char buffer
-
-	emit finished();
 }
 
 void JP2K_Preview::save2File() {
@@ -638,6 +652,8 @@ QImage JP2::DataToQImage()
 	else { // unknown ColorEncoding
 		return QImage(":/frame_error.png");
 	}
+
+	delete img_buff; // clear char buffer
 
 	return image;
 }

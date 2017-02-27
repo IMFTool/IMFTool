@@ -725,18 +725,18 @@ GraphicsWidgetFileResource(pParent, pResource, rAsset, QColor(CPL_COLOR_VIDEO_RE
 
 	mpJP2K = new JP2K_Preview(); // (k)
 	mpJP2K->asset = mAssset; // (k)
+
 	decodeProxyThread = new QThread();
-	connect(decodeProxyThread, SIGNAL(started()), mpJP2K, SLOT(getProxy()));
-	connect(mpJP2K, SIGNAL(finished()), decodeProxyThread, SLOT(quit()));
 	mpJP2K->moveToThread(decodeProxyThread);
 
+	connect(decodeProxyThread, SIGNAL(started()), mpJP2K, SLOT(getProxy()));
+	connect(mpJP2K, SIGNAL(finished()), decodeProxyThread, SLOT(quit()));
 	connect(mpJP2K, SIGNAL(proxyFinished(const QImage&, const QImage&)), this, SLOT(rShowProxyImage(const QImage&, const QImage&)));
+
 	connect(this, SIGNAL(SourceDurationChanged(const Duration&, const Duration&)), this, SLOT(rSourceDurationChanged()));
 	connect(this, SIGNAL(EntryPointChanged(const Duration&, const Duration&)), this, SLOT(rEntryPointChanged()));
 
 	this->timline_index = video_timeline_index; // (k)
-	//qDebug() << "creating timeline element nr" << video_timeline_index;
-	//RefreshProxy();
 }
 
 GraphicsWidgetVideoResource::GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, const QSharedPointer<AssetMxfTrack> &rAsset) :
@@ -747,11 +747,12 @@ GraphicsWidgetFileResource(pParent, rAsset, QColor(CPL_COLOR_VIDEO_RESOURCE)), m
 	mpJP2K = new JP2K_Preview(); // (k)
 	mpJP2K->asset = mAssset; // (k)
 	decodeProxyThread = new QThread();
-	connect(decodeProxyThread, SIGNAL(started()), mpJP2K, SLOT(getProxy()));
-	connect(mpJP2K, SIGNAL(finished()), decodeProxyThread, SLOT(quit()));
 	mpJP2K->moveToThread(decodeProxyThread);
 
+	connect(decodeProxyThread, SIGNAL(started()), mpJP2K, SLOT(getProxy()));
+	connect(mpJP2K, SIGNAL(finished()), decodeProxyThread, SLOT(quit()));
 	connect(mpJP2K, SIGNAL(proxyFinished(const QImage&, const QImage&)), this, SLOT(rShowProxyImage(const QImage&, const QImage&)));
+
 	connect(this, SIGNAL(SourceDurationChanged(const Duration&, const Duration&)), this, SLOT(rSourceDurationChanged()));
 	connect(this, SIGNAL(EntryPointChanged(const Duration&, const Duration&)), this, SLOT(rEntryPointChanged()));
 }
@@ -874,7 +875,6 @@ void GraphicsWidgetVideoResource::rSourceDurationChanged() {
 
 	if(mTrimActive == false) {
 		RefreshProxy();
-		//RefreshSecondProxy();
 	}
 }
 
@@ -898,29 +898,23 @@ void GraphicsWidgetVideoResource::rEntryPointChanged() {
 
 	if(mTrimActive == false) {
 		RefreshProxy();
-		//RefreshFirstProxy();
 	}
 }
 
 void GraphicsWidgetVideoResource::RefreshProxy() {
 
+	if (decodeProxyThread->isRunning()) decodeProxyThread->quit();
+
 	// first proxy
-	QVariant timecode_first_frame;
 	Timecode first_frame = GetFirstVisibleFrame();
-	timecode_first_frame.setValue<Timecode>(first_frame);
 	mpJP2K->first_proxy = first_frame.GetTargetFrame(); // set frame number
-		
+
 	// second proxy
-	QVariant timecode_last_frame;
 	Timecode last_frame = GetLastVisibleFrame();
-	timecode_last_frame.setValue<Timecode>(last_frame);
 	mpJP2K->second_proxy = last_frame.GetTargetFrame(); // set frame number
 
 	// start decoding process
-	qDebug() << "starting proxy thread";
 	decodeProxyThread->start(QThread::LowPriority);
-	//RefreshFirstProxy();
-	//RefreshSecondProxy();
 }
 
 void GraphicsWidgetVideoResource::RefreshFirstProxy() {

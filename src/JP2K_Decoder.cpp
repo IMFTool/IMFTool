@@ -152,7 +152,6 @@ void JP2K_Decoder::run() {
 	request->done = true; // image is ready
 	
 	decoded_shared->decoded_total++;
-	decoded_shared->decoded_cycle++;
 	decoded_shared->pending_requests--;
 
 	// clean up

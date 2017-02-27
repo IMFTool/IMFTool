@@ -21,9 +21,10 @@ class QTabWidget;
 class WidgetVideoPreview;
 class QMessageBox;	
 class WidgetCompositionInfo;
-class TTMLDetails;
+class WidgetTimedTextPreview;
 class TimelineParser;
 class WidgetContentVersionList; //WR
+class WidgetLocaleList; //WR
 
 class WidgetCentral : public QWidget {
 
@@ -79,9 +80,10 @@ private:
 	QTabWidget *mpTabWidget;
 	WidgetVideoPreview *mpPreview;
 	QTabWidget *mpTabDetailTTML; // (k)
-	TTMLDetails *mpTTMLDetailsWidget; // (k)
+	WidgetTimedTextPreview *mpTTMLDetailsWidget; // (k)
 	WidgetCompositionInfo *mpDetailsWidget;
 	WidgetContentVersionList *mpContentVersionListWidget; //WR
+	WidgetLocaleList *mpLocaleListWidget;
 	QThread *tpThread; // (k)
 	TimelineParser *timelineParser; // (k)
 	bool playListUpdateSuccess = true; // (k)

@@ -87,7 +87,7 @@ QString Metadata::GetAsString() {
 				ret.append(QObject::tr("Duration: unknown\n"));
 				ret.append(QObject::tr("Edit Rate: not set\n"));
 			}
-			ret.append(QObject::tr("TTML Frame Rate: %1 fps\n").arg(effectiveFrameRate.GetQuotient()));
+			if (effectiveFrameRate != editRate) ret.append(QObject::tr("TTML Frame Rate: %1 fps\n").arg(effectiveFrameRate.GetQuotient()));
 			ret.append(QObject::tr("Profile: %1\n").arg(profile.remove(0, 40)));
 			//WR
 			if(!languageTag.isEmpty()) ret.append(QObject::tr("Language: %1\n").arg(languageTag));
@@ -200,7 +200,8 @@ void Metadata::GetAsTextDocument(QTextDocument &rDoc) {
 			table->cellAt(1, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Duration: unknown"), Qt::ElideRight, column_text_width));
 			table->cellAt(2, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Edit Rate: not set"), Qt::ElideRight, column_text_width));
 		}
-		table->cellAt(2, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("TTML Frame Rate: %1 fps").arg(effectiveFrameRate.GetQuotient()), Qt::ElideRight, column_text_width));
+		if (effectiveFrameRate != editRate)
+			table->cellAt(2, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("TTML Frame Rate: %1 fps").arg(effectiveFrameRate.GetQuotient()), Qt::ElideRight, column_text_width));
 		//WR
 		if(!languageTag.isEmpty()) table->cellAt(3, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Language: %1").arg(languageTag), Qt::ElideRight, column_text_width));
 		//WR

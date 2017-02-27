@@ -150,7 +150,6 @@ void JP2K_Player::clean() {
 	// reset vars
 	decoded_shared->decoded_total = 0;
 	decoded_shared->pending_requests = 0;
-	decoded_shared->decoded_cycle = 0;
 
 	player_position_counter = 0;
 	requested_frames_total = 0;
@@ -227,7 +226,6 @@ void JP2K_Player::playLoop(){
 				request_queue[request_index]->decoded = QImage(":/frame_blank.png");
 
 				decoded_shared->decoded_total++;
-				decoded_shared->decoded_cycle++;
 				decoded_shared->pending_requests--;
 			}
 

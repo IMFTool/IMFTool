@@ -468,6 +468,8 @@ void WidgetVideoPreview::setPlaylist(QVector<VideoResource> &rPlayList, QVector<
 		if (showTTML) getTTML(); // look for TTML
 	}
 	else {
+		xSliderFrame = 0;
+		xSliderTotal = 0;
 		decoding_time->setText("No/empty playlist!");
 		mpImagePreview->Clear();
 	}
@@ -625,13 +627,14 @@ void WidgetVideoPreview::getTTML() {
 			TTMLtimelineResource segment = x.value().at(i);
 
 			// loop tt elements within segment
-			if (time > segment.timeline_in && time <= segment.timeline_out) {
+			if (time >= segment.timeline_in && time < segment.timeline_out) {
 				// visible segment found -> search inside segment
 
 				visibleTTtrack tt;
-				tt.segment = segment;
+				tt.resource = segment;
 
 				double rel_time = ((time - segment.timeline_in) + segment.in);
+				int rel_frame = qRound(((time - segment.timeline_in) + segment.in)*CPLEditRate);
 				frac_sec = modf(rel_time, &seconds);
 
 				h = QString("%1").arg((int)(seconds / 3600.0f), 2, 10, QChar('0')); // hours
@@ -643,8 +646,10 @@ void WidgetVideoPreview::getTTML() {
 				for (int z = 0; z < segment.items.length(); z++) {
 
 					TTMLelem ttelem = segment.items.at(z);
+					float beg_rounded = ceil(qRound(ttelem.beg * CPLEditRate * 100.f) / 100.f);
+					float end_rounded = ceil(qRound(ttelem.end * CPLEditRate * 100.f) / 100.f);
 
-					if (rel_time > ttelem.beg && rel_time <= ttelem.end) {
+					if (rel_frame >= beg_rounded && rel_frame < end_rounded) {
 
 						// add visible element
 						tt.elements.append(ttelem);
@@ -668,7 +673,6 @@ void WidgetVideoPreview::getTTML() {
 void WidgetVideoPreview::rPrevNextSubClicked(bool direction) {
 
 	// calculate frame indicator time
-	float time = ((float)xSliderTotal / CPLEditRate);
 	float next = -1, prev = -1, item_begin = 0;
 
 	// loop tracks
@@ -682,7 +686,8 @@ void WidgetVideoPreview::rPrevNextSubClicked(bool direction) {
 			// loop items within segment
 			for (int ii = 0; ii < segment.items.length(); ii++) {
 
-				item_begin = (segment.items.at(ii).beg + segment.timeline_in);
+				item_begin = ceil(qRound((segment.items.at(ii).beg - segment.in + segment.timeline_in) * CPLEditRate * 100.f) / 100.f); // round to two decimals
+				if (item_begin < 0) item_begin = 0;
 #ifdef DEBUG_JP2K
 				qDebug() << "item" << item_begin;
 #endif
@@ -694,28 +699,24 @@ void WidgetVideoPreview::rPrevNextSubClicked(bool direction) {
 #endif
 				}
 
-				if (next == -1 && item_begin > time) {
-					if (ceil((float)item_begin * CPLEditRate) > xSliderTotal) { // make sure there is at least one frame difference to current frame
+				if (next == -1 && item_begin > xSliderTotal) { // make sure there is at least one frame difference to current frame
 						next = item_begin; // initialize next
 #ifdef DEBUG_JP2K
 						qDebug() << "init next.";
 #endif
-					}
 				}
 
-				if (item_begin < time && item_begin > prev) {
-					if (ceil((float)item_begin * CPLEditRate) < xSliderTotal) { // make sure there is at least one frame difference to current frame
+				if (item_begin < xSliderTotal && item_begin > prev) { // make sure there is at least one frame difference to current frame
 						prev = item_begin;
 #ifdef DEBUG_JP2K
 						qDebug() << "update prev.";
 #endif
 					}
-				}
 			}
 		}
 	}
 #ifdef DEBUG_JP2K
-	qDebug() << "CPL fps:" << CPLEditRate << "frame indicator" << time << "prev" << prev << "next" << next;
+	qDebug() << "CPL fps:" << CPLEditRate << "frame indicator" << xSliderTotal << "prev" << prev << "next" << next;
 #endif
 
 	if (next == -1) { // no next found, use last time
@@ -723,9 +724,15 @@ void WidgetVideoPreview::rPrevNextSubClicked(bool direction) {
 	}
 
 	if (direction == true) { 
-		emit currentPlayerPosition(ceil(next * CPLEditRate)); // next
+		emit currentPlayerPosition(next); // next
+#ifdef DEBUG_JP2K
+		qDebug() << "set NEXT to qRound of:" << (next * CPLEditRate);
+#endif
 	}
 	else {
-		emit currentPlayerPosition(ceil(prev * CPLEditRate)); // previous
+		emit currentPlayerPosition(prev); // previous
+#ifdef DEBUG_JP2K
+		qDebug() << "set PREV to qRound of:" << (prev * CPLEditRate);
+#endif
 	}
 }

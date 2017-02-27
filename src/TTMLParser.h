@@ -27,10 +27,8 @@ class TTMLFns;
 class TTMLFns {
 
 protected:
-	float DurationExtractor(xercesc::DOMDocument *dom_doc, float fr, int tr);
-	float GetElementDuration(xercesc::DOMElement* eleDom, float fr, int tr);
 	float ConvertTimingQStringtoDouble(QString string_time, float fr, int tr);
-	QMap<QString, QString> mergeCss(QMap<QString, QString>, QMap<QString, QString>);
+	QMap<QString, QString> mergeCss(QMap<QString, QString>, QMap<QString, QString>); // elements from qm1 are preferred over qm2!!!
 	QString serializeCss(QMap<QString, QString>);
 };
 
@@ -64,8 +62,6 @@ public:
 	QMap<QString, QMap<QString, QString>> styles;
 	QMap<QString, TTMLRegion> regions;
 	QMap<QString, QString> cssAttr{
-
-		// text profile or image profile
 		{ "tts:backgroundColor" , "background-color" },
 		{ "tts:content" , "content" },
 		{ "tts:color" , "color" },
@@ -78,7 +74,7 @@ public:
 		{ "tts:padding" , "padding" },
 		{ "tts:textAlign" , "text-align" },
 		{ "tts:textDecoration" , "text-decoration" },
-		{ "tts:UnicodeBidi" , "unicode-bidi" },
+		{ "tts:unicodeBidi" , "unicode-bidi" },
 		{ "tts:opacity" , "opacity" }
 	}; // all supported css values
 
@@ -136,6 +132,8 @@ public:
 	QMap<QString, QString> CSS {
 		{ "color" , "white" } // default for text-profile
 	};
+
+	QList<QString> tt_tags {"div", "p", "span"};
 
 	xercesc::DOMElement *el;
 	xercesc::DOMNode *node;

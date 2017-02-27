@@ -60,41 +60,70 @@ void WidgetTrackDetailsTimeline::InitLayout() {
 	mpTimecodeLabel->setFont(font);
 	mpButtonGroup = new QButtonGroup(this);
 	mpButtonGroup->setExclusive(false);
-	QPushButton *p_button_settings = new QPushButton(this);
-	p_button_settings->setFlat(true);
-	p_button_settings->setIcon(QIcon(":/gear.png"));
-	p_button_settings->setFixedSize(20, 20);
-	//WR
-	p_button_settings->hide();
-	QPushButton *p_button_lock = new QPushButton(this);
-	p_button_lock->setFlat(true);
-	p_button_lock->setIcon(QIcon(":/lock_open.png"));
-	p_button_lock->setFixedSize(20, 20);
-	p_button_lock->setCheckable(true);
-	p_button_lock->setChecked(false);
-	//WR
-	p_button_lock->hide();
 
-	mpButtonGroup->addButton(p_button_settings, ButtonSettings);
-	mpButtonGroup->addButton(p_button_lock, ButtonLock);
+	QPushButton *p_button_timecode = new QPushButton(this);
+	p_button_timecode->setText("Timecode");
+	p_button_timecode->setFlat(true);
+	p_button_timecode->setFixedSize(80, 20);
+	//p_button_timecode->setCheckable(true);
+	p_button_timecode->setDown(true);
+	p_button_timecode->setChecked(true);
+
+	QPushButton *p_button_frames = new QPushButton(this);
+	p_button_frames->setText("Frames");
+	p_button_frames->setFlat(true);
+	p_button_frames->setFixedSize(80, 20);
+	//p_button_frames->setCheckable(true);
+	p_button_frames->setChecked(false);
+
+
+	mpButtonGroup->addButton(p_button_timecode, ButtonTimecode);
+	mpButtonGroup->addButton(p_button_frames, ButtonFrames);
 
 	QGridLayout *p_layout = new QGridLayout();
+	p_layout->setHorizontalSpacing(0);
 	p_layout->addWidget(mpTimecodeLabel, 0, 0, 1, 2);
-	p_layout->addWidget(p_button_settings, 1, 0, 1, 1);
-	p_layout->addWidget(p_button_lock, 1, 1, 1, 1);
+	p_layout->addWidget(p_button_timecode, 1, 0, 1, 1);
+	p_layout->addWidget(p_button_frames, 1, 1, 1, 1);
 
 	setLayout(p_layout);
 
 	connect(mpButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(rButtonClicked(int)));
 	connect(mpButtonGroup, SIGNAL(buttonToggled(int, bool)), this, SLOT(rButtonToggled(int, bool)));
+	connect(this, SIGNAL(FramesTimecodeToggled(bool)), this, SLOT(slotShowFrames(bool)));
 }
 
 void WidgetTrackDetailsTimeline::SetTimecode(const Timecode &rTimeCode) {
 
-	mpTimecodeLabel->setText(rTimeCode.GetAsString());
+	if (mShowFrames) mpTimecodeLabel->setText(rTimeCode.GetFramesAsString());
+	else mpTimecodeLabel->setText(rTimeCode.GetAsString());
+	mLastTimeCode = rTimeCode;
 }
 
 void WidgetTrackDetailsTimeline::rButtonClicked(int id) {
+	//WR
+	if(id == ButtonTimecode) {
+		QAbstractButton *p_button = mpButtonGroup->button(ButtonTimecode);
+		if (p_button) {
+			p_button->setDown(true);
+		}
+		p_button = mpButtonGroup->button(ButtonFrames);
+		if (p_button) {
+			p_button->setDown(false);
+		}
+		emit FramesTimecodeToggled(false);
+	}
+	if(id == ButtonFrames) {
+		QAbstractButton *p_button = mpButtonGroup->button(ButtonFrames);
+		if (p_button) {
+			p_button->setDown(true);
+		}
+		p_button = mpButtonGroup->button(ButtonTimecode);
+		if (p_button) {
+			p_button->setDown(false);
+		}
+		emit FramesTimecodeToggled(true);
+	}
 
 
 }
@@ -109,6 +138,12 @@ void WidgetTrackDetailsTimeline::rButtonToggled(int id, bool checked) {
 		}
 		emit LockToggled(checked);
 	}
+
+}
+
+void WidgetTrackDetailsTimeline::slotShowFrames(bool rShowFrames) {
+	mShowFrames = rShowFrames;
+	this->SetTimecode(mLastTimeCode);
 }
 
 WidgetTrackDetails::WidgetTrackDetails(const QUuid &rTrackId, eSequenceType type, QWidget *pParent /*= NULL*/) :
@@ -228,18 +263,10 @@ void WidgetAudioTrackDetails::InitLayout() {
 	p_menu->addAction(QIcon(":/delete.png"), tr("&Remove Track"), this, SLOT(DeleteAction()));
 	p_menu->addSeparator();
 	p_tool_button->setMenu(p_menu);
-	mpSoloButton = new QToolButton(this);
-	mpSoloButton->setText("S");
-	mpSoloButton->setCheckable(true);
-	mpSoloButton->setToolTip(tr("Solo"));
-	//WR
-	mpSoloButton->hide();
 	QHBoxLayout *p_layout = new QHBoxLayout();
 	p_layout->setContentsMargins(0, 0, 0, 0);
 	p_layout->addWidget(p_tool_button);
 	p_layout->addWidget(p_label);
-	p_layout->addWidget(mpSoloButton);
-
 	p_layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
 	setLayout(p_layout);
 }

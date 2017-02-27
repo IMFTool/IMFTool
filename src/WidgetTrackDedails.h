@@ -49,8 +49,12 @@ class WidgetTrackDetailsTimeline : public AbstractWidgetTrackDetails {
 private:
 	enum eButtons {
 		ButtonSettings = 0,
-		ButtonLock
+		ButtonLock,
+		ButtonTimecode,
+		ButtonFrames
 	};
+	bool mShowFrames = false;
+	Timecode mLastTimeCode;
 
 public:
 	WidgetTrackDetailsTimeline(QWidget *pParent = NULL);
@@ -60,6 +64,8 @@ public:
 
 signals:
 	void LockToggled(bool enabled);
+	//WR
+	void FramesTimecodeToggled(bool enabled);
 
 	public slots:
 	void SetTimecode(const Timecode &rTimeCode);
@@ -67,6 +73,7 @@ signals:
 	private slots:
 	void 	rButtonClicked(int id);
 	void 	rButtonToggled(int id, bool checked);
+	void	slotShowFrames (bool checked);
 
 private:
 	Q_DISABLE_COPY(WidgetTrackDetailsTimeline);
@@ -113,7 +120,6 @@ public:
 	virtual QSize sizeHint() const;
 	virtual QUuid GetId() const { return mTrackId; }
 	virtual eSequenceType GetType() const { return MainAudioSequence; }
-	QToolButton* GetSoloButton() const { return mpSoloButton; }
 
 	private slots:
 	void DeleteAction() { emit DeleteClicked(mTrackId); }
@@ -124,5 +130,4 @@ private:
 
 	QUuid mTrackId;
 	eSequenceType mType;
-	QToolButton *mpSoloButton;
 };

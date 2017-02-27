@@ -59,7 +59,7 @@ void TimelineParser::run() {
 							TTMLtimelineResource resource; // new resource
 							resource.track_index = ii;
 							resource.in = (float)timelineWidget->GetFirstVisibleFrame().GetSecondsF();
-							resource.out = (float)timelineWidget->GetLastVisibleFrame().GetSecondsF();
+							resource.out = (float)(timelineWidget->GetSourceDuration().GetCount() / timelineWidget->GetEditRate().GetQuotient());
 
 							// check for other segments in track
 							bool found = false; // default

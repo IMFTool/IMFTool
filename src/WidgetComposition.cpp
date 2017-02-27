@@ -43,7 +43,7 @@ WidgetComposition::WidgetComposition(const QSharedPointer<ImfPackage> &rImp, con
 QFrame(pParent), mpCompositionView(NULL), mpCompositionScene(NULL), mpTimelineView(NULL), mpTimelineScene(NULL), mpCompositionTracksWidget(NULL),
 mpLeftInnerSplitter(NULL), mpRightInnerSplitter(NULL), mpOuterSplitter(NULL), mpTrackSplitter(NULL), mpCompositionGraphicsWidget(NULL),
 mpTimelineGraphicsWidget(NULL), mpUndoStack(NULL), mpToolBar(NULL),
-mAssetCpl(rImp->GetAsset(rCplAssetId).objectCast<AssetCpl>()), mImp(rImp), mpSoloButtonGroup(NULL),
+mAssetCpl(rImp->GetAsset(rCplAssetId).objectCast<AssetCpl>()), mImp(rImp),
 mData(ImfXmlHelper::Convert(QUuid::createUuid()), ImfXmlHelper::Convert(QDateTime::currentDateTimeUtc()), ImfXmlHelper::Convert(UserText(tr("Unnamed"))), ImfXmlHelper::Convert(EditRate::EditRate24), cpl2016::CompositionPlaylistType::SegmentListType()) {
 
 	mpUndoStack = new QUndoStack(this);
@@ -58,8 +58,6 @@ WidgetComposition::~WidgetComposition() {
 
 void WidgetComposition::InitLayout() {
 
-	mpSoloButtonGroup = new QButtonGroup(this);
-	mpSoloButtonGroup->setExclusive(true);
 	mpToolBar = new QToolBar(tr("Composition Toolbar"), this);
 	mpToolBar->setIconSize(QSize(20, 20));
 	mpToolBar->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -96,6 +94,10 @@ void WidgetComposition::InitLayout() {
 	mpRightInnerSplitter->addWidget(mpCompositionView);
 	mpOuterSplitter->addWidget(mpLeftInnerSplitter);
 	mpOuterSplitter->addWidget(mpRightInnerSplitter);
+	//Don't stretch the WidgetTrackDetailsTimeline widget
+	mpOuterSplitter->setStretchFactor(0,0);
+	// TimelineView may be stretched
+	mpOuterSplitter->setStretchFactor(1,1);
 	mpTrackSplitter = new ImprovedSplitter(Qt::Vertical); // mpCompositionTracksWidget gets parent with setWidget()
 	mpTrackSplitter->setHandleWidth(0); // don't change
 	mpTrackSplitter->setChildrenCollapsible(false);
@@ -885,7 +887,6 @@ AbstractWidgetTrackDetails* WidgetComposition::GetTrackDetail(int trackIndex) co
 void WidgetComposition::AddTrackDetail(AbstractWidgetTrackDetails* pTrack, int TrackIndex) {
 
 	WidgetAudioTrackDetails *p_audio_track_details = qobject_cast<WidgetAudioTrackDetails*>(pTrack);
-	if(p_audio_track_details) mpSoloButtonGroup->addButton(p_audio_track_details->GetSoloButton());
 	mpTrackSplitter->insertWidget(TrackIndex, pTrack);
 	connect(pTrack, SIGNAL(DeleteClicked(const QUuid&)), this, SLOT(DeleteTrackRequest(const QUuid&)));
 }
@@ -893,7 +894,6 @@ void WidgetComposition::AddTrackDetail(AbstractWidgetTrackDetails* pTrack, int T
 void WidgetComposition::RemoveTrackDetail(AbstractWidgetTrackDetails *pTrack) {
 
 	WidgetAudioTrackDetails *p_audio_track_details = qobject_cast<WidgetAudioTrackDetails*>(pTrack);
-	if(p_audio_track_details) mpSoloButtonGroup->removeButton(p_audio_track_details->GetSoloButton());
 	disconnect(pTrack, SIGNAL(DeleteClicked(const QUuid&)), this, SLOT(DeleteTrackRequest(const QUuid&)));
 	pTrack->setParent(NULL);
 }

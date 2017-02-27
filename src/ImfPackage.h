@@ -237,7 +237,7 @@ public:
 	QUuid GetAmId() const { if(mpAssetMap) return mpAssetMap->GetId(); else return QUuid(); }
 	UserText GetAnnotationText() const;
 	QByteArray GetHash() const { if(mpPklData.get()) return ImfXmlHelper::Convert(mpPklData->getHash()); else return QByteArray(); }
-	quint32 GetSize() const { if(mpPklData.get()) return mpPklData->getSize(); else return quint32(0); }
+	quint64 GetSize() const { if(mpPklData.get()) return mpPklData->getSize(); else return quint64(0); }
 	eAssetType GetType() const { return mType; }
 	UserText GetOriginalFileName() const { if(mpPklData.get() && mpPklData->getOriginalFileName().present() == true) return ImfXmlHelper::Convert(mpPklData->getOriginalFileName().get()); else return UserText(); }
 

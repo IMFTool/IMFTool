@@ -134,7 +134,7 @@ void WidgetImagePreview::paintGL() {
 	painter.drawImage(draw_rect, mImage);
 
 	// draw regions
-	if (show_ttml_regions) paintRegions(painter, rect_viewport, frame_size);
+	paintRegions(painter, rect_viewport, frame_size);
 
 	painter.end();
 }
@@ -157,10 +157,9 @@ void WidgetImagePreview::paintRegions(QPainter &painter, const QRect rect_viewpo
 			if (!ttml_regions[i].bgImage.isNull()) {
 				// set background image
 				ttml_regions[i].bgImageScaled = ttml_regions[i].bgImage.scaled(QSize(region_width, region_height),Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-				//painter.setRenderHint(QPainter::SmoothPixmapTransform);
 				painter.drawImage(QPoint(region_left, region_top), ttml_regions[i].bgImageScaled);
 			}
-			else {
+			else if(show_ttml_regions){
 				painter.setBrush(QBrush(ttml_regions[i].bgColor));
 				QRect rect(region_left, region_top, region_width, region_height);
 				painter.drawRect(rect);

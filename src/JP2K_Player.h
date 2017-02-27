@@ -28,12 +28,12 @@ public:
 	qint64 frameNr; // current frame in asset
 	qint64 TframeNr; // current frame in track
 	QImage decoded; // decoded image
-	bool done;
-	bool error;
-	QString errorMsg;
-	QSharedPointer<AssetMxfTrack> asset;
-	int fps;
-	int layer;
+	bool done; // set to 'true' when decoding completed
+	bool error; // set to 'true' in case of error
+	QString errorMsg; // error details
+	QSharedPointer<AssetMxfTrack> asset; // reference to asset
+	int fps; // current playback rate
+	int layer; // current layer to decode
 };
 
 class JP2K_Player : public QObject
