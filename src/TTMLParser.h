@@ -47,7 +47,7 @@ public:
 	void parse(std::string xml);
 	QPair<QString, QMap<QString, QString>> parseStyle(xercesc::DOMNode *node);
 
-	TTMLtimelineResource *this_segment; // current timeline segment
+	TTMLtimelineResource *mThisResource; // current timeline resource
 
 	float seq_timing_total_offset = 0;
 	int tickrate;

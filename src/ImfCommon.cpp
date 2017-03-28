@@ -342,8 +342,7 @@ const EditRate& Timecode::GetEditRate() const {
 qint64 Timecode::GetTargetFrame() const {
 
 	qint64 target_frame = mFramesCount;
-	if(mFramesCount > 0) target_frame--;
-	else if(mFramesCount < 0) target_frame++;
+	if (mFramesCount < 0) target_frame = 0;
 	return target_frame;
 }
 

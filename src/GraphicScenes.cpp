@@ -466,6 +466,7 @@ void GraphicsSceneComposition::ProcessDrop(DragDropInfo &rInfo, bool addResource
 	if(rInfo.state == DragDropInfo::DragMove) {
 		rInfo.dropSucceeded = false;
 		AbstractGraphicsWidgetResource *p_origin_resource = rInfo.pOriginResource;
+		p_origin_resource->SetSourceDuration(p_origin_resource->GetIntrinsicDuration());  //For Audio: Ensures that SourceDuration is an integer multiple of samples per frame
 		if(rInfo.isDropable == true) {
 			// TODO: rinfo segment is null
 			Timecode edit_left = mpGhost->MapToCplTimeline(mpGhost->GetFirstVisibleFrame());

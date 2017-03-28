@@ -129,6 +129,9 @@ void AbstractGraphicsWidgetResource::SetSourceDuration(const Duration &rSourceDu
 	Duration current_source_duration(GetSourceDuration());
 	if(new_source_duration < rounded_samples_factor) new_source_duration = rounded_samples_factor;
 	else if(new_source_duration > GetIntrinsicDuration() - GetEntryPoint()) new_source_duration = GetIntrinsicDuration() - GetEntryPoint();
+	//Make sure new_source_duration is an integer multiple of rounded_samples_factor
+	//TODO: For 30 fps and 60 fps fractional, make sure new_source_duration is a multiple of 5 x samples_factor
+	new_source_duration = (new_source_duration.GetCount()/rounded_samples_factor)*rounded_samples_factor;
 	mpData->setSourceDuration(xml_schema::NonNegativeInteger(new_source_duration.GetCount()));
 	if (new_source_duration != current_source_duration) emit SourceDurationChanged(current_source_duration, new_source_duration); InOutChanged = true;
 	updateGeometry();
@@ -191,7 +194,7 @@ void AbstractGraphicsWidgetResource::TrimResource(qint64 pos, qint64 lastPos, eT
 			else mpVerticalIndicator->hide();
 		}
 		int local_pos = mapFromScene(QPointF(grid_info.SnapPos.x(), 0)).x();
-		Duration new_source_duration = ceil(local_pos * samples_factor);			//Why???
+		Duration new_source_duration = ceil(local_pos * samples_factor);			//Make sure Duration is an integer multiple of samples_factor
 		SetSourceDuration(new_source_duration);
 	}
 }
@@ -736,6 +739,7 @@ GraphicsWidgetFileResource(pParent, pResource, rAsset, QColor(CPL_COLOR_VIDEO_RE
 	connect(this, SIGNAL(SourceDurationChanged(const Duration&, const Duration&)), this, SLOT(rSourceDurationChanged()));
 	connect(this, SIGNAL(EntryPointChanged(const Duration&, const Duration&)), this, SLOT(rEntryPointChanged()));
 
+	//WR: Needs to be updated when the timeline changes, see TimelineParser::run()
 	this->timline_index = video_timeline_index; // (k)
 }
 

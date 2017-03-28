@@ -770,7 +770,7 @@ Error MetadataExtractor::ReadTimedTextMetadata(Metadata &rMetadata, const QFileI
 
 		//Tick Rate Extractor
 		int tickrate = 1; //TTML1 section 6.2.10
-		QString tr = XMLString::transcode(tteleDom->getAttribute(XMLString::transcode("ttp:tickRate")));
+		QString tr = XMLString::transcode(tteleDom->getAttributeNS(IMSC1_NS_TTP, XMLString::transcode("tickRate")));
 		if (!tr.isEmpty())
 			tickrate = tr.toInt();
 		else if (!fr.isEmpty())  //TTML1 section 6.2.10

@@ -444,7 +444,14 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 								foreach(QSharedPointer<Asset> asset, mAssetList) {
 									// TTML XF assets only: Set Edit Rate in metadata object to CPL Edit Rate, re-calculate duration in CPL Edit Rate units
 									// Uses the first CPL Edit Rate in mImpEditRates, this can be an issue in multi-edit rate IMPs
-									QSharedPointer <AssetMxfTrack> assetMxfTrack = qSharedPointerCast<AssetMxfTrack>(asset);
+									QSharedPointer <AssetMxfTrack> assetMxfTrack;
+									try {
+										assetMxfTrack = qSharedPointerCast<AssetMxfTrack>(asset);
+									}
+									catch(...) {
+										qDebug() << "Error in qSharedPointerCast";
+										break;
+									}
 									if (assetMxfTrack && !mImpEditRates.isEmpty()){
 										if (assetMxfTrack->GetEssenceType() == Metadata::TimedText) {
 											if (!assetMxfTrack->GetTimedTextFrameRate().IsValid()) break;  //CPLs arbitrarily expose EssenceType == Metadata::TimedText
@@ -453,7 +460,7 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 											assetMxfTrack->SetEditRate(mImpEditRates.first());
 											if (assetMxfTrack->GetTimedTextFrameRate() != assetMxfTrack->GetEditRate()) {
 												assetMxfTrack->SetDuration(Duration(ceil(assetMxfTrack->GetOriginalDuration().GetCount() / assetMxfTrack->GetTimedTextFrameRate().GetQuotient() * assetMxfTrack->GetEditRate().GetQuotient())));
-												qDebug() << "SampleRate of Asset" << assetMxfTrack->GetId() << "does not match CPL EditRate!";
+												qDebug() << "Warning: SampleRate of Asset" << assetMxfTrack->GetId() << "does not match CPL EditRate!";
 											} else {
 												assetMxfTrack->SetDuration(assetMxfTrack->GetOriginalDuration());
 											}

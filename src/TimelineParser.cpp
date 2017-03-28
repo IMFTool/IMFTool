@@ -9,6 +9,7 @@ void TimelineParser::run() {
 
 	int last_track = 0;
 	int track_index = 0;
+	int video_timeline_index = 0;
 
 	// loop all elements currently in timeline
 	for (int i = 0; i < composition->GetSegmentCount(); i++) {
@@ -28,14 +29,20 @@ void TimelineParser::run() {
 
 						if (p_resource->type() == GraphicsWidgetVideoResourceType) {
 
+							//WR Refresh timeline_index when parsing timeline, timeline_index is sent by signal CurrentVideoChanged to slot xPosChanged in mpPreview
+							p_resource->timline_index = video_timeline_index++;
 							// VideoResource found
 							GraphicsWidgetVideoResource *timelineWidget = dynamic_cast<GraphicsWidgetVideoResource*>(p_resource);
 
 							// create new playlist element
 							VideoResource playlist_element;
-							
-							playlist_element.in = timelineWidget->GetFirstVisibleFrame().GetOverallFrames();
-							playlist_element.out = timelineWidget->GetLastVisibleFrame().GetOverallFrames();
+
+							playlist_element.in = timelineWidget->GetEntryPoint().GetCount();
+							playlist_element.RepeatCount = timelineWidget->GetRepeatCount();
+							//playlist_element.Duration = timelineWidget->GetIntrinsicDuration().GetCount();
+							//playlist_element.out = playlist_element.Duration * playlist_element.RepeatCount;
+							playlist_element.Duration = timelineWidget->GetSourceDuration().GetCount();
+							playlist_element.out = playlist_element.in + playlist_element.Duration * playlist_element.RepeatCount;
 
 							if (p_resource->GetAsset()) {
 								playlist_element.asset = p_resource->GetAsset();
@@ -55,11 +62,12 @@ void TimelineParser::run() {
 								track_index++;
 							}
 
-							// create new segment
+							// create new resource
 							TTMLtimelineResource resource; // new resource
 							resource.track_index = ii;
 							resource.in = (float)timelineWidget->GetFirstVisibleFrame().GetSecondsF();
-							resource.out = (float)(timelineWidget->GetSourceDuration().GetCount() / timelineWidget->GetEditRate().GetQuotient());
+							resource.out = resource.in + (float)(timelineWidget->GetSourceDuration().GetCount() / timelineWidget->GetEditRate().GetQuotient());
+							resource.RepeatCount = timelineWidget->GetRepeatCount();
 
 							// check for other segments in track
 							bool found = false; // default
@@ -78,7 +86,7 @@ void TimelineParser::run() {
 
 							if (found == false) {
 								resource.timeline_in = 0;
-								resource.timeline_out = resource.out;
+								resource.timeline_out = resource.out - resource.in;
 							}
 							
 							// is asset alread wrapped in mxf?
@@ -96,6 +104,14 @@ void TimelineParser::run() {
 							else { // ?
 								// asset deleted?
 							}
+
+							if (resource.RepeatCount > 1) {
+								resource.timeline_out += ((resource.out - resource.in) * (resource.RepeatCount - 1)); // update out-point
+							}
+#ifdef DEBUG_JP2K
+					qDebug() << "resource.in" << resource.in << "resource.timeline_in" << resource.timeline_in
+							<< "resource.out" << resource.out << "resource.timeline_out" << resource.timeline_out;
+#endif
 
 							parser->~TTMLParser();
 		

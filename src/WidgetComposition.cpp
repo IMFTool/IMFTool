@@ -44,7 +44,8 @@ QFrame(pParent), mpCompositionView(NULL), mpCompositionScene(NULL), mpTimelineVi
 mpLeftInnerSplitter(NULL), mpRightInnerSplitter(NULL), mpOuterSplitter(NULL), mpTrackSplitter(NULL), mpCompositionGraphicsWidget(NULL),
 mpTimelineGraphicsWidget(NULL), mpUndoStack(NULL), mpToolBar(NULL),
 mAssetCpl(rImp->GetAsset(rCplAssetId).objectCast<AssetCpl>()), mImp(rImp),
-mData(ImfXmlHelper::Convert(QUuid::createUuid()), ImfXmlHelper::Convert(QDateTime::currentDateTimeUtc()), ImfXmlHelper::Convert(UserText(tr("Unnamed"))), ImfXmlHelper::Convert(EditRate::EditRate24), cpl2016::CompositionPlaylistType::SegmentListType()) {
+mData(ImfXmlHelper::Convert(QUuid::createUuid()), ImfXmlHelper::Convert(QDateTime::currentDateTimeUtc()), ImfXmlHelper::Convert(UserText(tr("Unnamed"))), ImfXmlHelper::Convert(EditRate::EditRate24), cpl2016::CompositionPlaylistType::SegmentListType())
+{
 
 	mpUndoStack = new QUndoStack(this);
 	InitLayout();
@@ -116,6 +117,7 @@ void WidgetComposition::InitLayout() {
 	mpTimelineView->viewport()->installEventFilter(this); // Synchronize view scaling.
 	mpTimelineView->installEventFilter(this);
 	mpCompositionTracksWidget->viewport()->installEventFilter(this); // Disable wheel scrolling.
+	lastPosition = Timecode(GetEditRate(), 0); // (k) initialize at beginning
 
 	QList<int> splitter_sizes;
 	splitter_sizes << mpTimelineView->minimumSizeHint().height() << -1;
@@ -1096,22 +1098,23 @@ int WidgetComposition::GetLastTrackDetailIndexForType(eSequenceType type) const 
 
 void WidgetComposition::rCurrentFrameChanged(const Timecode &rCplTimecode) {
 
-	lastPosition = rCplTimecode; // (k)
+	lastPosition = rCplTimecode; // (k) save last position
+	//qDebug() << "xpos" << rCplTimecode.AsPositiveDuration().GetCount();
 
 	GraphicsWidgetSegment *p_segment = mpCompositionScene->GetSegmentAt(rCplTimecode);
-	if(p_segment) {
+	if (p_segment) {
 		QUuid audio_track_id;
 		QUuid video_track_id;
 		QUuid ttml_track_id; // (k)
-		for(int i = 0; i < GetTrackDetailCount(); i++) {
+		for (int i = 0; i < GetTrackDetailCount(); i++) {
 			AbstractWidgetTrackDetails *p_track_details = GetTrackDetail(i);
-			if(p_track_details) {
+			if (p_track_details) {
 				//if(p_track_details->GetType() == MainAudioSequence) {
 				//	if(WidgetAudioTrackDetails *p_audio_track = static_cast<WidgetAudioTrackDetails*>(p_track_details)) {
 				//		if(p_audio_track->GetSoloButton()->isChecked() == true) audio_track_id = p_audio_track->GetId();
 				//	}
 				//}
-				if(p_track_details->GetType() == MainImageSequence) {
+				if (p_track_details->GetType() == MainImageSequence) {
 					video_track_id = p_track_details->GetId();
 				}
 				else if (p_track_details->GetType() == SubtitlesSequence) {
@@ -1121,21 +1124,27 @@ void WidgetComposition::rCurrentFrameChanged(const Timecode &rCplTimecode) {
 		}
 
 		QList<AbstractGraphicsWidgetResource*> resources_list = mpCompositionScene->GetResourcesAt(rCplTimecode, SubtitlesSequence | MainAudioSequence | MainImageSequence);
-		for(int i = 0; i < resources_list.size(); i++) {
+		for (int i = 0; i < resources_list.size(); i++) {
 			GraphicsWidgetSequence *p_seq = dynamic_cast<GraphicsWidgetSequence*>(resources_list.at(i)->GetSequence());
-			if(p_seq) {
+			if (p_seq) {
 				//if(p_seq->GetTrackId() == audio_track_id) {
 				//	AbstractGraphicsWidgetResource *p_resource = resources_list.at(i);
 				//	emit CurrentAudioChanged(p_resource->GetAsset(), (p_resource->MapToCplTimeline(Timecode()) - rCplTimecode).AsPositiveDuration(), rCplTimecode);
 				//}
-				if(p_seq->GetTrackId() == video_track_id) {
+				if (p_seq->GetTrackId() == video_track_id) {
 					AbstractGraphicsWidgetResource *p_resource = resources_list.at(i);
 					if (p_resource->GetLastVisibleFrame().GetOverallFrames() > -1) { // avoids wrong signals near segment transitions
-						emit CurrentVideoChanged(p_resource->GetAsset(), (p_resource->MapToCplTimeline(Timecode()) - rCplTimecode).AsPositiveDuration(), rCplTimecode, p_resource->timline_index);
+						qint64 assetPosition = (p_resource->MapToCplTimeline(Timecode()) - rCplTimecode).AsPositiveDuration().GetCount();
+						assetPosition = p_resource->GetEntryPoint().GetCount() + (assetPosition - p_resource->GetEntryPoint().GetCount());// % p_resource->GetSourceDuration().GetCount());
+						//emit CurrentVideoChanged(p_resource->GetAsset(), (p_resource->MapToCplTimeline(Timecode()) - rCplTimecode).AsPositiveDuration().GetCount(), rCplTimecode, p_resource->timline_index);
+						emit CurrentVideoChanged(p_resource->GetAsset(), assetPosition, rCplTimecode, p_resource->timline_index);
+						return;
 					}
-				}else if (p_seq->GetTrackId() == ttml_track_id && video_track_id.isNull()) { // (k)
+				}
+				else if (p_seq->GetTrackId() == ttml_track_id && video_track_id.isNull()) { // (k)
 					AbstractGraphicsWidgetResource *p_resource = resources_list.at(i);
-					emit CurrentVideoChanged(p_resource->GetAsset(), (p_resource->MapToCplTimeline(Timecode()) - rCplTimecode).AsPositiveDuration(), rCplTimecode, p_resource->timline_index);
+					emit CurrentVideoChanged(p_resource->GetAsset(), (p_resource->MapToCplTimeline(Timecode()) - rCplTimecode).AsPositiveDuration().GetCount(), rCplTimecode, p_resource->timline_index);
+					return;
 				}
 			}
 		}

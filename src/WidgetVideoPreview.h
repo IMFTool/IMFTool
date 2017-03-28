@@ -52,7 +52,7 @@ signals:
 	void ttmlChanged(const QVector<visibleTTtrack>&, int);
 	void regionOptionsChanged(int);
 public slots :
-	void xPosChanged(const QSharedPointer<AssetMxfTrack>&, const Duration&, const Timecode&, const int&);
+	void xPosChanged(const QSharedPointer<AssetMxfTrack>&, const qint64&, const Timecode&, const int&);
 	void rShowMsgBox(const QString&, int);
 	void rPrevNextSubClicked(bool);
 	void getTTML();

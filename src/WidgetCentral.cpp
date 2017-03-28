@@ -237,9 +237,9 @@ void WidgetCentral::rCurrentChanged(int tabWidgetIndex) {
 	WidgetComposition *p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->currentWidget());
 	if(p_composition) {
 		// (k) - start
-		disconnect(p_composition->GetUndoStack(), SIGNAL(indexChanged(int)), this, SLOT(rUpdatePlaylist())); // (k)
-		disconnect(p_composition, SIGNAL(CurrentVideoChanged(const QSharedPointer<AssetMxfTrack>&, const Duration&, const Timecode&, const int&)), mpPreview, SLOT(xPosChanged(const QSharedPointer<AssetMxfTrack>&, const Duration&, const Timecode&, const int&)));
-		disconnect(mpPreview, SIGNAL(currentPlayerPosition(qint64)), p_composition, SLOT(setVerticalIndicator(qint64))); // (k)
+		disconnect(p_composition->GetUndoStack(), SIGNAL(indexChanged(int)), 0, 0); // (k)
+		disconnect(p_composition, SIGNAL(CurrentVideoChanged(const QSharedPointer<AssetMxfTrack>&, const qint64&, const Timecode&, const int&)), 0, 0);
+		disconnect(mpPreview, SIGNAL(currentPlayerPosition(qint64)), 0, 0); // (k)
 		// (k) - end
 	}
 
@@ -256,13 +256,18 @@ void WidgetCentral::rCurrentChanged(int tabWidgetIndex) {
 		mpPreview->CPLEditRate = p_composition->GetEditRate().GetQuotient(); // set CPL edit rate
 		rUpdatePlaylist(); // update playlist
 		connect(p_composition->GetUndoStack(), SIGNAL(indexChanged(int)), this, SLOT(rUpdatePlaylist()));
-		connect(p_composition, SIGNAL(CurrentVideoChanged(const QSharedPointer<AssetMxfTrack>&, const Duration&, const Timecode&, const int&)), mpPreview, SLOT(xPosChanged(const QSharedPointer<AssetMxfTrack>&, const Duration&, const Timecode&, const int&)));
+		connect(p_composition, SIGNAL(CurrentVideoChanged(const QSharedPointer<AssetMxfTrack>&, const qint64&, const Timecode&, const int&)), mpPreview, SLOT(xPosChanged(const QSharedPointer<AssetMxfTrack>&, const qint64&, const Timecode&, const int&)));
 		connect(mpPreview, SIGNAL(currentPlayerPosition(qint64)), p_composition, SLOT(setVerticalIndicator(qint64)));
 		// (k) - end
 	}
 }
 
 void WidgetCentral::rTabCloseRequested(int index) {
+
+	mpTTMLDetailsWidget->ClearTTML(); // (k) - clear ttml view
+	ttmls = QVector<TTMLtimelineResource>(); // (k) - clear ttml list
+	playlist = QVector<VideoResource>(); // (k) - clear video playlist
+	mpPreview->setPlaylist(playlist, ttmls); // (k) - clear playlist
 
 	WidgetComposition *p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->widget(index));
 	if(p_composition) {
@@ -279,12 +284,8 @@ void WidgetCentral::rTabCloseRequested(int index) {
 			else if(ret == QMessageBox::Cancel) { return; }
 		}
 		mpTabWidget->removeTab(mpTabWidget->indexOf(p_composition));
-		p_composition->deleteLater();
 
-		mpTTMLDetailsWidget->ClearTTML(); // (k) - clear ttml view
-		ttmls = QVector<TTMLtimelineResource>(); // (k) - clear ttml list
-		playlist = QVector<VideoResource>(); // (k) - clear video playlist
-		mpPreview->setPlaylist(playlist, ttmls); // (k) - clear playlist
+		p_composition->deleteLater();
 	}
 }
 

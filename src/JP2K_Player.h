@@ -47,7 +47,7 @@ public:
 	void setFps(int fps);
 	void setLayer(int layer); // layer to decode
 	void setPlaylist(QVector<VideoResource>& rPlaylist);
-	void setPos(int frameNr, int frame_total, int playlist_index);
+	void setPos(qint64 frameNr, qint64 frame_total, int playlist_index);
 	void clean();
 	void convert_to_709(bool convert);
 
@@ -72,8 +72,8 @@ private:
 
 	// player settings
 	int layer = 0; // quality layer to decode (best = 0, default = 5)
-	int frameNr = 0; // player position within asset
-	int TframeNr = 0; // player position within track
+	qint64 frameNr = 0; // player position within asset
+	qint64 TframeNr = 0; // player position within track
 	int playlist_index = 0; // playlist asset index
 	int fps = 0; // nr of images to play/request per second
 	int ms_wait = 1000; // default wait intervall between cycles in play-loop
@@ -82,7 +82,7 @@ private:
 	qreal video_framerate = 0;
 
 	// player control
-	int last_frame_total = 0; // last frame in track
+	qint64 last_frame_total = 0; // last frame in track
 	bool started_playing = false; // buffer was filled and playing out of frames has started
 
 	// decoding

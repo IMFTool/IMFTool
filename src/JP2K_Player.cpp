@@ -122,7 +122,7 @@ void JP2K_Player::startPlay(){
 }
 
 // lets the player know where the slider is at the moment
-void JP2K_Player::setPos(int rframeNr, int rTframeNr, int rplaylist_index) {
+void JP2K_Player::setPos(qint64 rframeNr, qint64 rTframeNr, int rplaylist_index) {
 
 	decoding_index = rplaylist_index; 
 	playing_index = rplaylist_index; 
@@ -133,7 +133,7 @@ void JP2K_Player::setPos(int rframeNr, int rTframeNr, int rplaylist_index) {
 	frameNr = rframeNr;
 
 	frame_playing_total_float = (float)rTframeNr; 
-	TframeNr = (float)rTframeNr;
+	TframeNr = rTframeNr;
 
 	clean();
 }
@@ -205,11 +205,12 @@ void JP2K_Player::playLoop(){
 		emit playerInfo(QString("Buffer: %1").arg(buffer_size));
 
 		// request new frame
-		if (buffer_size <= fps && frame_decoding_total_float <= last_frame_total) {
+		if (buffer_size <= fps && frame_decoding_total_float <= last_frame_total && decoding_index < playlist.size()) {
 
 			request_index = requested_frames_total % decoders;
-
-			request_queue[request_index]->frameNr = (int)(frame_decoding_asset_float);
+			
+			request_queue[request_index]->frameNr = playlist.at(decoding_index).in + ((int)frame_decoding_asset_float - playlist.at(decoding_index).in) % playlist.at(decoding_index).Duration;
+			//request_queue[request_index]->frameNr = (int)frame_decoding_asset_float;
 			request_queue[request_index]->TframeNr = (int)(frame_decoding_total_float);
 			request_queue[request_index]->error = false;
 			request_queue[request_index]->layer = layer;
@@ -241,8 +242,7 @@ void JP2K_Player::playLoop(){
 				frame_decoding_asset_float++;
 				frame_decoding_total_float++;
 			}
-
-			if (frame_decoding_asset_float > playlist[decoding_index].out) {
+			if (frame_decoding_asset_float >= playlist[decoding_index].out) {
 				if (decoding_index < (playlist.length() - 1)) {
 					decoding_index++; // move on to next asset
 					frame_decoding_asset_float = (frame_decoding_asset_float - playlist.at(decoding_index - 1).out) + playlist.at(decoding_index).in;
@@ -278,7 +278,7 @@ void JP2K_Player::playLoop(){
 					return;
 				}
 
-				if (frame_playing_asset_float > playlist[playing_index].out) {
+				if (frame_playing_asset_float >= playlist[playing_index].out) {
 					if (playing_index < (playlist.length() - 1)) {
 
 						playing_index++; // move on to next asset
@@ -340,13 +340,14 @@ void JP2K_Player::setPlaylist(QVector<VideoResource> &rPlaylist) {
 	playlist = rPlaylist;
 	if(playlist.length() == 0) emit playerInfo("No/empty playlist!");
 
-	last_frame_total = playlist.length() - 1;
+	last_frame_total = 0; //playlist.length() - 1;
 
 	// loop playlist items
 	for (int i = 0; i < playlist.length(); i++) {
-		if(i == 0) setPos(playlist.at(i).in, 0, 0); // initialize player
-		last_frame_total += (playlist.at(i).out - playlist.at(i).in);
+		//last_frame_total += (playlist.at(i).Duration * playlist.at(i).RepeatCount) - 1;
+		last_frame_total += playlist.at(i).Duration * playlist.at(i).RepeatCount;
 	}
+	last_frame_total -= 1;
 
 	// look for first valid asset
 	int count = 0;

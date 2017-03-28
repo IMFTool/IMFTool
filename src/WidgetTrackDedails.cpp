@@ -65,15 +65,15 @@ void WidgetTrackDetailsTimeline::InitLayout() {
 	p_button_timecode->setText("Timecode");
 	p_button_timecode->setFlat(true);
 	p_button_timecode->setFixedSize(80, 20);
-	//p_button_timecode->setCheckable(true);
-	p_button_timecode->setDown(true);
+	p_button_timecode->setCheckable(true);
+	//p_button_timecode->setDown(true);
 	p_button_timecode->setChecked(true);
 
 	QPushButton *p_button_frames = new QPushButton(this);
 	p_button_frames->setText("Frames");
 	p_button_frames->setFlat(true);
 	p_button_frames->setFixedSize(80, 20);
-	//p_button_frames->setCheckable(true);
+	p_button_frames->setCheckable(true);
 	p_button_frames->setChecked(false);
 
 
@@ -88,7 +88,6 @@ void WidgetTrackDetailsTimeline::InitLayout() {
 
 	setLayout(p_layout);
 
-	connect(mpButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(rButtonClicked(int)));
 	connect(mpButtonGroup, SIGNAL(buttonToggled(int, bool)), this, SLOT(rButtonToggled(int, bool)));
 	connect(this, SIGNAL(FramesTimecodeToggled(bool)), this, SLOT(slotShowFrames(bool)));
 }
@@ -100,44 +99,25 @@ void WidgetTrackDetailsTimeline::SetTimecode(const Timecode &rTimeCode) {
 	mLastTimeCode = rTimeCode;
 }
 
-void WidgetTrackDetailsTimeline::rButtonClicked(int id) {
-	//WR
-	if(id == ButtonTimecode) {
-		QAbstractButton *p_button = mpButtonGroup->button(ButtonTimecode);
-		if (p_button) {
-			p_button->setDown(true);
-		}
-		p_button = mpButtonGroup->button(ButtonFrames);
-		if (p_button) {
-			p_button->setDown(false);
-		}
-		emit FramesTimecodeToggled(false);
-	}
-	if(id == ButtonFrames) {
-		QAbstractButton *p_button = mpButtonGroup->button(ButtonFrames);
-		if (p_button) {
-			p_button->setDown(true);
-		}
-		p_button = mpButtonGroup->button(ButtonTimecode);
-		if (p_button) {
-			p_button->setDown(false);
-		}
-		emit FramesTimecodeToggled(true);
-	}
-
-
-}
 
 void WidgetTrackDetailsTimeline::rButtonToggled(int id, bool checked) {
 
-	if(id == ButtonLock) {
-		QAbstractButton *p_button = mpButtonGroup->button(id);
-		if(p_button) {
-			if(checked == true) p_button->setIcon(QIcon(":/lock.png"));
-			else p_button->setIcon(QIcon(":/lock_open.png"));
+
+	if (id == ButtonTimecode) {
+		QAbstractButton *p_button =  mpButtonGroup->button(ButtonFrames);
+		if (p_button) {
+			p_button->setChecked(!checked);
 		}
-		emit LockToggled(checked);
+		emit FramesTimecodeToggled(!checked);
 	}
+	if (id == ButtonFrames) {
+		QAbstractButton *p_button = mpButtonGroup->button(ButtonTimecode);
+		if (p_button) {
+			p_button->setChecked(!checked);
+		}
+		emit FramesTimecodeToggled(checked);
+	}
+
 
 }
 

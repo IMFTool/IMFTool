@@ -71,7 +71,6 @@ signals:
 	void SetTimecode(const Timecode &rTimeCode);
 
 	private slots:
-	void 	rButtonClicked(int id);
 	void 	rButtonToggled(int id, bool checked);
 	void	slotShowFrames (bool checked);
 

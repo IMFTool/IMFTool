@@ -206,7 +206,7 @@ void elem::GetStyle() {
 bool elem::processTimedElement() {
 
 	// is element between in- and -out point?
-	if(timing_end < parser->timeline_in || timing_begin > (parser->timeline_out + parser->timeline_in)){
+	if(timing_end < parser->timeline_in || timing_begin > (parser->timeline_out)){
 		return false;
 	}
 
@@ -271,7 +271,7 @@ bool elem::processTimedElement() {
 	ttml_timed.CSS = CSS;
 
 	// add timed item to list
-	parser->this_segment->items.append(ttml_timed); 
+	parser->mThisResource->items.append(ttml_timed);
 
 	// add visible element duration to parent block duration if parent timing is seq
 	if (parent && parent->timeContainer == 2) {
@@ -406,7 +406,7 @@ Error TTMLParser::open(const QString &rSourceFile, TTMLtimelineResource &ttml_se
 
 	Error error;
 	
-	this_segment = &ttml_segment;
+	mThisResource = &ttml_segment;
 	timeline_in = ttml_segment.in;
 	timeline_out = ttml_segment.out;
 	is_wrapped = rIsWrapped;
@@ -513,8 +513,8 @@ void TTMLParser::parse(std::string xml) {
 	getMetadata(dom_doc);
 
 	// set framerate & doc in TTMLtimelineSegment
-	this_segment->frameRate = framerate;
-	this_segment->doc = QString(xml.c_str());
+	mThisResource->frameRate = framerate;
+	mThisResource->doc = QString(xml.c_str());
 
 	// loop styles
 	DOMNodeList	*styleList = dom_doc->getElementsByTagName(XMLString::transcode("style"));
@@ -584,7 +584,7 @@ void TTMLParser::parse(std::string xml) {
 	}
 
 #ifdef DEBUG_TTML
-	print2Console(this_segment->items);
+	print2Console(mThisResource->items);
 #endif
 
 	parser->~XercesDOMParser(); // delete DOM parser

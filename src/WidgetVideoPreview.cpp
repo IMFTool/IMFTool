@@ -28,7 +28,7 @@
 #include <QThread>
 #include <QLineEdit>
 
- //#define DEBUG_JP2K
+//#define DEBUG_JP2K
 
 WidgetVideoPreview::WidgetVideoPreview(QWidget *pParent) : QWidget(pParent) {
 
@@ -216,6 +216,9 @@ void WidgetVideoPreview::InitLayout() {
 }
 
 void WidgetVideoPreview::forwardPlayerPosition(qint64 frameNr, bool decode_at_new_pos) {
+#ifdef DEBUG_JP2K
+	qDebug() << "set frame indicator to:" << frameNr;
+#endif
 	if(!decode_at_new_pos) setFrameIndicator = true; // ignore next xPosChanged signal!
 	emit currentPlayerPosition(frameNr);
 }
@@ -234,7 +237,7 @@ void WidgetVideoPreview::stopPlayback(bool clicked) {
 	if (decodingThreads[0]->isRunning()) decodingThreads[0]->quit();
 	if (decodingThreads[1]->isRunning()) decodingThreads[1]->quit();
 
-	decodingFrame = -1; // force preview refresh
+	if(currentPlaylist.length() > 0) decodingFrame = -1; // force preview refresh
 	setFrameIndicator = false;
 	emit currentPlayerPosition(0); // reset indicator to first frame
 }
@@ -274,11 +277,12 @@ void WidgetVideoPreview::rPlaybackEnded() {
 	if(playerThread->isRunning()) playerThread->quit();
 }
 
-void WidgetVideoPreview::xPosChanged(const QSharedPointer<AssetMxfTrack> &rAsset, const Duration &rOffset, const Timecode &rTimecode, const int &playlist_index){
+void WidgetVideoPreview::xPosChanged(const QSharedPointer<AssetMxfTrack> &rAsset, const qint64 &rOffset, const Timecode &rTimecode, const int &playlist_index){
 
-	xSliderFrame = rOffset.GetCount(); // slider is pointing to this frame (within asset)
+	xSliderFrame = rOffset; // slider is pointing to this frame (within asset)
 	xSliderTotal = rTimecode.GetOverallFrames(); // slider is pointing to this frame (in timeline)
 	currentAsset = rAsset;
+	current_playlist_index = playlist_index;
 
 	if (setFrameIndicator) {
 		setFrameIndicator = false;
@@ -291,14 +295,12 @@ void WidgetVideoPreview::xPosChanged(const QSharedPointer<AssetMxfTrack> &rAsset
 	}
 
 #ifdef DEBUG_JP2K
-	qDebug() << "xpos asset:" << xSliderFrame << "total:" << xSliderTotal;
+	qDebug() << "xpos asset:" << xSliderFrame << "total:" << xSliderTotal << "current_playlist_index:" << current_playlist_index;
 #endif
 	
 	if (showTTML) getTTML(); // TTML
 
-	if (decodingFrame != xSliderFrame) {
-
-		current_playlist_index = playlist_index;
+	if (decodingFrame != xSliderTotal) {
 
 		player->setPos(xSliderFrame, xSliderTotal, playlist_index); // set current frame in player
 
@@ -311,10 +313,12 @@ void WidgetVideoPreview::xPosChanged(const QSharedPointer<AssetMxfTrack> &rAsset
 #ifdef DEBUG_JP2K
 			qDebug() << "start generating preview nr:" << xSliderFrame;
 #endif
-			decodingFrame = xSliderFrame;
+			decodingFrame = xSliderTotal;
 
 			decoders[run]->asset = currentAsset; // set new asset in current decoder
-			decoders[run]->frameNr = xSliderFrame; // set current frame number in decoder								 
+			//decoders[run]->frameNr = xSliderFrame; // set current frame number in decoder
+			VideoResource vr = currentPlaylist[current_playlist_index];
+			decoders[run]->frameNr = vr.in + (xSliderFrame - vr.in) % vr.Duration; // set current frame number in decoder
 			decodingThreads[run]->start(QThread::HighestPriority); // start decoder
 			decoding_time->setText("loading...");
 		}
@@ -330,14 +334,17 @@ void WidgetVideoPreview::decodingStatus(qint64 frameNr,QString status) {
 	run = (int)now_running;
 
 	// check if current xSlider Position matches last decoded frame
-	if (decodingFrame != xSliderFrame && player->playing == false && !decodingThreads[run]->isRunning()){
+	if (decodingFrame != xSliderTotal && player->playing == false && !decodingThreads[run]->isRunning()){
 		
-		decodingFrame = xSliderFrame;
+		decodingFrame = xSliderTotal;
 #ifdef DEBUG_JP2K
 		qDebug() << "now start decoding nr" << xSliderFrame;
 #endif
+		//TODO
 		decoders[run]->asset = currentAsset; // set new asset in current decoder
-		decoders[run]->frameNr = xSliderFrame; // set frame number in decoder
+		//decoders[run]->frameNr = xSliderFrame; // set frame number in decoder
+		VideoResource vr = currentPlaylist[current_playlist_index];
+		decoders[run]->frameNr = vr.in + (xSliderFrame - vr.in) % vr.Duration; // set current frame number in decoder
 		player->setPos(xSliderFrame, xSliderTotal, current_playlist_index); // set current frame in player
 
 		decodingThreads[run]->start(QThread::HighestPriority); // start decoder
@@ -411,6 +418,7 @@ void WidgetVideoPreview::setPlaylist(QVector<VideoResource> &rPlayList, QVector<
 	currentPlaylist = rPlayList; // set playlist
 	player->setPlaylist(rPlayList); // set playlist in player
 	menuQuality->clear(); // clear prev. resolutions from menu
+	current_playlist_index = 0; // set to first item in playlist 
 
 	// create array of TTMLtracks
 	int track_index = 0;
@@ -466,12 +474,15 @@ void WidgetVideoPreview::setPlaylist(QVector<VideoResource> &rPlayList, QVector<
 		decodingThreads[(int)(now_running)]->start(QThread::HighestPriority); // start decoder (again)
 
 		if (showTTML) getTTML(); // look for TTML
+
+		player->setPos(rPlayList.at(0).in, xSliderTotal, current_playlist_index); // set current frame in player
 	}
 	else {
 		xSliderFrame = 0;
 		xSliderTotal = 0;
+		decodingFrame = 0;
 		decoding_time->setText("No/empty playlist!");
-		mpImagePreview->Clear();
+		Clear(); // stop player & clear preview
 	}
 }
 
@@ -557,7 +568,6 @@ void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 		}
 		break;
 	case 3: // real speed
-		qDebug() << "real speed" << action->isChecked();
 
 		if(playerThread->isRunning()) playerThread->quit();
 		player->realspeed = action->isChecked();
@@ -613,8 +623,8 @@ void WidgetVideoPreview::getTTML() {
 	mpImagePreview->ttml_regions.clear();
 
 	float frac_sec;
-	double seconds;
-
+	double seconds, rel_time;
+	int rel_frame;
 	QString h, m, s, f;
 
 	// loop tracks
@@ -624,28 +634,43 @@ void WidgetVideoPreview::getTTML() {
 		// loop segments in track
 		for (int i = 0; i < x.value().length(); i++) {
 
-			TTMLtimelineResource segment = x.value().at(i);
+			TTMLtimelineResource resource = x.value().at(i);
+
+			float beg_rounded = ceil(qRound(resource.timeline_in * CPLEditRate * 100.f) / 100.f);
+			float end_rounded = ceil(qRound(resource.timeline_out * CPLEditRate * 100.f) / 100.f);
 
 			// loop tt elements within segment
-			if (time >= segment.timeline_in && time < segment.timeline_out) {
+			if (xSliderTotal >= beg_rounded && xSliderTotal < end_rounded) {
 				// visible segment found -> search inside segment
 
 				visibleTTtrack tt;
-				tt.resource = segment;
+				tt.resource = resource;
 
-				double rel_time = ((time - segment.timeline_in) + segment.in);
-				int rel_frame = qRound(((time - segment.timeline_in) + segment.in)*CPLEditRate);
+				if (resource.RepeatCount > 0) { // RepeatCount != 0
+					if (modf((time - resource.timeline_in) / (resource.out - resource.in), &seconds) > 0.99) {
+						rel_time = resource.in;
+					}
+					else {
+						rel_time = modf((time - resource.timeline_in) / (resource.out - resource.in), &seconds) * (resource.out - resource.in) + resource.in;
+					}
+					rel_frame = (qRound((time - resource.timeline_in)*CPLEditRate) % qRound((resource.out - resource.in) * CPLEditRate)) + resource.in * CPLEditRate;
+				}
+				else { // no repeating elements
+					rel_time = ((time - resource.timeline_in) + resource.in);
+					rel_frame = qRound(((time - resource.timeline_in) + resource.in)*CPLEditRate);
+				}
+
 				frac_sec = modf(rel_time, &seconds);
 
 				h = QString("%1").arg((int)(seconds / 3600.0f), 2, 10, QChar('0')); // hours
 				m = QString("%1").arg((int)(seconds / 60.0f), 2, 10, QChar('0')); // minutes
 				s = QString("%1").arg((int)(seconds) % 60, 2, 10, QChar('0')); // seconds
 				tt.formatted_time = QString("%1 : %2 : %3").arg(h).arg(m).arg(s); // ttml timecode
-				tt.fractional_frames = QString::number(qRound(frac_sec * segment.frameRate * (float)100) / (float)100, 'f', 2);
+				tt.fractional_frames = QString::number(qRound(frac_sec * resource.frameRate * (float)100) / (float)100, 'f', 2);
 
-				for (int z = 0; z < segment.items.length(); z++) {
+				for (int z = 0; z < resource.items.length(); z++) {
 
-					TTMLelem ttelem = segment.items.at(z);
+					TTMLelem ttelem = resource.items.at(z);
 					float beg_rounded = ceil(qRound(ttelem.beg * CPLEditRate * 100.f) / 100.f);
 					float end_rounded = ceil(qRound(ttelem.end * CPLEditRate * 100.f) / 100.f);
 
@@ -674,44 +699,57 @@ void WidgetVideoPreview::rPrevNextSubClicked(bool direction) {
 
 	// calculate frame indicator time
 	float next = -1, prev = -1, item_begin = 0;
+	int repeat = 1;
 
 	// loop tracks
 	QMap<int, QVector<TTMLtimelineResource>>::iterator x;
 	for (x = ttml_tracks.begin(); x != ttml_tracks.end(); ++x) { // i.key(), i.value()
-
-		// loop segments within track
+		// loop resources within track
 		for (int i = 0; i < x.value().count(); i++) {
-			TTMLtimelineResource segment = x.value().at(i);
+			TTMLtimelineResource resource = x.value().at(i);
 
-			// loop items within segment
-			for (int ii = 0; ii < segment.items.length(); ii++) {
-
-				item_begin = ceil(qRound((segment.items.at(ii).beg - segment.in + segment.timeline_in) * CPLEditRate * 100.f) / 100.f); // round to two decimals
-				if (item_begin < 0) item_begin = 0;
+			if (resource.RepeatCount > 1) {
+				repeat = resource.RepeatCount;
+			}
+			else {
+				repeat = 1; // default
+			}
 #ifdef DEBUG_JP2K
-				qDebug() << "item" << item_begin;
+					qDebug() << "resource.in" << resource.in << "resource.timeline_in" << resource.timeline_in
+							<< "resource.out" << resource.out << "resource.timeline_out" << resource.timeline_out;
 #endif
 
-				if (prev == -1) {
-					prev = item_begin; // initialize prev
+			// loop repeated elements
+			for (int ii = 0; ii < repeat; ii++) {
+				// loop items within resource
+				for (int iii = 0; iii < resource.items.length(); iii++) {
+					item_begin = ceil(qRound((resource.items.at(iii).beg - resource.in + resource.timeline_in) * CPLEditRate * 100.f) / 100.f) + qRound((resource.out - resource.in)*ii * CPLEditRate);
+					if (item_begin < 0) item_begin = 0;
 #ifdef DEBUG_JP2K
-					qDebug() << "init prev.";
+					qDebug() << "item" << item_begin << "resource.items.at(iii).beg" << resource.items.at(iii).beg;
 #endif
-				}
 
-				if (next == -1 && item_begin > xSliderTotal) { // make sure there is at least one frame difference to current frame
+					if (prev == -1) {
+						prev = item_begin; // initialize prev
+#ifdef DEBUG_JP2K
+						qDebug() << "init prev.";
+#endif
+					}
+
+					if (next == -1 && item_begin > xSliderTotal) { // make sure there is at least one frame difference to current frame
 						next = item_begin; // initialize next
 #ifdef DEBUG_JP2K
 						qDebug() << "init next.";
 #endif
-				}
+					}
 
-				if (item_begin < xSliderTotal && item_begin > prev) { // make sure there is at least one frame difference to current frame
+					if (item_begin < xSliderTotal && item_begin > prev) { // make sure there is at least one frame difference to current frame
 						prev = item_begin;
 #ifdef DEBUG_JP2K
 						qDebug() << "update prev.";
 #endif
 					}
+				}
 			}
 		}
 	}

@@ -432,6 +432,8 @@ struct VideoResource {
 	QSharedPointer<AssetMxfTrack> asset; // pointer to asset
 	qint64 in; // in-point
 	qint64 out; // out-point
+	qint64 Duration;
+	int RepeatCount;
 };
 // (k) - end
 

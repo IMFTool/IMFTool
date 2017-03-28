@@ -97,6 +97,12 @@ public:
 	int ImageSequenceIndex; // (k)
 	int SubtitlesSequenceIndex; // (k)
 	Timecode lastPosition; // (k)
+	void getVerticalIndicator() { 
+		if (lastPosition.IsValid()) {
+			rCurrentFrameChanged(lastPosition);
+		}
+	}; // (k)
+
 	GraphicsWidgetComposition* GetComposition() { return mpCompositionScene->GetComposition(); } // (k)
 
 	//! Writes a minimalistic CPL
@@ -105,7 +111,7 @@ public:
 signals:
 	void FrameInicatorActive(bool active);
 	void CurrentAudioChanged(const QSharedPointer<AssetMxfTrack> &rAsset, const Duration &rOffset, const Timecode &rTimecode);
-	void CurrentVideoChanged(const QSharedPointer<AssetMxfTrack> &rAsset, const Duration &rOffset, const Timecode &rTimecode, const int &playlist_index);
+	void CurrentVideoChanged(const QSharedPointer<AssetMxfTrack> &rAsset, const qint64 &rOffset, const Timecode &rTimecode, const int &playlist_index);
 	void PlaylistFinished();
 
 	public slots:
@@ -118,7 +124,6 @@ signals:
 	void DeleteTrackRequest(int trackIndex);
 	void DeleteTrackRequest(const QUuid &rId);
 	void setVerticalIndicator(qint64); // (k)
-	void getVerticalIndicator() { if (lastPosition.IsValid()) rCurrentFrameChanged(lastPosition); }; // (k)
 
 	private slots:
 	void rCurrentFrameChanged(const Timecode &rCplTimecode);

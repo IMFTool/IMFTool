@@ -391,6 +391,7 @@ typedef struct {
 	QVector<TTMLelem> items;
 	QString doc; // serialized ttml document
 	int track_index;
+	int RepeatCount;
 } TTMLtimelineResource;
 
 typedef struct {

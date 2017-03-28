@@ -132,7 +132,7 @@ void JP2K_Preview::setUp() {
 void JP2K_Preview::getProxy() {
 
 	cpus = 1; // (default for proxys)
-	convert_to_709 = true; // (default for proxys)
+	convert_to_709 = false; // (default for proxys)
 	params.cp_reduce = 4; // (default for proxy)
 
 	setAsset(); // initialize reader
@@ -354,7 +354,6 @@ bool JP2K_Preview::decodeImage() {
 	{
 		OPENJPEG_H::opj_stream_destroy(pStream);
 		OPENJPEG_H::opj_destroy_codec(pDecompressor);
-		OPENJPEG_H::opj_image_destroy(psImage);
 		msg = "Failed to read image header!"; // ERROR
 		err = true;
 		psImage = NULL; // reset decoded output stream
