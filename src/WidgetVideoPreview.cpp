@@ -318,7 +318,7 @@ void WidgetVideoPreview::xPosChanged(const QSharedPointer<AssetMxfTrack> &rAsset
 			decoders[run]->asset = currentAsset; // set new asset in current decoder
 			//decoders[run]->frameNr = xSliderFrame; // set current frame number in decoder
 			VideoResource vr = currentPlaylist[current_playlist_index];
-			decoders[run]->frameNr = vr.in + (xSliderFrame - vr.in) % vr.Duration; // set current frame number in decoder
+			decoders[run]->mFrameNr = vr.in + (xSliderFrame - vr.in) % vr.Duration; // set current frame number in decoder
 			decodingThreads[run]->start(QThread::HighestPriority); // start decoder
 			decoding_time->setText("loading...");
 		}
@@ -344,7 +344,7 @@ void WidgetVideoPreview::decodingStatus(qint64 frameNr,QString status) {
 		decoders[run]->asset = currentAsset; // set new asset in current decoder
 		//decoders[run]->frameNr = xSliderFrame; // set frame number in decoder
 		VideoResource vr = currentPlaylist[current_playlist_index];
-		decoders[run]->frameNr = vr.in + (xSliderFrame - vr.in) % vr.Duration; // set current frame number in decoder
+		decoders[run]->mFrameNr = vr.in + (xSliderFrame - vr.in) % vr.Duration; // set current frame number in decoder
 		player->setPos(xSliderFrame, xSliderTotal, current_playlist_index); // set current frame in player
 
 		decodingThreads[run]->start(QThread::HighestPriority); // start decoder
@@ -385,7 +385,7 @@ void WidgetVideoPreview::rPlayPauseButtonClicked(bool checked) {
 		emit ttmlChanged(QVector<visibleTTtrack>(), ttml_search_time.elapsed()); // clear subtitle preview
 	}else
 	{
-		decoding_time->setText("Player could not be started!");
+		decoding_time->setText("Player could not be started - please open a CPL with a video track first!");
 	}
 }
 
@@ -470,7 +470,7 @@ void WidgetVideoPreview::setPlaylist(QVector<VideoResource> &rPlayList, QVector<
 		now_running = !now_running; // use same decoder (relevant frame is still set)
 		decoders[0]->asset = currentAsset; // set new asset in decoder 1
 		decoders[1]->asset = currentAsset; // set new asset in decoder 2
-		decoders[(int)(now_running)]->frameNr = rPlayList[0].in; // set first frame
+		decoders[(int)(now_running)]->mFrameNr = rPlayList[0].in; // set first frame
 		decodingThreads[(int)(now_running)]->start(QThread::HighestPriority); // start decoder (again)
 
 		if (showTTML) getTTML(); // look for TTML

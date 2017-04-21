@@ -45,18 +45,18 @@ JP2K_Preview::~JP2K_Preview()
 
 void JP2K_Preview::setUp() {
 
-	decode_time.start();
+	mDecode_time.start();
 
 	params.cp_reduce = 3; // (default)
-	cpus = opj_get_num_cpus();
+	mCpus = opj_get_num_cpus();
 
 	pDecompressor = OPENJPEG_H::opj_create_decompress(OPJ_CODEC_J2K);
 
-	opj_codec_set_threads(pDecompressor, cpus);
+	opj_codec_set_threads(pDecompressor, mCpus);
 
 	// Setup the decoder (first time), using user parameters
 	if (!OPENJPEG_H::opj_setup_decoder(pDecompressor, &params)) {
-		msg = "Error setting up decoder!"; // ERROR
+		mMsg = "Error setting up decoder!"; // ERROR
 		opj_destroy_codec(pDecompressor);
 	}
 
@@ -85,12 +85,7 @@ void JP2K_Preview::setUp() {
 		float input = (float)(i / max_f_); // convert input to value between 0...1
 
 		// BT.709 - OETF
-		if (input < 0.018) {
-			oetf_709[i] = 4.5 * input;
-		}
-		else {
-			oetf_709[i] = 1.099 * pow(input, 0.45) - 0.099;
-		}
+		oetf_709[i] = pow(input, 1.0f / 2.4f);
 
 		/*
 		// BT.709 - EOTF
@@ -131,7 +126,7 @@ void JP2K_Preview::setUp() {
 
 void JP2K_Preview::getProxy() {
 
-	cpus = 1; // (default for proxys)
+	mCpus = 1; // (default for proxys)
 	convert_to_709 = false; // (default for proxys)
 	params.cp_reduce = 4; // (default for proxy)
 
@@ -139,7 +134,7 @@ void JP2K_Preview::getProxy() {
 	QImage p1, p2;
 
 	// FIRST PROXY
-	if (!err && extractFrame(first_proxy)) { // frame extraction was successfull -> decode frame
+	if (!err && extractFrame(mFirst_proxy)) { // frame extraction was successfull -> decode frame
 		if (decodeImage()) { // try to decode image
 			p1 = DataToQImage();
 			cleanUp();
@@ -153,7 +148,7 @@ void JP2K_Preview::getProxy() {
 	}
 	
 	// SECOND PROXY
-	if (!err && extractFrame(second_proxy)) { // frame extraction was successfull -> decode frame
+	if (!err && extractFrame(mSecond_proxy)) { // frame extraction was successful -> decode frame
 		if (decodeImage()) { // try to decode image
 			p2 = DataToQImage();
 			cleanUp();
@@ -230,28 +225,28 @@ void JP2K_Preview::setAsset() {
 			//P365 is 4:4:4 only
 			break;
 		default:
-			msg = "Unknown color encoding"; // ERROR
+			mMsg = "Unknown color encoding"; // ERROR
 			err = true;
 			break; // abort!
 		}
 
-		if (mxf_path != "") { // close old asset/reader
+		if (mMxf_path != "") { // close old asset/reader
 			reader->Close();
 			reader->~MXFReader();
 		}
 
-		mxf_path = asset->GetPath().absoluteFilePath(); // get new path
+		mMxf_path = asset->GetPath().absoluteFilePath(); // get new path
 
 		reader = new AS_02::JP2K::MXFReader(); // create new reader
 
-		Result_t result_o = reader->OpenRead(mxf_path.toStdString()); // open file for reading
+		Result_t result_o = reader->OpenRead(mMxf_path.toStdString()); // open file for reading
 		if (!ASDCP_SUCCESS(result_o)) {
-			msg = QString("Failed to init. reader: %1").arg(result_o.Message()); // ERROR
+			mMsg = QString("Failed to init. reader: %1").arg(result_o.Message()); // ERROR
 			err = true;
 		}
 	}
 	else {
-		msg = "Asset is invalid!"; // ERROR
+		mMsg = "Asset is invalid!"; // ERROR
 		err = true;
 	}
 }
@@ -259,7 +254,7 @@ void JP2K_Preview::setAsset() {
 void JP2K_Preview::decode() {
 
 #ifdef DEBUG_JP2K
-	qDebug() << "begin decoding image nr. " << frameNr;
+	qDebug() << "begin decoding image nr. " << mFrameNr;
 #endif
 
 	//register callbacks (for debugging)
@@ -270,35 +265,35 @@ void JP2K_Preview::decode() {
 #endif
 
 	err = false; // reset
-	decode_time.restart(); // start calculating decode time
+	mDecode_time.restart(); // start calculating decode time
 
 	if (operator!=(asset, current_asset) || !asset) { // asset changed!!
 		setAsset();
 	}
 
-	if (!err && extractFrame(frameNr)) { // frame extraction was successfull -> decode frame
+	if (!err && extractFrame(mFrameNr)) { // frame extraction was successfull -> decode frame
 
 		// try to decode image
 		if (decodeImage() && !err) {
 
 			emit ShowFrame(DataToQImage());
 
-			if (!err) msg = QString("Decoded frame %1 in %2 ms").arg(frameNr).arg(decode_time.elapsed()); // no error
+			if (!err) mMsg = QString("Decoded frame %1 in %2 ms").arg(mFrameNr).arg(mDecode_time.elapsed()); // no error
 
-			emit decodingStatus(frameNr, msg);
+			emit decodingStatus(mFrameNr, mMsg);
 			QApplication::processEvents();
 			cleanUp();
 			emit finished();
 		}
 		else { // error decoding image
 			emit ShowFrame(QImage(":/frame_error.png"));
-			emit decodingStatus(frameNr, msg);
+			emit decodingStatus(mFrameNr, mMsg);
 			emit finished();
 		}
 	}
 	else {
 		emit ShowFrame(QImage(":/frame_blank.png")); // show empty image
-		emit decodingStatus(frameNr, msg);
+		emit decodingStatus(mFrameNr, mMsg);
 		emit finished();
 	}
 }
@@ -313,13 +308,13 @@ bool JP2K_Preview::extractFrame(qint64 frameNr) {
 		if (ASDCP_SUCCESS(reader->AS02IndexReader().Lookup(frameNr, IndexF1))) { // current frame
 			if (!ASDCP_SUCCESS(buff->Capacity((IndexF2.StreamOffset - IndexF1.StreamOffset) - 20))) { // set buffer size
 
-				msg = QString("Could not set FrameBuffer size to: %1").arg((IndexF2.StreamOffset - IndexF1.StreamOffset) - 20); // ERROR
+				mMsg = QString("Could not set FrameBuffer size to: %1").arg((IndexF2.StreamOffset - IndexF1.StreamOffset) - 20); // ERROR
 				err = true;
 				return false;
 			}
 		}
 		else {
-			msg = QString("Frame does not exist: %1").arg(frameNr); // ERROR
+			mMsg = QString("Frame does not exist: %1").arg(frameNr); // ERROR
 			err = true;
 			return false;
 		}
@@ -335,7 +330,7 @@ bool JP2K_Preview::extractFrame(qint64 frameNr) {
 		return true;
 	}
 	else {
-		msg = "Error reading frame!"; // ERROR
+		mMsg = "Error reading frame!"; // ERROR
 		err = true;
 		return false;
 	}
@@ -354,7 +349,7 @@ bool JP2K_Preview::decodeImage() {
 	{
 		OPENJPEG_H::opj_stream_destroy(pStream);
 		OPENJPEG_H::opj_destroy_codec(pDecompressor);
-		msg = "Failed to read image header!"; // ERROR
+		mMsg = "Failed to read image header!"; // ERROR
 		err = true;
 		psImage = NULL; // reset decoded output stream
 
@@ -370,7 +365,7 @@ bool JP2K_Preview::decodeImage() {
 
 			psImage = NULL; // reset decoded output stream
 			pDecompressor = OPENJPEG_H::opj_create_decompress(OPJ_CODEC_J2K); // create new decompresser
-			msg = "Failed to decode image!"; // ERROR
+			mMsg = "Failed to decode image!"; // ERROR
 			err = true;
 			return false;
 		}
@@ -380,7 +375,7 @@ bool JP2K_Preview::decodeImage() {
 		}
 	}
 
-	msg = "There was an error decoding the image";
+	mMsg = "There was an error decoding the image";
 	err = true;
 	return false;
 }
@@ -399,7 +394,7 @@ void JP2K_Preview::cleanUp() {
 		opj_destroy_codec(pDecompressor);
 	}
 
-	opj_codec_set_threads(pDecompressor, cpus); // set nr. of cores in new decoder
+	opj_codec_set_threads(pDecompressor, mCpus); // set nr. of cores in new decoder
 }
 
 void JP2K_Preview::save2File() {
@@ -441,9 +436,9 @@ QImage JP2::DataToQImage()
 
 					//WR
 					if (ComponentMinRef && ComponentMaxRef) { // QE.2 If ComponentMinRef is != 0, it's Legal Range. Don't convert if ComponentMaxRef is (accidentally) zero, or not set.
-						r = (r - ComponentMaxRef) / (ComponentMaxRef - ComponentMinRef) * maxcv;
-						g = (g - ComponentMaxRef) / (ComponentMaxRef - ComponentMinRef) * maxcv;
-						b = (b - ComponentMaxRef) / (ComponentMaxRef - ComponentMinRef) * maxcv;
+						r = (r - ComponentMinRef) / (ComponentMaxRef - ComponentMinRef) * maxcv;
+						g = (g - ComponentMinRef) / (ComponentMaxRef - ComponentMinRef) * maxcv;
+						b = (b - ComponentMinRef) / (ComponentMaxRef - ComponentMinRef) * maxcv;
 						if (r < 0) r = 0;
 						if (g < 0) g = 0;
 						if (b < 0) b = 0;
@@ -756,16 +751,16 @@ opj_stream_t* JP2::opj_stream_create_default_memory_stream(opj_memory_stream* p_
 	return l_stream;
 }
 
-void JP2::info_callback(const char *msg, void *client_data) {
-	qDebug() << "INFO" << msg;
+void JP2::info_callback(const char *mMsg, void *client_data) {
+	qDebug() << "INFO" << mMsg;
 }
 
-void JP2::warning_callback(const char *msg, void *client_data) {
-	qDebug() << "WARNING" << msg;
+void JP2::warning_callback(const char *mMsg, void *client_data) {
+	qDebug() << "WARNING" << mMsg;
 }
 
-void JP2::error_callback(const char *msg, void *client_data) {
-	qDebug() << "ERROR" << msg;
+void JP2::error_callback(const char *mMsg, void *client_data) {
+	qDebug() << "ERROR" << mMsg;
 }
 
 

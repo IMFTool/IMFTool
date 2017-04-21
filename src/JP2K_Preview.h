@@ -111,18 +111,18 @@ private:
 	bool extractFrame(qint64 frameNr);
 	void save2File(); // save JP2K bytestream to file
 	
-	int cpus = 0; // nr of threads used for decoding
-	QTime decode_time; // time (ms) needed to decode/convert the image
-	QString msg; // error message
-	QString mxf_path; // path to current asset
+	int mCpus = 0; // nr of threads used for decoding
+	QTime mDecode_time; // time (ms) needed to decode/convert the image
+	QString mMsg; // error message
+	QString mMxf_path; // path to current asset
 
 public:
 	JP2K_Preview();
 	~JP2K_Preview();
 
-	qint64 frameNr;
-	qint64 first_proxy;
-	qint64 second_proxy;
+	qint64 mFrameNr;
+	qint64 mFirst_proxy;
+	qint64 mSecond_proxy;
 	QSharedPointer<AssetMxfTrack> asset;
 signals:
 	void proxyFinished(const QImage&, const QImage&); // finished generating proxy

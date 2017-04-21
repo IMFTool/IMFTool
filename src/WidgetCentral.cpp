@@ -153,6 +153,7 @@ void WidgetCentral::InitLyout() {
 	sizes << mpDetailsWidget->sizeHint().height() << -1;
 	p_outer_splitter->setSizes(sizes);
 	p_outer_splitter->setStretchFactor(1, 1);
+	//mpContentVersionListWidget->setFixedHeight(mpDetailsWidget->sizeHint().height());
 
 	QHBoxLayout *p_layout = new QHBoxLayout();
 	p_layout->setContentsMargins(0, 0, 0, 0);
@@ -409,10 +410,16 @@ void WidgetCentral::SaveAllCpl() const {
 	for(int i = 0; i < mpTabWidget->count(); i++) {
 		//QSharedPointer<AssetCpl> asset_cpl = this->GetMpImfPackage()->GetAsset(0).objectCast<AssetCpl>();
 		WidgetComposition *p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->widget(i));
-		QSharedPointer<AssetCpl> asset_cpl = this->GetMpImfPackage()->GetAsset(p_composition->GetCplAssetId()).objectCast<AssetCpl>();
+		if (p_composition) {
+			QSharedPointer<AssetCpl> asset_cpl = this->GetMpImfPackage()->GetAsset(p_composition->GetCplAssetId()).objectCast<AssetCpl>();
 
-		if (asset_cpl->GetIsNewOrModified()) SaveCpl(i);
-		if (asset_cpl->GetIsNewOrModified()) qDebug() << "asset_cpl->GetIsNewOrModified";
+			if (asset_cpl) {
+				if (asset_cpl->GetIsNewOrModified()) SaveCpl(i);
+				if (asset_cpl->GetIsNewOrModified()) qDebug() << "asset_cpl->GetIsNewOrModified";
+			} else {
+				qDebug() << "Asset doesn't exist";
+			}
+		}
 	}
 	//WR begin
 	emit SaveAllCplFinished();

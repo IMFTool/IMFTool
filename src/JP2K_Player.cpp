@@ -50,13 +50,8 @@ JP2K_Player::JP2K_Player() {
 
 		float input = (float)(i / max_f_); // convert input to value between 0...1
 
-		// BT.709 - OETF
-		if (input < 0.018) {
-			oetf_709[i] = 4.5 * input;
-		}
-		else {
-			oetf_709[i] = 1.099 * pow(input, 0.45) - 0.099;
-		}
+		// BT.709 - OETF (Inverse of BT.1886 EOTF)
+		oetf_709[i] = pow(input, 1.0f / 2.4f);
 
 		// BT.2020 - EOTF
 		if (input < (4.5 * beta)) {

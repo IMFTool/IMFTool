@@ -1,17 +1,17 @@
 # IMFTool
 A tool for editing IMF CPLs and creating new versions of an existing IMF package
 
-##NEW-NEW
+### NEW
 The latest binary installers are available at
 [Releases](../../releases/)
 
 
-##What is IMF Tool
+## What is IMF Tool
 IMF Tool supports browsing and limited editing of IMF [1] packages (IMPs).
 In particular, it supports the addition and deletion of audio tracks and subtitle tracks (versioning).
 An introductory video is available on YouTube [2].
 
-##Workflows supported:
+## Workflows supported:
 -	Open an IMP, visualize the timeline of the CPL(s) included in the IMP
 -	Add new virtual tracks (limited to audio, subtitles and markers)
 -	Import and wrap audio and timed text resources
@@ -27,22 +27,22 @@ An introductory video is available on YouTube [2].
 -	Outgest will be IMF 1.1 only
 -	Editing of the ContentVersionList element
 
-##CREDITS
+## CREDITS
 The initial development of this tool has kindly been sponsored by Netflix Inc.
 
-##What IMF Tool NOT is
+## What IMF Tool NOT is
 An IMF Authoring Tool. For creating IMF packages, please check for the wide variety of commercial solutions available on the market.
 
-##Binary installers
+## Binary installers
 Please visit
 [Releases](../../releases/)
 to download the latest binary installers.
 
-##Runtime Requirements
+## Runtime Requirements
 -	For creating essence descriptors, IMF Tool uses regxmllib [3] and requires Oracle JDK 1.8 to be installed, and java/java.exe being available in the executable search path. (In particular under Mac OS X, the JRE is not sufficient - you'll have to install the JDK !)
 
-##Building
-IMF Tool is multi-platform and been susccesfully tested to build under Mac OS X 10.10 and 10.11, Windows 7 and Linux 64 bit.
+## Building
+IMF Tool is multi-platform and has been susccesfully built under Mac OS X 10.10 and 10.11, Windows 7 and Linux 64 bit.
 The build system is based on CMake. Please use CMake to create make files and project files for eclipse or Visual Studio. Installation instructions including CMake screenshots are provided as pdf file here.
 Prerequisites:
 -	Qt Version 5.x

@@ -208,7 +208,7 @@ void WidgetImpBrowser::UninstallImp() {
 	} (k) */
 
 	disconnect(mpViewAssets->selectionModel(), NULL, this, NULL);
-	disconnect(mpViewImp, NULL, this, NULL);
+	//disconnect(mpViewImp, NULL, this, NULL);
 	disconnect(mpImfPackage.data(), NULL, this, NULL);
 	emit ImplInstalled(false);
 	emit ImpSaveStateChanged(false);
@@ -248,30 +248,28 @@ void WidgetImpBrowser::rCustomMenuRequested(QPoint pos) {
 		// Over item.
 		if(index.isValid() == true) {
 
-			QAction *remove_action = new QAction(QIcon(":/delete.png"), tr("Remove selected Asset"), this);
-			QAction *delete_action = new QAction(QIcon(":/close.png"), tr("Delete selected Asset"), this);
+			QAction *remove_action = new QAction(QIcon(":/delete.png"), tr("Remove selected Asset from IMP"), this);
+			//QAction *delete_action = new QAction(QIcon(":/close.png"), tr("Delete selected Asset from IMP and from disk"), this);
+			//edit_action disabled, because Empty TT cannot be added afterwards AND assets already dragged into a timeline don't get updated after editing
 			//QAction *edit_action = new QAction(QIcon(":/edit.png"), tr("Edit selected Asset"), this);
-			QAction *edit_action = new QAction(QIcon(":/edit.png"), tr("Edit CPL"), this);
-			QAction *extract_action = new QAction(QIcon(":/attach.png"), tr("Extract ancillary Data"), this);
-			extract_action->setDisabled(true);
+			QAction *open_action = new QAction(QIcon(":/edit.png"), tr("Open CPL"), this);
 			connect(remove_action, SIGNAL(triggered(bool)), this, SLOT(rRemoveSelectedRow()));
-			connect(delete_action, SIGNAL(triggered(bool)), this, SLOT(rDeleteSelectedRow()));
-			connect(edit_action, SIGNAL(triggered(bool)), this, SLOT(rOpenCplTimeline()));
+			//connect(delete_action, SIGNAL(triggered(bool)), this, SLOT(rDeleteSelectedRow()));
+			connect(open_action, SIGNAL(triggered(bool)), this, SLOT(rOpenCplTimeline()));
 			//connect(edit_action, SIGNAL(triggered(bool)), this, SLOT(rShowResourceGeneratorForSelectedRow()));
 			menu.addAction(remove_action);
-			menu.addAction(delete_action);
-			menu.addSeparator();
+			//menu.addAction(delete_action);
+			//menu.addSeparator();
 			//menu.addAction(edit_action);
 			menu.addSeparator();
 			QSharedPointer<Asset> asset = mpImfPackage->GetAsset(mpSortProxyModelImp->mapToSource(index).row());
 			if(asset) {
 				//if(asset->Exists() == true) edit_action->setDisabled(true);
-				if(asset->Exists() == false) delete_action->setDisabled(true);
+				//if(asset->Exists() == false) delete_action->setDisabled(true);
 				if(asset->Exists() == true && asset->GetType() == Asset::cpl)
-					menu.addAction(edit_action);
+					menu.addAction(open_action);
 				if(asset->Exists() == true && asset->GetType() == Asset::mxf) {
 					QSharedPointer<AssetMxfTrack> mxf_asset = asset.staticCast<AssetMxfTrack>();
-					menu.addAction(extract_action);
 				}
 			}
 		}

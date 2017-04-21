@@ -911,11 +911,11 @@ void GraphicsWidgetVideoResource::RefreshProxy() {
 
 	// first proxy
 	Timecode first_frame = GetFirstVisibleFrame();
-	mpJP2K->first_proxy = first_frame.GetTargetFrame(); // set frame number
+	mpJP2K->mFirst_proxy = first_frame.GetTargetFrame(); // set frame number
 
 	// second proxy
 	Timecode last_frame = GetLastVisibleFrame();
-	mpJP2K->second_proxy = last_frame.GetTargetFrame(); // set frame number
+	mpJP2K->mSecond_proxy = last_frame.GetTargetFrame(); // set frame number
 
 	// start decoding process
 	decodeProxyThread->start(QThread::LowPriority);
