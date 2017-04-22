@@ -9,7 +9,7 @@ The latest binary installers are available at
 ## What is IMF Tool
 IMF Tool supports browsing and limited editing of IMF [1] packages (IMPs).
 In particular, it supports the addition and deletion of audio tracks and subtitle tracks (versioning).
-An introductory video is available on YouTube [2].
+Introductory videos are available on YouTube [2], [3].
 
 ## Workflows supported:
 -	Open an IMP, visualize the timeline of the CPL(s) included in the IMP
@@ -39,7 +39,7 @@ Please visit
 to download the latest binary installers.
 
 ## Runtime Requirements
--	For creating essence descriptors, IMF Tool uses regxmllib [3] and requires Oracle JDK 1.8 to be installed, and java/java.exe being available in the executable search path. (In particular under Mac OS X, the JRE is not sufficient - you'll have to install the JDK !)
+-	For creating essence descriptors, IMF Tool uses regxmllib [4] and requires Oracle JDK 1.8 to be installed, and java/java.exe being available in the executable search path. (In particular under Mac OS X, the JRE is not sufficient - you'll have to install the JDK !)
 
 ## Building
 IMF Tool is multi-platform and has been susccesfully built under Mac OS X 10.10 and 10.11, Windows 7 and Linux 64 bit.
@@ -68,6 +68,8 @@ http://techblog.netflix.com/2016/03/imf-prescription-for-versionitis.html
 
 [2] IMF-Tool introductory video: https://www.youtube.com/watch?v=Zi3p8oElPM8
 
-[3] regxmllib: https://github.com/sandflow/regxmllib
+[3] IMF-Tool introductory video Part 2: https://www.youtube.com/watch?v=k6OIx7WfF8s
+
+[4] regxmllib: https://github.com/sandflow/regxmllib
 
 
