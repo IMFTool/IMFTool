@@ -87,6 +87,7 @@ void WidgetVideoPreview::InitLayout() {
 	connect(player, SIGNAL(showFrame(const QImage&)), mpImagePreview, SLOT(ShowImage(const QImage&))); // player -> glWidget
 	connect(decoders[0], SIGNAL(ShowFrame(const QImage&)), mpImagePreview, SLOT(ShowImage(const QImage&))); // decoder -> glWidget
 	connect(decoders[1], SIGNAL(ShowFrame(const QImage&)), mpImagePreview, SLOT(ShowImage(const QImage&))); // decoder -> glWidget
+	connect(mpImagePreview, SIGNAL(keyPressed(QKeyEvent*)), this, SLOT(keyPressEvent(QKeyEvent*)));
 
 	// create menue bar
 	menuBar = new QMenuBar(this);
@@ -210,9 +211,17 @@ void WidgetVideoPreview::InitLayout() {
 	decoding_time->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	connect(player, SIGNAL(playerInfo(const QString&)), decoding_time, SLOT(setText(const QString&)));
 
+	// full screen
+	menuView = new QMenu(tr("View"));
+	menuBar->addMenu(menuView);
+	menuView->addAction("Toggle fullscreen");
+	connect(menuView, SIGNAL(triggered(QAction*)), this, SLOT(rViewFullScreen(void)));
+
+
 	p_layout->addWidget(decoding_time, 2, 4, 1, 1);
 	
 	setLayout(p_layout);
+	setFocusPolicy(Qt::ClickFocus);
 }
 
 void WidgetVideoPreview::forwardPlayerPosition(qint64 frameNr, bool decode_at_new_pos) {
@@ -240,6 +249,10 @@ void WidgetVideoPreview::stopPlayback(bool clicked) {
 	if(currentPlaylist.length() > 0) decodingFrame = -1; // force preview refresh
 	setFrameIndicator = false;
 	emit currentPlayerPosition(0); // reset indicator to first frame
+}
+
+void WidgetVideoPreview::rViewFullScreen() {
+	mpImagePreview->toggleFullScreen();
 }
 
 // show message box & handle input
@@ -393,6 +406,12 @@ void WidgetVideoPreview::keyPressEvent(QKeyEvent *pEvent) {
 
 	if(pEvent->key() == Qt::Key_Space) {
 		rPlayPauseButtonClicked(false);
+	}
+	else if(pEvent->key() == Qt::Key_K) {
+		if (player->playing) rPlayPauseButtonClicked(false);
+	}
+	else if(pEvent->key() == Qt::Key_L) {
+		if (!player->playing) rPlayPauseButtonClicked(false);
 	}
 }
 

@@ -32,7 +32,7 @@
 #define MAX_DEBUG_FILE_SIZE 1000 // [Byte]
 #define ASSET_SEARCH_NAME "ASSETMAP.xml" // never ever change this
 #define VOLINDEX_SEARCH_NAME "VOLINDEX.xml" // never ever change this
-#define CREATOR_STRING PROJECT_NAME VERSION_MAJOR "." VERSION_MINOR "." VERSION_PATCH
+#define CREATOR_STRING PROJECT_NAME " " VERSION_MAJOR "." VERSION_MINOR "." VERSION_PATCH
 #define MIME_TYPE_MXF "application/mxf"
 #define MIME_TYPE_XML "text/xml"
 #define WELL_KNOWN_MARKER_LABEL_SCOPE_2013 "http://www.smpte-ra.org/schemas/2067-3/2013#standard-markers"

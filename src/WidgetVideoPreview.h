@@ -65,7 +65,8 @@ private slots:
 	void rPlaybackEnded();
 	void decodingStatus(qint64, QString);
 	void stopPlayback(bool clicked);
-protected:
+	void rViewFullScreen();
+public slots:
 	virtual void keyPressEvent(QKeyEvent *pEvent);
 
 private:
@@ -91,6 +92,8 @@ private:
 	QMenu *menuQuality;
 	QAction *qualities[5];
 	QMenu *menuProcessing;
+	QMenu *menuView;
+	QAction *view_actions[1];
 	QMenu *processing_extract;
 	QStringList *processing_extract_names;
 	QAction *processing_extract_actions[15];

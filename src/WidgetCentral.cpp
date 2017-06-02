@@ -81,6 +81,16 @@ void WidgetCentral::InitLyout() {
 	//WR
 	mpContentVersionListWidget = new WidgetContentVersionList(this);
 	mpContentVersionListWidget->setDisabled(true);
+	QWidget* p_content_version_list_widget = new QWidget();
+	QScrollArea* p_content_version_list_scroll_area = new QScrollArea();
+	p_content_version_list_scroll_area->setWidgetResizable(true);
+	QVBoxLayout *p_content_version_list_layout = new QVBoxLayout();
+	//mpContentVersionListWidget->setFixedHeight(mpDetailsWidget->sizeHint().height());
+	p_content_version_list_layout->addWidget(mpContentVersionListWidget);
+	p_content_version_list_layout->addStretch();
+	p_content_version_list_layout->setSizeConstraint(QLayout::SetMinAndMaxSize);
+	p_content_version_list_widget->setLayout(p_content_version_list_layout);
+	p_content_version_list_scroll_area->setWidget(p_content_version_list_widget);
 	//QFrame *p_version_widget_frame = new QFrame(this);
 	//p_version_widget_frame->setFrameStyle(QFrame::StyledPanel);
 	//QHBoxLayout *p_version_widget_frame_layout = new QHBoxLayout();
@@ -121,12 +131,11 @@ void WidgetCentral::InitLyout() {
 	p_tab_detail_widget_frame_layout->addWidget(mpTabDetailTTML);
 	p_tab_detail_widget_frame->setLayout(p_tab_detail_widget_frame_layout);
 
-
-
 	mpTabDetailTTML->addTab(mpDetailsWidget, "Details"); // add to layout
 	mpTTMLDetailsWidget = new WidgetTimedTextPreview(this);
-	mpTabDetailTTML->addTab(mpContentVersionListWidget, "ContentVersionList"); // add to layout
-	mpTabDetailTTML->addTab(mpLocaleListWidget, "LocaleList"); // add to layout
+	mpTabDetailTTML->addTab(p_content_version_list_scroll_area, "ContentVersionList"); // add to layout
+	int tabNumber = mpTabDetailTTML->addTab(mpLocaleListWidget, "LocaleList"); // add to layout
+	mpTabDetailTTML->setTabToolTip(tabNumber, "Use right-click to add/delete items, double click to edit values");
 	mpTabDetailTTML->addTab(mpTTMLDetailsWidget, "TTML"); // add to layout
 	connect(mpTTMLDetailsWidget->show_regions, SIGNAL(stateChanged(int)), mpPreview, SIGNAL(regionOptionsChanged(int)));
 
@@ -153,7 +162,6 @@ void WidgetCentral::InitLyout() {
 	sizes << mpDetailsWidget->sizeHint().height() << -1;
 	p_outer_splitter->setSizes(sizes);
 	p_outer_splitter->setStretchFactor(1, 1);
-	//mpContentVersionListWidget->setFixedHeight(mpDetailsWidget->sizeHint().height());
 
 	QHBoxLayout *p_layout = new QHBoxLayout();
 	p_layout->setContentsMargins(0, 0, 0, 0);
@@ -265,10 +273,6 @@ void WidgetCentral::rCurrentChanged(int tabWidgetIndex) {
 
 void WidgetCentral::rTabCloseRequested(int index) {
 
-	mpTTMLDetailsWidget->ClearTTML(); // (k) - clear ttml view
-	ttmls = QVector<TTMLtimelineResource>(); // (k) - clear ttml list
-	playlist = QVector<VideoResource>(); // (k) - clear video playlist
-	mpPreview->setPlaylist(playlist, ttmls); // (k) - clear playlist
 
 	WidgetComposition *p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->widget(index));
 	if(p_composition) {
@@ -284,6 +288,15 @@ void WidgetCentral::rTabCloseRequested(int index) {
 			}
 			else if(ret == QMessageBox::Cancel) { return; }
 		}
+		mpDetailsWidget->Clear();
+		//mpContentVersionListWidget->setDisabled(true);
+		mpContentVersionListWidget->Clear();
+		//mpLocaleListWidget->setDisabled(true);
+		mpLocaleListWidget->Clear();
+		mpTTMLDetailsWidget->ClearTTML(); // (k) - clear ttml view
+		ttmls = QVector<TTMLtimelineResource>(); // (k) - clear ttml list
+		playlist = QVector<VideoResource>(); // (k) - clear video playlist
+		mpPreview->setPlaylist(playlist, ttmls); // (k) - clear playlist
 		mpTabWidget->removeTab(mpTabWidget->indexOf(p_composition));
 
 		p_composition->deleteLater();
@@ -334,9 +347,9 @@ void WidgetCentral::InstallImp(const QSharedPointer<ImfPackage> &rImfPackage) {
 
 	UninstallImp();
 	mpImfPackage = rImfPackage;
-	mpDetailsWidget->setEnabled(true);
-	mpContentVersionListWidget->setEnabled(true);
-	mpLocaleListWidget->setEnabled(true);
+	//mpDetailsWidget->setEnabled(true);
+	//mpContentVersionListWidget->setEnabled(true);
+	//mpLocaleListWidget->setEnabled(true);
 
 	mpPreview->InstallImp(); // set IMP in player (k)
 }

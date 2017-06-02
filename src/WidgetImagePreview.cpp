@@ -22,6 +22,9 @@
 #include "openjpeg.h"
 #include <QOpenGLTexture>
 #include <QFileDialog>
+#include <QKeyEvent>
+#include <QWindow>
+
 
 WidgetImagePreview::WidgetImagePreview() {
 
@@ -41,6 +44,7 @@ void WidgetImagePreview::InitLayout() {
 
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	setAutoFillBackground(false);
+	setFocusPolicy(Qt::ClickFocus);
 }
 
 QSize WidgetImagePreview::sizeHint() const {
@@ -168,6 +172,21 @@ void WidgetImagePreview::paintRegions(QPainter &painter, const QRect rect_viewpo
 	}
 }
 
+void WidgetImagePreview::toggleFullScreen() {
+
+	if (isFullScreen() == false) {
+		setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
+		auto const desktop(QApplication::desktop());
+		setGeometry(desktop->screenGeometry(desktop->numScreens() - 1));
+		windowHandle()->setScreen(qApp->screens()[desktop->numScreens() - 1]);
+		showFullScreen();
+	}
+	else {
+		setWindowFlags(Qt::Widget);
+		showNormal();
+	}
+}
+
 void WidgetImagePreview::initializeGL() {
 
 	QOpenGLFunctions *f = context()->functions();
@@ -176,15 +195,8 @@ void WidgetImagePreview::initializeGL() {
 }
 
 void WidgetImagePreview::mouseDoubleClickEvent(QMouseEvent *pEvent) {
-
-	if (isFullScreen() == false) {
-		setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
-		showFullScreen();
-	}
-	else {
-		setWindowFlags(Qt::Widget);
-		showNormal();
-	}
+	toggleFullScreen();
+	return;
 }
 
 void WidgetImagePreview::ShowImage(const QImage &rImage) {
@@ -199,6 +211,19 @@ void WidgetImagePreview::Clear() {
 	mImage = nullimage;
 	repaint();
 }
+
+void WidgetImagePreview::keyPressEvent(QKeyEvent *pEvent) {
+
+	if (pEvent->key() == Qt::Key_Escape) {
+		if (isFullScreen() == true) {
+			setWindowFlags(Qt::Widget);
+			showNormal();
+		}
+		return;
+	}
+	emit keyPressed(pEvent);
+}
+
 
 void WidgetImagePreview::setSmoothing(bool rsmooth) {
 	smooth = rsmooth;

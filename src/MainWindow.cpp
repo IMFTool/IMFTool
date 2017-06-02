@@ -61,6 +61,9 @@ QMainWindow(pParent) {
 	} else {
 		error = Error(Error::ExitStatusError);
 	}
+	if (myProcess->error() == QProcess::FailedToStart) {
+		error = Error(Error::Unknown);
+	}
 
 	try {
 		qresult = myProcess->readAllStandardError();

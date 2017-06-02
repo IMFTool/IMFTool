@@ -81,6 +81,7 @@ void WidgetCompositionInfo::InitLayout() {
 	p_layout->addWidget(p_issue_date, 6, 1, 1, 1);
 	p_layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding), 7, 0, 1, 2);
 	setLayout(p_layout);
+	this->setEnabled(false);
 }
 
 void WidgetCompositionInfo::SetComposition(WidgetComposition *pComposition) {
@@ -88,6 +89,7 @@ void WidgetCompositionInfo::SetComposition(WidgetComposition *pComposition) {
 	mpProxyModel->SetUndoStack(pComposition->GetUndoStack());
 	mpModel->SetComposition(pComposition);
 	mpMapper->toFirst();
+	this->setEnabled(true);
 }
 
 void WidgetCompositionInfo::Clear() {
@@ -95,6 +97,7 @@ void WidgetCompositionInfo::Clear() {
 	mpProxyModel->SetUndoStack(NULL);
 	mpModel->SetComposition(NULL);
 	mpMapper->toFirst();
+	this->setEnabled(false);
 }
 
 CompositionInfoModel::CompositionInfoModel(QObject *pParent /*= NULL*/) :

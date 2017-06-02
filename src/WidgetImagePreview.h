@@ -49,10 +49,16 @@ public slots:
 	void paintRegions(QPainter &painter, const QRect rect_viewport, const QSize frame_size);
 	void InitLayout();
 	void regionOptionsChanged(int);
+	void toggleFullScreen();
+
+signals:
+	void keyPressed(QKeyEvent *pEvent);
+
 protected:
 
 	virtual void initializeGL();
 	virtual void mouseDoubleClickEvent(QMouseEvent *pEvent);
+	virtual void keyPressEvent(QKeyEvent *pEvent);
 
 private:
 	Q_DISABLE_COPY(WidgetImagePreview);

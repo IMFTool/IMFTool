@@ -40,9 +40,12 @@ void WidgetContentVersionList::InitLayout() {
 	p_layout = new QGridLayout();
 	p_layout->setVerticalSpacing(3);
 	setLayout(p_layout);
+	this->setEnabled(false);
 }
 
 void WidgetContentVersionList::SetComposition(WidgetComposition *pComposition) {
+
+	if (pComposition == 0) return;
 
 	mpProxyModel->SetUndoStack(pComposition->GetUndoStack());
 	mpUndoStack = pComposition->GetUndoStack();
@@ -58,10 +61,12 @@ void WidgetContentVersionList::SetComposition(WidgetComposition *pComposition) {
 		}
 	}
 
+
 	for (int i = 0; i < content_version_list.count(); i++ ) {
 		QLineEdit *p_id = new QLineEdit(this);
 		//p_id->setEnabled(false);
 		QLineEdit *p_label_text = new QLineEdit(this);
+		p_label_text->setMinimumWidth(350);
 		QPushButton *p_delete_button = new QPushButton("Delete");
 		p_layout->addWidget(new QLabel(tr("Id:")), 3*i, 0, 1, 1);
 		mpMapper->addMapping(p_id, 3*i);
@@ -88,7 +93,9 @@ void WidgetContentVersionList::Clear() {
 	mpProxyModel->SetUndoStack(NULL);
 	mpModel->SetComposition(NULL, NULL);
 	mpMapper->toFirst();
+	//SetComposition(0); Didn't work
 	//delete mpUndoStack;
+	this->setEnabled(false);
 }
 
 void WidgetContentVersionList::slotDeleteClicked() {

@@ -1,4 +1,4 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
+/* Copyright(C) 2017 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
  *
  * This program is free software : you can redistribute it and / or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,5 +18,63 @@
 #include "WidgetLocaleList.h"
 #include "WidgetComposition.h"
 #include <QUndoCommand>
+
+
+class AddLocaleCommand : public QUndoCommand {
+
+public:
+	AddLocaleCommand(const QPointer<WidgetComposition> rpComposition, WidgetLocaleList* rWidget, const int rPos, LocaleListModel *rModel, QUndoCommand *pParent = NULL);
+	virtual ~AddLocaleCommand() {}
+	virtual void undo();
+	//!! Called once when pushed on Undo Stack.
+	virtual void redo();
+
+private:
+	Q_DISABLE_COPY(AddLocaleCommand);
+	const QPointer<WidgetComposition> mpComposition;
+	WidgetLocaleList* mWidget;
+	int mPos;
+	LocaleList mSavedLocaleList;
+};
+
+
+class RemoveLocaleCommand : public QUndoCommand {
+
+public:
+	RemoveLocaleCommand(const QPointer<WidgetComposition> rpComposition, WidgetLocaleList* rWidget, const int rPos, LocaleListModel *rModel, QUndoCommand *pParent = NULL);
+	virtual ~RemoveLocaleCommand() {}
+	virtual void undo();
+	//! Called once when pushed on Undo Stack.
+	virtual void redo();
+
+private:
+	Q_DISABLE_COPY(RemoveLocaleCommand);
+	QPointer<WidgetComposition> mpComposition;
+	WidgetLocaleList* mWidget;
+	LocaleList mSavedLocaleList;
+	int mPos;
+	LocaleListModel *mModel;
+};
+
+class AddItemCommand : public QUndoCommand {
+
+public:
+	AddItemCommand(const QPointer<WidgetComposition> rpComposition, WidgetLocaleList* rWidget, const int rParentRow, const QString rIdentifier, LocaleListModel *rModel, QUndoCommand *pParent = NULL);
+	virtual ~AddItemCommand() {}
+	virtual void undo();
+	//!! Called once when pushed on Undo Stack.
+	virtual void redo();
+
+private:
+	Q_DISABLE_COPY(AddItemCommand);
+	const QPointer<WidgetComposition> mpComposition;
+	WidgetLocaleList* mWidget;
+	//const QModelIndex mIndex;
+	LocaleList mSavedLocaleList;
+	LocaleListModel* mpModel;
+	int mParentRow;
+	QString mIdentifier;
+
+};
 
 

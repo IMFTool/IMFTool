@@ -217,5 +217,72 @@ QList<ContentMaturityRating> ImfXmlHelper::Convert(cpl2016::LocaleType_ContentMa
 	return maturity_sequence;
 }
 
+ cpl2016::LocaleType ImfXmlHelper::Convert(const ::Locale &rLocale) {
+	cpl2016::LocaleType locale;
+	::Locale myLocale = rLocale;
+
+	//Add Annotation
+	locale.setAnnotation(dcml::UserTextType(Convert(myLocale.getAnnotation())));
+
+	//Add LanguageList
+	cpl2016::LocaleType_LanguageListType::LanguageType language;
+	cpl2016::LocaleType_LanguageListType::LanguageSequence languageSequence;
+	cpl2016::LocaleType_LanguageListType languageList;
+	bool languagePresent = false;
+	foreach (QString lang, myLocale.getLanguageList()) {
+		language = cpl2016::LocaleType_LanguageListType::LanguageType(lang.toStdString());
+		if (!lang.isEmpty()) {
+			languageSequence.push_back(language);
+			languagePresent = true;
+		}
+
+	}
+	if (languagePresent) {
+		languageList.setLanguage(languageSequence);
+		locale.setLanguageList(languageList);
+	}
+
+	//Add RegionList
+	cpl2016::LocaleType_RegionListType::RegionType region;
+	cpl2016::LocaleType_RegionListType::RegionSequence regionSequence;
+	cpl2016::LocaleType_RegionListType regionList;
+	bool regionPresent = false;
+	foreach (QString reg, myLocale.getRegionList()) {
+		region = cpl2016::LocaleType_RegionListType::RegionType(reg.toStdString());
+		if (!reg.isEmpty()) {
+			regionSequence.push_back(region);
+			regionPresent = true;
+		}
+	}
+	if (regionPresent) {
+		regionList.setRegion(regionSequence);
+		locale.setRegionList(regionList);
+	}
+
+	//Add ContentMaturityRatingList
+	cpl2016::LocaleType_ContentMaturityRatingListType::ContentMaturityRatingSequence cmrSequence;
+	cpl2016::LocaleType_ContentMaturityRatingListType cmrList;
+	bool cmrPresent = false;
+	foreach (ContentMaturityRating cmr_model, myLocale.getContentMaturityRating()) {
+		cpl2016::LocaleType_ContentMaturityRatingListType::ContentMaturityRatingType
+			cmr(xml_schema::Uri(cmr_model.getAgency().first.toStdString().c_str()), cmr_model.getRating().first.toStdString());
+		//If cmr_model.getAudience().second.toStdString().isEmpty() == true: AudienceType will not be created
+		cmr.setAudience(
+				cpl2016::ContentMaturityRatingType_AudienceType(cmr_model.getAudience().second.toStdString().c_str(), xml_schema::Uri(cmr_model.getAudience().first.toStdString().c_str()))
+		);
+		if (!cmr_model.getRating().first.isEmpty()) {
+			cmrSequence.push_back(cmr);
+			cmrPresent = true;
+		}
+
+	}
+	if (cmrPresent) {
+		cmrList.setContentMaturityRating(cmrSequence);
+		locale.setContentMaturityRatingList(cmrList);
+	}
+
+	return locale;
+}
+
 
 //WR

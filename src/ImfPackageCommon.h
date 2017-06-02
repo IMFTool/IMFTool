@@ -91,6 +91,10 @@ public:
 	QList<QString> getLanguageList() { return mLanguageList; };
 	QList<QString> getRegionList() { return mRegionList; };
 	QList<ContentMaturityRating> getContentMaturityRating() { return mContentMaturityRatingList; };
+	void setAnnotation(UserText rUserText) {mAnnotation = rUserText; };
+	void setLanguageList(QList<QString> rLanguageList) { mLanguageList = rLanguageList; };
+	void setRegionList(QList<QString> rRegionList) { mRegionList = rRegionList; };
+	void setContentMaturityRating(QList<ContentMaturityRating> rContentMaturityRatingList) { mContentMaturityRatingList = rContentMaturityRatingList;} ;
 
 private:
 	UserText mAnnotation;
@@ -465,10 +469,5 @@ public:
 
 	static QList<ContentMaturityRating> Convert(cpl2016::LocaleType_ContentMaturityRatingListType::ContentMaturityRatingSequence rContentMaturityRatingSequence);
 
-	static cpl2016::LocaleType Convert(const ::Locale &rLocale) {
-		cpl2016::LocaleType locale;
-		return locale;
-	}
-
-
+	static cpl2016::LocaleType Convert(const ::Locale &rLocale);
 };
