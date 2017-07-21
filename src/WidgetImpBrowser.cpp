@@ -147,8 +147,9 @@ void WidgetImpBrowser::InitToolbar() {
 	connect(p_add_ttml_resource, SIGNAL(triggered(bool)), this, SLOT(ShowResourceGeneratorTimedTextMode()));
 	//p_add_ttml_resource->setDisabled(true);
 	p_add_track_menu->addSeparator();
-	//QAction *p_add_mxf_resource = p_add_track_menu->addAction(QIcon(":/asset_mxf.png"), tr("MXF Resource"));
-	//connect(p_add_mxf_resource, SIGNAL(triggered(bool)), this, SLOT(ShowResourceGeneratorMxfMode()));
+	QAction *p_add_mxf_resource = p_add_track_menu->addAction(QIcon(":/asset_mxf.png"), tr("MXF Resource"));
+	connect(p_add_mxf_resource, SIGNAL(triggered(bool)), this, SLOT(ShowResourceGeneratorMxfMode()));
+	p_add_mxf_resource->setDisabled(true);
 
 	p_button_add_track->setMenu(p_add_track_menu);
 
@@ -613,7 +614,7 @@ void WidgetImpBrowser::rJobQueueFinished() {
 void WidgetImpBrowser::rImpViewDoubleClicked(const QModelIndex &rIndex) {
 
 	if(mpImfPackage) {
-		qDebug() << "rImpViewDoubleClicked";
+		//qDebug() << "rImpViewDoubleClicked";
 		if(sender() == mpViewImp && rIndex.column() != ImfPackage::ColumnAnnotation) {
 			QModelIndex index = mpSortProxyModelImp->mapToSource(rIndex);
 			if(index.isValid() == true) {
@@ -770,6 +771,23 @@ void WidgetImpBrowser::RecalcHashForCpls() {
 
 void WidgetImpBrowser::SetMxfFile(const QStringList &rFiles) {
 
+		MetadataExtractor extractor;
+		Metadata metadata;
+		extractor.ReadMetadata(metadata, QDir(rFiles.at(0)).absolutePath());
+		qDebug() << metadata.displayWidth << metadata.assetId;
+		QFileInfo path = QFileInfo(QDir(rFiles.at(0)).absolutePath());
+		QSharedPointer<AssetMxfTrack> mxf_asset(new AssetMxfTrack(path, metadata.assetId));
+	  	mxf_asset->SetIsNew(true);
+	  	mpUndoStack->push(new AddAssetCommand(mpImfPackage, mxf_asset, mpImfPackage->GetPackingListId()));
+
+	  	//JobExtractEssenceDescriptor *p_ed_job = new JobExtractEssenceDescriptor(mxf_asset->GetPath().absoluteFilePath());
+		//connect(p_ed_job, SIGNAL(Result(const QString&, const QVariant&)), mxf_asset.data(), SLOT(SetEssenceDescriptor(const QString&)));
+		//mpJobQueue->AddJob(p_ed_job);
+		JobExtractEssenceDescriptor *p_ed_job_c = new JobExtractEssenceDescriptor(mxf_asset->GetPath().absoluteFilePath());
+		connect(p_ed_job_c, SIGNAL(Result(const DOMDocument*, const QVariant&)), mxf_asset.data(), SLOT(SetEssenceDescriptor(const DOMDocument*)));
+		mpJobQueue->AddJob(p_ed_job_c);
+		return;
+
 	mpFileDialog->hide();
 	if(rFiles.isEmpty() == false) {
 		if(is_mxf_file(rFiles.at(0))) {
@@ -785,6 +803,9 @@ void WidgetImpBrowser::SetMxfFile(const QStringList &rFiles) {
 				  //FileInfoWrapper<AS_02::JP2K::MXFReader, MyPictureDescriptor> wrapper;
 				  //result = wrapper.file_info(Options, "JPEG 2000 pictures");
 				  qDebug() << "ASDCP::ESS_AS02_JPEG_2000";
+				  //extractor.ReadJP2KMxfDescriptor(metadata, QDir(rFiles.at(0)).absolutePath());
+				  qDebug() << metadata.displayWidth;
+
 			    }
 
 			//QFileInfo new_asset_path = QFileInfo(GetWorkingDir().absolutePath().append("/").append(rFiles.at(0))); //.c_str()));

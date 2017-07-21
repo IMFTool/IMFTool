@@ -36,6 +36,13 @@
 #include <QVector>
 
 #include "JP2K_Preview.h"
+#include <xercesc/dom/DOM.hpp>
+#include <xercesc/util/PlatformUtils.hpp>
+#include <xercesc/framework/LocalFileFormatTarget.hpp>
+#include <xercesc/parsers/XercesDOMParser.hpp>
+
+XERCES_CPP_NAMESPACE_USE
+
 
 class Asset;
 class AssetMap;
@@ -397,12 +404,14 @@ public:
 	void SetMCAAudioElementKind(const QString &rText) {mMetadata.mcaAudioElementKind = rText;};
 	void SetCplEditRate(const EditRate &rCplEditRate) { mCplEditRate = rCplEditRate;};
 	//This method extracts the essence descriptor from rFilePath and writes it into mEssenceDescriptor
+	//Error ExtractEssenceDescriptor(const QString &filePath);
 	Error ExtractEssenceDescriptor(const QString &filePath);
 	bool GetIsNew() {return mIsNew;}
 	void SetIsNew(bool rIsNew) { mIsNew = rIsNew;}
 
 	public slots:
-	void SetEssenceDescriptor(const QString& qresult);
+	//void SetEssenceDescriptor(const QString& qresult);
+	void SetEssenceDescriptor(const DOMDocument* dom_result);
 	//WR end
 
 	private slots :

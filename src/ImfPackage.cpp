@@ -32,6 +32,16 @@
 #include <xercesc/parsers/XercesDOMParser.hpp>
 #include <xercesc/framework/MemBufInputSource.hpp>
 
+//regxmllibc
+#include <com/sandflow/smpte/regxml/dict/MetaDictionaryCollection.h>
+#include <com/sandflow/smpte/regxml/dict/importers/XMLImporter.h>
+#include <com/sandflow/smpte/regxml/MXFFragmentBuilder.h>
+
+XERCES_CPP_NAMESPACE_USE
+
+using namespace rxml;
+//regxmllibc
+
 //WR end
 
 
@@ -321,14 +331,9 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 													QSharedPointer<AssetMxfTrack> mxf_track(new AssetMxfTrack(new_asset_path, am_asset, pkl_asset));
 													AddAsset(mxf_track, ImfXmlHelper::Convert(packing_list->getId()));
 													//WR
-//#define DEBUG_NOESSENCE_DESCRIPTOR
-#ifdef DEBUG_NOESSENCE_DESCRIPTOR
-													mxf_track->SetEssenceDescriptor("<DEBUG_NOESSENCE_DESCRIPTOR/>");
-#else
-													JobExtractEssenceDescriptor *p_ed_job = new JobExtractEssenceDescriptor(mxf_track->GetPath().absoluteFilePath());
-													connect(p_ed_job, SIGNAL(Result(const QString&, const QVariant&)), mxf_track.data(), SLOT(SetEssenceDescriptor(const QString&)));
-													mpJobQueue->AddJob(p_ed_job);
-#endif
+													JobExtractEssenceDescriptor *p_ed_job_c = new JobExtractEssenceDescriptor(mxf_track->GetPath().absoluteFilePath());
+													connect(p_ed_job_c, SIGNAL(Result(const DOMDocument*, const QVariant&)), mxf_track.data(), SLOT(SetEssenceDescriptor(const DOMDocument*)));
+													mpJobQueue->AddJob(p_ed_job_c);
 													//WR
 												}
 												else if(pkl_asset.getType().compare(MIME_TYPE_XML) == 0) {
@@ -1072,6 +1077,7 @@ void Asset::FileModified() {
 	AssetMxfTrack *assetMxfTrack = dynamic_cast<AssetMxfTrack*>(this);
 	if (assetMxfTrack){
 		//Here we call ExtractEssenceDescriptor, which extracts and sets mEssenceDescriptor
+		//assetMxfTrack->ExtractEssenceDescriptor(QString(this->GetPath().absoluteFilePath()));
 		assetMxfTrack->ExtractEssenceDescriptor(QString(this->GetPath().absoluteFilePath()));
 		qDebug() << "Essence Descriptor updated for " << this->GetPath().absoluteFilePath();
 	}
@@ -1222,7 +1228,7 @@ void AssetMxfTrack::SetDefaultProxyImages() {
 
 //WR begin
 
-Error AssetMxfTrack::ExtractEssenceDescriptor(const QString &filePath) {
+/*Error AssetMxfTrack::ExtractEssenceDescriptor(const QString &filePath) {
 	QString qresult;
 	QProcess *myProcess = new QProcess();
 	const QString program = "java";
@@ -1258,10 +1264,81 @@ Error AssetMxfTrack::ExtractEssenceDescriptor(const QString &filePath) {
 		SetEssenceDescriptor(qresult);
 	}
 	return error;
+}*/
+
+Error AssetMxfTrack::ExtractEssenceDescriptor(const QString &filePath) {
+	QFile file(filePath);
+	if(file.open(QIODevice::ReadOnly) == false) {
+		return Error(Error::SourceFileOpenError, file.fileName());
+	}
+	Error error;
+
+	QList<QString> dicts_fname = QList<QString>()
+		<< "www-smpte-ra-org-reg-395-2014-13-1-aaf.xml"
+		<< "www-smpte-ra-org-reg-2003-2012.xml"
+		<< "www-smpte-ra-org-reg-335-2012.xml"
+		<< "www-smpte-ra-org-reg-335-2012-13-1-aaf.xml"
+		;
+
+	XMLPlatformUtils::Initialize();
+
+	XercesDOMParser *parser = new XercesDOMParser();
+
+	parser->setDoNamespaces(true);
+
+	MetaDictionaryCollection mds;
+
+	qDebug() << dicts_fname.size();
+	for (int i = 0; i < dicts_fname.size(); i++) {
+
+		QString dict_path = QApplication::applicationDirPath() + QString("/regxmllib/") + dicts_fname[i];
+		parser->parse(dict_path.toStdString().c_str());
+		DOMDocument *doc = parser->getDocument();
+		MetaDictionary *md = new MetaDictionary();
+		XMLImporter::fromDOM(*doc, *md);
+		mds.addDictionary(md);
+	}
+
+	XMLCh tempStr[3] = { chLatin_L, chLatin_S, chNull };
+	DOMImplementation *impl = DOMImplementationRegistry::getDOMImplementation(tempStr);
+	DOMLSOutput       *output = ((DOMImplementationLS*)impl)->createLSOutput();
+
+	DOMDocument *doc = impl->createDocument();
+
+	std::ifstream f(filePath.toStdString().c_str(), std::ifstream::in | std::ifstream::binary);
+
+	if (!f.good()) {
+		qDebug() << "Can't read file:" << filePath;
+		error = Error(Error::EssenceDescriptorExtraction);
+
+	}
+	static const rxml::UL ESSENCE_DESCRIPTOR_KEY = "urn:smpte:ul:060e2b34.02010101.0d010101.01012400";
+	const rxml::AUID* ed_auid = new rxml::AUID(ESSENCE_DESCRIPTOR_KEY);
+	DOMDocumentFragment* frag = MXFFragmentBuilder::fromInputStream(f, mds, NULL, ed_auid, *doc);
+
+	doc->appendChild(frag);
+
+
+	if(error.IsError() == false) {
+		SetEssenceDescriptor(doc);
+	}
+
+	//doc->release();
+
+
+	/* free heap */
+
+	for (std::map<std::string, MetaDictionary*>::const_iterator it = mds.getDictionatries().begin();
+		it != mds.getDictionatries().end();
+		it++) {
+		delete it->second;
+	}
+	XMLPlatformUtils::Terminate();
+	return error;
 }
 
 
-void AssetMxfTrack::SetEssenceDescriptor(const QString& qresult) {
+/*void AssetMxfTrack::SetEssenceDescriptor(const QString& qresult) {
 	if (!qresult.isEmpty()) {
 		cpl2016::EssenceDescriptorBaseType* rEssenceDescriptor = this->GetEssenceDescriptor();
 		cpl2016::EssenceDescriptorBaseType::AnySequence &r_any_sequence(rEssenceDescriptor->getAny());
@@ -1317,6 +1394,56 @@ void AssetMxfTrack::SetEssenceDescriptor(const QString& qresult) {
 		  qDebug() << "p_dom_element == NULL";
 
 	  delete parser;
+	}
+}*/
+
+void AssetMxfTrack::SetEssenceDescriptor(const DOMDocument* dom_result) {
+	if (dom_result) {
+		cpl2016::EssenceDescriptorBaseType* rEssenceDescriptor = this->GetEssenceDescriptor();
+		cpl2016::EssenceDescriptorBaseType::AnySequence &r_any_sequence(rEssenceDescriptor->getAny());
+		xercesc::DOMElement * p_dom_element;
+		xercesc::DOMNode * node;
+		try {
+			xercesc::DOMDocument &p_dom_document  = rEssenceDescriptor->getDomDocument();
+			p_dom_element = dom_result->getDocumentElement();
+			if (p_dom_element) {
+			  node = p_dom_document.importNode(p_dom_element, true);
+
+			  // Appending the node to the new document
+			  if (node) {
+				  p_dom_document.appendChild(node);
+			  }
+			}
+			p_dom_element = p_dom_document.getDocumentElement();
+		}
+	  catch (const xercesc::DOMException& toCatch) {
+			char* message = xercesc::XMLString::transcode(toCatch.msg);
+			qDebug() << "Exception message is:"
+				 << QString(message);
+			xercesc::XMLString::release(&message);
+			//delete parser;
+			return;
+	  }
+	  catch (...) {
+			qDebug() << "Failed to extract essence descriptor"; // from " << mFilePath;
+			return;
+	  }
+
+	  if (p_dom_element) {
+		  //p_dom_element->setAttribute(X("xmlns"), NULL);
+		  try {
+		  r_any_sequence.push_back(p_dom_element);
+		  rEssenceDescriptor->setAny(r_any_sequence);
+		  }
+		  catch (...) {
+				qDebug() << "Failed to extract essence descriptor"; // from " << mFilePath;
+				return;
+		  }
+	  }
+	  else
+		  qDebug() << "p_dom_element == NULL";
+
+	  //delete parser;
 	}
 }
 

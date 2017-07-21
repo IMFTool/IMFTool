@@ -43,6 +43,7 @@ public:
 		EssenceDescriptorExtraction,
 		ExitCodeNotZero,
 		ExitStatusError,
+		MetaDictionaryOpenError,
 		Unknown
 	};
 	//! Constructs empty error (IsError returns false).
@@ -91,6 +92,8 @@ public:
 				ret = QObject::tr("Java call has returned an error"); break;
 			case ExitStatusError:
 				ret = QObject::tr("Java call has returned an error"); break;
+			case MetaDictionaryOpenError:
+				ret = QObject::tr("Couldn't open Meta Dictionary - CPLs will not contain proper Essence Descriptors!"); break;
 			case Unknown:
 				ret = QObject::tr("Unknown error"); break;
 			default:

@@ -50,6 +50,7 @@ private:
 	enum eButtons {
 		ButtonAddTrack = 0,
 	};
+	xml_schema::NamespaceInfomap cpl_namespace;
 
 public:
 	WidgetComposition(const QSharedPointer<ImfPackage> &rImp, const QUuid &rCplAssetId, QWidget *pParent = NULL);
@@ -68,6 +69,7 @@ public:
 	//WR
 	QDateTime GetIssuerDate() const { return ImfXmlHelper::Convert(mData.getIssueDate()); }
 	EditRate GetEditRate() const { return ImfXmlHelper::Convert(mData.getEditRate()); }
+	UserText GetApplicationIdentification() const;
 
 	void SetContentTitle(const UserText &rTitle) { mData.setContentTitle(ImfXmlHelper::Convert(rTitle)); }
 	void SetIssuer(const UserText &rIssuer) { mData.setIssuer(ImfXmlHelper::Convert(rIssuer)); }
@@ -76,7 +78,10 @@ public:
 	void SetContentVersionList(const ContentVersionList &rContentVersionList) { if (rContentVersionList.count() == 0)  mData.getContentVersionList().detach(); else mData.setContentVersionList(ImfXmlHelper::Convert(rContentVersionList)); }
 	void SetLocaleList(const LocaleList &rLocaleList) { if (rLocaleList.count() == 0)  mData.getLocaleList().detach(); else mData.setLocaleList(ImfXmlHelper::Convert(rLocaleList)); }
 	void SetAnnotation(const UserText &rAnnotation) { mData.setAnnotation(ImfXmlHelper::Convert(rAnnotation)); }
-	void SetID(QUuid rID) {mData.setId(ImfXmlHelper::Convert(rID));}
+	void SetID(QUuid rID) { mData.setId(ImfXmlHelper::Convert(rID)); }
+	void SetApplicationIdentification(const UserText &rApplicationIdentification);
+	const cpl2016::CompositionPlaylistType::ContentKindOptional contentKind;
+	void SetContentKind(const UserText &rContentKind) { rContentKind.IsEmpty() ? mData.setContentKind(contentKind) : mData.setContentKind(ImfXmlHelper::Convert(rContentKind)); }
 
 	QUuid GetCplAssetId() const { return(mAssetCpl ? mAssetCpl->GetId() : QUuid()); }
 	QUndoStack* GetUndoStack() const { return mpUndoStack; }

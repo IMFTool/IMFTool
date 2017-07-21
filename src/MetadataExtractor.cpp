@@ -49,6 +49,7 @@
 #include <QCryptographicHash>
 #include <QMessageBox>
 #include "ImfPackageCommon.h"
+#include "global.h"
 
 using namespace xercesc;
 
@@ -117,6 +118,16 @@ Error MetadataExtractor::ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileI
 	Result_t result = reader.OpenRead(rSourceFile.absoluteFilePath().toStdString());
 
 	if(ASDCP_SUCCESS(result)) {
+		WriterInfo writerinfo;
+		//FileInfoWrapper<AS_02::JP2K::MXFReader, MyPictureDescriptor> wrapper;
+		//qDebug() << "Vor metadata.assetId";
+		result = reader.FillWriterInfo(writerinfo);
+		//qDebug() << "WriterInfoDump:";
+		//WriterInfoDump(writerinfo);
+		char str_buf[16], str_buf2[40];
+		//metadata.assetId = QUuid(QByteArray((UUID(writerinfo.AssetUUID).EncodeHex(str_buf, 16)), 16));
+		metadata.assetId = convert_uuid((unsigned char*)writerinfo.AssetUUID);
+
 		ASDCP::MXF::RGBAEssenceDescriptor *rgba_descriptor = NULL;
 		ASDCP::MXF::CDCIEssenceDescriptor *cdci_descriptor = NULL;
 

@@ -13,6 +13,7 @@ Introductory videos are available on YouTube [2], [3].
 
 ## Workflows supported:
 -	Open an IMP, visualize the timeline of the CPL(s) included in the IMP
+-	Edit CPL metadata
 -	Add new virtual tracks (limited to audio, subtitles and markers)
 -	Import and wrap audio and timed text resources
 -	Delete virtual tracks
@@ -38,8 +39,6 @@ Please visit
 [Releases](../../releases/)
 to download the latest binary installers.
 
-## Runtime Requirements
--	For creating essence descriptors, IMF Tool uses regxmllib [4] and requires Oracle JDK 1.8 to be installed, and java/java.exe being available in the executable search path. (In particular under Mac OS X, the JRE is not sufficient - you'll have to install the JDK !)
 
 ## Building
 IMF Tool is multi-platform and has been susccesfully built under Mac OS X 10.10 and 10.11, Windows 7 and Linux 64 bit.
@@ -50,8 +49,9 @@ Prerequisites:
 -	libxsd
 -	Xerces 3.1
 -	Requires OpenJPEG 2.2 (with multi-threading support), available at https://github.com/uclouvain/openjpeg
+-	regxmllibc (fork) at https://github.com/IMFTool/regxmllib/tree/FEATURE-regxmllibc
 
-##DISCLAIMER
+## DISCLAIMER
   THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
 APPLICABLE LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT
 HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY
@@ -70,6 +70,5 @@ http://techblog.netflix.com/2016/03/imf-prescription-for-versionitis.html
 
 [3] IMF-Tool introductory video Part 2: https://www.youtube.com/watch?v=k6OIx7WfF8s
 
-[4] regxmllib: https://github.com/sandflow/regxmllib
 
 

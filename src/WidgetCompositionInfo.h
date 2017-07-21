@@ -27,11 +27,16 @@ class UndoProxyModel;
 
 class WidgetCompositionInfo : public QWidget {
 
+	Q_OBJECT
+
 public:
 	WidgetCompositionInfo(QWidget *pParent = NULL);
 	virtual ~WidgetCompositionInfo() {}
 	void SetComposition(WidgetComposition *pComposition);
 	void Clear();
+
+public slots:
+		void onCurrentIndexChanged(QString text);
 
 private:
 	Q_DISABLE_COPY(WidgetCompositionInfo);
@@ -40,6 +45,28 @@ private:
 	QDataWidgetMapper *mpMapper;
 	CompositionInfoModel *mpModel;
 	UndoProxyModel *mpProxyModel;
+	const QMap<QString, QString> mApplicationIdentificationMap {
+			{"http://www.smpte-ra.org/schemas/2067-20/2016", "App #2"},
+			{"http://www.smpte-ra.org/schemas/2067-21/2016", "App #2E"},
+			//{"http://www.smpte-ra.org/schemas/2067-40/2016", "App #4"},
+			{"http://www.smpte-ra.org/schemas/2067-20/2013", "App #2 2013"},
+			{"http://www.smpte-ra.org/schemas/2067-21/2014", "App #2E 2014"},
+	};
+	const QStringList mContentKindList {
+		"advertisement",
+		"feature",
+		"psa",
+		"rating",
+		"short",
+		"teaser",
+		"test",
+		"trailer",
+		"transitional",
+		"episode",
+		"highlights",
+		"event",
+	};
+
 };
 
 
@@ -56,7 +83,8 @@ public:
 		ColumnAnnotation,
 		ColumnEditRate,
 		ColumnIssuerDate,
-		ColumnContentVersionTag,
+		ColumnApplicationIdentification,
+		ColumnApplicationString,
 		ColumnMax
 	};
 	CompositionInfoModel(QObject *pParent = NULL);
@@ -73,4 +101,11 @@ private:
 	Q_DISABLE_COPY(CompositionInfoModel);
 
 	QPointer<WidgetComposition> mpComposition;
+	const QMap<QString, QString> mApplicationIdentificationMap {
+			{"http://www.smpte-ra.org/schemas/2067-20/2016", "App #2"},
+			{"http://www.smpte-ra.org/schemas/2067-21/2016", "App #2E"},
+			//{"http://www.smpte-ra.org/schemas/2067-40/2016", "App #4"},
+			{"http://www.smpte-ra.org/schemas/2067-20/2013", "App #2 2013"},
+			{"http://www.smpte-ra.org/schemas/2067-21/2014", "App #2E 2014"},
+	};
 };

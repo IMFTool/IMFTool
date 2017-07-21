@@ -25,6 +25,16 @@
 #include <QFile>
 #include <QProcess>
 #include <QDir>
+//regxmllibc
+#include <com/sandflow/smpte/regxml/dict/MetaDictionaryCollection.h>
+#include <com/sandflow/smpte/regxml/dict/importers/XMLImporter.h>
+#include "com/sandflow/smpte/regxml/MXFFragmentBuilder.h"
+#include <fstream>
+
+XERCES_CPP_NAMESPACE_USE
+
+using namespace rxml;
+//regxmllibc
 
 JobCalculateHash::JobCalculateHash(const QString &rSourceFile) :
 AbstractJob(tr("Calculating Hash: %1").arg(QFileInfo(rSourceFile).fileName())), mSourceFile(rSourceFile) {
@@ -129,7 +139,7 @@ Error JobWrapWav::Execute() {
 				}
 				ASDCP::MXF::InterchangeObject_list_t::iterator i;
 				for ( i = mca_config.begin(); i != mca_config.end(); ++i ) {
-				  if ( (*i)->GetUL() == UL(dict->ul(MDD_SoundfieldGroupLabelSubDescriptor))) {
+				  if ( (*i)->GetUL() == ASDCP::UL(dict->ul(MDD_SoundfieldGroupLabelSubDescriptor))) {
 					  ASDCP::MXF::SoundfieldGroupLabelSubDescriptor *current_soundfield;
 					  current_soundfield = reinterpret_cast<ASDCP::MXF::SoundfieldGroupLabelSubDescriptor*>(*i);
 					  if (current_soundfield) {
@@ -281,12 +291,12 @@ Error JobWrapTimedText::Execute() {
 }
 //WR
 
-JobExtractEssenceDescriptor::JobExtractEssenceDescriptor(const QString &rSourceFile) :
+/*JobExtractEssenceDescriptor::JobExtractEssenceDescriptor(const QString &rSourceFile) :
 AbstractJob(tr("Extracting Essence Descriptor from: %1").arg(QFileInfo(rSourceFile).fileName())), mSourceFile(rSourceFile) {
 
 }
 
-Error JobExtractEssenceDescriptor::Execute() {
+ Error JobExtractEssenceDescriptor::Execute() {
 
 	QFile file(mSourceFile);
 	if(file.open(QIODevice::ReadOnly) == false) {
@@ -330,6 +340,110 @@ Error JobExtractEssenceDescriptor::Execute() {
 	}
 
 	return error;
+} */
+
+JobExtractEssenceDescriptor::JobExtractEssenceDescriptor(const QString &rSourceFile) :
+AbstractJob(tr("Extracting Essence Descriptor from: %1").arg(QFileInfo(rSourceFile).fileName())), mSourceFile(rSourceFile) {
+
 }
 
+
+Error JobExtractEssenceDescriptor::Execute() {
+
+	QFile file(mSourceFile);
+	if(file.open(QIODevice::ReadOnly) == false) {
+		return Error(Error::SourceFileOpenError, file.fileName());
+	}
+	Error error;
+
+	QList<QString> dicts_fname = QList<QString>()
+/*		<< "www-smpte-ra-org-reg-335-2012-13-1-amwa-as12.xml"
+		<< "www-smpte-ra-org-reg-335-2012-13-1-amwa-rules.xml"
+		<< "www-smpte-ra-org-reg-335-2012-13-4-archive.xml"
+		<< "www-smpte-ra-org-reg-335-2012-13-12-as11.xml"
+		<< "www-smpte-ra-org-reg-335-2012-13-13.xml"
+		<< "www-smpte-ra-org-reg-395-2014.xml"*/
+		<< "www-smpte-ra-org-reg-395-2014-13-1-aaf.xml"
+/*		<< "www-smpte-ra-org-reg-395-2014-13-1-amwa-as10.xml"
+		<< "www-smpte-ra-org-reg-395-2014-13-1-amwa-as11.xml"
+		<< "www-smpte-ra-org-reg-395-2014-13-1-amwa-as12.xml"
+		<< "www-smpte-ra-org-reg-395-2014-13-1-amwa-as-common.xml"
+		<< "www-smpte-ra-org-reg-395-2014-13-4-archive.xml"
+		<< "www-smpte-ra-org-reg-395-2014-13-12-as11.xml"
+		<< "www-smpte-ra-org-reg-395-2014-13-13.xml"*/
+		<< "www-smpte-ra-org-reg-2003-2012.xml"
+/*		<< "www-smpte-ra-org-reg-2003-2012-13-1-amwa-as11.xml"
+		<< "www-smpte-ra-org-reg-2003-2012-13-1-amwa-as12.xml"
+		<< "www-smpte-ra-org-reg-2003-2012-13-4-archive.xml"
+		<< "www-smpte-ra-org-reg-2003-2012-13-12-as11.xml"
+		<< "www-ebu-ch-metadata-schemas-ebucore-smpte-class13-element.xml"
+		<< "www-ebu-ch-metadata-schemas-ebucore-smpte-class13-group.xml"
+		<< "www-ebu-ch-metadata-schemas-ebucore-smpte-class13-type.xml" */
+		<< "www-smpte-ra-org-reg-335-2012.xml"
+		<< "www-smpte-ra-org-reg-335-2012-13-1-aaf.xml"
+//		<< "www-smpte-ra-org-reg-335-2012-13-1-amwa-as10.xml"
+//		<< "www-smpte-ra-org-reg-335-2012-13-1-amwa-as11.xml"
+		;
+
+	XMLPlatformUtils::Initialize();
+
+	XercesDOMParser *parser = new XercesDOMParser();
+
+	parser->setDoNamespaces(true);
+
+	MetaDictionaryCollection mds;
+
+	for (int i = 0; i < dicts_fname.size(); i++) {
+
+		QString dict_path = QApplication::applicationDirPath() + QString("/regxmllib/") + dicts_fname[i];
+		parser->parse(dict_path.toStdString().c_str());
+		DOMDocument *doc = parser->getDocument();
+		if (doc) {
+			MetaDictionary *md = new MetaDictionary();
+			XMLImporter::fromDOM(*doc, *md);
+			mds.addDictionary(md);
+		} else
+		{
+			qDebug() << "Meta Dictionary " << dict_path << " not found!";
+			return Error(Error::MetaDictionaryOpenError, QString("Couldn't open file %1").arg(dict_path));
+		}
+	}
+
+	XMLCh tempStr[3] = { chLatin_L, chLatin_S, chNull };
+	DOMImplementation *impl = DOMImplementationRegistry::getDOMImplementation(tempStr);
+	DOMLSOutput       *output = ((DOMImplementationLS*)impl)->createLSOutput();
+
+	DOMDocument *doc = impl->createDocument();
+
+	std::ifstream f(mSourceFile.toStdString().c_str(), std::ifstream::in | std::ifstream::binary);
+
+	if (!f.good()) {
+		qDebug() << "Can't read file:" << mSourceFile;
+		error = Error(Error::EssenceDescriptorExtraction);
+
+	}
+	static const rxml::UL ESSENCE_DESCRIPTOR_KEY = "urn:smpte:ul:060e2b34.02010101.0d010101.01012400";
+	const rxml::AUID* ed_auid = new rxml::AUID(ESSENCE_DESCRIPTOR_KEY);
+	DOMDocumentFragment* frag = MXFFragmentBuilder::fromInputStream(f, mds, NULL, ed_auid, *doc);
+
+	doc->appendChild(frag);
+
+
+	if(error.IsError() == false) {
+		emit Result(doc, GetIdentifier());
+	}
+
+	//doc->release();
+
+
+	/* free heap */
+
+	for (std::map<std::string, MetaDictionary*>::const_iterator it = mds.getDictionatries().begin();
+		it != mds.getDictionatries().end();
+		it++) {
+		delete it->second;
+	}
+	XMLPlatformUtils::Terminate();
+	return error;
+}
 //WR

@@ -22,7 +22,6 @@
 #include <QLabel>
 #include <QDataWidgetMapper>
 
-
 WidgetCompositionInfo::WidgetCompositionInfo(QWidget *pParent /*= NULL*/) :
 QWidget(pParent), mpMapper(NULL), mpModel(NULL), mpProxyModel(NULL) {
 
@@ -52,11 +51,22 @@ void WidgetCompositionInfo::InitLayout() {
 	p_content_originator->setPlaceholderText(tr("--The originator of the content underlying the composition--"));
 	mpMapper->addMapping(p_content_originator, CompositionInfoModel::ColumnContentOriginator);
 
+	QComboBox *p_application_identification = new QComboBox(this);
+	for (QMap<QString, QString>::const_iterator i = mApplicationIdentificationMap.cbegin(); i != mApplicationIdentificationMap.cend(); i++) {
+		p_application_identification->addItem(i.key());
+	}
+	p_application_identification->setEditable(true);
+	connect(p_application_identification, SIGNAL(currentTextChanged(QString)), this, SLOT(onCurrentIndexChanged(QString)));
+	mpMapper->addMapping(p_application_identification, CompositionInfoModel::ColumnApplicationIdentification);
+	QLineEdit *p_application_string = new QLineEdit(this);
+	p_application_string->setPlaceholderText(tr("Unknown"));
+	mpMapper->addMapping(p_application_string, CompositionInfoModel::ColumnApplicationString);
+	p_application_string->setReadOnly(true);
+
 	//WR
-	/*	QComboBox *p_content_kind = new QComboBox(this);
-	p_content_kind->setEditable(true);*/
-	QLineEdit *p_content_kind = new QLineEdit(this);
-	p_content_kind->setDisabled(true);
+	QComboBox *p_content_kind = new QComboBox(this);
+	p_content_kind->addItems(mContentKindList);
+	p_content_kind->setEditable(true);
 	//WR
 	mpMapper->addMapping(p_content_kind, CompositionInfoModel::ColumnContentKind);
 	QLineEdit *p_edit_rate = new QLineEdit(this);
@@ -66,20 +76,24 @@ void WidgetCompositionInfo::InitLayout() {
 
 	QGridLayout *p_layout = new QGridLayout();
 	p_layout->addWidget(new QLabel(tr("Content Title:")), 0, 0, 1, 1);
-	p_layout->addWidget(p_content_title, 0, 1, 1, 1);
+	p_layout->addWidget(p_content_title, 0, 1, 1, 2);
 	p_layout->addWidget(new QLabel(tr("Issuer:")), 1, 0, 1, 1);
-	p_layout->addWidget(p_issuer, 1, 1, 1, 1);
+	p_layout->addWidget(p_issuer, 1, 1, 1, 2);
 	p_layout->addWidget(new QLabel(tr("Content Originator:")), 2, 0, 1, 1);
-	p_layout->addWidget(p_content_originator, 2, 1, 1, 1);
+	p_layout->addWidget(p_content_originator, 2, 1, 1, 2);
 	p_layout->addWidget(new QLabel(tr("Content Kind:")), 3, 0, 1, 1);
-	p_layout->addWidget(p_content_kind, 3, 1, 1, 1);
+	p_layout->addWidget(p_content_kind, 3, 1, 1, 2);
 	p_layout->addWidget(new QLabel(tr("Annotation:")), 4, 0, 1, 1);
-	p_layout->addWidget(p_annotation, 4, 1, 1, 1);
+	p_layout->addWidget(p_annotation, 4, 1, 1, 2);
 	p_layout->addWidget(new QLabel(tr("Edit Rate:")), 5, 0, 1, 1);
-	p_layout->addWidget(p_edit_rate, 5, 1, 1, 1);
+	p_layout->addWidget(p_edit_rate, 5, 1, 1, 2);
 	p_layout->addWidget(new QLabel(tr("Issue Date:")), 6, 0, 1, 1);
-	p_layout->addWidget(p_issue_date, 6, 1, 1, 1);
-	p_layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding), 7, 0, 1, 2);
+	p_layout->addWidget(p_issue_date, 6, 1, 1, 2);
+	p_layout->addWidget(new QLabel(tr("Application:")), 7, 0, 1, 1);
+	p_layout->addWidget(p_application_identification, 7, 1, 1, 1);
+	p_application_string->setMinimumWidth(100);
+	p_layout->addWidget(p_application_string, 7, 2, 1, 1);
+	p_layout->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding), 8, 0, 1, 3);
 	setLayout(p_layout);
 	this->setEnabled(false);
 }
@@ -100,6 +114,14 @@ void WidgetCompositionInfo::Clear() {
 	this->setEnabled(false);
 }
 
+void WidgetCompositionInfo::onCurrentIndexChanged(QString text) {
+	//qDebug() << "SLOT CALLED!";
+	QModelIndex modelIndex = mpProxyModel->index(0, CompositionInfoModel::ColumnApplicationIdentification);
+	mpProxyModel->setData(modelIndex, QVariant(text));
+
+}
+
+
 CompositionInfoModel::CompositionInfoModel(QObject *pParent /*= NULL*/) :
 QAbstractTableModel(pParent), mpComposition(NULL) {
 
@@ -112,9 +134,8 @@ Qt::ItemFlags CompositionInfoModel::flags(const QModelIndex &rIndex) const {
 	if(column == ColumnContentTitle
 		 || column == ColumnIssuer
 		 || column == ColumnContentOriginator
-		 //WR
-		 //|| column == ColumnContentKind
-		 //WR
+		 || column == ColumnContentKind
+		 || column == ColumnApplicationIdentification
 		 || column == ColumnAnnotation) {
 		return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
 	}
@@ -173,6 +194,18 @@ QVariant CompositionInfoModel::data(const QModelIndex &rIndex, int role /*= Qt::
 				return mpComposition->GetContentKind().first;
 			}
 		}
+		else if(column == ColumnApplicationIdentification) {
+			if(role == Qt::EditRole) {
+				return mpComposition->GetApplicationIdentification().first;
+			}
+		}
+		else if(column == ColumnApplicationString) {
+			if(role == Qt::EditRole) {
+				QString retVal = { mApplicationIdentificationMap.contains(mpComposition->GetApplicationIdentification().first) ?
+						mApplicationIdentificationMap.value(mpComposition->GetApplicationIdentification().first) : "UNKNOWN" };
+				return QVariant(retVal);
+			}
+		}
 		//WR
 	}
 	return QVariant();
@@ -200,9 +233,22 @@ bool CompositionInfoModel::setData(const QModelIndex &rIndex, const QVariant &rV
 				emit dataChanged(rIndex, rIndex);
 				return true;
 			}
+			else if(column == ColumnContentKind && rValue.canConvert<QString>()) {
+				qDebug() << rValue.toString();
+				mpComposition->SetContentKind(rValue.toString());
+				emit dataChanged(rIndex, rIndex);
+				return true;
+			}
 			else if(column == ColumnAnnotation && rValue.canConvert<QString>()) {
 				mpComposition->SetAnnotation(rValue.toString());
 				emit dataChanged(rIndex, rIndex);
+				QModelIndex index;
+				return true;
+			}
+			else if(column == ColumnApplicationIdentification && rValue.canConvert<QString>()) {
+				mpComposition->SetApplicationIdentification(rValue.toString());
+				const QModelIndex applicationStringIndex = rIndex.sibling(0, column + 1);
+				emit dataChanged(rIndex, applicationStringIndex);
 				return true;
 			}
 		}
@@ -216,3 +262,4 @@ void CompositionInfoModel::SetComposition(WidgetComposition *pComposition) {
 	mpComposition = pComposition;
 	endResetModel();
 }
+

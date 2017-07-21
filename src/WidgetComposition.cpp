@@ -46,6 +46,11 @@ mpTimelineGraphicsWidget(NULL), mpUndoStack(NULL), mpToolBar(NULL),
 mAssetCpl(rImp->GetAsset(rCplAssetId).objectCast<AssetCpl>()), mImp(rImp),
 mData(ImfXmlHelper::Convert(QUuid::createUuid()), ImfXmlHelper::Convert(QDateTime::currentDateTimeUtc()), ImfXmlHelper::Convert(UserText(tr("Unnamed"))), ImfXmlHelper::Convert(EditRate::EditRate24), cpl2016::CompositionPlaylistType::SegmentListType())
 {
+	cpl_namespace[""].name = XML_NAMESPACE_CPL;
+	cpl_namespace["dcml"].name = XML_NAMESPACE_DCML;
+	cpl_namespace["cc"].name = XML_NAMESPACE_CC;
+	cpl_namespace["ds"].name = XML_NAMESPACE_DS;
+	cpl_namespace["xs"].name = XML_NAMESPACE_XS;
 
 	mpUndoStack = new QUndoStack(this);
 	InitLayout();
@@ -296,12 +301,12 @@ ImfError WidgetComposition::Write(const QString &rDestination /*= QString()*/) {
 
 	ImfError error; // Reset last error.
 	// namespace maps
-	xml_schema::NamespaceInfomap cpl_namespace;
+/*	xml_schema::NamespaceInfomap cpl_namespace;
 	cpl_namespace[""].name = XML_NAMESPACE_CPL;
 	cpl_namespace["dcml"].name = XML_NAMESPACE_DCML;
 	cpl_namespace["cc"].name = XML_NAMESPACE_CC;
 	cpl_namespace["ds"].name = XML_NAMESPACE_DS;
-	cpl_namespace["xs"].name = XML_NAMESPACE_XS;
+	cpl_namespace["xs"].name = XML_NAMESPACE_XS;*/
 
 	cpl2016::CompositionPlaylistType cpl(mData);
 	cpl.setCreator(ImfXmlHelper::Convert(UserText(CREATOR_STRING)));
@@ -452,12 +457,12 @@ ImfError WidgetComposition::WriteNew(const QString &rDestination /*= QString()*/
 
 	ImfError error; // Reset last error.
 	// namespace maps
-	xml_schema::NamespaceInfomap cpl_namespace;
+	/*xml_schema::NamespaceInfomap cpl_namespace;
 	cpl_namespace[""].name = XML_NAMESPACE_CPL;
 	cpl_namespace["dcml"].name = XML_NAMESPACE_DCML;
 	cpl_namespace["cc"].name = XML_NAMESPACE_CC;
 	cpl_namespace["ds"].name = XML_NAMESPACE_DS;
-	cpl_namespace["xs"].name = XML_NAMESPACE_XS;
+	cpl_namespace["xs"].name = XML_NAMESPACE_XS;*/
 
 	cpl2016::CompositionPlaylistType cpl(mData);
 	cpl.setCreator(ImfXmlHelper::Convert(UserText(CREATOR_STRING)));
@@ -1206,6 +1211,54 @@ XmlSerializationError WidgetComposition::WriteMinimal(const QString &rDestinatio
 	}
 	return serialization_error;
 }
+
+
+UserText WidgetComposition::GetApplicationIdentification() const {
+	if (mData.getExtensionProperties().present()) {
+		cpl2016::CompositionPlaylistType_ExtensionPropertiesType sequence_list = mData.getExtensionProperties().get();
+		cpl2016::CompositionPlaylistType_ExtensionPropertiesType::AnySequence &r_any_sequence(sequence_list.getAny());
+		return UserText(XMLString::transcode(r_any_sequence.front().getFirstChild()->getNodeValue()));
+	} else {
+		return UserText();
+	}
+}
+
+void WidgetComposition::SetApplicationIdentification(const UserText &rApplicationIdentification) {
+	if (!mData.getExtensionProperties().present()) {
+		cpl2016::CompositionPlaylistType_ExtensionPropertiesType exProp;
+		mData.setExtensionProperties(exProp);
+	}
+	cpl2016::CompositionPlaylistType_ExtensionPropertiesType sequence_list = mData.getExtensionProperties().get();
+	cpl2016::CompositionPlaylistType_ExtensionPropertiesType::AnySequence &r_any_sequence(sequence_list.getAny());
+	if ( !r_any_sequence.empty() ) {
+		try {
+			r_any_sequence.front().getFirstChild()->setNodeValue(XMLString::transcode(rApplicationIdentification.first.toStdString().c_str()));
+			sequence_list.setAny(r_any_sequence);
+			mData.setExtensionProperties(sequence_list);
+		} catch (...) {
+			qDebug() << "Error setting ApplicationIdentification!";
+		}
+	} else {
+		try {
+			xercesc::DOMDocument &doc = sequence_list.getDomDocument();
+			xercesc::DOMElement* p_dom_element = NULL;
+			p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("cc")->second.name).c_str(),
+					(xsd::cxx::xml::string("cc:ApplicationIdentification").c_str())
+					);
+			QString ns("xmlns:");
+			ns.append(cpl_namespace.find("cc")->first.c_str());
+			p_dom_element->setAttributeNS(xsd::cxx::xml::string(XML_NAMESPACE_NS).c_str(), xsd::cxx::xml::string(ns.toStdString()).c_str(), xsd::cxx::xml::string(cpl_namespace.find("cc")->second.name).c_str());
+			p_dom_element->setTextContent(XMLString::transcode(rApplicationIdentification.first.toStdString().c_str()));
+			r_any_sequence.push_back(p_dom_element);
+			sequence_list.setAny(r_any_sequence);
+			mData.setExtensionProperties(sequence_list);
+		} catch (...) {
+			qDebug() << "Error setting ApplicationIdentification!";
+		}
+	}
+
+}
+
 
 ImprovedSplitter::ImprovedSplitter(QWidget *pParent /*= NULL*/) :
 QSplitter(pParent), mpDummyWidget(NULL) {

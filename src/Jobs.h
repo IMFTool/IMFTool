@@ -17,7 +17,12 @@
 #include "JobQueue.h"
 #include "info.h"
 #include "ImfCommon.h"
+#include <xercesc/dom/DOM.hpp>
+#include <xercesc/util/PlatformUtils.hpp>
+#include <xercesc/framework/LocalFileFormatTarget.hpp>
+#include <xercesc/parsers/XercesDOMParser.hpp>
 
+XERCES_CPP_NAMESPACE_USE
 
 namespace
 {
@@ -120,7 +125,7 @@ private:
 	//WR
 };
 
-class JobExtractEssenceDescriptor : public AbstractJob {
+/*class JobExtractEssenceDescriptor : public AbstractJob {
 
 	Q_OBJECT
 
@@ -130,6 +135,27 @@ public:
 
 signals:
 	void Result(const QString &qresult, const QVariant &rIdentifier = QVariant());
+
+protected:
+	virtual Error Execute();
+
+private:
+	Q_DISABLE_COPY(JobExtractEssenceDescriptor);
+
+	const QString mSourceFile;
+
+};*/
+
+class JobExtractEssenceDescriptor : public AbstractJob {
+
+	Q_OBJECT
+
+public:
+	JobExtractEssenceDescriptor(const QString &rSourceFile);
+	virtual ~JobExtractEssenceDescriptor() {}
+
+signals:
+	void Result(const DOMDocument* dom_result, const QVariant &rIdentifier = QVariant());
 
 protected:
 	virtual Error Execute();

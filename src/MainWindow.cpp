@@ -47,6 +47,9 @@ QMainWindow(pParent) {
 	InitLayout();
 	InitMenuAndToolbar();
 	// Test for JAVA VM
+	// Not required - EDs are extracted in C++
+	// Might become relevant again for Photon..
+	/*
 	QString qresult;
 	QProcess *myProcess = new QProcess();
 	const QString program = "java";
@@ -96,7 +99,7 @@ QMainWindow(pParent) {
 		mpMsgBox->setStandardButtons(QMessageBox::Ok);
 		mpMsgBox->setDefaultButton(QMessageBox::Ok);
 		mpMsgBox->exec();
-	}
+	}*/
 }
 
 void MainWindow::InitLayout() {

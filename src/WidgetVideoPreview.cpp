@@ -248,7 +248,8 @@ void WidgetVideoPreview::stopPlayback(bool clicked) {
 
 	if(currentPlaylist.length() > 0) decodingFrame = -1; // force preview refresh
 	setFrameIndicator = false;
-	emit currentPlayerPosition(0); // reset indicator to first frame
+	//if clicked==false --> Button Stop was pressed
+	if (!clicked) emit currentPlayerPosition(0); // reset indicator to first frame
 }
 
 void WidgetVideoPreview::rViewFullScreen() {
@@ -330,10 +331,15 @@ void WidgetVideoPreview::xPosChanged(const QSharedPointer<AssetMxfTrack> &rAsset
 
 			decoders[run]->asset = currentAsset; // set new asset in current decoder
 			//decoders[run]->frameNr = xSliderFrame; // set current frame number in decoder
-			VideoResource vr = currentPlaylist[current_playlist_index];
-			decoders[run]->mFrameNr = vr.in + (xSliderFrame - vr.in) % vr.Duration; // set current frame number in decoder
-			decodingThreads[run]->start(QThread::HighestPriority); // start decoder
-			decoding_time->setText("loading...");
+			if (currentPlaylist.length() == 0) {//Under some race conditions during Outgest currentPlaylist can be empty here.
+				qDebug() << "WidgetVideoPreview::xPosChanged called with empty currentPlaylist";
+				running[run] = false;
+			} else {
+				VideoResource vr = currentPlaylist[current_playlist_index];
+				decoders[run]->mFrameNr = vr.in + (xSliderFrame - vr.in) % vr.Duration; // set current frame number in decoder
+				decodingThreads[run]->start(QThread::HighestPriority); // start decoder
+				decoding_time->setText("loading...");
+			}
 		}
 	}
 }

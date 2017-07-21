@@ -8,6 +8,8 @@ find_library(XercescppLib_PATH NAMES xerces-c xerces-c_3 PATHS "${PROJECT_SOURCE
 find_library(XercescppLib_Debug_PATH NAMES xerces-c xerces-c_3D PATHS "${PROJECT_SOURCE_DIR}/../xercescpp" "${PROJECT_SOURCE_DIR}/../lib/xercescpp" "$ENV{CMAKE_HINT}/xercescpp" ENV CMAKE_HINT PATH_SUFFIXES "lib")
 find_path(XercescppLib_include_DIR NAMES xercesc/dom/DOM.hpp PATHS "${PROJECT_SOURCE_DIR}/../xercescpp" "${PROJECT_SOURCE_DIR}/../lib/xercescpp" "$ENV{CMAKE_HINT}/xercescpp" ENV CMAKE_HINT PATH_SUFFIXES "include")
 find_path(LibXSD_root_DIR NAMES xsd/cxx/tree/parsing/int.hxx PATHS "${PROJECT_SOURCE_DIR}/../xsd" "${PROJECT_SOURCE_DIR}/../lib/xsd" "$ENV{CMAKE_HINT}/xsd" ENV CMAKE_HINT PATH_SUFFIXES "libxsd")
+find_package(regxmllibc)
+
 if(ARCHIVIST)
 find_library(OpenEXRLib_IlmImf_PATH NAMES IlmImf IlmImf-2_2 PATHS "${PROJECT_SOURCE_DIR}/../openexr" "${PROJECT_SOURCE_DIR}/../lib/openexr" "$ENV{CMAKE_HINT}/openexr" ENV CMAKE_HINT PATH_SUFFIXES "lib")
 find_library(OpenEXRLib_IlmImf_Debug_PATH NAMES IlmImf IlmImf-2_2 PATHS "${PROJECT_SOURCE_DIR}/../openexr" "${PROJECT_SOURCE_DIR}/../lib/openexr" "$ENV{CMAKE_HINT}/openexr" ENV CMAKE_HINT PATH_SUFFIXES "lib")
@@ -87,7 +89,7 @@ include_directories("${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/synth
 	"${asdcplib_include_DIR}" "${OpenEXRLib_include_DIR}/OpenEXR" "${IlmBaseLib_include_DIR}/OpenEXR")
 else(ARCHIVIST)
 include_directories("${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/synthesis" "${LibXSD_root_DIR}" "${XercescppLib_include_DIR}" 
-	"${asdcplib_include_DIR}" "${OpenJPEG_include_DIR}")
+	"${asdcplib_include_DIR}" "${OpenJPEG_include_DIR}" "${REGXMLLIBC_INCLUDE_DIRS}")
 endif(ARCHIVIST)
 
 add_definitions(/DLIBAS02MOD)
@@ -106,6 +108,7 @@ target_link_libraries(${EXE_NAME} general Qt5::Widgets general Qt5::Multimedia d
 else(ARCHIVIST)
 target_link_libraries(${EXE_NAME} general Qt5::Widgets general Qt5::Multimedia 
 	 general libas02 debug "${XercescppLib_Debug_PATH}" optimized "${XercescppLib_PATH}" debug "${OpenJPEGLib_Debug_Path}" optimized "${OpenJPEGLib_Path}"
+	 debug regxmllibc_d optimized regxmllibc
 	 )
 endif(ARCHIVIST)
 

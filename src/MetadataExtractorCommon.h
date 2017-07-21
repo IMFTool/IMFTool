@@ -21,6 +21,7 @@
 #include <QString>
 #include <QTextDocument>
 #include <QTextOption>
+#include <QUuid>
 #include "SMPTE_Labels.h" // (k)
 
 class Metadata {
@@ -96,6 +97,7 @@ public:
 	Duration								originalDuration; // For TTML only: Duration of TTML1/IMSC1 file expressed in effectiveFrameRate
 	quint32									componentMinRef;  // J2K RGBA only
 	quint32									componentMaxRef;  // J2K RGBA only
+	QUuid									assetId;
 	//WR
 };
 
