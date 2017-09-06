@@ -179,7 +179,7 @@ SoundfieldGroup::eChannel SoundfieldGroup::GetChannel(int Indexes) const {
 
 QList<SoundfieldGroup*> SoundfieldGroup::mMap;
 // IMF
-const SoundfieldGroup SoundfieldGroup::SoundFieldGroupNone("None", "No Soundfield", 0, 0x00);
+const SoundfieldGroup SoundfieldGroup::SoundFieldGroupNone("None", "Unknown Soundfield", 0, 0x00);
 const SoundfieldGroup SoundfieldGroup::SoundFieldGroupVA("VA", "Visual Accessibility", 1, ChannelVIN);
 const SoundfieldGroup SoundfieldGroup::SoundFieldGroupHA("HA", "Hearing Accessibility", 1, ChannelHI);
 const SoundfieldGroup SoundfieldGroup::SoundFieldGroup51EX("51EX", "5.1EX", 6, ChannelL | ChannelC | ChannelR | ChannelLst | ChannelRst | ChannelLFE);

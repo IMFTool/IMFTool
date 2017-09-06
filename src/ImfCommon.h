@@ -189,7 +189,7 @@ public:
 	//! Used for custom marker label.
 	MarkerLabel(const QString &rLabel, const QString &rDescription, const QString &rScope) :
 		mLabel(rLabel), mDescription(rDescription), mScope(rScope) {
-		MarkerLabel::mMap.push_back(this);
+		if (rLabel != "None") MarkerLabel::mMap.push_back(this);
 	}
 	~MarkerLabel() {}
 	QString GetLabel() const { return mLabel; }

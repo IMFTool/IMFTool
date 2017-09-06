@@ -355,7 +355,7 @@ public:
 	//! Create New Mxf Track.
 	AssetMxfTrack(const QFileInfo &rFilePath, const QUuid &rId, const UserText &rAnnotationText = QString());
 	//! Import existing MXF file to IMP.
-	AssetMxfTrack(const QFileInfo &rFilePath, const UserText &rAnnotationText = QString());
+	AssetMxfTrack(const QFileInfo &rFilePath, const Metadata &rMetadata, const UserText &rAnnotationText = QString());
 	virtual ~AssetMxfTrack() {}
 	//! Returns current metadata.
 	Metadata GetMetadata() const { return mMetadata; }

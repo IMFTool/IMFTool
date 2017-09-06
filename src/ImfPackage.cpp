@@ -148,8 +148,13 @@ ImfError ImfPackage::Outgest() {
 	pkl_namespace["ds"].name = XML_NAMESPACE_DS;
 	pkl_namespace["xs"].name = XML_NAMESPACE_XS;
 
-	QUuid pkl_id = QUuid::createUuid();
-	QString pkl_file_path(mRootDir.absoluteFilePath(QString("PKL_%1.xml").arg(strip_uuid(pkl_id))));
+	QList<QUuid> pkl_ids;
+	QList<QString> pkl_file_paths;
+	for (int i = 0; i< mPackingLists.size(); i++) {
+		pkl_ids << QUuid::createUuid();
+		pkl_file_paths << mRootDir.absoluteFilePath(QString("PKL_%1.xml").arg(strip_uuid(pkl_ids[i])));
+	}
+	//QString pkl_file_path(mRootDir.absoluteFilePath(QString("PKL_%1.xml").arg(strip_uuid(pkl_id))));
 
 	for(int i = 0; i < mPackingLists.size(); i++) {
 		if(mPackingLists.at(i)) {
@@ -169,7 +174,7 @@ ImfError ImfPackage::Outgest() {
 				}
 			}
 			// Write Packing List
-			packing_list.setId(ImfXmlHelper::Convert(pkl_id));
+			packing_list.setId(ImfXmlHelper::Convert(pkl_ids[i]));
 
 			std::ofstream pkl_ofs(mPackingLists.at(i)->GetFilePath().absoluteFilePath().toStdString().c_str(), std::ofstream::out);
 			try {
@@ -190,15 +195,21 @@ ImfError ImfPackage::Outgest() {
 	}
 
 	QString old_pkl_file_path;
+	QList<PackingList*>	rPackingLists;
 	for(int i = 0; i < mPackingLists.size(); i++){
 		old_pkl_file_path = mPackingLists.at(i)->GetFilePath().absoluteFilePath();
 		RemoveAsset(mPackingLists.at(i)->GetId());
+		QFile::rename(old_pkl_file_path, pkl_file_paths[i]);
+		QSharedPointer<AssetPkl> pkl_asset(new AssetPkl(pkl_file_paths[i], pkl_ids[i]));
+		AddAsset(pkl_asset, QUuid());
+		rPackingLists.push_back(new PackingList(this, pkl_file_paths[i], pkl_ids[i]));
 	}
-	QFile::rename(old_pkl_file_path, pkl_file_path);
-	QSharedPointer<AssetPkl> pkl_asset(new AssetPkl(pkl_file_path, pkl_id));
+	//QFile::rename(old_pkl_file_path, pkl_file_path);
+	//QSharedPointer<AssetPkl> pkl_asset(new AssetPkl(pkl_file_path, pkl_id));
 	mPackingLists.clear();
-	mPackingLists.push_back(new PackingList(this, pkl_file_path, pkl_id));
-	AddAsset(pkl_asset, QUuid());
+	//mPackingLists.push_back(new PackingList(this, pkl_file_path, pkl_id));
+	mPackingLists = rPackingLists;
+	//AddAsset(pkl_asset, QUuid());
 
 	if(serialization_error.IsError() == false) {
 		// Write VOLINDEX.xml
@@ -1139,6 +1150,13 @@ Asset(Asset::mxf, rFilePath, rId, rAnnotationText), mMetadata(), mSourceFiles(),
 	mEssenceDescriptor = new cpl2016::EssenceDescriptorBaseType(ImfXmlHelper::Convert(mSourceEncoding));
 	//leave ED empty because file does not exist yet on the file system
 
+}
+
+AssetMxfTrack::AssetMxfTrack(const QFileInfo &rFilePath, const Metadata &rMetadata, const UserText &rAnnotationText) :
+		Asset(Asset::mxf, rFilePath, rMetadata.assetId, rAnnotationText), mMetadata(rMetadata), mSourceFiles(), mFirstProxyImage() {
+			SetDefaultProxyImages();
+			mSourceEncoding = QUuid::createUuid();
+			mEssenceDescriptor = new cpl2016::EssenceDescriptorBaseType(ImfXmlHelper::Convert(mSourceEncoding));
 }
 
 void AssetMxfTrack::SetSourceFiles(const QStringList &rSourceFiles) {

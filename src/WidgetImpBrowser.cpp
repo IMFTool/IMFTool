@@ -38,6 +38,8 @@
 #include <QToolButton>
 #include <QFileDialog>
 #include <list>
+#include <cmath>
+
 
 
 WidgetImpBrowser::WidgetImpBrowser(QWidget *pParent /*= NULL*/) :
@@ -141,15 +143,15 @@ void WidgetImpBrowser::InitToolbar() {
 	p_button_add_track->setDisabled(true);
 	connect(this, SIGNAL(ImplInstalled(bool)), p_button_add_track, SLOT(setEnabled(bool)));
 	QMenu *p_add_track_menu = new QMenu(tr("Add Asset"), this);
-	QAction *p_add_pcm_resource = p_add_track_menu->addAction(QIcon(":/sound.png"), tr("PCM Resource"));
+	QAction *p_add_pcm_resource = p_add_track_menu->addAction(QIcon(":/sound.png"), tr("Wrap PCM Essence"));
 	connect(p_add_pcm_resource, SIGNAL(triggered(bool)), this, SLOT(ShowResourceGeneratorWavMode()));
-	QAction *p_add_ttml_resource = p_add_track_menu->addAction(QIcon(":/text.png"), tr("Timed Text Resource"));
+	QAction *p_add_ttml_resource = p_add_track_menu->addAction(QIcon(":/text.png"), tr("Wrap Timed Text Essence"));
 	connect(p_add_ttml_resource, SIGNAL(triggered(bool)), this, SLOT(ShowResourceGeneratorTimedTextMode()));
 	//p_add_ttml_resource->setDisabled(true);
 	p_add_track_menu->addSeparator();
-	QAction *p_add_mxf_resource = p_add_track_menu->addAction(QIcon(":/asset_mxf.png"), tr("MXF Resource"));
+	QAction *p_add_mxf_resource = p_add_track_menu->addAction(QIcon(":/asset_mxf.png"), tr("Add existing MXF Track File"));
 	connect(p_add_mxf_resource, SIGNAL(triggered(bool)), this, SLOT(ShowResourceGeneratorMxfMode()));
-	p_add_mxf_resource->setDisabled(true);
+	//p_add_mxf_resource->setDisabled(true);
 
 	p_button_add_track->setMenu(p_add_track_menu);
 
@@ -368,11 +370,13 @@ void WidgetImpBrowser::ShowResourceGeneratorTimedTextMode() {
 		/* -----Denis Manthey End----- */
 //WR
 void WidgetImpBrowser::ShowResourceGeneratorMxfMode() {
-	mpFileDialog = new QFileDialog(this, QString(), GetWorkingDir().absolutePath());
+	mpFileDialog = new QFileDialog(this, QString("Select MXF file"), mpImfPackage->GetRootDir().absolutePath());
+	mpFileDialog->setOption(QFileDialog::DontUseNativeDialog);
 	mpFileDialog->setFileMode(QFileDialog::ExistingFile);
 	mpFileDialog->setViewMode(QFileDialog::Detail);
 	mpFileDialog->setNameFilters(QStringList() << "*.mxf");
-	mpFileDialog->setIconProvider(new IconProviderExrWav(this)); // TODO: Does not work.
+	mpFileDialog->setIconProvider(new IconProviderExrWav(this));
+	connect(mpFileDialog, SIGNAL(directoryEntered(const QString&)), this, SLOT(SetMxfFileDirectory(const QString&)));
 	connect(mpFileDialog, SIGNAL(filesSelected(const QStringList &)), this, SLOT(SetMxfFile(const QStringList &)));
 	mpFileDialog->show();
 }
@@ -661,7 +665,7 @@ void WidgetImpBrowser::StartOutgest(bool clearUndoStack /*= true*/) {
 			}
 
 			for (int i = 0; i < mpImfPackage->GetAssetCount(); i++) {
-				//Add new CPLs to the IMP
+				//Add new CPLs to the Partial IMP
 				if (mpImfPackage->GetAsset(i)->GetType() == Asset::cpl) {
 					QSharedPointer<AssetCpl> asset_cpl = mpImfPackage->GetAsset(i).objectCast<AssetCpl>();
 					if (asset_cpl->GetIsNew() == true) {
@@ -672,7 +676,7 @@ void WidgetImpBrowser::StartOutgest(bool clearUndoStack /*= true*/) {
 						PartialImp->AddAsset(newCPL, PartialImp->GetPackingListId());
 					}
 				}
-				//Add new MXF Tracks to the IMP
+				//Add new MXF Tracks to the Partial IMP
 				if (mpImfPackage->GetAsset(i)->GetType() == Asset::mxf) {
 					QSharedPointer<AssetMxfTrack> asset_mxf = mpImfPackage->GetAsset(i).objectCast<AssetMxfTrack>();
 					if (asset_mxf->GetIsNew() == true) {
@@ -687,7 +691,6 @@ void WidgetImpBrowser::StartOutgest(bool clearUndoStack /*= true*/) {
 			InstallImp(PartialImp);
 			SetPartialOutgestInProgress(false);
 		}
-		//WR
 		ImfError error = mpImfPackage->Outgest();
 		if(error.IsError() == false) {
 			if(error.IsRecoverableError() == true) {
@@ -773,55 +776,76 @@ void WidgetImpBrowser::SetMxfFile(const QStringList &rFiles) {
 
 		MetadataExtractor extractor;
 		Metadata metadata;
+		Error error(Error::None);
 		extractor.ReadMetadata(metadata, QDir(rFiles.at(0)).absolutePath());
-		qDebug() << metadata.displayWidth << metadata.assetId;
+		qDebug() << "Asset ID of imported MXF track file:" << metadata.assetId.toString();
 		QFileInfo path = QFileInfo(QDir(rFiles.at(0)).absolutePath());
-		QSharedPointer<AssetMxfTrack> mxf_asset(new AssetMxfTrack(path, metadata.assetId));
-	  	mxf_asset->SetIsNew(true);
-	  	mpUndoStack->push(new AddAssetCommand(mpImfPackage, mxf_asset, mpImfPackage->GetPackingListId()));
-
-	  	//JobExtractEssenceDescriptor *p_ed_job = new JobExtractEssenceDescriptor(mxf_asset->GetPath().absoluteFilePath());
-		//connect(p_ed_job, SIGNAL(Result(const QString&, const QVariant&)), mxf_asset.data(), SLOT(SetEssenceDescriptor(const QString&)));
-		//mpJobQueue->AddJob(p_ed_job);
-		JobExtractEssenceDescriptor *p_ed_job_c = new JobExtractEssenceDescriptor(mxf_asset->GetPath().absoluteFilePath());
-		connect(p_ed_job_c, SIGNAL(Result(const DOMDocument*, const QVariant&)), mxf_asset.data(), SLOT(SetEssenceDescriptor(const DOMDocument*)));
-		mpJobQueue->AddJob(p_ed_job_c);
-		return;
-
-	mpFileDialog->hide();
-	if(rFiles.isEmpty() == false) {
-		if(is_mxf_file(rFiles.at(0))) {
-			//determine if AS-02
-			  ASDCP::EssenceType_t EssenceType;
-			  ASDCP::Result_t result = ASDCP::EssenceType(QDir(rFiles.at(0)).absolutePath().toStdString(), EssenceType);
-			  qDebug() << rFiles.at(0);
-			  if ( ASDCP_FAILURE(result) )
-			    qDebug() << "ASDCP_FAILURE";
-;
-			  if ( EssenceType == ASDCP::ESS_AS02_JPEG_2000 )
-			    {
-				  //FileInfoWrapper<AS_02::JP2K::MXFReader, MyPictureDescriptor> wrapper;
-				  //result = wrapper.file_info(Options, "JPEG 2000 pictures");
-				  qDebug() << "ASDCP::ESS_AS02_JPEG_2000";
-				  //extractor.ReadJP2KMxfDescriptor(metadata, QDir(rFiles.at(0)).absolutePath());
-				  qDebug() << metadata.displayWidth;
-
-			    }
-
-			//QFileInfo new_asset_path = QFileInfo(GetWorkingDir().absolutePath().append("/").append(rFiles.at(0))); //.c_str()));
-			//QSharedPointer<AssetMxfTrack> mxf_track(new AssetMxfTrack(new_asset_path));
-			//AddAsset(mxf_track, ImfXmlHelper::Convert(packing_list->getId()));
-			//JobExtractEssenceDescriptor *p_ed_job = new JobExtractEssenceDescriptor(mxf_track->GetPath().absoluteFilePath());
-			//connect(p_ed_job, SIGNAL(Result(const QString&, const QVariant&)), mxf_track.data(), SLOT(SetEssenceDescriptor(const QString&)));
-			//mpJobQueue->AddJob(p_ed_job);
-			//Determine essence type
-			//Determine size
-			//Calc hash (job)
-			//Extract Essence descriptor (job?)
-			//Add to IMP
+		if (metadata.assetId.isNull()) {
+			mpMsgBox->setText(tr("MXF Error"));
+			mpMsgBox->setInformativeText("Cannot determine Asset ID");
+			mpMsgBox->setStandardButtons(QMessageBox::Ok);
+			mpMsgBox->setDefaultButton(QMessageBox::Ok);
+			mpMsgBox->setIcon(QMessageBox::Critical);
+			mpMsgBox->exec();
+			return;
 		}
-	}
+		if (!mpImfPackage->GetAsset(metadata.assetId).isNull()) {
+			mpMsgBox->setText(tr("MXF Error"));
+			mpMsgBox->setInformativeText(tr("Asset ID %1 already exists in IMP").arg(metadata.assetId.toString()));
+			mpMsgBox->setStandardButtons(QMessageBox::Ok);
+			mpMsgBox->setDefaultButton(QMessageBox::Ok);
+			mpMsgBox->setIcon(QMessageBox::Critical);
+			mpMsgBox->exec();
+			return;
+		}
+		if(rFiles.isEmpty() == false) {
+			if(is_mxf_file(rFiles.at(0))) {
+				QFileInfo source_file(rFiles.at(0));
+				ASDCP::EssenceType_t EssenceType;
+				ASDCP::Result_t result = ASDCP::EssenceType(QDir(rFiles.at(0)).absolutePath().toStdString(), EssenceType);
+				if ( ASDCP_FAILURE(result) )
+					qDebug() << "ASDCP_FAILURE";
+
+				switch(EssenceType) {
+				#ifdef ARCHIVIST
+					case  ASDCP::ESS_ACES:
+						break;
+				#endif
+					case ASDCP::ESS_AS02_JPEG_2000:
+					case ASDCP::ESS_AS02_PCM_24b_48k:
+					case ASDCP::ESS_AS02_PCM_24b_96k:
+						break;
+
+					case ASDCP::ESS_AS02_TIMED_TEXT:
+						// Convert originalDuration to CPL Edit Units
+						metadata.editRate = mpImfPackage->GetImpEditRates().first();
+						metadata.duration = Duration(ceil(metadata.originalDuration.GetCount() / metadata.effectiveFrameRate.GetQuotient() * metadata.editRate.GetQuotient()));
+
+						break;
+					default:
+						mpMsgBox->setText(tr("MXF Error"));
+						mpMsgBox->setInformativeText("Unknown Essence Type");
+						mpMsgBox->setStandardButtons(QMessageBox::Ok);
+						mpMsgBox->setDefaultButton(QMessageBox::Ok);
+						mpMsgBox->setIcon(QMessageBox::Critical);
+						mpMsgBox->exec();
+						return;
+				}
+
+				QSharedPointer<AssetMxfTrack> mxf_asset(new AssetMxfTrack(path, metadata));
+				mxf_asset->SetIsNew(true);
+				mpUndoStack->push(new AddAssetCommand(mpImfPackage, mxf_asset, mpImfPackage->GetPackingListId()));
+
+				mxf_asset->ExtractEssenceDescriptor(mxf_asset->GetPath().absoluteFilePath());
+			}
+		}
+
+		mpFileDialog->hide();
 }
+void WidgetImpBrowser::SetMxfFileDirectory(const QString& rPath) {
+	if (!rPath.contains(mpImfPackage->GetRootDir().absolutePath())) mpFileDialog->setDirectory(mpImfPackage->GetRootDir().absolutePath());
+}
+
 //WR end
 
 
@@ -836,7 +860,7 @@ void WidgetImpBrowser::ExportPartialImp(QString &rDir, QString &rIssuer, QString
 	for (int i = 0; i < mpImfPackage->GetAssetCount(); i++) {
 		if (mpImfPackage->GetAsset(i)->GetType() == Asset::mxf) {
 			QSharedPointer<AssetMxfTrack> asset_mxf = mpImfPackage->GetAsset(i).objectCast<AssetMxfTrack>();
-			if(asset_mxf->Exists()) {
+			if(asset_mxf->Exists() && !asset_mxf->GetIsNew()) { //GetIsNew() is true for imported MXF files
 				asset_mxf->SetIsNew(false);
 			} else {
 				asset_mxf->SetIsNew(true);

@@ -58,7 +58,7 @@ signals:
 //WR end;
 
 
-	void UpdateStatusBar(const QString &); // (k)
+	void UpdateStatusBar(const QString &, const int &, const QString &); // (k)
 private slots:
 	void rCurrentChanged(int tabWidgetIndex);
 	void rToggleTTML(int tabWidgetIndex);

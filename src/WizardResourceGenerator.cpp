@@ -83,7 +83,7 @@ QWizardPage(pParent), mpFileDialog(NULL), mpSoundFieldGroupModel(NULL), mpTimedT
 mpComboBoxSoundfieldGroup(NULL), mpMsgBox(NULL), mpAs02Wrapper(NULL), mpLineEditDuration(NULL), mpComboBoxCplEditRate(NULL) {
 	mpAs02Wrapper = new MetadataExtractor(this);
 	setTitle(tr("Edit Resource"));
-	setSubTitle(tr("Select  a single (multichannel) wav file or IMSC1/TTML1 file that should build a resource."));
+	setSubTitle(tr("Select essence file(s) that should be wrapped as MXF AS-02."));
 	mEditRates = rEditRates;
 	InitLayout();
 }
@@ -277,7 +277,7 @@ void WizardResourceGeneratorPage::InitLayout() {
 	QGridLayout *p_wrapper_layout_three = new QGridLayout();
 	QGridLayout *vbox = new QGridLayout;
 	p_wrapper_layout_three->setContentsMargins(0, 0, 0, 0);
-	p_wrapper_layout_three->addWidget(new QLabel(tr("Select a Timed Text Resource (.ttml) compliant to IMSC1"), this), 0, 0, 1, 3);
+	p_wrapper_layout_three->addWidget(new QLabel(tr("Select a Timed Text Resource (.xml) compliant to IMSC1"), this), 0, 0, 1, 3);
 	p_wrapper_layout_three->addWidget(new QLabel(tr("CPL Edit Rate:"), this), 1, 0, 1, 2);
 	p_wrapper_layout_three->addWidget(mpComboBoxCplEditRate, 1, 2, 1, 1);
 	p_wrapper_layout_three->addWidget(new QLabel(tr("RFC 5646 Language Tag (e.g. en-US):"), this), 2, 0, 1, 2);

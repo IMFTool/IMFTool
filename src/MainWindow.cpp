@@ -219,7 +219,7 @@ void MainWindow::InitMenuAndToolbar() {
 	p_tool_bar->addAction(p_action_redo);
 
 	connect(mpCentralWidget, SIGNAL(UndoStackChanged(QUndoStack*)), mpUndoGroup, SLOT(setActiveStack(QUndoStack*)));
-	connect(mpCentralWidget, SIGNAL(UpdateStatusBar(const QString &)), mpStatusBar, SLOT(showMessage(const QString &)));
+	connect(mpCentralWidget, SIGNAL(UpdateStatusBar(const QString &, const int &, const QString &)), this, SLOT(showStatusMessage(const QString &, const int &, const QString &)));
 }
 
 			/* -----Denis Manthey Beg----- */
@@ -506,3 +506,9 @@ void MainWindow::SetUnwrittenCPL(QString FilePath) {
 	mpUnwrittenCPLs.append(FilePath);
 }
 			/* -----Denis Manthey End----- */
+//WR
+void MainWindow::showStatusMessage(const QString &text, const int &timeout, const QString &color) {
+	mpStatusBar->setStyleSheet(color);
+	mpStatusBar->showMessage(text, timeout);
+}
+

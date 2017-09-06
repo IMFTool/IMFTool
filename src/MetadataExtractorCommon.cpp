@@ -31,7 +31,6 @@ displayHeight(0),
 colorEncoding(Metadata::Unknown_Color_Encoding),
 horizontalSubsampling(0),
 componentDepth(0),
-colorSpace(Metadata::eColorSpace::Unknown), // (k)
 duration(),
 audioChannelCount(0),
 audioQuantization(0),

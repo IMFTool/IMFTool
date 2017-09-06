@@ -42,24 +42,6 @@ public:
 		RGBA
 	};
 
-	// (k) - start
-	enum eColorSpace {
-		Unknown = 0,
-		RGB709, // ["ITU-R.BT709 Color Primaries" in SMPTE RP 224]
-		RGB_2020_PQ, // ["SMPTE ST 2084 Transfer Characteristic" in SMPTE RP 224]
-		RGB_P3D65, // ["P3D65 Color Primaries" in SMPTE RP 224]
-		YUV_709, // ["ITU-R.BT709 Color Primaries" in SMPTE RP 224]
-		YUV_2020_LIN, // ["ITU-R.BT2020 Transfer Characteristic" in SMPTE RP 224]
-		YUV_2020_PQ, // ["SMPTE ST 2084 Transfer Characteristic" in SMPTE RP 224]
-		// ...
-		COLOR_3, // UHD (8, 10 bit), 4K (8, 10 bit), YCbCr, RGB
-		COLOR_4, // UHD (8, 10 bit), xvYCC709 (BT.709), YCbCr only!
-		COLOR_5, // UHD (10, 12 bit), 4K (10, 12 bit), YCbCr, RGB, BT.2020, NON-CONST-Y
-		COLOR_6, // 4K (10, 12, 16 bit), P3D65, RGB, CONST-Y
-		COLOR_7, // UHD (10, 12, 16 bit), 4K (10, 12, 16 bit), (RGB: CONST-Y), (YCbCr: NON-CONST-Y)
-	};
-	// (k) - end
-
 	Metadata(Metadata::eEssenceType type = Metadata::Unknown_Type);
 	~Metadata() {}
 	bool IsWellKnownType() { return type; }
@@ -74,9 +56,8 @@ public:
 	quint32									displayWidth;
 	quint32									displayHeight;
 	eColorEncoding							colorEncoding;
-	eColorSpace								colorSpace; // delete!
 	SMPTE::eColorPrimaries                  colorPrimaries; // (k)
-	SMPTE::eTransferCharacteristic         transferCharcteristics; // (k)
+	SMPTE::eTransferCharacteristic        	transferCharcteristics; // (k)
 	quint32									horizontalSubsampling;
 	quint32									componentDepth;
 	Duration								duration;
@@ -98,6 +79,8 @@ public:
 	quint32									componentMinRef;  // J2K RGBA only
 	quint32									componentMaxRef;  // J2K RGBA only
 	QUuid									assetId;
+	QString									pictureEssenceCoding; // J2K only
+	QString									pixelLayout; // J2K RGB only
 	//WR
 };
 

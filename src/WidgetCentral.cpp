@@ -175,13 +175,13 @@ void WidgetCentral::InitLyout() {
 // (k) - start
 void WidgetCentral::rUpdatePlaylist() {
 
-	emit UpdateStatusBar("updating playlist...");
+	emit UpdateStatusBar("updating playlist...", 500, "QStatusBar{color:white}");
 	WidgetComposition *p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->currentWidget());
 	if (p_composition) {
 
 		if (tpThread->isRunning()) {
 			playListUpdateSuccess = false;
-			emit UpdateStatusBar("The thread is currently in use :(");
+			emit UpdateStatusBar("The thread is currently in use :(", 2000, "QStatusBar{color:white}");
 		}
 		else {
 			mpPreview->Clear(); // (k) - clear preview
@@ -199,7 +199,7 @@ void WidgetCentral::rUpdatePlaylist() {
 		}
 	}
 	else {
-		emit UpdateStatusBar("no composition found!");
+		emit UpdateStatusBar("no composition found!", 2000, "QStatusBar{color:white}");
 	}
 }
 
@@ -214,7 +214,7 @@ void WidgetCentral::rPlaylistFinished() {
 	if (p_composition) {
 		mpPreview->setPlaylist(playlist, ttmls); // forward playlist to mpPreview
 		p_composition->getVerticalIndicator();
-		emit UpdateStatusBar(QString("updating took %1 ms").arg(timelineParserTime->elapsed()));
+		//emit UpdateStatusBar(QString("updating took %1 ms").arg(timelineParserTime->elapsed()), 2000, "QStatusBar{color:white}");
 	}
 }
 
@@ -508,3 +508,4 @@ void WidgetCentral::CopyCPL(const QSharedPointer<AssetCpl> &rDestination) {
 	}
 	GetCurrentUndoStack()->clear();
 }
+

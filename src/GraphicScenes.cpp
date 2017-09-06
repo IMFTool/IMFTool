@@ -374,6 +374,7 @@ void GraphicsSceneComposition::ProcessDragMove(DragDropInfo &rInfo, const QPoint
 				if(p_dummy && p_dummy->size().width() >= 1) dummy_right = p_dummy;
 			}
 
+			QString warning_text, error_text;
 			if(rInfo.pSegment) {
 				// Check if drop for audio resource is allowed
 				if(p_origin_resource->type() == GraphicsWidgetAudioResourceType) {
@@ -382,59 +383,183 @@ void GraphicsSceneComposition::ProcessDragMove(DragDropInfo &rInfo, const QPoint
 					if(GraphicsWidgetSequence *p_sequence = dynamic_cast<GraphicsWidgetSequence*>(grid_info_left.HorizontalOrigin)) {
 						if(p_sequence->GetType() == MainAudioSequence) {
 							QUuid track_id = p_sequence->GetTrackId();
+							bool descriptor_found = false;
 							for(int i = 0; i < mpComposition->GetSegmentCount(); i++) {
 								GraphicsWidgetSegment *p_segment = mpComposition->GetSegment(i);
 								if(p_segment) {
 									GraphicsWidgetSequence *p_sequence = p_segment->GetSequenceWithTrackId(track_id);
 									if(p_sequence && p_sequence->IsEmpty() == false) {
 										track_is_empty = false;
-										GraphicsWidgetAudioResource *p_resource_other = dynamic_cast<GraphicsWidgetAudioResource*>(p_sequence->GetResource(0));
-										if(p_resource_other) {
-											proposed_soundfield_group = p_resource_other->GetSoundfieldGroup();
-											if(p_resource_other->GetSoundfieldGroup() == static_cast<GraphicsWidgetAudioResource*>(p_origin_resource)->GetSoundfieldGroup()) {
-												rInfo.isDropable = true;
+										GraphicsWidgetAudioResource *p_resource_other = NULL;
+										for (int i=0; i < p_sequence->GetResourceCount(); i++) {
+											p_resource_other = dynamic_cast<GraphicsWidgetAudioResource*>(p_sequence->GetResource(i));
+											if (p_resource_other && p_resource_other->GetAsset()) {
+												descriptor_found = true;
 												break;
 											}
 										}
+										if(descriptor_found && p_resource_other->GetSoundfieldGroup() != static_cast<GraphicsWidgetAudioResource*>(p_origin_resource)->GetSoundfieldGroup()) {
+											error_text = tr("Sound field group mismatch: %1 expected.").arg(proposed_soundfield_group.GetName());
+											break;
+										}
+										else if (p_resource_other && p_resource_other->GetAsset()) {
+											proposed_soundfield_group = p_resource_other->GetSoundfieldGroup();
+											if (p_resource_other->GetAsset()->GetLanguageTag() != p_origin_resource->GetAsset()->GetLanguageTag()
+												|| p_resource_other->GetAsset()->GetMCAAudioContentKind() != p_origin_resource->GetAsset()->GetMCAAudioContentKind()
+												|| p_resource_other->GetAsset()->GetMCAAudioElementKind() != p_origin_resource->GetAsset()->GetMCAAudioElementKind()
+												|| p_resource_other->GetAsset()->GetMCATitle() != p_origin_resource->GetAsset()->GetMCATitle()
+												|| p_resource_other->GetAsset()->GetMCATitleVersion() != p_origin_resource->GetAsset()->GetMCATitleVersion()
+												) {
+												//get_main_window()->statusBar()->setStyleSheet("QStatusBar{color:yellow}");
+												//get_main_window()->statusBar()->showMessage("Warning: Essence Descriptor mismatch", 5000);
+												warning_text = "Warning: Essence Descriptor mismatch";
+
+											}
+										}
+
+									}
+								}
+							}
+							if (!descriptor_found) {
+								warning_text =  "Warning: Cannot determine audio characteristics";
+							}
+						}
+					}
+					if(track_is_empty == true) rInfo.isDropable = true;
+					else if (!error_text.isEmpty()) {
+						get_main_window()->statusBar()->setStyleSheet("QStatusBar{color:red}");
+						get_main_window()->statusBar()->showMessage(error_text, 5000);
+					}
+					else if (!warning_text.isEmpty()) {
+						get_main_window()->statusBar()->setStyleSheet("QStatusBar{color:yellow}");
+						get_main_window()->statusBar()->showMessage(warning_text, 2000);
+						rInfo.isDropable = true;
+					}
+					else {
+						rInfo.isDropable = true;
+					}
+				}
+				else if(p_origin_resource->type() == GraphicsWidgetVideoResourceType) {
+					bool track_is_empty = true;
+					if(GraphicsWidgetSequence *p_sequence = dynamic_cast<GraphicsWidgetSequence*>(grid_info_left.HorizontalOrigin)) {
+						if(p_sequence->GetType() == MainImageSequence) {
+							QUuid track_id = p_sequence->GetTrackId();
+							for(int i = 0; i < mpComposition->GetSegmentCount(); i++) {
+								GraphicsWidgetSegment *p_segment = mpComposition->GetSegment(i);
+								if(p_segment) {
+									GraphicsWidgetSequence *p_sequence = p_segment->GetSequenceWithTrackId(track_id);
+									if(!(p_origin_resource->GetAsset() && p_origin_resource->GetAsset()->GetEditRate() == GetCplEditRate()))
+										error_text = tr("Image edit rate mismatch: %1 expected.").arg(GetCplEditRate().GetQuotient(), 0, 'f', 2);
+									if(p_sequence && p_sequence->IsEmpty() == false) {
+										track_is_empty = false;
+										GraphicsWidgetVideoResource *p_resource_other = NULL;
+										for (int i=0; i < p_sequence->GetResourceCount(); i++) {
+											p_resource_other = dynamic_cast<GraphicsWidgetVideoResource*>(p_sequence->GetResource(i));
+											if (p_resource_other && p_resource_other->GetAsset()) break;
+										}
+										if(p_resource_other && p_resource_other->GetAsset()) {
+											if (error_text.isEmpty() && (p_resource_other->GetAsset()->GetMetadata().storedWidth != p_origin_resource->GetAsset()->GetMetadata().storedWidth)
+													&& (p_resource_other->GetAsset()->GetMetadata().storedHeight != p_origin_resource->GetAsset()->GetMetadata().storedHeight)) {
+												error_text = tr("Resolution mismatch: %1 x %2 expected.").arg(p_resource_other->GetAsset()->GetMetadata().storedWidth, p_resource_other->GetAsset()->GetMetadata().storedHeight);
+
+											}
+											else if (error_text.isEmpty() && (p_resource_other->GetAsset()->GetMetadata().colorEncoding != p_origin_resource->GetAsset()->GetMetadata().colorEncoding)) {
+												QString color;
+												switch (p_resource_other->GetAsset()->GetMetadata().colorEncoding) {
+												case Metadata::eColorEncoding::Unknown_Color_Encoding:
+													color = "Unknown";
+													break;
+												case Metadata::eColorEncoding::RGBA:
+													color = "RGB";
+													break;
+												case Metadata::eColorEncoding::CDCI:
+													color = "YCbCr";
+													break;
+												}
+												error_text = tr("Color encoding mismatch: %1 expected.").arg(color);
+											}
+											else if (error_text.isEmpty() && (p_resource_other->GetAsset()->GetMetadata().horizontalSubsampling != p_origin_resource->GetAsset()->GetMetadata().horizontalSubsampling)) {
+												QString subsampling;
+												switch (p_resource_other->GetAsset()->GetMetadata().horizontalSubsampling) {
+												case 1:
+													subsampling = "4:4:4";
+													break;
+												case 2:
+													subsampling = "4:2:2";
+													break;
+												default:
+													subsampling = "Unknown";
+													break;
+												}
+												error_text = tr("Color subsampling mismatch: %1 expected.").arg(subsampling);
+
+											}
+											else if (error_text.isEmpty() && (p_resource_other->GetAsset()->GetMetadata().colorPrimaries != p_origin_resource->GetAsset()->GetMetadata().colorPrimaries)) {
+												error_text = tr("Color primaries mismatch.");
+
+											}
+											else if (error_text.isEmpty() && (p_resource_other->GetAsset()->GetMetadata().transferCharcteristics != p_origin_resource->GetAsset()->GetMetadata().transferCharcteristics)) {
+												error_text = tr("Transfer characteristics mismatch.");
+
+											}
+											else if (error_text.isEmpty() && (p_resource_other->GetAsset()->GetMetadata().pictureEssenceCoding != p_origin_resource->GetAsset()->GetMetadata().pictureEssenceCoding)) {
+												error_text = tr("Picture Essence Coding mismatch.");
+
+											}
+											else if (error_text.isEmpty() && (p_resource_other->GetAsset()->GetMetadata().componentDepth != p_origin_resource->GetAsset()->GetMetadata().componentDepth)) {
+												if (p_resource_other->GetAsset()->GetMetadata().componentDepth) {
+													error_text = tr("Component Bit Depth mismatch: %1 expected.").arg(p_resource_other->GetAsset()->GetMetadata().componentDepth);
+												} else {
+													get_main_window()->statusBar()->setStyleSheet("QStatusBar{color:yellow}");
+													get_main_window()->statusBar()->showMessage("Warning: Cannot determine component bit depth of virtaul track", 5000);
+												}
+
+											}
+										} else {
+											get_main_window()->statusBar()->setStyleSheet("QStatusBar{color:yellow}");
+											get_main_window()->statusBar()->showMessage("Warning: Cannot determine image characteristics", 5000);
+
+										}
+									}
+									if (error_text.isEmpty()) {
+										rInfo.isDropable = true;
+									} else {
+										get_main_window()->statusBar()->setStyleSheet("QStatusBar{color:red}");
+										get_main_window()->statusBar()->showMessage(error_text, 5000);
 									}
 								}
 							}
 						}
 					}
-					if(track_is_empty == true) rInfo.isDropable = true;
-					if(rInfo.isDropable == false) {
-						get_main_window()->statusBar()->showMessage(tr("Sound field group mismatch: %1 proposed.").arg(proposed_soundfield_group.GetName()), 5000);
-					}
-				}
-				else if(p_origin_resource->type() == GraphicsWidgetVideoResourceType) {
-					if(p_origin_resource->GetAsset() && p_origin_resource->GetAsset()->GetEditRate() == GetCplEditRate()) {
-						rInfo.isDropable = true;
-					}
-					else {
-						get_main_window()->statusBar()->showMessage(tr("Image edit rate mismatch: %1 proposed.").arg(GetCplEditRate().GetQuotient(), 0, 'f', 2), 5000);
-					}
 				}
 
 				else if(p_origin_resource->type() == GraphicsWidgetTimedTextResourceType) {
 
-					if(p_origin_resource->GetAsset()) {
+					if(p_origin_resource->GetAsset() && p_origin_resource->GetAsset()->GetEditRate() == GetCplEditRate()) {
 						rInfo.isDropable = true;
 					}
 					else {
-						get_main_window()->statusBar()->showMessage(tr("Resource can not be dropped here."));
+						get_main_window()->statusBar()->setStyleSheet("QStatusBar{color:red}");
+						get_main_window()->statusBar()->showMessage(tr("Image edit rate mismatch: %1 expected.").arg(GetCplEditRate().GetQuotient(), 0, 'f', 2), 5000);
 					}
 				}
 
 				if((dummy_right != NULL && dummy_right == dummy_left) || (rInfo.pSegment && dummy_left != NULL && rInfo.pSegment->isAncestorOf(dummy_left))) {
-					if(rInfo.isDropable == true) get_main_window()->statusBar()->showMessage(tr("Resource can not be dropped here."));
+					if(rInfo.isDropable == true) {
+						get_main_window()->statusBar()->setStyleSheet("QStatusBar{color:red}");
+						get_main_window()->statusBar()->showMessage(tr("Resource cannot be dropped here."), 5000);
+					}
 					rInfo.isDropable = false;
 				}
 			}
-			else get_main_window()->statusBar()->showMessage(tr("Resource can not be dropped here."));
+			else {
+				get_main_window()->statusBar()->setStyleSheet("QStatusBar{color:red}");
+				get_main_window()->statusBar()->showMessage(tr("Resource cannot be dropped here."), 5000);
+			}
 
 			// Overwrite cursor and ghost opacity depending on drop state
 			if(rInfo.isDropable == true) {
-				get_main_window()->statusBar()->clearMessage();
+				//get_main_window()->statusBar()->clearMessage();
 				mpGhost->SetColor(p_origin_resource->GetColor().darker(150));
 				QCursor *p_cursor = QGuiApplication::overrideCursor();
 				if(p_cursor && p_cursor->shape() == Qt::ForbiddenCursor) QGuiApplication::restoreOverrideCursor();
@@ -768,11 +893,15 @@ void GraphicsSceneComposition::dragEnterEvent(QGraphicsSceneDragDropEvent *pEven
 
 
 					default:
+						get_main_window()->statusBar()->setStyleSheet("QStatusBar{color:red}");
 						get_main_window()->statusBar()->showMessage(tr("Unsupported MXF asset"), 5000);
 						break;
 				}
 			}
-			else get_main_window()->statusBar()->showMessage(tr("MXF asset duration < one composition edit unit"), 5000);
+			else {
+				get_main_window()->statusBar()->setStyleSheet("QStatusBar{color:red}");
+				get_main_window()->statusBar()->showMessage(tr("MXF asset duration < one composition edit unit"), 5000);
+			}
 		}
 	}
 	pEvent->setAccepted(accept);

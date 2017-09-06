@@ -119,14 +119,11 @@ Error MetadataExtractor::ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileI
 
 	if(ASDCP_SUCCESS(result)) {
 		WriterInfo writerinfo;
-		//FileInfoWrapper<AS_02::JP2K::MXFReader, MyPictureDescriptor> wrapper;
-		//qDebug() << "Vor metadata.assetId";
 		result = reader.FillWriterInfo(writerinfo);
-		//qDebug() << "WriterInfoDump:";
-		//WriterInfoDump(writerinfo);
-		char str_buf[16], str_buf2[40];
-		//metadata.assetId = QUuid(QByteArray((UUID(writerinfo.AssetUUID).EncodeHex(str_buf, 16)), 16));
-		metadata.assetId = convert_uuid((unsigned char*)writerinfo.AssetUUID);
+		if(KM_SUCCESS(result)) {
+			char str_buf[16], str_buf2[40];
+			metadata.assetId = convert_uuid((unsigned char*)writerinfo.AssetUUID);
+		}
 
 		ASDCP::MXF::RGBAEssenceDescriptor *rgba_descriptor = NULL;
 		ASDCP::MXF::CDCIEssenceDescriptor *cdci_descriptor = NULL;
@@ -163,11 +160,26 @@ Error MetadataExtractor::ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileI
 			metadata.storedHeight = rgba_descriptor->StoredHeight;
 			metadata.storedWidth = rgba_descriptor->StoredWidth;
 			metadata.horizontalSubsampling = 1;
-			if(rgba_descriptor->ComponentMaxRef.empty() == false)metadata.componentDepth = log10(rgba_descriptor->ComponentMaxRef.get() + 1) / log10(2.);
+			if (rgba_descriptor->PixelLayout.HasValue()) {
+				char buf[64];
+				QString pixel_layout;
+				pixel_layout = QString(rgba_descriptor->PixelLayout.EncodeString(buf, 64)); //WR
+				if (pixel_layout.contains(QRegExp("\([0-9]*\)"))) {
+					metadata.componentDepth = pixel_layout.split('(')[1].split(')').first().toInt();
+				}
+			} else {
+				// Try deriving from ComponentMaxRef, if present.
+				if(rgba_descriptor->ComponentMaxRef.empty() == false)metadata.componentDepth = log10(rgba_descriptor->ComponentMaxRef.get() + 1) / log10(2.);
+
+			}
 			TransferCharacteristic = rgba_descriptor->TransferCharacteristic; // (k)
 			ColorPrimaries = rgba_descriptor->ColorPrimaries; // (k)
 			if(rgba_descriptor->ComponentMinRef.empty() == false) metadata.componentMinRef = rgba_descriptor->ComponentMinRef;
 			if(rgba_descriptor->ComponentMaxRef.empty() == false) metadata.componentMaxRef = rgba_descriptor->ComponentMaxRef;
+			if (rgba_descriptor->PictureEssenceCoding.HasValue()) {
+				char buf[64];
+				metadata.pictureEssenceCoding = QString(rgba_descriptor->PictureEssenceCoding.EncodeString(buf, 64)); //WR
+			}
 		}
 		else if(cdci_descriptor) {
 			metadata.colorEncoding = Metadata::CDCI;
@@ -181,8 +193,12 @@ Error MetadataExtractor::ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileI
 			else metadata.displayWidth = cdci_descriptor->StoredWidth;
 			metadata.storedHeight = cdci_descriptor->StoredHeight;
 			metadata.storedWidth = cdci_descriptor->StoredWidth;
-			metadata.horizontalSubsampling = 2;
+			metadata.horizontalSubsampling = cdci_descriptor->HorizontalSubsampling;
 			metadata.componentDepth = cdci_descriptor->ComponentDepth;
+			if (cdci_descriptor->PictureEssenceCoding.HasValue()) {
+				char buf[64];
+				metadata.pictureEssenceCoding = QString(cdci_descriptor->PictureEssenceCoding.EncodeString(buf, 64)); //WR
+			}
 			TransferCharacteristic = cdci_descriptor->TransferCharacteristic; // (k)
 			ColorPrimaries = cdci_descriptor->ColorPrimaries; // (k)
 		}
@@ -234,6 +250,13 @@ Error MetadataExtractor::ReadPcmMxfDescriptor(Metadata &rMetadata, const QFileIn
 	Result_t result = reader.OpenRead(rSourceFile.absoluteFilePath().toStdString(), ASDCP::Rational(24, 1));
 
 	if(KM_SUCCESS(result)) {
+		WriterInfo writerinfo;
+		result = reader.FillWriterInfo(writerinfo);
+		if(KM_SUCCESS(result)) {
+			char str_buf[16], str_buf2[40];
+			metadata.assetId = convert_uuid((unsigned char*)writerinfo.AssetUUID);
+		}
+
 		ASDCP::MXF::InterchangeObject* tmp_obj = NULL;
 
 		result = reader.OP1aHeader().GetMDObjectByType(DefaultCompositeDict().ul(MDD_WaveAudioDescriptor), &tmp_obj);
@@ -377,6 +400,12 @@ Error MetadataExtractor::ReadTimedTextMxfDescriptor(Metadata &rMetadata, const Q
 	AS_02::Result_t result = reader.OpenRead(rSourceFile.absoluteFilePath().toStdString());
 	if(ASDCP_SUCCESS(result)) {
 		//WR
+		WriterInfo writerinfo;
+		result = reader.FillWriterInfo(writerinfo);
+		if(KM_SUCCESS(result)) {
+			char str_buf[16], str_buf2[40];
+			metadata.assetId = convert_uuid((unsigned char*)writerinfo.AssetUUID);
+		}
 		ASDCP::MXF::InterchangeObject* tmp_obj = NULL;
 
 		result = reader.OP1aHeader().GetMDObjectByType(DefaultCompositeDict().ul(MDD_TimedTextDescriptor), &tmp_obj);

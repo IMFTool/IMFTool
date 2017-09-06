@@ -47,6 +47,7 @@ public slots:
 	void SaveAllCpl();
 	void SaveAsNewCPL();
 	void WritePackage();
+	void showStatusMessage(const QString &text, const int &timeout, const QString &color);
 
 
 private slots:

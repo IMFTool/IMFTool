@@ -56,7 +56,6 @@ public:
 	virtual QSize minimumSizeHint() const;
 	QUndoStack* GetUndoStack() const { return mpUndoStack; }
 	QSharedPointer<AssetCpl> GenerateEmptyCPL();
-	QDir GetWorkingDir() {return mpImfPackage->GetRootDir();}
 
 	void ExportPartialImp(QString &rDir, QString &rIssuer, QString &rAnnotation);
 	//WR
@@ -64,6 +63,7 @@ public:
 	bool GetPartialOutgestInProgress() {return mPartialOutgestInProgress;}
 	void SetPartialImpPath (QString rPartialImpPath) {mPartialImpPath = rPartialImpPath;}
 	QString GetPartialImpPath () {return mPartialImpPath;}
+	QSharedPointer<ImfPackage> GetImfPackage () {return mpImfPackage;}
 	//WR
 
 signals:
@@ -96,6 +96,7 @@ signals:
 	void rReinstallImp();
 	//WR
 	void SetMxfFile(const QStringList &rFiles);
+	void SetMxfFileDirectory(const QString&);
 	//WR
 
 protected:
