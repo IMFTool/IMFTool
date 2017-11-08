@@ -39,8 +39,8 @@
 #include <QFileDialog>
 #include <list>
 #include <cmath>
-
-
+#include <QTextEdit>
+#include "WizardEssenceDescriptor.h"
 
 WidgetImpBrowser::WidgetImpBrowser(QWidget *pParent /*= NULL*/) :
 QFrame(pParent), mpViewImp(NULL), mpViewAssets(NULL), mpImfPackage(NULL), mpToolBar(NULL), mpUndoStack(NULL), mpUndoProxyModel(NULL), mpSortProxyModelImp(NULL), mpSortProxyModelAssets(NULL), mpMsgBox(NULL), mpJobQueue(NULL), mPartialOutgestInProgress(false) {
@@ -126,6 +126,7 @@ void WidgetImpBrowser::InitLayout() {
 	connect(mpJobQueue, SIGNAL(Progress(int)), mpProgressDialog, SLOT(setValue(int)));
 	connect(mpJobQueue, SIGNAL(NextJobStarted(const QString&)), mpProgressDialog, SLOT(setLabelText(const QString&)));
 	connect(mpProgressDialog, SIGNAL(canceled()), mpJobQueue, SLOT(InterruptQueue()));
+	connect(mpViewImp, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(rImpViewDoubleClicked(const QModelIndex&)));
 }
 
 void WidgetImpBrowser::InitToolbar() {
@@ -197,7 +198,6 @@ void WidgetImpBrowser::InstallImp(const QSharedPointer<ImfPackage> &rImfPackage,
 
 	connect(mpViewAssets->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(rMapCurrentRowSelectionChanged(const QModelIndex&, const QModelIndex&)));
 	connect(mpViewImp->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(rMapCurrentRowSelectionChanged(const QModelIndex&, const QModelIndex&)));
-	connect(mpViewImp, SIGNAL(doubleClicked(const QModelIndex&)), this, SLOT(rImpViewDoubleClicked(const QModelIndex&)));
 	connect(mpImfPackage.data(), SIGNAL(DirtyChanged(bool)), this, SIGNAL(ImpSaveStateChanged(bool)));
 	emit ImplInstalled(true);
 	emit ImpSaveStateChanged(mpImfPackage->IsDirty());
@@ -256,10 +256,14 @@ void WidgetImpBrowser::rCustomMenuRequested(QPoint pos) {
 			//edit_action disabled, because Empty TT cannot be added afterwards AND assets already dragged into a timeline don't get updated after editing
 			//QAction *edit_action = new QAction(QIcon(":/edit.png"), tr("Edit selected Asset"), this);
 			QAction *open_action = new QAction(QIcon(":/edit.png"), tr("Open CPL"), this);
+			QAction *view_metadata_action = new QAction(QIcon(":/information.png"), tr("View metadata"), this);
+			QAction *view_essence_descriptor_action = new QAction(QIcon(":/information.png"), tr("View essence descriptor"), this);
 			connect(remove_action, SIGNAL(triggered(bool)), this, SLOT(rRemoveSelectedRow()));
 			//connect(delete_action, SIGNAL(triggered(bool)), this, SLOT(rDeleteSelectedRow()));
 			connect(open_action, SIGNAL(triggered(bool)), this, SLOT(rOpenCplTimeline()));
 			//connect(edit_action, SIGNAL(triggered(bool)), this, SLOT(rShowResourceGeneratorForSelectedRow()));
+			connect(view_metadata_action, SIGNAL(triggered(bool)), this, SLOT(rShowMetadata()));
+			connect(view_essence_descriptor_action, SIGNAL(triggered(bool)), this, SLOT(rShowEssenceDescriptor()));
 			menu.addAction(remove_action);
 			//menu.addAction(delete_action);
 			//menu.addSeparator();
@@ -271,8 +275,11 @@ void WidgetImpBrowser::rCustomMenuRequested(QPoint pos) {
 				//if(asset->Exists() == false) delete_action->setDisabled(true);
 				if(asset->Exists() == true && asset->GetType() == Asset::cpl)
 					menu.addAction(open_action);
-				if(asset->Exists() == true && asset->GetType() == Asset::mxf) {
-					QSharedPointer<AssetMxfTrack> mxf_asset = asset.staticCast<AssetMxfTrack>();
+				if(asset->GetType() == Asset::mxf) {
+					QSharedPointer <AssetMxfTrack> assetMxfTrack = qSharedPointerCast<AssetMxfTrack>(asset);
+					if (asset->Exists() || assetMxfTrack->HasSourceFiles())
+						menu.addAction(view_metadata_action);
+					if(asset->Exists()) menu.addAction(view_essence_descriptor_action);
 				}
 			}
 		}
@@ -394,8 +401,12 @@ void WidgetImpBrowser::rShowResourceGeneratorForAsset(const QUuid &rAssetId) {
 
 	if(mpImfPackage) {
 		QSharedPointer<AssetMxfTrack> asset = mpImfPackage->GetAsset(rAssetId).objectCast<AssetMxfTrack>();
-		if(asset && asset->Exists() == false) {
-			WizardResourceGenerator *p_wizard_resource_generator = new WizardResourceGenerator(this, mpImfPackage->GetImpEditRates());
+		if(asset) { // && asset->Exists() == false) {
+			WizardResourceGenerator *p_wizard_resource_generator;
+			if (asset->Exists() == false)
+				p_wizard_resource_generator = new WizardResourceGenerator(this, mpImfPackage->GetImpEditRates());
+			else
+				p_wizard_resource_generator = new WizardResourceGenerator(this, mpImfPackage->GetImpEditRates(), asset);
 			p_wizard_resource_generator->setAttribute(Qt::WA_DeleteOnClose, true);
 			p_wizard_resource_generator->setField(FIELD_NAME_SELECTED_FILES, QVariant(asset->GetSourceFiles()));
 			p_wizard_resource_generator->setField(FIELD_NAME_SOUNDFIELD_GROUP, QVariant::fromValue<SoundfieldGroup>(asset->GetSoundfieldGroup()));
@@ -415,6 +426,16 @@ void WidgetImpBrowser::rShowResourceGeneratorForAsset(const QUuid &rAssetId) {
 		}
 	}
 }
+
+void WidgetImpBrowser::rShowEssenceDescriptorForAsset(const QSharedPointer<AssetMxfTrack> &rAsset) {
+
+	if(rAsset) {
+		WizardEssenceDescriptor *p_wizard_essence_descriptor= new WizardEssenceDescriptor(this,rAsset);
+		p_wizard_essence_descriptor->setAttribute(Qt::WA_DeleteOnClose, true);
+		p_wizard_essence_descriptor->show();
+		}
+}
+
 
 void WidgetImpBrowser::rResourceGeneratorAccepted() {
 
@@ -623,7 +644,7 @@ void WidgetImpBrowser::rImpViewDoubleClicked(const QModelIndex &rIndex) {
 			QModelIndex index = mpSortProxyModelImp->mapToSource(rIndex);
 			if(index.isValid() == true) {
 				QSharedPointer<AssetMxfTrack> asset = mpImfPackage->GetAsset(index.row()).objectCast<AssetMxfTrack>();
-				if(asset && asset->Exists() == false) {
+				if(asset && (asset->HasSourceFiles() || asset->Exists())) { // Do not call rShowResourceGeneratorForAsset for assets that are listed in the PKL but are not present in the file system.
 					rShowResourceGeneratorForAsset(asset->GetId());
 				}
 				QSharedPointer<AssetCpl> asset_cpl = mpImfPackage->GetAsset(index.row()).objectCast<AssetCpl>();
@@ -643,6 +664,21 @@ void WidgetImpBrowser::rOpenCplTimeline() {
 	}
 }
 			/* -----Denis Manthey End----- */
+
+void WidgetImpBrowser::rShowMetadata() {
+	QSharedPointer<AssetMxfTrack> asset = mpImfPackage->GetAsset(mpSortProxyModelImp->mapToSource(mpViewImp->currentIndex()).row()).objectCast<AssetMxfTrack>();
+	if(asset) {
+		rShowResourceGeneratorForAsset(asset->GetId());
+	}
+}
+
+void WidgetImpBrowser::rShowEssenceDescriptor() {
+	QSharedPointer<AssetMxfTrack> asset = mpImfPackage->GetAsset(mpSortProxyModelImp->mapToSource(mpViewImp->currentIndex()).row()).objectCast<AssetMxfTrack>();
+	if(asset) {
+		rShowEssenceDescriptorForAsset(asset);
+	}
+
+}
 
 
 void WidgetImpBrowser::StartOutgest(bool clearUndoStack /*= true*/) {

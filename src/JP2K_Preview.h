@@ -61,10 +61,7 @@ protected:
 	int max_f; // (float)pow(2, bitdepth)
 	float max_f_; // max_f - 1;
 	float *oetf_709;
-	float *eotf_709;
-	float *oetf_2020;
 	float *eotf_2020;
-	float *oetf_PQ;
 	float *eotf_PQ;
 
 	AS_02::JP2K::MXFReader *reader;

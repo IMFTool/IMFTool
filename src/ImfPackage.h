@@ -35,7 +35,6 @@
 #include <QUndoCommand>
 #include <QVector>
 
-#include "JP2K_Preview.h"
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/framework/LocalFileFormatTarget.hpp>

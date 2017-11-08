@@ -698,7 +698,12 @@ QVariant ImfPackage::data(const QModelIndex &rIndex, int role /*= Qt::DisplayRol
 					else if(size < 1073741824) return QVariant(QString::number((double)size / 1048576., 'f', 2).append(" MiB"));
 					else return QVariant(QString::number((double)size / 1073741824., 'f', 2).append(" GiB"));
 				}
-				else return QVariant(tr("Not Finalized"));
+				else if (mAssetList.at(row)->GetType() == Asset::mxf) {
+					QSharedPointer <AssetMxfTrack> assetMxfTrack = qSharedPointerCast<AssetMxfTrack>(mAssetList.at(row));
+					if (!assetMxfTrack->HasSourceFiles()) return QVariant(tr("Missing file"));
+					else return QVariant(tr("Not Finalized"));
+				}
+				else return QVariant(tr("Missing file"));
 			}
 			else if(role == Qt::TextAlignmentRole) {
 				return QVariant(Qt::AlignRight | Qt::AlignCenter);

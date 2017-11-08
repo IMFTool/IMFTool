@@ -65,6 +65,8 @@ private:
 		"episode",
 		"highlights",
 		"event",
+		"supplemental",
+		"documentary",
 	};
 
 };

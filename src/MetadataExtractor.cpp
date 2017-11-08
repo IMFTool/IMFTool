@@ -160,16 +160,22 @@ Error MetadataExtractor::ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileI
 			metadata.storedHeight = rgba_descriptor->StoredHeight;
 			metadata.storedWidth = rgba_descriptor->StoredWidth;
 			metadata.horizontalSubsampling = 1;
+			metadata.componentDepth = 0;
 			if (rgba_descriptor->PixelLayout.HasValue()) {
 				char buf[64];
 				QString pixel_layout;
 				pixel_layout = QString(rgba_descriptor->PixelLayout.EncodeString(buf, 64)); //WR
-				if (pixel_layout.contains(QRegExp("\([0-9]*\)"))) {
+				if (pixel_layout.contains(QRegExp("\\([0-9]*\\)"))) {
 					metadata.componentDepth = pixel_layout.split('(')[1].split(')').first().toInt();
 				}
-			} else {
+			}
+			if (metadata.componentDepth == 0) {
 				// Try deriving from ComponentMaxRef, if present.
-				if(rgba_descriptor->ComponentMaxRef.empty() == false)metadata.componentDepth = log10(rgba_descriptor->ComponentMaxRef.get() + 1) / log10(2.);
+				if(rgba_descriptor->ComponentMaxRef.empty() == false) {
+					metadata.componentDepth = round (log10(rgba_descriptor->ComponentMaxRef.get() + 1) / log10(2.));
+				} else {
+					qDebug() << "WARNING: Pixel Layout and ComponentMaxRef do not contain proper values!";
+				}
 
 			}
 			TransferCharacteristic = rgba_descriptor->TransferCharacteristic; // (k)
@@ -211,7 +217,7 @@ Error MetadataExtractor::ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileI
 		if (ColorPrimaries.HasValue()) {
 
 			CP = ColorPrimaries.EncodeString(buf, 64);
-			CP = CP.toUpper().replace(".", "");
+			CP = CP.toLower(); //.replace(".", "");
 			metadata.colorPrimaries = SMPTE::ColorPrimariesMap[CP];
 		}
 
@@ -219,7 +225,7 @@ Error MetadataExtractor::ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileI
 		QString TC;
 		if (TransferCharacteristic.HasValue()){
 			TC = TransferCharacteristic.EncodeString(buf, 64);
-			TC = TC.toUpper().replace(".", "");
+			TC = TC.toLower(); //.replace(".", "");
 			metadata.transferCharcteristics = SMPTE::TransferCharacteristicMap[TC];
 
 		}

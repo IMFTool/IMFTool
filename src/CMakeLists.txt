@@ -1,13 +1,13 @@
 find_file(asdcplib_Targets_PATH NAMES asdcplibtargets.cmake PATHS "$ENV{CMAKE_HINT}/asdcplib" ENV CMAKE_HINT PATH_SUFFIXES "targets")
-find_file(OpenJPEG_Targets_PATH NAMES OpenJPEGTargets.cmake ENV CMAKE_HINT PATH_SUFFIXES "targets")
+#find_file(OpenJPEG_Targets_PATH NAMES OpenJPEGTargets.cmake ENV CMAKE_HINT PATH_SUFFIXES "targets")
 find_path(asdcplib_include_DIR NAMES AS_02.h PATHS "$ENV{CMAKE_HINT}/asdcplib" ENV CMAKE_HINT PATH_SUFFIXES "include")
-find_path(OpenJPEG_include_DIR NAMES openjpeg.h)
-find_library(OpenJPEGLib_Path NAMES openjp2 PATHS ENV CMAKE_HINT PATH_SUFFIXES "lib")
-find_library(OpenJPEGLib_Debug_Path NAMES openjp2 PATHS ENV CMAKE_HINT PATH_SUFFIXES "lib")
+#find_path(OpenJPEG_include_DIR NAMES openjpeg.h)
+#find_library(OpenJPEGLib_Path NAMES openjp2 PATHS ENV CMAKE_HINT PATH_SUFFIXES "lib")
+#find_library(OpenJPEGLib_Debug_Path NAMES openjp2 PATHS ENV CMAKE_HINT PATH_SUFFIXES "lib")
 find_library(XercescppLib_PATH NAMES xerces-c xerces-c_3 PATHS "${PROJECT_SOURCE_DIR}/../xercescpp" "${PROJECT_SOURCE_DIR}/../lib/xercescpp" "$ENV{CMAKE_HINT}/xercescpp" ENV CMAKE_HINT PATH_SUFFIXES "lib")
 find_library(XercescppLib_Debug_PATH NAMES xerces-c xerces-c_3D PATHS "${PROJECT_SOURCE_DIR}/../xercescpp" "${PROJECT_SOURCE_DIR}/../lib/xercescpp" "$ENV{CMAKE_HINT}/xercescpp" ENV CMAKE_HINT PATH_SUFFIXES "lib")
 find_path(XercescppLib_include_DIR NAMES xercesc/dom/DOM.hpp PATHS "${PROJECT_SOURCE_DIR}/../xercescpp" "${PROJECT_SOURCE_DIR}/../lib/xercescpp" "$ENV{CMAKE_HINT}/xercescpp" ENV CMAKE_HINT PATH_SUFFIXES "include")
-find_path(LibXSD_root_DIR NAMES xsd/cxx/tree/parsing/int.hxx PATHS "${PROJECT_SOURCE_DIR}/../xsd" "${PROJECT_SOURCE_DIR}/../lib/xsd" "$ENV{CMAKE_HINT}/xsd" ENV CMAKE_HINT PATH_SUFFIXES "libxsd")
+find_package(OpenJPEG)
 find_package(regxmllibc)
 
 if(ARCHIVIST)
@@ -28,7 +28,7 @@ find_library(ZLib_Debug_PATH NAMES z zlibd PATHS "${PROJECT_SOURCE_DIR}/../zlib"
 endif(ARCHIVIST)
 
 include("${asdcplib_Targets_PATH}") # Import asdcplib targets.
-include("${OpenJPEG_Targets_PATH}") # Import OpenJPEG targets
+#include("${OpenJPEG_Targets_PATH}") # Import OpenJPEG targets
 
 #find_package(OpenCL)
 find_package(Qt5Core)
@@ -60,7 +60,8 @@ set(tool_src main.cpp MainWindow.cpp KMQtLogSink.cpp QtWaitingSpinner.cpp Widget
 	GraphicsWidgetSequence.cpp Events.cpp WidgetCentral.cpp
 	WidgetCompositionInfo.cpp UndoProxyModel.cpp JobQueue.cpp Jobs.cpp Error.cpp EmptyTimedTextGenerator.cpp WizardPartialImpGenerator.cpp
 	WidgetVideoPreview.cpp WidgetImagePreview.cpp JP2K_Preview.cpp JP2K_Player.cpp JP2K_Decoder.cpp TTMLParser.cpp WidgetTimedTextPreview.cpp TimelineParser.cpp createLUTs.cpp # (k)
-	WidgetContentVersionList.cpp WidgetContentVersionListCommands.cpp WidgetLocaleList.cpp WidgetLocaleListCommands.cpp#WR
+	WidgetContentVersionList.cpp WidgetContentVersionListCommands.cpp WidgetLocaleList.cpp WidgetLocaleListCommands.cpp WizardEssenceDescriptor.cpp#WR
+	#Player.cpp Preview.cpp
 	)
 
 # header
@@ -72,7 +73,8 @@ set(tool_src ${tool_src} global.h MainWindow.h KMQtLogSink.h QtWaitingSpinner.h
 	GraphicsWidgetSequence.h Events.h WidgetCentral.h Int24.h
 	WidgetCompositionInfo.h UndoProxyModel.h SafeBool.h JobQueue.h Jobs.h Error.h EmptyTimedTextGenerator.h WizardPartialImpGenerator.h
 	WidgetVideoPreview.h WidgetImagePreview.h JP2K_Preview.h JP2K_Player.h JP2K_Decoder.h TTMLParser.h WidgetTimedTextPreview.h TimelineParser.h createLUTs.h SMPTE_Labels.h # (k)
-	WidgetContentVersionList.h WidgetContentVersionListCommands.h WidgetLocaleList.h WidgetLocaleListCommands.h# WR
+	WidgetContentVersionList.h WidgetContentVersionListCommands.h WidgetLocaleList.h WidgetLocaleListCommands.h WizardEssenceDescriptor.h# WR
+	#Player.h Preview.h
 	)
 
 set(synthesis_src synthesis/dcmlTypes.cpp synthesis/SMPTE-429-8-2006-PKL.cpp synthesis/SMPTE-429-8-2014-AM.cpp synthesis/SMPTE-2067-2-2013-Core.cpp 
@@ -85,14 +87,12 @@ source_group("Synthesis Files" FILES ${synthesis_src})
 qt5_add_resources(resSources ${qt_rcc_resources})
 
 if(ARCHIVIST)
-include_directories("${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/synthesis" "${LibXSD_root_DIR}" "${XercescppLib_include_DIR}" 
+include_directories("${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/synthesis" "${XercescppLib_include_DIR}" 
 	"${asdcplib_include_DIR}" "${OpenEXRLib_include_DIR}/OpenEXR" "${IlmBaseLib_include_DIR}/OpenEXR")
 else(ARCHIVIST)
-include_directories("${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/synthesis" "${LibXSD_root_DIR}" "${XercescppLib_include_DIR}" 
-	"${asdcplib_include_DIR}" "${OpenJPEG_include_DIR}" "${REGXMLLIBC_INCLUDE_DIRS}")
+include_directories("${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/synthesis" "${XercescppLib_include_DIR}" 
+	"${asdcplib_include_DIR}" "${OPENJPEG_INCLUDE_DIRS}" "${REGXMLLIBC_INCLUDE_DIRS}")
 endif(ARCHIVIST)
-
-add_definitions(/DLIBAS02MOD)
 
 if(WIN32)
 	add_definitions(/D_CRT_SECURE_NO_WARNINGS /DUNICODE /DKM_WIN32 /DASDCP_PLATFORM=\"win32\" /DNOMINMAX)
@@ -108,7 +108,7 @@ target_link_libraries(${EXE_NAME} general Qt5::Widgets general Qt5::Multimedia d
 else(ARCHIVIST)
 target_link_libraries(${EXE_NAME} general Qt5::Widgets general Qt5::Multimedia 
 	 general libas02 debug "${XercescppLib_Debug_PATH}" optimized "${XercescppLib_PATH}" debug "${OpenJPEGLib_Debug_Path}" optimized "${OpenJPEGLib_Path}"
-	 debug regxmllibc_d optimized regxmllibc
+	 regxmllibc debug openjp2 optimized openjp2
 	 )
 endif(ARCHIVIST)
 

@@ -88,6 +88,7 @@ signals:
 	void rShowResourceGeneratorForSelectedRow();
 	void rShowResourceGeneratorForAsset(const QUuid &rAssetId);
 	void rResourceGeneratorAccepted();
+	void rShowEssenceDescriptorForAsset(const QSharedPointer<AssetMxfTrack> &rAsset);
 	void rCustomMenuRequested(QPoint pos);
 	void rMapCurrentRowSelectionChanged(const QModelIndex &rCurrent, const QModelIndex &rPrevious);
 	void rJobQueueFinished();
@@ -95,6 +96,8 @@ signals:
 	void rOpenCplTimeline();
 	void rReinstallImp();
 	//WR
+	void rShowMetadata();
+	void rShowEssenceDescriptor();
 	void SetMxfFile(const QStringList &rFiles);
 	void SetMxfFileDirectory(const QString&);
 	//WR

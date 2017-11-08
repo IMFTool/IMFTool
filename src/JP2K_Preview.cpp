@@ -35,12 +35,9 @@ JP2K_Preview::~JP2K_Preview()
 		qDebug() << "no reader found!";
 	}
 	
-	delete eotf_709;
 	delete oetf_709;
 	delete eotf_2020;
-	delete oetf_2020;
 	delete eotf_PQ;
-	delete oetf_PQ;
 }
 
 void JP2K_Preview::setUp() {
@@ -64,13 +61,11 @@ void JP2K_Preview::setUp() {
 	max_f = 1 << bitdepth;
 	max_f_ = (float)(max_f)-1.0;
 
-	eotf_709 = new float[max_f];
 	oetf_709 = new float[max_f];
 
 	float alpha = 1.09929682680944;
 	float beta = 0.018053968510807;
 	eotf_2020 = new float[max_f];
-	oetf_2020 = new float[max_f];
 
 	float m1 = 0.1593017578125;
 	float m2 = 78.84375;
@@ -78,7 +73,6 @@ void JP2K_Preview::setUp() {
 	float c2 = 18.8515625;
 	float c3 = 18.6875;
 	eotf_PQ = new float[max_f];
-	oetf_PQ = new float[max_f];
 
 	for (int i = 0; i < max_f; i++) {
 
@@ -87,23 +81,6 @@ void JP2K_Preview::setUp() {
 		// BT.709 - OETF
 		oetf_709[i] = pow(input, 1.0f / 2.4f);
 
-		/*
-		// BT.709 - EOTF
-		if (input < (4.5 * 0.018)) {
-			eotf_709[i] = input / 4.5;
-		}
-		else {
-			eotf_709[i] = pow(((input + (alpha - 1)) / alpha), 1.0 / 0.45);
-		}
-
-		// BT.2020 - OETF
-		if (input < beta) {
-			oetf_2020[i] = 4.5 * input;
-		}
-		else {
-			oetf_2020[i] = alpha * pow(input, 0.45) - (alpha - 1);
-		}
-		*/
 
 		// BT.2020 - EOTF
 		if (input < (4.5 * beta)) {
@@ -115,12 +92,10 @@ void JP2K_Preview::setUp() {
 
 		// SMPTE ST 2084 (PQ)
 		eotf_PQ[i] = pow(((pow(input, (1.0 / m2)) - c1)) / (c2 - c3 *pow(input, (1.0 / m2))), 1.0 / m1) * 10000;
-		//oetf_PQ[i] = pow((c1 + c2*pow(input, m1)) / (1 + c3*pow(input, m1)), m2);
 
 	}
 
 	eotf_PQ[0] = 0;
-	oetf_PQ[0] = 0;
 
 }
 

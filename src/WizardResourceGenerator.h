@@ -24,8 +24,11 @@
 #include <QLineEdit>
 #include <QGroupBox>
 #include "EmptyTimedTextGenerator.h"
+#include "ImfPackage.h"
+
 
 #define ASSET_ID_DYNAMIK_PROPERTY "AssetId"
+#define ASSET_ESSENCE_TYPE "EssenceType"
 
 class QDialogButtonBox;
 class QFileDialog;
@@ -49,9 +52,10 @@ public:
 	enum eMode {
 		ExrMode,
 		WavMode,
-		TTMLMode
+		TTMLMode,
+		Jpeg2000Mode,
 	};
-	WizardResourceGenerator(QWidget *pParent = NULL, QVector<EditRate> rEditRates = QVector<EditRate>());
+	WizardResourceGenerator(QWidget *pParent = NULL, QVector<EditRate> rEditRates = QVector<EditRate>(), QSharedPointer<AssetMxfTrack> rAsset = QSharedPointer<AssetMxfTrack>());
 	virtual ~WizardResourceGenerator() {}
 	virtual QSize sizeHint() const;
 	void SwitchMode(eMode mode);
@@ -61,6 +65,8 @@ private:
 	void	InitLayout();
 	int		mPageId;
 	QVector<EditRate> mEditRates;
+	QSharedPointer<AssetMxfTrack> mAsset;
+	bool mReadOnly;
 };
 
 
@@ -82,7 +88,7 @@ class WizardResourceGeneratorPage : public QWizardPage {
 		//WR
 
 public:
-	WizardResourceGeneratorPage(QWidget *pParent = NULL, 	QVector<EditRate> rEditRates = QVector<EditRate>());
+	WizardResourceGeneratorPage(QWidget *pParent = NULL, 	QVector<EditRate> rEditRates = QVector<EditRate>(), bool rReadOnly = false, QSharedPointer<AssetMxfTrack> rAsset = QSharedPointer<AssetMxfTrack>());
 	virtual ~WizardResourceGeneratorPage() {}
 	void SwitchMode(WizardResourceGenerator::eMode mode);
 	QStringList GetFilesList() const;
@@ -148,7 +154,8 @@ private:
 	enum eStackedLayoutIndex {
 		ExrIndex = 0,
 		WavIndex,
-		TTMLIndex
+		TTMLIndex,
+		Jpeg2000Index,
 	};
 	Q_DISABLE_COPY(WizardResourceGeneratorPage);
 	QVector<EditRate> mEditRates;
@@ -183,6 +190,9 @@ private:
 	EmptyTimedTextGenerator *mpEmptyTt;
 	QGroupBox *mpGroupBox;
 	bool mGroupBoxCheck;
+
+	QSharedPointer<AssetMxfTrack> mAsset;
+	bool mReadOnly;
 };
 
 

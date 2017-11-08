@@ -399,7 +399,7 @@ void GraphicsSceneComposition::ProcessDragMove(DragDropInfo &rInfo, const QPoint
 											}
 										}
 										if(descriptor_found && p_resource_other->GetSoundfieldGroup() != static_cast<GraphicsWidgetAudioResource*>(p_origin_resource)->GetSoundfieldGroup()) {
-											error_text = tr("Sound field group mismatch: %1 expected.").arg(proposed_soundfield_group.GetName());
+											error_text = tr("Sound field group mismatch: %1 expected.").arg(p_resource_other->GetSoundfieldGroup().GetName());
 											break;
 										}
 										else if (p_resource_other && p_resource_other->GetAsset()) {
@@ -460,7 +460,7 @@ void GraphicsSceneComposition::ProcessDragMove(DragDropInfo &rInfo, const QPoint
 										if(p_resource_other && p_resource_other->GetAsset()) {
 											if (error_text.isEmpty() && (p_resource_other->GetAsset()->GetMetadata().storedWidth != p_origin_resource->GetAsset()->GetMetadata().storedWidth)
 													&& (p_resource_other->GetAsset()->GetMetadata().storedHeight != p_origin_resource->GetAsset()->GetMetadata().storedHeight)) {
-												error_text = tr("Resolution mismatch: %1 x %2 expected.").arg(p_resource_other->GetAsset()->GetMetadata().storedWidth, p_resource_other->GetAsset()->GetMetadata().storedHeight);
+												error_text = tr("Resolution mismatch: %1 x %2 expected.").arg(p_resource_other->GetAsset()->GetMetadata().storedWidth).arg(p_resource_other->GetAsset()->GetMetadata().storedHeight);
 
 											}
 											else if (error_text.isEmpty() && (p_resource_other->GetAsset()->GetMetadata().colorEncoding != p_origin_resource->GetAsset()->GetMetadata().colorEncoding)) {
