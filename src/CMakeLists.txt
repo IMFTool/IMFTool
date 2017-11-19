@@ -5,7 +5,7 @@ find_path(asdcplib_include_DIR NAMES AS_02.h PATHS "$ENV{CMAKE_HINT}/asdcplib" E
 #find_library(OpenJPEGLib_Path NAMES openjp2 PATHS ENV CMAKE_HINT PATH_SUFFIXES "lib")
 #find_library(OpenJPEGLib_Debug_Path NAMES openjp2 PATHS ENV CMAKE_HINT PATH_SUFFIXES "lib")
 find_library(XercescppLib_PATH NAMES xerces-c xerces-c_3 PATHS "${PROJECT_SOURCE_DIR}/../xercescpp" "${PROJECT_SOURCE_DIR}/../lib/xercescpp" "$ENV{CMAKE_HINT}/xercescpp" ENV CMAKE_HINT PATH_SUFFIXES "lib")
-find_library(XercescppLib_Debug_PATH NAMES xerces-c xerces-c_3D PATHS "${PROJECT_SOURCE_DIR}/../xercescpp" "${PROJECT_SOURCE_DIR}/../lib/xercescpp" "$ENV{CMAKE_HINT}/xercescpp" ENV CMAKE_HINT PATH_SUFFIXES "lib")
+find_library(XercescppLib_Debug_PATH NAMES xerces-cD xerces-c_3D xerces-c PATHS "${PROJECT_SOURCE_DIR}/../xercescpp" "${PROJECT_SOURCE_DIR}/../lib/xercescpp" "$ENV{CMAKE_HINT}/xercescpp" ENV CMAKE_HINT PATH_SUFFIXES "lib")
 find_path(XercescppLib_include_DIR NAMES xercesc/dom/DOM.hpp PATHS "${PROJECT_SOURCE_DIR}/../xercescpp" "${PROJECT_SOURCE_DIR}/../lib/xercescpp" "$ENV{CMAKE_HINT}/xercescpp" ENV CMAKE_HINT PATH_SUFFIXES "include")
 find_package(OpenJPEG)
 find_package(regxmllibc)

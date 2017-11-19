@@ -15,9 +15,6 @@
  */
 #include "WizardResourceGenerator.h"
 #include "global.h"
-#ifdef ARCHIVIST
-#include "ColorTransformation.h"
-#endif
 #include "ImfCommon.h"
 #include "QtWaitingSpinner.h"
 #include "MetadataExtractor.h"
@@ -103,24 +100,15 @@ void WizardResourceGenerator::SwitchMode(eMode mode) {
 }
 
 WizardResourceGeneratorPage::WizardResourceGeneratorPage(QWidget *pParent /*= NULL*/, QVector<EditRate> rEditRates /* = QVector<EditRate>()*/, bool rReadOnly, QSharedPointer<AssetMxfTrack> rAsset ) :
-#ifdef ARCHIVIST
-QWizardPage(pParent), mpFileDialog(NULL), mpOpenExrFilesModel(NULL), mpSoundFieldGroupModel(NULL), mpTableViewExr(NULL), mpTableViewWav(NULL), mpProxyImageWidget(NULL), mpStackedLayout(NULL), mpComboBoxEditRate(NULL),
-mpComboBoxAcesVersion(NULL), mpComboBoxODTid(NULL), mpComboBoxSoundfieldGroup(NULL), mpMsgBox(NULL), mpAs02Wrapper(NULL) {
-#else
 QWizardPage(pParent), mpFileDialog(NULL), mpSoundFieldGroupModel(NULL), mpTimedTextModel(NULL), mpTableViewExr(NULL), mpTableViewWav(NULL), mpTableViewTimedText(NULL), mpProxyImageWidget(NULL), mpStackedLayout(NULL), mpComboBoxEditRate(NULL),
 mpComboBoxSoundfieldGroup(NULL), mpMsgBox(NULL), mpAs02Wrapper(NULL), mpLineEditDuration(NULL), mpComboBoxCplEditRate(NULL) {
-#endif
 	mpAs02Wrapper = new MetadataExtractor(this);
 	mReadOnly = rReadOnly;
 	mAsset = rAsset;
 	if (!mReadOnly) setTitle(tr("Edit Resource"));
 	else setTitle(tr("Metadata view"));
-#ifdef ARCHIVIST
-	setSubTitle(tr("Select multiple ACES OpenEXR files or a single (multichannel) wav file that should buid a resource."));
-#else
 	if (!mReadOnly) setSubTitle(tr("Select essence file(s) that should be wrapped as MXF AS-02."));
 	else setSubTitle(tr("MXF metadata items cannot be edited!"));
-#endif
 	mEditRates = rEditRates;
 	InitLayout();
 }
@@ -146,37 +134,6 @@ void WizardResourceGeneratorPage::InitLayout() {
 	p_edit_rates_model->setStringList(EditRate::GetFrameRateNames());
 	mpComboBoxEditRate->setModel(p_edit_rates_model);
 
-#ifdef ARCHIVIST
-	mpComboBoxAcesVersion = new QComboBox(this);
-	mpComboBoxAcesVersion->setWhatsThis(tr("Select an ACES System Version."));
-	QStringListModel *p_aces_version_model = new QStringListModel(this);
-	p_aces_version_model->setStringList(ACESSystemVersion::GetACESSystemVersions());
-	mpComboBoxAcesVersion->setModel(p_aces_version_model);
-
-	mpComboBoxODTid = new QComboBox(this);
-	mpComboBoxODTid->setWhatsThis(tr("Select an ODT."));
-	QStringListModel *p_odt_id_model = new QStringListModel(this);
-	p_odt_id_model->setStringList(ODTid::GetODTids());
-	mpComboBoxODTid->setModel(p_odt_id_model);
-#endif
-#ifdef ARCHIVIST
-	//--- exr files ---
-	mpOpenExrFilesModel = new SelectedOpenExrFilesModel(this);
-	mpTableViewExr = new QTableView(this);
-	mpTableViewExr->setModel(mpOpenExrFilesModel);
-	mpTableViewExr->setEditTriggers(QAbstractItemView::NoEditTriggers);
-	mpTableViewExr->setSelectionBehavior(QAbstractItemView::SelectRows);
-	mpTableViewExr->setSelectionMode(QAbstractItemView::SingleSelection);
-	mpTableViewExr->setShowGrid(false);
-	mpTableViewExr->horizontalHeader()->setHidden(true);
-	mpTableViewExr->horizontalHeader()->setStretchLastSection(true);
-	mpTableViewExr->verticalHeader()->setHidden(true);
-	mpTableViewExr->resizeRowsToContents();
-	mpTableViewExr->resizeColumnsToContents();
-	mpTableViewExr->setMouseTracking(true);
-	mpTableViewExr->viewport()->setMouseTracking(true);
-	mpTableViewExr->viewport()->installEventFilter(this);
-#endif
 
 	//--- soundfield group ---
 	mpComboBoxSoundfieldGroup = new QComboBox(this);
@@ -329,14 +286,6 @@ void WizardResourceGeneratorPage::InitLayout() {
 	p_wrapper_layout_one->setContentsMargins(0, 0, 0, 0);
 	p_wrapper_layout_one->addWidget(new QLabel(tr("Frame Rate:"), this), 0, 0, 1, 1);
 	p_wrapper_layout_one->addWidget(mpComboBoxEditRate, 0, 1, 1, 1);
-#ifdef ARCHIVIST
-	p_wrapper_layout_one->addWidget(new QLabel(tr("ACES System Version:"), this), 1, 0, 1, 1);
-	p_wrapper_layout_one->addWidget(mpComboBoxAcesVersion, 1, 1, 1, 1);
-	p_wrapper_layout_one->addWidget(new QLabel(tr("ODT: "), this), 2, 0, 1, 1);
-	p_wrapper_layout_one->addWidget(mpComboBoxODTid, 2, 1, 1, 1);
-	p_wrapper_layout_one->addWidget(mpTableViewExr, 3, 0, 1, 2);
-	p_wrapper_widget_one->setLayout(p_wrapper_layout_one);
-#endif
 	QWidget *p_wrapper_widget_two = new QWidget(this);
 	QGridLayout *p_wrapper_layout_two = new QGridLayout();
 	p_wrapper_layout_two->setContentsMargins(0, 0, 0, 0);
@@ -400,7 +349,10 @@ void WizardResourceGeneratorPage::InitLayout() {
 		p_wrapper_layout_four->addWidget(new QLabel(tr("Picture Essence Encoding UL:")), 0, 0, 1, 1);
 		p_wrapper_layout_four->addWidget(label, 0, 1, 1, 1);
 		p_wrapper_layout_four->addWidget(new QLabel(tr("Picture Essence Encoding:")), 1, 0, 1, 1);
-		p_wrapper_layout_four->addWidget(new QLabel(SMPTE::vJ2K_Profiles[SMPTE::J2K_ProfilesMap[metadata.pictureEssenceCoding]]), 1, 1, 1, 1);
+		if (SMPTE::J2K_ProfilesMap.contains(metadata.pictureEssenceCoding))
+			p_wrapper_layout_four->addWidget(new QLabel(SMPTE::vJ2K_Profiles[SMPTE::J2K_ProfilesMap[metadata.pictureEssenceCoding]]), 1, 1, 1, 1);
+		else
+			p_wrapper_layout_four->addWidget(new QLabel("Unknown"), 1, 1, 1, 1);
 //		p_wrapper_layout_four->addWidget(new QLabel(metadata.GetAsString()), 2, 0, 1, 2);
 
 		p_wrapper_layout_four->addWidget(new QLabel(tr("Duration:")), 2, 0, 1, 1);
@@ -466,10 +418,6 @@ void WizardResourceGeneratorPage::InitLayout() {
 	registerField(FIELD_NAME_MCA_AUDIO_ELEMENT_KIND, this, "MCAAudioElementKindSelected", SIGNAL(MCAAudioElementKindChanged()));
 	registerField(FIELD_NAME_CPL_EDIT_RATE, this, "CplEditRateSelected", SIGNAL(CplEditRateChanged()));
 	//WR
-#ifdef ARCHIVIST
-	registerField(FIELD_NAME_ACES_VERSION, this, "ACESVersionSelected", SIGNAL(ACESVersionChanged()));
-	registerField(FIELD_NAME_ODT_ID, this, "ODTidSelected", SIGNAL(ODTidChanged()));
-#endif
 
 	connect(mpFileDialog, SIGNAL(filesSelected(const QStringList &)), this, SLOT(SetSourceFiles(const QStringList &)));
 	connect(mpComboBoxSoundfieldGroup, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(ChangeSoundfieldGroup(const QString&)));
@@ -608,21 +556,6 @@ void WizardResourceGeneratorPage::SetSourceFiles(const QStringList &rFiles) {
 			SwitchMode(WizardResourceGenerator::WavMode);
 			emit FilesListChanged();
 		}
-#ifdef ARCHIVIST
-		else if(is_exr_file(rFiles.at(0))) {
-			Metadata metadata; // We have to check if ACES files have a preferred frame rate (framesPerSecond is present in ACES header).
-			mpAs02Wrapper->ReadMetadata(metadata, rFiles.at(0));
-			if(metadata.editRate.IsValid() == true) {
-				SetEditRate(metadata.editRate);
-				mpComboBoxEditRate->setDisabled(true);
-			}
-			SwitchMode(WizardResourceGenerator::ExrMode);
-			mpOpenExrFilesModel->SetFilesList(rFiles);
-			mpTableViewExr->resizeRowsToContents();
-			mpTableViewExr->resizeColumnsToContents();
-			emit FilesListChanged();
-		}
-#endif
 
 
 			/* -----Denis Manthey----- */
@@ -684,41 +617,12 @@ void WizardResourceGeneratorPage::SetSourceFiles(const QStringList &rFiles) {
 	}
 }
 
-#ifdef ARCHIVIST
-bool WizardResourceGeneratorPage::eventFilter(QObject *PObject, QEvent *pEvent) {
-
-	if(pEvent->type() == QEvent::MouseMove) {
-		QModelIndex mouse_over_index = mpTableViewExr->indexAt(mpTableViewExr->mapFromGlobal(QCursor::pos()));
-		if(mouse_over_index.isValid() && mouse_over_index.column() == SelectedOpenExrFilesModel::ColumnIcon) {
-			if(mouse_over_index != mpProxyImageWidget->GetModelIndex()) {
-				mpProxyImageWidget->hide();
-				mpProxyImageWidget->SetModelIndex(mouse_over_index);
-				QVariant image_file_string = mpOpenExrFilesModel->index(mouse_over_index.row(), SelectedOpenExrFilesModel::ColumnFilePath).data();
-				QFileInfo file(image_file_string.toString());
-				mpProxyImageWidget->DelayShow(file);
-			}
-		}
-		else {
-			mpProxyImageWidget->hide();
-		}
-	}
-	else if(pEvent->type() == QEvent::Leave || pEvent->type() == QEvent::Scroll) {
-		mpProxyImageWidget->hide();
-	}
-	return false;
-}
-#endif
 
 QStringList WizardResourceGeneratorPage::GetFilesList() const {
 
 	if(mpStackedLayout->currentIndex() == WizardResourceGeneratorPage::WavIndex) {
 		return mpSoundFieldGroupModel->GetSourceFiles();
 	}
-#ifdef ARCHIVIST
-	else if(mpStackedLayout->currentIndex() == WizardResourceGeneratorPage::ExrIndex) {
-		return mpOpenExrFilesModel->GetFilesList();
-	}
-#endif
 
 
 
@@ -826,21 +730,6 @@ void WizardResourceGeneratorPage::SetCplEditRate(const EditRate &rEditRate) {
 }
 //WR
 
-#ifdef ARCHIVIST
-void WizardResourceGeneratorPage::SetACESVersion(const ACESSystemVersion &rVersion) {
-
-	mpComboBoxAcesVersion->setCurrentText(rVersion.GetName());
-	emit ACESVersionChanged();
-	emit completeChanged();
-}
-
-void WizardResourceGeneratorPage::SetODTid(const ODTid &rId) {
-
-	mpComboBoxODTid->setCurrentText(rId.GetLabel());
-	emit ODTidChanged();
-	emit completeChanged();
-}
-#endif
 
 EditRate WizardResourceGeneratorPage::GetEditRate() const {
 
@@ -890,17 +779,6 @@ EditRate WizardResourceGeneratorPage::GetCplEditRate() const {
 }
 
 
-#ifdef ARCHIVIST
-ACESSystemVersion WizardResourceGeneratorPage::GetACESVersion() const {
-
-	return ACESSystemVersion::GetACESSystemVersion(mpComboBoxAcesVersion->currentText());
-}
-
-ODTid WizardResourceGeneratorPage::GetOdtId() const {
-
-	return ODTid::GetODTid(mpComboBoxODTid->currentText());
-}
-#endif
 
 bool WizardResourceGeneratorPage::isComplete() const {
 
@@ -916,25 +794,10 @@ bool WizardResourceGeneratorPage::isComplete() const {
 	}
 	return false;
 }
-#ifdef ARCHIVIST
-void WizardResourceGeneratorPage::showEvent(QShowEvent *pEvent) {
-
-	if(pEvent->spontaneous() == false && mpStackedLayout->currentIndex() == WizardResourceGeneratorPage::ExrIndex) {
-		mpTableViewExr->resizeRowsToContents();
-		mpTableViewExr->resizeColumnsToContents();
-	}
-}
-#endif
 
 void WizardResourceGeneratorPage::SwitchMode(WizardResourceGenerator::eMode mode) {
 
 	switch(mode) {
-#ifdef ARCHIVIST
-		case WizardResourceGenerator::ExrMode:
-			mpStackedLayout->setCurrentIndex(ExrIndex);
-			mpFileDialog->setNameFilters(QStringList() << "*.exr" << "*.wav" << "*.ttml");
-			break;
-#endif
 		case WizardResourceGenerator::WavMode:
 			mpStackedLayout->setCurrentIndex(WavIndex);
 			mpFileDialog->setNameFilters(QStringList() << "*.wav" );
@@ -959,19 +822,11 @@ void WizardResourceGeneratorPage::SwitchMode(WizardResourceGenerator::eMode mode
 }
 
 WidgetProxyImage::WidgetProxyImage(QWidget *pParent /*= NULL*/) :
-#ifdef ARCHIVIST
-QWidget(NULL), mIndex(QPersistentModelIndex()), mpSpinner(NULL), mpCtlWrapper(NULL), mpTimer(NULL), mpImageLabel(NULL) {
-#else
 QWidget(NULL), mIndex(QPersistentModelIndex()), mpSpinner(NULL), mpTimer(NULL), mpImageLabel(NULL) {
-#endif
 
 	setWindowFlags(Qt::FramelessWindowHint | Qt::Tool | Qt::WindowTransparentForInput);
 	mpTimer = new QTimer(this);
 	mpTimer->setSingleShot(true);
-#ifdef ARCHIVIST
-	mpCtlWrapper = new ColorTransformation(this, true);
-	connect(mpCtlWrapper, SIGNAL(TransformationFinished(const QImage&, const QVariant&)), this, SLOT(rTransformationFinished(const QImage&, const QVariant&)));
-#endif
 	setGeometry(0, 0, 100, 100);
 	InitLayout();
 }
@@ -1011,17 +866,6 @@ void WidgetProxyImage::InitLayout() {
 	setLayout(p_layout);
 }
 
-#ifdef ARCHIVIST
-void WidgetProxyImage::DelayShow(const QFileInfo &rSourceFile) {
-
-	disconnect(mpTimer, NULL, NULL, NULL);
-	connect(mpTimer, SIGNAL(timeout()), this, SLOT(rTimeout()));
-	mpCtlWrapper->FlushThreadPoolQueue();
-	mpCtlWrapper->TransformRawImage(rSourceFile, QVariant(mIndex), QSize(300, -1));
-	mpSpinner->start();
-	mpTimer->start(400);
-}
-#endif
 
 void WidgetProxyImage::rTransformationFinished(const QImage &rImage, const QVariant &rIdentifier) {
 
@@ -1037,74 +881,12 @@ void WidgetProxyImage::rTransformationFinished(const QImage &rImage, const QVari
 
 void WidgetProxyImage::hide() {
 
-#ifdef ARCHIVIST
-	mpCtlWrapper->FlushThreadPoolQueue();
-#endif
 	disconnect(mpTimer, NULL, NULL, NULL);
 	mpImageLabel->clear();
 	repaint();
 	QWidget::hide();
 }
 
-#ifdef ARCHIVIST
-SelectedOpenExrFilesModel::SelectedOpenExrFilesModel(QObject *pParent /*= NULL*/) :
-QAbstractTableModel(pParent), mSelectedFilesList(QStringList()), mpAs02Wrapper(NULL) {
-
-	mpAs02Wrapper = new MetadataExtractor(this);
-}
-
-void SelectedOpenExrFilesModel::SetFilesList(const QStringList &rFilesList) {
-
-	beginResetModel();
-	mSelectedFilesList.clear();
-	mSelectedFilesList = rFilesList;
-	endResetModel();
-}
-
-int SelectedOpenExrFilesModel::rowCount(const QModelIndex &rParent /*= QModelIndex()*/) const {
-
-	if(rParent.isValid() == false) {
-		return mSelectedFilesList.size();
-	}
-	return 0;
-}
-
-int SelectedOpenExrFilesModel::columnCount(const QModelIndex &rParent /*= QModelIndex()*/) const {
-
-	if(rParent.isValid() == false) {
-		return ColumnMax;
-	}
-	return 0;
-}
-
-QVariant SelectedOpenExrFilesModel::data(const QModelIndex &rIndex, int role /*= Qt::DisplayRole*/) const {
-
-	const int row = rIndex.row();
-	const int column = rIndex.column();
-
-	if(row < mSelectedFilesList.size()) {
-		if(column == SelectedOpenExrFilesModel::ColumnIcon) {
-			if(role == Qt::DecorationRole) {
-				return QVariant(QPixmap(":/film_small.png"));
-			}
-		}
-		else if(column == SelectedOpenExrFilesModel::ColumnFilePath) {
-			if(role == Qt::DisplayRole) {
-				return QVariant(mSelectedFilesList.at(row));
-			}
-			else if(role == Qt::ToolTipRole) {
-				Metadata metadata;
-				Error error = mpAs02Wrapper->ReadMetadata(metadata, mSelectedFilesList.at(row));
-				if(error.IsError() == true) {
-					return QVariant(error.GetErrorMsg());
-				}
-				return QVariant(metadata.GetAsString());
-			}
-		}
-	}
-	return QVariant();
-}
-#endif
 
 SoundFieldGroupModel::SoundFieldGroupModel(QObject *pParent /*= NULL*/) :
 QAbstractTableModel(pParent), mSourceFilesChannels(QList<QPair<QString, unsigned int> >()), mSoundfieldGroup(SoundfieldGroup::SoundFieldGroupNone), mpAs02Wrapper(NULL) {
