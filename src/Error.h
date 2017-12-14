@@ -44,6 +44,7 @@ public:
 		ExitCodeNotZero,
 		ExitStatusError,
 		MetaDictionaryOpenError,
+		PhotonQcReport,
 		Unknown
 	};
 	//! Constructs empty error (IsError returns false).
@@ -94,6 +95,8 @@ public:
 				ret = QObject::tr("Java call has returned an error"); break;
 			case MetaDictionaryOpenError:
 				ret = QObject::tr("Couldn't open Meta Dictionary - CPLs will not contain proper Essence Descriptors!"); break;
+			case PhotonQcReport:
+				ret = QObject::tr("Error creating Photon QC report"); break;
 			case Unknown:
 				ret = QObject::tr("Unknown error"); break;
 			default:

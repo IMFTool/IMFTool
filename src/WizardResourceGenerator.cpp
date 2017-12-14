@@ -46,12 +46,15 @@ QWizard(pParent) {
 
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	setWindowModality(Qt::WindowModal);
-	setWindowTitle(tr("Resource Generator"));
 	setWizardStyle(QWizard::ModernStyle);
 	setStyleSheet("QWizard QPushButton {min-width: 60 px;}");
 	mEditRates = rEditRates;
 	mAsset = rAsset;
 	mReadOnly = (mAsset != NULL);
+	if (mReadOnly)
+		setWindowTitle(tr("Resource Generator"));
+	else
+		setWindowTitle(tr("Metadata View"));
 	InitLayout();
 }
 

@@ -37,7 +37,15 @@
 #include <QDir>
 
 #include <Qshortcut> //(k)
-#include <QProcess> //WR
+//WR
+#include <QProcess>
+#include "JobQueue.h"
+#include "Jobs.h"
+#include <QProgressDialog>
+#include <QTextEdit>
+#include <QClipboard>
+//WR
+
 
 
 
@@ -46,60 +54,20 @@ QMainWindow(pParent) {
 
 	InitLayout();
 	InitMenuAndToolbar();
-	// Test for JAVA VM
-	// Not required - EDs are extracted in C++
-	// Might become relevant again for Photon..
-	/*
-	QString qresult;
-	QProcess *myProcess = new QProcess();
-	const QString program = "java";
-	QStringList arg;
-	QString error_msg;
-	Error error(Error::None);
-	arg << "-version";
-	myProcess->start(program, arg);
-	myProcess->waitForFinished(-1);
-	if (myProcess->exitStatus() == QProcess::NormalExit) {
-		if (myProcess->exitCode() != 0) { error = Error(Error::ExitCodeNotZero); }
-	} else {
-		error = Error(Error::ExitStatusError);
-	}
-	if (myProcess->error() == QProcess::FailedToStart) {
-		error = Error(Error::Unknown);
-	}
+	// Prepare mpJobQueue for Photon calls
+	mpJobQueue = new JobQueue(this);
+	mpJobQueue->SetInterruptIfError(true);
+	connect(mpJobQueue, SIGNAL(finished()), this, SLOT(rJobQueueFinished()));
+	mpProgressDialog = new QProgressDialog();
+	mpProgressDialog->setWindowModality(Qt::WindowModal);
+	mpProgressDialog->setMinimumSize(500, 150);
+	mpProgressDialog->setMinimum(0);
+	mpProgressDialog->setMaximum(100);
+	mpProgressDialog->setValue(100);
+	mpProgressDialog->setMinimumDuration(0);
+	connect(mpJobQueue, SIGNAL(Progress(int)), mpProgressDialog, SLOT(setValue(int)));
+	connect(mpJobQueue, SIGNAL(NextJobStarted(const QString&)), mpProgressDialog, SLOT(setLabelText(const QString&)));
 
-	try {
-		qresult = myProcess->readAllStandardError();
-		QRegularExpression re("([0-9]+)\\.([0-9]+)\\.([0-9]+)");
-		QRegularExpressionMatch match = re.match(qresult, 0);
-		if (match.hasMatch()) {
-		    QString major = match.captured(1);
-		    QString minor = match.captured(2);
-		    if ((major.toInt() != 1) || (minor.toInt() < 8)) {
-		    	error_msg = "Java version mismatch, current version is " + match.captured(0);
-				mpMsgBox->setText(tr("IMF Tool requires Java SDK 1.8 or higher - Exported CPLs will not contain Essence Descriptors!"));
-				mpMsgBox->setIcon(QMessageBox::Warning);
-				mpMsgBox->setInformativeText(error_msg);
-				mpMsgBox->setStandardButtons(QMessageBox::Ok);
-				mpMsgBox->setDefaultButton(QMessageBox::Ok);
-				mpMsgBox->exec();
-		    }
-		}
-	}
-	catch (...) {
-		error = Error(Error::Unknown);
-	}
-
-	if(error.IsError()) {
-		qDebug() << "No Java / wrong Java version" << qresult;
-		error_msg = QString("%1\n%2").arg(error.GetErrorMsg()).arg(error.GetErrorDescription());
-		mpMsgBox->setText(tr("java not available - Exported CPLs will not contain Essence Descriptors ! IMF Tool requires Java SDK 1.8 or higher."));
-		mpMsgBox->setIcon(QMessageBox::Warning);
-		mpMsgBox->setInformativeText(error_msg);
-		mpMsgBox->setStandardButtons(QMessageBox::Ok);
-		mpMsgBox->setDefaultButton(QMessageBox::Ok);
-		mpMsgBox->exec();
-	}*/
 }
 
 void MainWindow::InitLayout() {
@@ -184,8 +152,17 @@ void MainWindow::InitMenuAndToolbar() {
 	p_action_exit->setShortcut(tr("Ctrl+Q"));
 	connect(p_action_exit, SIGNAL(triggered(bool)), qApp, SLOT(closeAllWindows()));
 
+	// WR
+	QAction *p_qc_photon = new QAction(QIcon(":/qc.png"), tr("&Create Photon QC Report"), menuBar());
+	p_qc_photon->setDisabled(true);
+	connect(p_qc_photon, SIGNAL(triggered(bool)), this, SLOT(rCallPhoton()));
+	connect(this, SIGNAL(ImpOpened(bool)), p_qc_photon, SLOT(setEnabled(bool)));
+	connect(this, SIGNAL(ImpClosed(bool)), p_qc_photon, SLOT(setDisabled(bool)));
+	// WR
+
 	p_menu_file->addAction(p_action_write);
 	p_menu_file->addAction(p_action_writePartial);
+	p_menu_file->addAction(p_qc_photon);
 	p_menu_file->addAction(p_action_open);
 	p_menu_file->addAction(p_action_close);
 	p_menu_file->addSeparator();
@@ -209,6 +186,7 @@ void MainWindow::InitMenuAndToolbar() {
 	p_tool_bar->addAction(p_action_open);
 	p_tool_bar->addAction(p_action_write);
 	p_tool_bar->addAction(p_action_writePartial);
+	p_tool_bar->addAction(p_qc_photon);
 	p_tool_bar->addSeparator();
 	//p_tool_bar->addAction(mpActionSaveAll);
 	p_tool_bar->addSeparator();
@@ -262,6 +240,74 @@ void MainWindow::rCloseImpRequest() {
 	else
 		CloseImfPackage();
 }
+//WR
+
+void MainWindow::rCallPhoton() {
+	if (!mpRootDirection.isEmpty()) {
+
+		// Test for Java VM
+		QString qresult;
+		QProcess *myProcess = new QProcess();
+		const QString program = "java";
+		QStringList arg;
+		QString error_msg;
+		Error error(Error::None);
+		arg << "-version";
+		myProcess->start(program, arg);
+		myProcess->waitForFinished(-1);
+		if (myProcess->exitStatus() == QProcess::NormalExit) {
+			if (myProcess->exitCode() != 0) { error = Error(Error::ExitCodeNotZero); }
+		} else {
+			error = Error(Error::ExitStatusError);
+		}
+		if (myProcess->error() == QProcess::FailedToStart) {
+			error = Error(Error::Unknown);
+		}
+
+		try {
+			qresult = myProcess->readAllStandardError();
+			QRegularExpression re("([0-9]+)\\.([0-9]+)\\.([0-9]+)");
+			QRegularExpressionMatch match = re.match(qresult, 0);
+			if (match.hasMatch()) {
+			    QString major = match.captured(1);
+			    QString minor = match.captured(2);
+			    if ((major.toInt() != 1) || (minor.toInt() < 8)) {
+			    	error_msg = "Java version mismatch, current version is " + match.captured(0);
+					mpMsgBox->setText(tr("IMF Tool requires Java SDK 1.8 or higher - Exported CPLs will not contain Essence Descriptors!"));
+					mpMsgBox->setIcon(QMessageBox::Warning);
+					mpMsgBox->setInformativeText(error_msg);
+					mpMsgBox->setStandardButtons(QMessageBox::Ok);
+					mpMsgBox->setDefaultButton(QMessageBox::Ok);
+					mpMsgBox->exec();
+			    }
+			}
+		}
+		catch (...) {
+			error = Error(Error::Unknown);
+		}
+
+		if(error.IsError()) {
+			qDebug() << "No Java / wrong Java version" << qresult;
+			error_msg = QString("%1\n%2").arg(error.GetErrorMsg()).arg(error.GetErrorDescription());
+			mpMsgBox->setText(tr("java not available - Cannot run Photon ! Photon requires Java JRE Version 1.8 or higher."));
+			mpMsgBox->setIcon(QMessageBox::Warning);
+			mpMsgBox->setInformativeText(error_msg);
+			mpMsgBox->setStandardButtons(QMessageBox::Ok);
+			mpMsgBox->setDefaultButton(QMessageBox::Ok);
+			mpMsgBox->exec();
+			return;
+		}
+
+
+
+		mpJobQueue->FlushQueue();
+		JobCallPhoton *p_qc_job = new JobCallPhoton(mpRootDirection);
+		connect(p_qc_job, SIGNAL(Result(const QString&, const QVariant&)), this, SLOT(ShowQcReport(const QString&, const QVariant&)));
+		mpJobQueue->AddJob(p_qc_job);
+		mpJobQueue->StartQueue();
+	}
+}
+//WR
 
 bool MainWindow::checkUndoStack() {
 
@@ -337,32 +383,7 @@ void MainWindow::rWorkspaceLauncherAccepted() {
 		QString working_dir = p_workspace_launcher->field(FIELD_NAME_WORKING_DIR).toString();
 		QDir dir(working_dir);
 		mpRootDirection = working_dir;
-		QSharedPointer<ImfPackage> imf_package(new ImfPackage(dir));
-		ImfError error = imf_package->Ingest();
-		if(error.IsError() == false) {
-			if(error.IsRecoverableError() == true) {
-				QString error_msg = QString("%1\n%2").arg(error.GetErrorMsg()).arg(error.GetErrorDescription());
-				mpMsgBox->setText(tr("Ingest Warning"));
-				mpMsgBox->setIcon(QMessageBox::Warning);
-				mpMsgBox->setInformativeText(error_msg);
-				mpMsgBox->setStandardButtons(QMessageBox::Ok);
-				mpMsgBox->setDefaultButton(QMessageBox::Ok);
-				mpMsgBox->exec();
-			}
-			mpWidgetImpBrowser->InstallImp(imf_package);
-			mpCentralWidget->InstallImp(imf_package);
-		}
-		else {
-			mpWidgetImpBrowser->UninstallImp();
-			mpCentralWidget->UninstallImp();
-			QString error_msg = QString("%1\n%2").arg(error.GetErrorMsg()).arg(error.GetErrorDescription());
-			mpMsgBox->setText(tr("Ingest Error"));
-			mpMsgBox->setIcon(QMessageBox::Critical);
-			mpMsgBox->setInformativeText(error_msg);
-			mpMsgBox->setStandardButtons(QMessageBox::Ok);
-			mpMsgBox->setDefaultButton(QMessageBox::Ok);
-			mpMsgBox->exec();
-		}
+		rAutoInstallImp();
 	}
 }
 
@@ -416,6 +437,7 @@ void MainWindow::CloseImfPackage() {
 
 	mpWidgetImpBrowser->UninstallImp();
 	mpCentralWidget->UninstallImp();
+	emit ImpClosed(true);
 }
 
 void MainWindow::ShowCplEditor(const QUuid &rCplAssetId) {
@@ -484,8 +506,56 @@ void MainWindow::rReinstallImp() {
 	imf_package->Ingest();
 	mpWidgetImpBrowser->InstallImp(imf_package);
 	mpCentralWidget->InstallImp(imf_package);
+	emit ImpOpened(true);
 }
 			/* -----Denis Manthey End----- */
+
+void MainWindow::rAutoInstallImp(const bool rOpenAllCpls /* = false*/) {
+	QSharedPointer<ImfPackage> imf_package(new ImfPackage(mpRootDirection));
+	ImfError error = imf_package->Ingest();
+	if(error.IsError() == false) {
+		if(error.IsRecoverableError() == true) {
+			QString error_msg = QString("%1\n%2").arg(error.GetErrorMsg()).arg(error.GetErrorDescription());
+			mpMsgBox->setText(tr("Ingest Warning"));
+			mpMsgBox->setIcon(QMessageBox::Warning);
+			mpMsgBox->setInformativeText(error_msg);
+			mpMsgBox->setStandardButtons(QMessageBox::Ok);
+			mpMsgBox->setDefaultButton(QMessageBox::Ok);
+			mpMsgBox->exec();
+		}
+		mpWidgetImpBrowser->InstallImp(imf_package);
+		mpCentralWidget->InstallImp(imf_package);
+		emit ImpOpened(true);
+	}
+	else {
+		mpWidgetImpBrowser->UninstallImp();
+		mpCentralWidget->UninstallImp();
+		emit ImpClosed(true);
+		QString error_msg = QString("%1\n%2").arg(error.GetErrorMsg()).arg(error.GetErrorDescription());
+		mpMsgBox->setText(tr("Ingest Error"));
+		mpMsgBox->setIcon(QMessageBox::Critical);
+		mpMsgBox->setInformativeText(error_msg);
+		mpMsgBox->setStandardButtons(QMessageBox::Ok);
+		mpMsgBox->setDefaultButton(QMessageBox::Ok);
+		mpMsgBox->exec();
+		mpRootDirection = QString();
+		return;
+	}
+	if (rOpenAllCpls) {
+		// For command-line option --imp-directory and --open-all
+		// Open all CPLs in Timeline View
+		for (int i = 0; i < imf_package->GetAssetCount(); i++) {
+			if (imf_package->GetAsset(i)->GetType() == Asset::cpl) {
+				QSharedPointer<AssetCpl> asset_cpl = imf_package->GetAsset(i).objectCast<AssetCpl>();
+				if(asset_cpl && asset_cpl->Exists() == true) {
+					emit mpWidgetImpBrowser->ShowCpl(asset_cpl->GetId());
+				}
+			}
+
+		}
+
+	}
+}
 
 void MainWindow::WritePackage() {
 
@@ -511,4 +581,88 @@ void MainWindow::showStatusMessage(const QString &text, const int &timeout, cons
 	mpStatusBar->setStyleSheet(color);
 	mpStatusBar->showMessage(text, timeout);
 }
+
+//WR
+
+void MainWindow::rJobQueueFinished() {
+	mpProgressDialog->reset();
+	QString error_msg;
+	QList<Error> errors = mpJobQueue->GetErrors();
+	for(int i = 0; i < errors.size(); i++) {
+		error_msg.append(QString("%1: %2\n%3\n").arg(i + 1).arg(errors.at(i).GetErrorMsg()).arg(errors.at(i).GetErrorDescription()));
+	}
+	error_msg.chop(1); // remove last \n
+	if (error_msg != "") {
+		qDebug() << "rJobQueueFinished error:" << error_msg;
+		mpMsgBox->setText(tr("Photon has returned an error:"));
+		mpMsgBox->setInformativeText(error_msg + "\n\n Photon QC failed");
+		mpMsgBox->setStandardButtons(QMessageBox::Ok);
+		mpMsgBox->setDefaultButton(QMessageBox::Ok);
+		mpMsgBox->setIcon(QMessageBox::Critical);
+		mpMsgBox->exec();
+	}
+}
+
+void MainWindow::ShowQcReport(const QString &rQcResult, const QVariant &rIdentifier) {
+
+	mQcReport = rQcResult;
+	// Create wizard
+	QWizard *qc_report_wizard = new QWizard(this, Qt::Popup | Qt::Dialog );
+	// Create wizard page
+	QWizardPage *qc_report_wizard_page = new QWizardPage(qc_report_wizard);
+	qc_report_wizard->addPage(qc_report_wizard_page);
+	qc_report_wizard->resize(1200,1000);
+	qc_report_wizard->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	qc_report_wizard->setWindowModality(Qt::WindowModal);
+	qc_report_wizard->setWindowTitle(tr("Photon QC Report"));
+	qc_report_wizard->setWizardStyle(QWizard::ModernStyle);
+	qc_report_wizard->setStyleSheet("QWizard QPushButton {min-width: 60 px;}");
+
+	// Create text widget
+	QTextEdit *qc_report_view = new QTextEdit();
+	QStringList report_as_list = mQcReport.split("\n"); //,QString::SkipEmptyParts);
+	qc_report_view->setFontFamily("Courier New");
+	qc_report_view->setAttribute(Qt::WA_DeleteOnClose, true);
+	qc_report_view->setReadOnly(true);
+	// Set colors for errors and warnings
+	foreach (const QString &line, report_as_list) {
+		if (line.contains("[ERROR]") || line.contains("[FATAL]"))
+			qc_report_view->setTextColor(Qt::red);
+		else if (line.contains("[WARN ]"))
+			qc_report_view->setTextColor(Qt::yellow);
+		else
+			qc_report_view->setTextColor(QColor("#b1b1b1"));
+		qc_report_view->insertPlainText(line + "\n");
+	}
+
+	// Create layout for text widget and buttons
+	QVBoxLayout *vbox_layout = new QVBoxLayout();
+	vbox_layout->addWidget(qc_report_view);
+	qc_report_wizard_page->setLayout(vbox_layout);
+	QList<QWizard::WizardButton> layout;
+	qc_report_wizard->setOption(QWizard::HaveCustomButton1, true);
+	qc_report_wizard->setButtonText(QWizard::CustomButton1, tr("Copy to Clipboard"));
+	layout << QWizard::CustomButton1 << QWizard::Stretch << QWizard::CancelButton;
+	qc_report_wizard->setButtonLayout(layout);
+	connect(qc_report_wizard->button(QWizard::CustomButton1), SIGNAL(clicked()), this, SLOT(CopyQcReport()));
+
+	qc_report_wizard->setAttribute(Qt::WA_DeleteOnClose, true);
+	qc_report_wizard->show();
+	qc_report_wizard->activateWindow();
+
+}
+
+void MainWindow::CopyQcReport() {
+
+	QClipboard *clipboard = QGuiApplication::clipboard();
+	clipboard->setText(mQcReport);
+}
+
+void MainWindow::setStartupDirectory (const QString &rStartupDirectory, const bool rOpenAllCpls) {
+	mpRootDirection = rStartupDirectory;
+	rAutoInstallImp(rOpenAllCpls);
+}
+
+//WR
+
 

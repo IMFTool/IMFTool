@@ -1,19 +1,21 @@
 This folder contains patches (file replacements) for asdcplib-2.7.19
 asdcplib can be downloaded from www.cinecert.com
 
-Instructions:
+Instructions (READ CAREFULLY):
 
 - Download and unpack from www.cincert.com
 
-- Copy the files in directory src/ into the <asdcplib>/src/ folder.
-
 - Attention: There are Two CMakeLists.txt files to be replaced, on in base folder <asdcplib>/, one in the <asdcplib>/src/ subfolder!
+
+- Copy CMakeLists.txt into the <asdcplib>/ folder.
+
+- Copy the files in directory src/ into the <asdcplib>/src/ folder.
 
 - Follow the build instructions in README.cmake in the root folder of the asdcplib distribution
 
 - Install asdcplib using make install (Linux, macOS) or INSTALL target in Visual Studio
 
-List of patches files:
+List of patch files:
 * ./CMakeLists.txt Version detection, INSTALL target configuration
 * ./src/AS_02_TimedText.cpp	Contains an extension to read the essence element of TTML MXF files with broken indes table. This replacement is optional.
 * ./src/CMakeLists.txt Modified CMake file solving Windows Visual Studio build issues.

@@ -36,6 +36,8 @@
 #include <QSettings>
 #include <iostream>
 #include <memory>
+//WR
+#include <QCommandLineParser>
 
 
 namespace
@@ -137,6 +139,26 @@ int main(int argc, char *argv[]) {
 	a.setApplicationVersion(QString("%1.%2.%3").arg(VERSION_MAJOR).arg(VERSION_MINOR).arg(VERSION_PATCH));
 	a.setWindowIcon(QIcon(":/icon1.ico"));
 	a.setStyle(new CustomProxyStyle);
+	//WR
+	QCommandLineParser parser;
+	parser.setApplicationDescription(PROJECT_NAME);
+	parser.addHelpOption();
+	parser.addVersionOption();
+
+	QCommandLineOption startupDirectoryOption(QStringList() << "i" << "imp-directory",
+			QCoreApplication::translate("main", "Open IMP in <directory> upon startup."),
+			QCoreApplication::translate("main", "directory"));
+	parser.addOption(startupDirectoryOption);
+
+	QCommandLineOption openOption(QStringList() << "a" << "open-all-cpls",
+			QCoreApplication::translate("main", "Open all CPLs from <directory>, as provided by option \"--imp-directory\", in Timeline View."));
+	parser.addOption(openOption);
+
+	// Process the actual command line arguments given by the user
+	parser.process(a);
+	QString startupDirectory = parser.value(startupDirectoryOption);
+	bool openAllCpls = parser.isSet(openOption);
+	//WR
 	QSettings::setDefaultFormat(QSettings::IniFormat); // Set default settings format to init format.
 	// load qt style sheet
 	QFile style_file(":/style/stylesheet.qss");
@@ -183,6 +205,10 @@ int main(int argc, char *argv[]) {
 
 	xercesc::XMLPlatformUtils::Initialize();
 	MainWindow w;
+	if (!startupDirectory.isEmpty()) {
+		qDebug() << "Opening IMP at: " << startupDirectory;
+		w.setStartupDirectory(startupDirectory, openAllCpls);
+	}
 	w.showMaximized();
 	int ret = a.exec();
 	//xercesc::XMLPlatformUtils::Terminate();

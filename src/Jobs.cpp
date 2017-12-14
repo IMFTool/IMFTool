@@ -291,57 +291,6 @@ Error JobWrapTimedText::Execute() {
 }
 //WR
 
-/*JobExtractEssenceDescriptor::JobExtractEssenceDescriptor(const QString &rSourceFile) :
-AbstractJob(tr("Extracting Essence Descriptor from: %1").arg(QFileInfo(rSourceFile).fileName())), mSourceFile(rSourceFile) {
-
-}
-
- Error JobExtractEssenceDescriptor::Execute() {
-
-	QFile file(mSourceFile);
-	if(file.open(QIODevice::ReadOnly) == false) {
-		return Error(Error::SourceFileOpenError, file.fileName());
-	}
-	Error error;
-
-	QString filePath = mSourceFile;
-	QString qresult;
-	QProcess *myProcess = new QProcess();
-	const QString program = "java";
-	QStringList arg;
-	arg << "-cp";
-	arg << QApplication::applicationDirPath() + QString("/regxmllib/regxmllib.jar");
-	arg << "com.sandflow.smpte.tools.RegXMLDump";
-	arg << "-ed";
-	arg << "-d";
-	arg << QApplication::applicationDirPath() + QString("/regxmllib/www-smpte-ra-org-reg-335-2012.xml");
-	arg << QApplication::applicationDirPath() + QString("/regxmllib/www-smpte-ra-org-reg-335-2012-13-1-aaf.xml");
-	arg << QApplication::applicationDirPath() + QString("/regxmllib/www-smpte-ra-org-reg-395-2014-13-1-aaf.xml");
-	arg << QApplication::applicationDirPath() + QString("/regxmllib/www-smpte-ra-org-reg-2003-2012.xml");
-	arg << "-i";
-	arg << filePath;
-	myProcess->start(program, arg);
-	myProcess->waitForFinished(-1);
-	if (myProcess->exitStatus() == QProcess::NormalExit) {
-		if (myProcess->exitCode() != 0) { return error = Error(Error::ExitCodeNotZero); }
-	} else {
-		return error = Error(Error::ExitStatusError);
-	}
-
-	try {
-		qresult = myProcess->readAllStandardOutput();
-	}
-	catch (...) {
-		return error = Error(Error::EssenceDescriptorExtraction);
-	}
-
-	if(error.IsError() == false) {
-		emit Result(qresult, GetIdentifier());
-	}
-
-	return error;
-} */
-
 JobExtractEssenceDescriptor::JobExtractEssenceDescriptor(const QString &rSourceFile) :
 AbstractJob(tr("Extracting Essence Descriptor from: %1").arg(QFileInfo(rSourceFile).fileName())), mSourceFile(rSourceFile) {
 
@@ -422,12 +371,16 @@ Error JobExtractEssenceDescriptor::Execute() {
 		error = Error(Error::EssenceDescriptorExtraction);
 
 	}
-	static const rxml::UL ESSENCE_DESCRIPTOR_KEY = "urn:smpte:ul:060e2b34.02010101.0d010101.01012400";
+	static const rxml::UL ESSENCE_DESCRIPTOR_KEY = "urn:smpte:ul:060e2b34.02010101.0d010101.01012400"; // Generic Descriptor per SMPTE ST 377-1 Table 19
 	const rxml::AUID* ed_auid = new rxml::AUID(ESSENCE_DESCRIPTOR_KEY);
 	DOMDocumentFragment* frag = MXFFragmentBuilder::fromInputStream(f, mds, NULL, ed_auid, *doc);
 
-	doc->appendChild(frag);
-
+	if (frag)
+		doc->appendChild(frag);
+	else {
+		qDebug() << "Can't find ESSENCE_DESCRIPTOR_KEY" << "urn:smpte:ul:060e2b34.02010101.0d010101.01012400";
+		error = Error(Error::EssenceDescriptorExtraction);
+	}
 
 	if(error.IsError() == false) {
 		emit Result(doc, GetIdentifier());
@@ -447,3 +400,49 @@ Error JobExtractEssenceDescriptor::Execute() {
 	return error;
 }
 //WR
+
+
+JobCallPhoton::JobCallPhoton(const QString &rWorkingDirectory) :
+AbstractJob("Generating Photon IMP QC Report"), mWorkingDirectory(rWorkingDirectory) {
+
+}
+
+Error JobCallPhoton::Execute() {
+
+	Error error;
+	QString qresult;
+	QProcess *myProcess = new QProcess();
+	const QString program = "java";
+	QStringList arg;
+	arg << "-cp";
+#ifdef WIN32
+	arg << QApplication::applicationDirPath() + QString("/photon/build/libs/*;");
+#else
+	arg << QApplication::applicationDirPath() + QString("/photon/build/libs/*:");
+#endif
+	arg << "com.netflix.imflibrary.app.IMPAnalyzer";
+	arg << mWorkingDirectory;
+	emit Progress(20);
+	myProcess->start(program, arg);
+	emit Progress(40);
+	myProcess->waitForFinished(-1);
+	if (myProcess->exitStatus() == QProcess::NormalExit) {
+		if (myProcess->exitCode() != 0) { return error = Error(Error::ExitCodeNotZero); }
+	} else {
+		return error = Error(Error::ExitStatusError);
+	}
+	emit Progress(80);
+	try {
+		qresult = myProcess->readAllStandardOutput();
+	}
+	catch (...) {
+		return error = Error(Error::PhotonQcReport);
+	}
+
+	if(error.IsError() == false) {
+		emit Result(qresult, GetIdentifier());
+	}
+
+	return error;
+}
+

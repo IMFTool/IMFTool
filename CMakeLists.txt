@@ -25,7 +25,7 @@ message(STATUS "SVN Last Changed Revision Number is ${SVN_REV}")
 
 # The version number.
 set(VERSION_MAJOR 1)
-set(VERSION_MINOR 1)
+set(VERSION_MINOR 2)
 set(VERSION_PATCH ${SVN_REV})
 set(VERSION_STRING ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)

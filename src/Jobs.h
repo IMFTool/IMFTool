@@ -166,3 +166,24 @@ private:
 	const QString mSourceFile;
 
 };
+
+class JobCallPhoton : public AbstractJob {
+
+	Q_OBJECT
+
+public:
+	JobCallPhoton(const QString &rWorkingDirectory);
+	virtual ~JobCallPhoton() {}
+
+signals:
+	void Result(const QString &qc_result, const QVariant &rIdentifier = QVariant());
+
+protected:
+	virtual Error Execute();
+
+private:
+	Q_DISABLE_COPY(JobCallPhoton);
+
+	const QString mWorkingDirectory;
+
+};

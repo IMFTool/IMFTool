@@ -53,6 +53,7 @@ void WidgetCentral::InitLyout() {
 	mpTabWidget = new QTabWidget(this);
 	mpTabWidget->setTabsClosable(true);
 	mpTabWidget->setMovable(true);
+	mpTabWidget->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 	QFrame *p_tab_widget_frame = new QFrame(this);
 	p_tab_widget_frame->setFrameStyle(QFrame::StyledPanel);
 	QHBoxLayout *p_tab_widget_frame_layout = new QHBoxLayout();

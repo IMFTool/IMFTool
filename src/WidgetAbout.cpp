@@ -41,6 +41,7 @@ QString third_party = QString("Third Party:\n\n"
 															"Other Icons: Copyright 2009-2014 FatCow Web Hosting\n\n"
 															"QtWaitingSpinner: Original Work Copyright (c) 2012-2014 Alexander Turkin Modified 2014 by William Hallatt\n\n"
 															"Marker Icon: This icon is provided by icons8.com as Creative Commons Attribution-NoDerivs 3.0 Unported\n\n"
+															"Photon: Available at https://github.com/Netflix/photon/ under Apache 2.0 License\n\n"
 
 		"\n"
 		"BEGIN OpenJPEG License, copied from https://github.com/uclouvain/openjpeg/LICENSE\n"

@@ -25,6 +25,11 @@ class WidgetImpBrowser;
 class WidgetCentral;
 class QMessageBox;
 class QUndoGroup;
+//WR
+class QMessageBox;
+class QProgressDialog;
+class JobQueue;
+//WR
 
 class MainWindow : public QMainWindow {
 
@@ -33,10 +38,14 @@ class MainWindow : public QMainWindow {
 public:
 	MainWindow(QWidget *pParent = NULL);
 	virtual ~MainWindow() {}
+	void setStartupDirectory(const QString &rStartupDirectory, const bool rOpenAllCpls);
 
 signals:
 	void SettingsSaved();
 	void KeyStroke(int); // (k)
+	void ImpOpened(bool);
+	void ImpClosed(bool);
+	void StartupDirectory();
 public slots:
 	void ShowWidgetAbout();
 	void ShowWorkspaceLauncher();
@@ -48,6 +57,7 @@ public slots:
 	void SaveAsNewCPL();
 	void WritePackage();
 	void showStatusMessage(const QString &text, const int &timeout, const QString &color);
+	void rJobQueueFinished();
 
 
 private slots:
@@ -59,6 +69,12 @@ private slots:
 	void rOpenImpRequest();
 	void rCloseImpRequest();
 	void rReinstallImp();
+	//WR
+	void ShowQcReport(const QString &rQcResult, const QVariant &rIdentifier);
+	void CopyQcReport();
+	void rCallPhoton();
+	void rAutoInstallImp(const bool rOpenAllCpls = false);
+	//WR
 
 private:
 	Q_DISABLE_COPY(MainWindow);
@@ -84,4 +100,10 @@ private:
 	QList <QString> mpUnwrittenCPLs;
 	QString mpRootDirection;
 	QStatusBar *mpStatusBar;
+	//WR
+	QProgressDialog *mpProgressDialog;
+	JobQueue *mpJobQueue;
+	QString mQcReport;
+	//WR
+
 };
