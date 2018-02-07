@@ -284,5 +284,32 @@ QList<ContentMaturityRating> ImfXmlHelper::Convert(cpl2016::LocaleType_ContentMa
 	return locale;
 }
 
+int ImfXmlHelper::RemoveWhiteSpaces(const QString &rPathName) {
+	// Remove trailing CR and CRLF from base64 encoded hashes
+	// The XSD Code Synthesis serializer inserts CR (mac) and CRLF (Win) for type base64Binary
+	// Trailing CR/CRLF are allowed in base64, nevertheless some QC systems are complaining about them.
+	int result = 0;
+#ifdef WIN32
+	QByteArray before("\r\n</Hash>");
+#else
+	QByteArray before("\n</Hash>");
+#endif
+	QByteArray after("</Hash>");
+	QFile file(rPathName);
+	QByteArray blob;
+	if (file.open(QIODevice::ReadOnly)) {
+		blob = file.readAll();
+		blob.replace(before, after);
+		file.remove();
+		file.close();
+		if (file.open(QIODevice::WriteOnly)) {
+			file.write(blob);
+			file.close();
+		} else result = -1;
+	} else result = -1;
+	return result;
+}
+
+
 
 //WR

@@ -102,6 +102,7 @@ void MainWindow::InitLayout() {
 	connect(mpWidgetImpBrowser, SIGNAL(WritePackageComplete()), this, SLOT(rReinstallImp()));
 	//WR begin
 	connect(mpCentralWidget, SIGNAL(SaveAllCplFinished()), mpWidgetImpBrowser, SLOT(RecalcHashForCpls()));
+	connect(mpWidgetImpBrowser, SIGNAL(CallSaveAllCpl()), this, SLOT(SaveAllCpl()));
 	//WR end
 }
 
@@ -411,9 +412,6 @@ void MainWindow::rWorkspaceLauncherPartialImpAccepted() {
 		}
 		//check writing permissions
 		if (success == true) {
-			//WR
-			connect(mpWidgetImpBrowser, SIGNAL(CallSaveAllCpl()), this, SLOT(SaveAllCpl()));
-			//WR
 			mpWidgetImpBrowser->ExportPartialImp(partial_imp_dir, partial_imp_issuer, partial_imp_annotation);
 		} else {
 			mpMsgBox->setText(tr("Couldn't create folder"));
@@ -559,8 +557,6 @@ void MainWindow::rAutoInstallImp(const bool rOpenAllCpls /* = false*/) {
 
 void MainWindow::WritePackage() {
 
-	//mpCentralWidget->SaveAllCpl();
-	connect(mpWidgetImpBrowser, SIGNAL(CallSaveAllCpl()), this, SLOT(SaveAllCpl()));
 	mpWidgetImpBrowser->Save();
 	mpUnwrittenCPLs.clear();
 }

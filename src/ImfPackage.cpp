@@ -189,6 +189,8 @@ ImfError ImfPackage::Outgest() {
 				if(QSharedPointer<Asset> pkl_asset = GetAsset(mPackingLists.at(i)->GetId())) {
 					pkl_asset->FileModified();
 				}
+				if (ImfXmlHelper::RemoveWhiteSpaces(mPackingLists.at(i)->GetFilePath().absoluteFilePath()))
+					qDebug() << "Error removong XML whitespaces from " << mPackingLists.at(i)->GetFilePath().absoluteFilePath();
 			}
 			else break;
 		}

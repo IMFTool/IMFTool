@@ -437,6 +437,9 @@ ImfError WidgetComposition::Write(const QString &rDestination /*= QString()*/) {
 		if(serialization_error.IsError() == true) {
 			qDebug() << serialization_error;
 			error = ImfError(serialization_error);
+		} else {
+		if (ImfXmlHelper::RemoveWhiteSpaces(destination))
+			qDebug() << "Error removong XML whitespaces from " << destination;
 		}
 	}
 	else {
@@ -613,6 +616,9 @@ ImfError WidgetComposition::WriteNew(const QString &rDestination /*= QString()*/
 		if(serialization_error.IsError() == true) {
 			qDebug() << serialization_error;
 			error = ImfError(serialization_error);
+		} else {
+		if (ImfXmlHelper::RemoveWhiteSpaces(destination))
+			qDebug() << "Error removong XML whitespaces from " << destination;
 		}
 	}
 	else {

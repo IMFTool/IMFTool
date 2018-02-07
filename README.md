@@ -13,6 +13,7 @@ Introductory videos are available on YouTube [2], [3].
 
 ## Workflows supported:
 -	Open an IMP, visualize the timeline of the CPL(s) included in the IMP
+- 	NEW: Create Photon[4] QC report
 -	Edit CPL metadata
 -	Add new virtual tracks (limited to audio, subtitles and markers)
 -	Import and wrap audio and timed text resources
@@ -70,5 +71,5 @@ http://techblog.netflix.com/2016/03/imf-prescription-for-versionitis.html
 
 [3] IMF-Tool introductory video Part 2: https://www.youtube.com/watch?v=k6OIx7WfF8s
 
-
+[4] Photon IMF QC tool https://github.com/Netflix/photon
 

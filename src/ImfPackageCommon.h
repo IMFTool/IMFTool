@@ -470,4 +470,7 @@ public:
 	static QList<ContentMaturityRating> Convert(cpl2016::LocaleType_ContentMaturityRatingListType::ContentMaturityRatingSequence rContentMaturityRatingSequence);
 
 	static cpl2016::LocaleType Convert(const ::Locale &rLocale);
+
+	//WR
+	static int RemoveWhiteSpaces(const QString &rPathName);
 };

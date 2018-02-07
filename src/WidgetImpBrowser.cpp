@@ -379,12 +379,18 @@ void WidgetImpBrowser::ShowResourceGeneratorTimedTextMode() {
 void WidgetImpBrowser::ShowResourceGeneratorMxfMode() {
 	mpFileDialog = new QFileDialog(this, QString("Select MXF file"), mpImfPackage->GetRootDir().absolutePath());
 	mpFileDialog->setOption(QFileDialog::DontUseNativeDialog);
+	mpFileDialog->setOption(QFileDialog::DontUseCustomDirectoryIcons);
 	mpFileDialog->setFileMode(QFileDialog::ExistingFile);
 	mpFileDialog->setViewMode(QFileDialog::Detail);
 	mpFileDialog->setNameFilters(QStringList() << "*.mxf");
 	mpFileDialog->setIconProvider(new IconProviderExrWav(this));
 	connect(mpFileDialog, SIGNAL(directoryEntered(const QString&)), this, SLOT(SetMxfFileDirectory(const QString&)));
 	connect(mpFileDialog, SIGNAL(filesSelected(const QStringList &)), this, SLOT(SetMxfFile(const QStringList &)));
+    QToolButton* backButton = this->findChild<QToolButton *>("backButton");
+    QToolButton* forwardButton = this->findChild<QToolButton *>("forwardButton");
+    backButton->setVisible(false);
+    forwardButton->setVisible(false);
+
 	mpFileDialog->show();
 }
 //WR

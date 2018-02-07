@@ -414,9 +414,13 @@ QImage JP2::DataToQImage()
 						r = (r - ComponentMinRef) / (ComponentMaxRef - ComponentMinRef) * maxcv;
 						g = (g - ComponentMinRef) / (ComponentMaxRef - ComponentMinRef) * maxcv;
 						b = (b - ComponentMinRef) / (ComponentMaxRef - ComponentMinRef) * maxcv;
-						if (r < 0) r = 0;
-						if (g < 0) g = 0;
-						if (b < 0) b = 0;
+						// clamp between 0...CVmax
+						if (r < 0) { r = 0; }
+						else if (r > maxcv) { r = maxcv; }
+						if (g < 0) { g = 0; }
+						else if (g > maxcv) { g = maxcv; }
+						if (b < 0) { b = 0; }
+						else if (b > maxcv) { b = maxcv; }
 					}
 					//WR
 					break;
