@@ -159,6 +159,8 @@ void MainWindow::InitMenuAndToolbar() {
 	connect(p_qc_photon, SIGNAL(triggered(bool)), this, SLOT(rCallPhoton()));
 	connect(this, SIGNAL(ImpOpened(bool)), p_qc_photon, SLOT(setEnabled(bool)));
 	connect(this, SIGNAL(ImpClosed(bool)), p_qc_photon, SLOT(setDisabled(bool)));
+	connect(this, SIGNAL(ImpOpened(bool)), this, SLOT(informIsSupplementalImp()));
+
 	// WR
 
 	p_menu_file->addAction(p_action_write);
@@ -657,6 +659,18 @@ void MainWindow::CopyQcReport() {
 void MainWindow::setStartupDirectory (const QString &rStartupDirectory, const bool rOpenAllCpls) {
 	mpRootDirection = rStartupDirectory;
 	rAutoInstallImp(rOpenAllCpls);
+}
+
+void MainWindow::informIsSupplementalImp() {
+	if (mpWidgetImpBrowser->GetImfPackage()->GetIsSupplemental()) {
+		mpMsgBox->setText(tr("Supplemental IMP"));
+		mpMsgBox->setInformativeText(tr("This IMP is a Supplemental IMP. \nYou may use the \"Load OV IMP\" button to load ancestor Original Version IMPs for previewing and editing this IMP."));
+		mpMsgBox->setStandardButtons(QMessageBox::Ok);
+		mpMsgBox->setDefaultButton(QMessageBox::Ok);
+		mpMsgBox->setIcon(QMessageBox::Information);
+		mpMsgBox->exec();
+	}
+
 }
 
 //WR

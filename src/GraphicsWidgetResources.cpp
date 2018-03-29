@@ -695,8 +695,15 @@ void GraphicsWidgetDummyResource::paint(QPainter *pPainter, const QStyleOptionGr
 	}
 }
 
-GraphicsWidgetFileResource::GraphicsWidgetFileResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/, const QColor &rColor /*= QColor(Qt::white)*/) :
-AbstractGraphicsWidgetResource(pParent, pResource, rAsset, rColor) {
+GraphicsWidgetFileResource::GraphicsWidgetFileResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/, const QColor &rColor /*= QColor(Qt::white)*/,
+		const QSharedPointer<ImfPackage> rImfPackage /* = 0 */) :
+AbstractGraphicsWidgetResource(pParent, pResource, rAsset, rColor), mImfPackage(rImfPackage) {
+	if (mpData) mTrackFileId = ImfXmlHelper::Convert(static_cast<cpl2016::TrackFileResourceType*>(mpData)->getTrackFileId());
+	// WR mAsset is.Null for Partial IMP assets not contained in the package.
+	if(mAssset.isNull() && (mTrackFileId != QUuid(0))) {
+		// WR: Connect to mImfPackage::ImpAssetModified, to be notified when OV assets are loaded
+		connect(mImfPackage.data(), SIGNAL(ImpAssetModified(QSharedPointer<Asset>)), this, SLOT(slotAssetAdded(QSharedPointer<Asset>)));
+	}
 
 }
 
@@ -719,10 +726,52 @@ std::auto_ptr<cpl2016::BaseResourceType> GraphicsWidgetFileResource::Write() con
 	return std::auto_ptr<cpl2016::BaseResourceType>(mpData->_clone());
 }
 
+// WR This slot is called for each asset loaded from an OV
+void GraphicsWidgetFileResource::slotAssetAdded(QSharedPointer<Asset> rAsset) {
+	QSharedPointer<AssetMxfTrack> mxf_asset;
+	mxf_asset = qobject_cast<QSharedPointer<AssetMxfTrack> >(rAsset);
+	if (!mxf_asset.isNull() && mTrackFileId == mxf_asset->GetId()) {
+		mAssset = QSharedPointer<AssetMxfTrack>(mxf_asset);
+		disconnect(mImfPackage.data(), SIGNAL(ImpAssetModified(QSharedPointer<Asset>)), this, SLOT(slotAssetAdded(QSharedPointer<Asset>)));
+		connect(mAssset.data(), SIGNAL(AssetModified(Asset*)), this, SLOT(rAssetModified()));
+		GraphicsWidgetVideoResource* video_res = dynamic_cast<GraphicsWidgetVideoResource*>(this);
+		if (video_res) {
+			// Thread needs to be restarted to update mAssset
+			video_res->restartThread(mAssset);
+			video_res->RefreshProxy();
+			GraphicsWidgetComposition* composition;
+			if(GraphicsSceneComposition* p_scene = qobject_cast<GraphicsSceneComposition*>(scene())) {
+				composition = p_scene->GetComposition();
+				emit composition->updatePlaylist();
+			}
+		}
+	}
 
-GraphicsWidgetVideoResource::GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/, int video_timeline_index) :
+	update();
+}
+
+void GraphicsWidgetVideoResource::restartThread(QSharedPointer<AssetMxfTrack> rAsset) {
+	if (decodeProxyThread->isRunning()) {
+		decodeProxyThread->quit();
+		decodeProxyThread->wait();
+	}
+	mpJP2K = new JP2K_Preview(); // (k)
+	mpJP2K->asset = rAsset; // (k)
+
+	decodeProxyThread = new QThread();
+	mpJP2K->moveToThread(decodeProxyThread);
+
+	connect(decodeProxyThread, SIGNAL(started()), mpJP2K, SLOT(getProxy()));
+	connect(mpJP2K, SIGNAL(finished()), decodeProxyThread, SLOT(quit()));
+	connect(mpJP2K, SIGNAL(proxyFinished(const QImage&, const QImage&)), this, SLOT(rShowProxyImage(const QImage&, const QImage&)));
+
+
+}
+
+GraphicsWidgetVideoResource::GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/, int video_timeline_index,
+		const QSharedPointer<ImfPackage> rImfPackage /* = 0 */) :
 mpJP2K(0), // (k)
-GraphicsWidgetFileResource(pParent, pResource, rAsset, QColor(CPL_COLOR_VIDEO_RESOURCE)), mLeftProxyImage(":/proxy_film.png"), mRightProxyImage(":/proxy_film.png"), mTrimActive(false) {
+GraphicsWidgetFileResource(pParent, pResource, rAsset, QColor(CPL_COLOR_VIDEO_RESOURCE), rImfPackage), mLeftProxyImage(":/proxy_film.png"), mRightProxyImage(":/proxy_film.png"), mTrimActive(false) {
 
 
 
@@ -817,11 +866,15 @@ void GraphicsWidgetVideoResource::paint(QPainter *pPainter, const QStyleOptionGr
 
 			QString duration(font_metrics.elidedText(tr("Dur.: %1").arg(MapToCplTimeline(GetSourceDuration()).GetCount()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
 			QString file_name;
-			if(mAssset && mAssset->HasAffinity()) {
+			if((mAssset) && mAssset->HasAffinity()) {
 				if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
 				else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
-			}
-			else {
+			} else if ((mAssset) && (!mAssset->HasAffinity()) && (mAssset->GetIsOutsidePackage())) {
+				pen.setColor(mAssset->GetColor());
+				pPainter->setPen(pen);
+				if(i == 0) file_name = QString(font_metrics.elidedText("OV Asset: " + mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+				else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+			} else if ((mAssset == NULL)  ||  ((mAssset) && (!mAssset->HasAffinity()))) {
 				pen.setColor(Qt::white);
 				pPainter->setPen(pen);
 				file_name = QString(font_metrics.elidedText("Missing Asset", Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
@@ -868,7 +921,7 @@ GraphicsWidgetVideoResource* GraphicsWidgetVideoResource::Clone() const {
 
 	cpl2016::TrackFileResourceType intermediate_resource(*(static_cast<cpl2016::TrackFileResourceType*>(mpData)));
 	intermediate_resource.setId(ImfXmlHelper::Convert(QUuid::createUuid()));
-	GraphicsWidgetVideoResource *p_resource = new GraphicsWidgetVideoResource(NULL, intermediate_resource._clone(), mAssset);
+	GraphicsWidgetVideoResource *p_resource = new GraphicsWidgetVideoResource(NULL, intermediate_resource._clone(), mAssset, 0, mImfPackage);
 	p_resource->mLeftProxyImage = mLeftProxyImage;
 	p_resource->mRightProxyImage = mRightProxyImage;
 	p_resource->update();
@@ -929,8 +982,9 @@ void GraphicsWidgetVideoResource::RefreshSecondProxy() {
 
 }
 
-GraphicsWidgetAudioResource::GraphicsWidgetAudioResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/) :
-GraphicsWidgetFileResource(pParent, pResource, rAsset, QColor(CPL_COLOR_AUDIO_RESOURCE)) {
+GraphicsWidgetAudioResource::GraphicsWidgetAudioResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/, int unused_index /* = 0 */,
+		const QSharedPointer<ImfPackage> rImfPackage /* = 0 */) :
+GraphicsWidgetFileResource(pParent, pResource, rAsset, QColor(CPL_COLOR_AUDIO_RESOURCE), rImfPackage) {
 
 }
 
@@ -973,11 +1027,15 @@ void GraphicsWidgetAudioResource::paint(QPainter *pPainter, const QStyleOptionGr
 
 			QString duration(font_metrics.elidedText(tr("Dur.: %1").arg(MapToCplTimeline(GetSourceDuration()).GetCount()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
 			QString file_name;
-			if(mAssset && mAssset->HasAffinity()) {
+			if((mAssset) && mAssset->HasAffinity()) {
 				if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
 				else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
-			}
-			else {
+			} else if ((mAssset) && (!mAssset->HasAffinity()) && (mAssset->GetIsOutsidePackage())) {
+				pen.setColor(mAssset->GetColor());
+				pPainter->setPen(pen);
+				if(i == 0) file_name = QString(font_metrics.elidedText("OV Asset: " + mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+				else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+			} else if ((mAssset == NULL)  ||  ((mAssset) && (!mAssset->HasAffinity()))) {
 				pen.setColor(Qt::white);
 				pPainter->setPen(pen);
 				file_name = QString(font_metrics.elidedText("Missing Asset", Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
@@ -1017,7 +1075,7 @@ GraphicsWidgetAudioResource* GraphicsWidgetAudioResource::Clone() const {
 
 	cpl2016::TrackFileResourceType intermediate_resource(*(static_cast<cpl2016::TrackFileResourceType*>(mpData)));
 	intermediate_resource.setId(ImfXmlHelper::Convert(QUuid::createUuid()));
-	return new GraphicsWidgetAudioResource(NULL, intermediate_resource._clone(), mAssset);
+	return new GraphicsWidgetAudioResource(NULL, intermediate_resource._clone(), mAssset, 0, mImfPackage);
 }
 
 SoundfieldGroup GraphicsWidgetAudioResource::GetSoundfieldGroup() const {
@@ -1026,8 +1084,9 @@ SoundfieldGroup GraphicsWidgetAudioResource::GetSoundfieldGroup() const {
 	return SoundfieldGroup::SoundFieldGroupNone;
 }
 
-GraphicsWidgetTimedTextResource::GraphicsWidgetTimedTextResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/) :
-GraphicsWidgetFileResource(pParent, pResource, rAsset, QColor(CPL_COLOR_TIMED_TEXT_RESOURCE)) {
+GraphicsWidgetTimedTextResource::GraphicsWidgetTimedTextResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/, int unused_index /* = 0 */,
+		const QSharedPointer<ImfPackage> rImfPackage /* = 0 */) :
+GraphicsWidgetFileResource(pParent, pResource, rAsset, QColor(CPL_COLOR_TIMED_TEXT_RESOURCE), rImfPackage) {
 
 }
 
@@ -1075,11 +1134,15 @@ void GraphicsWidgetTimedTextResource::paint(QPainter *pPainter, const QStyleOpti
 
 			QString duration(font_metrics.elidedText(tr("Dur.: %1").arg(MapToCplTimeline(GetSourceDuration()).GetCount()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
 			QString file_name;
-			if(mAssset && mAssset->HasAffinity()) {
-				if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first.append(" [ %1 ]").arg(mAssset->GetAnnotationText().first), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+			if((mAssset) && mAssset->HasAffinity()) {
+				if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
 				else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
-			}
-			else {
+			} else if ((mAssset) && (!mAssset->HasAffinity()) && (mAssset->GetIsOutsidePackage())) {
+				pen.setColor(mAssset->GetColor());
+				pPainter->setPen(pen);
+				if(i == 0) file_name = QString(font_metrics.elidedText("OV Asset: " + mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+				else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+			} else if ((mAssset == NULL)  ||  ((mAssset) && (!mAssset->HasAffinity()))) {
 				pen.setColor(Qt::white);
 				pPainter->setPen(pen);
 				file_name = QString(font_metrics.elidedText("Missing Asset", Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
@@ -1114,7 +1177,7 @@ GraphicsWidgetTimedTextResource* GraphicsWidgetTimedTextResource::Clone() const 
 
 	cpl2016::TrackFileResourceType intermediate_resource(*(static_cast<cpl2016::TrackFileResourceType*>(mpData)));
 	intermediate_resource.setId(ImfXmlHelper::Convert(QUuid::createUuid()));
-	return new GraphicsWidgetTimedTextResource(NULL, intermediate_resource._clone(), mAssset);
+	return new GraphicsWidgetTimedTextResource(NULL, intermediate_resource._clone(), mAssset, 0, mImfPackage);
 }
 
 double GraphicsWidgetTimedTextResource::ResourceErPerCompositionEr(const EditRate &rCompositionEditRate) const {
@@ -1122,8 +1185,9 @@ double GraphicsWidgetTimedTextResource::ResourceErPerCompositionEr(const EditRat
 	return GetEditRate().GetNumerator() * rCompositionEditRate.GetDenominator() / double(rCompositionEditRate.GetNumerator() * GetEditRate().GetDenominator());
 }
 
-GraphicsWidgetAncillaryDataResource::GraphicsWidgetAncillaryDataResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/) :
-GraphicsWidgetFileResource(pParent, pResource, rAsset, QColor(CPL_COLOR_ANC_RESOURCE)) {
+GraphicsWidgetAncillaryDataResource::GraphicsWidgetAncillaryDataResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/, int unused_index /* = 0 */,
+		const QSharedPointer<ImfPackage> rImfPackage /* = 0 */) :
+GraphicsWidgetFileResource(pParent, pResource, rAsset, QColor(CPL_COLOR_ANC_RESOURCE), rImfPackage) {
 
 }
 
@@ -1166,11 +1230,15 @@ void GraphicsWidgetAncillaryDataResource::paint(QPainter *pPainter, const QStyle
 
 			QString duration(font_metrics.elidedText(tr("Dur.: %1").arg(MapToCplTimeline(GetSourceDuration()).GetCount()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
 			QString file_name;
-			if(mAssset && mAssset->HasAffinity()) {
-				if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
-				else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
-			}
-			else {
+			if((mAssset) && mAssset->HasAffinity()) {
+					if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+					else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+			} else if ((mAssset) && (!mAssset->HasAffinity()) && (mAssset->GetIsOutsidePackage())) {
+					pen.setColor(mAssset->GetColor());
+					pPainter->setPen(pen);
+					if(i == 0) file_name = QString(font_metrics.elidedText("OV Asset: " + mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+					else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+			} else if ((mAssset == NULL)  ||  ((mAssset) && (!mAssset->HasAffinity()))) {
 				pen.setColor(Qt::white);
 				pPainter->setPen(pen);
 				file_name = QString(font_metrics.elidedText("Missing Asset", Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
@@ -1205,7 +1273,7 @@ GraphicsWidgetAncillaryDataResource* GraphicsWidgetAncillaryDataResource::Clone(
 
 	cpl2016::TrackFileResourceType intermediate_resource(*(static_cast<cpl2016::TrackFileResourceType*>(mpData)));
 	intermediate_resource.setId(ImfXmlHelper::Convert(QUuid::createUuid()));
-	return new GraphicsWidgetAncillaryDataResource(NULL, intermediate_resource._clone(), mAssset);
+	return new GraphicsWidgetAncillaryDataResource(NULL, intermediate_resource._clone(), mAssset, 0, mImfPackage);
 }
 
 double GraphicsWidgetAncillaryDataResource::ResourceErPerCompositionEr(const EditRate &rCompositionEditRate) const {

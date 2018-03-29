@@ -25,13 +25,15 @@ message(STATUS "SVN Last Changed Revision Number is ${SVN_REV}")
 
 # The version number.
 set(VERSION_MAJOR 1)
-set(VERSION_MINOR 2)
+set(VERSION_MINOR 3)
 set(VERSION_PATCH ${SVN_REV})
 set(VERSION_STRING ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "Default Targets")
 set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER "Generated Files")
 set_property(GLOBAL PROPERTY AUTOMOC_TARGETS_FOLDER "Generated Files")
+# Helps Eclipse finding include paths:
+set(CMAKE_VERBOSE_MAKEFILE ON)
 # use, i.e. don't skip the full RPATH for the build tree
 set(CMAKE_SKIP_BUILD_RPATH  OFF)
 # when building, don't use the install RPATH already

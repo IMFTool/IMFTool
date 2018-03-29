@@ -74,6 +74,7 @@ private slots:
 	void CopyQcReport();
 	void rCallPhoton();
 	void rAutoInstallImp(const bool rOpenAllCpls = false);
+	void informIsSupplementalImp();
 	//WR
 
 private:

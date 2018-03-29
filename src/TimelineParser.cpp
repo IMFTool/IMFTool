@@ -24,9 +24,6 @@ void TimelineParser::run() {
 					for (int iii = 0; iii < p_sequence->GetResourceCount(); iii++) {
 						AbstractGraphicsWidgetResource *p_resource = p_sequence->GetResource(iii);
 
-						//qDebug() << i << ii << iii;
-						//qDebug() << p_resource->type();
-
 						if (p_resource->type() == GraphicsWidgetVideoResourceType) {
 
 							//WR Refresh timeline_index when parsing timeline, timeline_index is sent by signal CurrentVideoChanged to slot xPosChanged in mpPreview

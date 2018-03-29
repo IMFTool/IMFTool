@@ -297,7 +297,9 @@ void WidgetVideoPreview::xPosChanged(const QSharedPointer<AssetMxfTrack> &rAsset
 	xSliderTotal = rTimecode.GetOverallFrames(); // slider is pointing to this frame (in timeline)
 	currentAsset = rAsset;
 	current_playlist_index = playlist_index;
-
+#ifdef DEBUG_JP2K
+	qDebug() << "xPosChanged" << rOffset << decodingFrame << xSliderTotal << currentAsset.isNull();
+#endif
 	if (setFrameIndicator) {
 		setFrameIndicator = false;
 		return; // ignore this signal (it is a response from setting the player position)
@@ -317,22 +319,28 @@ void WidgetVideoPreview::xPosChanged(const QSharedPointer<AssetMxfTrack> &rAsset
 	if (decodingFrame != xSliderTotal) {
 
 		player->setPos(xSliderFrame, xSliderTotal, playlist_index); // set current frame in player
-
+		// Terminate running decodes
+		if (decodingThreads[run]->isRunning()) decodingThreads[run]->quit();
 		run = (int)now_running;
+#ifdef DEBUG_JP2K
+		qDebug() << run << running[0] << running[1] << decodingThreads[0]->isRunning() << decodingThreads[1]->isRunning();
+#endif
 
 		if (running[run] == false && !decodingThreads[run]->isRunning()) {
 			running[run] = true;
 
 			//emit setVerticalIndicator(const Timecode &rCplTimecode);
 #ifdef DEBUG_JP2K
-			qDebug() << "start generating preview nr:" << xSliderFrame;
+			qDebug() << "start generating preview nr:" << xSliderFrame << currentAsset.isNull();
 #endif
 			decodingFrame = xSliderTotal;
 
 			decoders[run]->asset = currentAsset; // set new asset in current decoder
 			//decoders[run]->frameNr = xSliderFrame; // set current frame number in decoder
 			if (currentPlaylist.length() == 0) {//Under some race conditions during Outgest currentPlaylist can be empty here.
+#ifdef DEBUG_JP2K
 				qDebug() << "WidgetVideoPreview::xPosChanged called with empty currentPlaylist";
+#endif
 				running[run] = false;
 			} else {
 				VideoResource vr = currentPlaylist[current_playlist_index];
@@ -351,7 +359,9 @@ void WidgetVideoPreview::decodingStatus(qint64 frameNr,QString status) {
 	running[(int)(now_running)] = false; // free up decoder
 	now_running = !now_running; // flip value
 	run = (int)now_running;
-
+#ifdef DEBUG_JP2K
+	qDebug() << decodingFrame << xSliderTotal << player->playing << decodingThreads[run]->isRunning();
+#endif
 	// check if current xSlider Position matches last decoded frame
 	if (decodingFrame != xSliderTotal && player->playing == false && !decodingThreads[run]->isRunning()){
 		
@@ -499,7 +509,9 @@ void WidgetVideoPreview::setPlaylist(QVector<VideoResource> &rPlayList, QVector<
 		decodingThreads[(int)(now_running)]->start(QThread::HighestPriority); // start decoder (again)
 
 		if (showTTML) getTTML(); // look for TTML
-
+#ifdef DEBUG_JP2K
+		qDebug() << "setPos(rPlayList.at(0).in, xSliderTotal, current_playlist_index)" << rPlayList.at(0).in <<  xSliderTotal;
+#endif
 		player->setPos(rPlayList.at(0).in, xSliderTotal, current_playlist_index); // set current frame in player
 	}
 	else {

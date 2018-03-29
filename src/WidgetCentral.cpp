@@ -26,6 +26,7 @@
 #include "ImfCommon.h"
 #include "WidgetContentVersionList.h" //WR
 #include "WidgetLocaleList.h" //WR
+#include "GraphicsWidgetComposition.h"
 #include <QHBoxLayout>
 #include <QSplitter>
 #include <QTabWidget>
@@ -266,6 +267,7 @@ void WidgetCentral::rCurrentChanged(int tabWidgetIndex) {
 		mpPreview->CPLEditRate = p_composition->GetEditRate().GetQuotient(); // set CPL edit rate
 		rUpdatePlaylist(); // update playlist
 		connect(p_composition->GetUndoStack(), SIGNAL(indexChanged(int)), this, SLOT(rUpdatePlaylist()));
+		connect(p_composition->GetComposition(), SIGNAL(updatePlaylist()), this, SLOT(rUpdatePlaylist()));
 		connect(p_composition, SIGNAL(CurrentVideoChanged(const QSharedPointer<AssetMxfTrack>&, const qint64&, const Timecode&, const int&)), mpPreview, SLOT(xPosChanged(const QSharedPointer<AssetMxfTrack>&, const qint64&, const Timecode&, const int&)));
 		connect(mpPreview, SIGNAL(currentPlayerPosition(qint64)), p_composition, SLOT(setVerticalIndicator(qint64)));
 		// (k) - end
@@ -289,15 +291,15 @@ void WidgetCentral::rTabCloseRequested(int index) {
 			}
 			else if(ret == QMessageBox::Cancel) { return; }
 		}
-		mpDetailsWidget->Clear();
-		//mpContentVersionListWidget->setDisabled(true);
-		mpContentVersionListWidget->Clear();
-		//mpLocaleListWidget->setDisabled(true);
-		mpLocaleListWidget->Clear();
-		mpTTMLDetailsWidget->ClearTTML(); // (k) - clear ttml view
-		ttmls = QVector<TTMLtimelineResource>(); // (k) - clear ttml list
-		playlist = QVector<VideoResource>(); // (k) - clear video playlist
-		mpPreview->setPlaylist(playlist, ttmls); // (k) - clear playlist
+		if (mpTabWidget->currentIndex() == index) { // Don't clear when any tab other than current is being closed
+			mpDetailsWidget->Clear();
+			mpContentVersionListWidget->Clear();
+			mpLocaleListWidget->Clear();
+			mpTTMLDetailsWidget->ClearTTML(); // (k) - clear ttml view
+			ttmls = QVector<TTMLtimelineResource>(); // (k) - clear ttml list
+			playlist = QVector<VideoResource>(); // (k) - clear video playlist
+			mpPreview->setPlaylist(playlist, ttmls); // (k) - clear playlist
+		}
 		mpTabWidget->removeTab(mpTabWidget->indexOf(p_composition));
 
 		p_composition->deleteLater();

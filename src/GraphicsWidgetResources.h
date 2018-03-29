@@ -31,7 +31,7 @@ public:
 		Left = 0,
 		Right
 	};
-	int timline_index; // (k)
+	int timline_index = 0; // (k)
 	bool InOutChanged = true; // (k)
 
 private:
@@ -158,6 +158,7 @@ protected:
 
 	cpl2016::BaseResourceType* mpData;
 	QSharedPointer<AssetMxfTrack> mAssset;
+	QUuid mTrackFileId = QUuid(0); // Required to hold a reference if mAsset does not exist when creating a AbstractGraphicsWidgetResource (Partial IMP)
 
 private:
 	Q_DISABLE_COPY(AbstractGraphicsWidgetResource);
@@ -176,9 +177,12 @@ private:
 
 class GraphicsWidgetFileResource : public AbstractGraphicsWidgetResource {
 
+Q_OBJECT
+
 public:
 	//! Import existing Resource. pResource is owned by this.
-	GraphicsWidgetFileResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL), const QColor &rColor = QColor(Qt::white));
+	GraphicsWidgetFileResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL), const QColor &rColor = QColor(Qt::white),
+			const QSharedPointer<ImfPackage> rImfPackage = QSharedPointer<ImfPackage>() );
 	//! Creates new Resource.
 	GraphicsWidgetFileResource(GraphicsWidgetSequence *pParent, const QSharedPointer<AssetMxfTrack> &rAsset, const QColor &rColor = QColor(Qt::white));
 	virtual ~GraphicsWidgetFileResource() {}
@@ -189,6 +193,14 @@ public:
 
 private:
 	Q_DISABLE_COPY(GraphicsWidgetFileResource);
+
+protected:
+	const QSharedPointer<ImfPackage> mImfPackage = QSharedPointer<ImfPackage>();
+
+	private slots:
+	void slotAssetAdded(QSharedPointer<Asset>);
+
+
 };
 
 
@@ -217,7 +229,8 @@ class GraphicsWidgetVideoResource : public GraphicsWidgetFileResource {
 
 public:
 	//! Import existing Resource. pResource is owned by this.
-	GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL), int video_timeline_index = 0);
+	GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL), int video_timeline_index = 0,
+			const QSharedPointer<ImfPackage> rImfPackage = QSharedPointer<ImfPackage>());
 	//! Creates new Resource.
 	GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, const QSharedPointer<AssetMxfTrack> &rAsset);
 	virtual ~GraphicsWidgetVideoResource(){}
@@ -226,6 +239,8 @@ public:
 	virtual void paint(QPainter *pPainter, const QStyleOptionGraphicsItem *pOption, QWidget *pWidget = NULL);
 	virtual GraphicsWidgetVideoResource* Clone() const;
 	void RefreshProxy();
+	//WR
+	void restartThread(QSharedPointer<AssetMxfTrack> rAsset);
 
 	private slots:
 	void rShowProxyImage(const QImage&, const QImage&);
@@ -255,7 +270,8 @@ class GraphicsWidgetAudioResource : public GraphicsWidgetFileResource {
 
 public:
 	//! Import existing Resource. pResource is owned by this.
-	GraphicsWidgetAudioResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL));
+	GraphicsWidgetAudioResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL), int unused_index = 0,
+			const QSharedPointer<ImfPackage> rImfPackage = QSharedPointer<ImfPackage>());
 	//! Creates new Resource.
 	GraphicsWidgetAudioResource(GraphicsWidgetSequence *pParent, const QSharedPointer<AssetMxfTrack> &rAsset);
 	virtual ~GraphicsWidgetAudioResource() {}
@@ -276,7 +292,8 @@ class GraphicsWidgetTimedTextResource : public GraphicsWidgetFileResource {
 
 public:
 	//! Import existing Resource. pResource is owned by this.
-	GraphicsWidgetTimedTextResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL));
+	GraphicsWidgetTimedTextResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL), int unused_index = 0,
+			const QSharedPointer<ImfPackage> rImfPackage = QSharedPointer<ImfPackage>());
 	//! Creates new Resource.
 	GraphicsWidgetTimedTextResource(GraphicsWidgetSequence *pParent, const QSharedPointer<AssetMxfTrack> &rAsset);
 	virtual ~GraphicsWidgetTimedTextResource() {}
@@ -296,7 +313,8 @@ class GraphicsWidgetAncillaryDataResource : public GraphicsWidgetFileResource {
 
 public:
 	//! Import existing Resource. pResource is owned by this.
-	GraphicsWidgetAncillaryDataResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL));
+	GraphicsWidgetAncillaryDataResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL), int unused_index = 0,
+			const QSharedPointer<ImfPackage> rImfPackage = QSharedPointer<ImfPackage>());
 	//! Creates new Resource.
 	GraphicsWidgetAncillaryDataResource(GraphicsWidgetSequence *pParent, const QSharedPointer<AssetMxfTrack> &rAsset);
 	virtual ~GraphicsWidgetAncillaryDataResource() {}

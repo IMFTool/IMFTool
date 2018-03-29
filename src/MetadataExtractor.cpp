@@ -29,14 +29,11 @@
 #include <xercesc/sax/HandlerBase.hpp>
 #include <xercesc/util/XMLString.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
+#include <xercesc/util/OutOfMemoryException.hpp>
 #include <xercesc/validators/common/Grammar.hpp>
 #include <xercesc/sax2/XMLReaderFactory.hpp>
 #include <xercesc/sax2/SAX2XMLReader.hpp>
 
-#include <xercesc/util/PlatformUtils.hpp>
-#include <xercesc/util/XMLString.hpp>
-#include <xercesc/dom/DOM.hpp>
-#include <xercesc/util/OutOfMemoryException.hpp>
 #include <xercesc/framework/XMLFormatter.hpp>
 #include <xercesc/framework/LocalFileFormatTarget.hpp>
 #include <xercesc/dom/DOMDocument.hpp>

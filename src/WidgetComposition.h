@@ -102,7 +102,7 @@ public:
 	int ImageSequenceIndex; // (k)
 	int SubtitlesSequenceIndex; // (k)
 	Timecode lastPosition; // (k)
-	void getVerticalIndicator() { 
+	void getVerticalIndicator() {
 		if (lastPosition.IsValid()) {
 			rCurrentFrameChanged(lastPosition);
 		}
@@ -112,6 +112,7 @@ public:
 
 	//! Writes a minimalistic CPL
 	static XmlSerializationError WriteMinimal(const QString &rDestination, const QUuid &rId, const EditRate &rEditRate, const UserText &rContentTitle, const UserText &rIssuer = UserText(), const UserText &rContentOriginator = UserText());
+	qint64 GetTotalDuration();
 
 signals:
 	void FrameInicatorActive(bool active);

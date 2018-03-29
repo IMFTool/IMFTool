@@ -34,6 +34,7 @@
 #include <QAbstractTableModel>
 #include <QUndoCommand>
 #include <QVector>
+#include <QItemSelection>
 
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
@@ -51,6 +52,7 @@ class QAbstractItemModel;
 class QMessageBox;
 class QProgressDialog;
 class JobQueue;
+class AssetCpl;
 //WR
 class JPEG2000; // (k)
 
@@ -101,6 +103,7 @@ public:
 	QUuid GetPackingListId(int index = 0);
 	//WR
 	QVector<EditRate> GetImpEditRates() const {return mImpEditRates;}
+	bool GetIsSupplemental() const { return mIsSupplemental;}
 	//WR
 
 	//! Model View related.
@@ -112,11 +115,14 @@ public:
 	virtual bool setData(const QModelIndex &rIndex, const QVariant &rValue, int role = Qt::EditRole);
 	virtual QMimeData* mimeData(const QModelIndexList &rIndexes) const;
 	virtual Qt::DropActions supportedDropActions() const;
+	bool selectedIsOutsidePackage(const QModelIndex &selected);
 
 signals:
 	void DirtyChanged(bool isDirty);
+	void ImpAssetModified(QSharedPointer<Asset> pAsset);
+	void rIsSupplemental(bool isSupplemental);
 
-	private slots:
+private slots:
 	void rAssetModified(Asset *pAsset);
 	//WR
 	void rJobQueueFinished();
@@ -128,6 +134,7 @@ private:
 	QUuid GetPackingListId(PackingList *pPackingList);
 	//! Parses the Ingest Dir (all Assets are added). Expects a valid Asset Map file path.
 	ImfError ParseAssetMap(const QFileInfo &rAssetMapFilePath);
+	void CheckIfSupplemental();
 
 	AssetMap						*mpAssetMap;
 	QList<PackingList*>				mPackingLists;
@@ -140,6 +147,8 @@ private:
 	QProgressDialog *mpProgressDialog;
 	JobQueue *mpJobQueue;
 	QVector<EditRate> mImpEditRates; //required for creating TT assets
+	bool mIsSupplemental = false;
+	QList<cpl2016::CompositionPlaylistType> mCplList;
 	//WR
 };
 
@@ -249,6 +258,12 @@ public:
 
 	void SetAnnotationText(const UserText &rAnnotationText);
 
+	void SetIsOutsidePackage(const bool &rIsOutsidePackage) {mIsOutsidePackage = rIsOutsidePackage; mpAssetMap = 0;} // mpAssetMap = 0 means AffinityLost() = true
+	bool GetIsOutsidePackage() const { return mIsOutsidePackage; }
+
+	void SetColor(const QColor rColor) {mColor = rColor;}
+	QColor GetColor() const {return mColor;}
+
 	inline bool operator==(const Asset &rOther) const { return GetId() == rOther.GetId(); }
 	inline bool operator!=(const Asset &rOther) const { return GetId() != rOther.GetId(); }
 
@@ -286,6 +301,8 @@ private:
 	am::AssetType									mAmData;
 	std::auto_ptr<pkl2016::AssetType>	mpPklData;
 	bool mFileNeedsNewHash;
+	bool mIsOutsidePackage;
+	QColor mColor = QColor(Qt::black); // Font color for IMP browser and timeline view
 };
 
 

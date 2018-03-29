@@ -18,6 +18,7 @@
 #include <QFrame>
 #include <QTableView>
 #include <QFileDialog>
+#include <QToolButton>
 
 class ImfPackage;
 class QToolBar;
@@ -64,6 +65,7 @@ public:
 	void SetPartialImpPath (QString rPartialImpPath) {mPartialImpPath = rPartialImpPath;}
 	QString GetPartialImpPath () {return mPartialImpPath;}
 	QSharedPointer<ImfPackage> GetImfPackage () {return mpImfPackage;}
+	void LoadAdditionalImpPackage(const QSharedPointer<ImfPackage> &rImfPackage);
 	//WR
 
 signals:
@@ -72,6 +74,7 @@ signals:
 	void ShowCpl(const QUuid &rCplAssetId);
 	void WritePackageComplete();
 	void CallSaveAllCpl();
+	void AssetAdded(QSharedPointer<AssetMxfTrack> &rAsset);
 
 	public slots:
 	void Save();
@@ -80,6 +83,7 @@ signals:
 	//WR begin
 	void RecalcHashForCpls();
 	void ShowResourceGeneratorMxfMode();
+	void slotCurrentChanged(const QModelIndex &selected, const QModelIndex &deselected);
 	//WR end
 
 	private slots :
@@ -100,6 +104,7 @@ signals:
 	void rShowEssenceDescriptor();
 	void SetMxfFile(const QStringList &rFiles);
 	void SetMxfFileDirectory(const QString&);
+	void rLoadRequest();
 	//WR
 
 protected:
@@ -127,6 +132,9 @@ private:
 	bool mPartialOutgestInProgress;
 	QString mPartialImpPath;
 	QFileDialog *mpFileDialog;
+	QList<QSharedPointer<ImfPackage> > mAdditionalPackages;
+	QList<QSharedPointer<Asset> > mAdditionalAssets;
+	QToolButton *mpButtonAddOv;
 
 	//WR
 };

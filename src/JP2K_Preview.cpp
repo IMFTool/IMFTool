@@ -256,6 +256,9 @@ void JP2K_Preview::decode() {
 			if (!err) mMsg = QString("Decoded frame %1 in %2 ms").arg(mFrameNr).arg(mDecode_time.elapsed()); // no error
 
 			emit decodingStatus(mFrameNr, mMsg);
+#ifdef DEBUG_JP2K
+			qDebug() << "JP2K_Preview::decode" << mFrameNr;
+#endif
 			QApplication::processEvents();
 			cleanUp();
 			emit finished();

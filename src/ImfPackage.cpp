@@ -46,7 +46,7 @@ using namespace rxml;
 
 
 ImfPackage::ImfPackage(const QDir &rWorkingDir) :
-QAbstractTableModel(NULL), mpAssetMap(NULL), mPackingLists(), mAssetList(), mRootDir(rWorkingDir), mIsDirty(false), mIsIngest(false), mpJobQueue(NULL) {
+QAbstractTableModel(NULL), mpAssetMap(NULL), mPackingLists(), mAssetList(), mRootDir(rWorkingDir), mIsDirty(false), mIsIngest(false), mpJobQueue(NULL), mCplList() {
 
 	mpAssetMap = new AssetMap(this, mRootDir.absoluteFilePath(ASSET_SEARCH_NAME));
 	QUuid pkl_id = QUuid::createUuid();
@@ -73,7 +73,7 @@ QAbstractTableModel(NULL), mpAssetMap(NULL), mPackingLists(), mAssetList(), mRoo
 }
 
 ImfPackage::ImfPackage(const QDir &rWorkingDir, const UserText &rIssuer, const UserText &rAnnotationText /*= QString()*/) :
-QAbstractTableModel(NULL), mpAssetMap(NULL), mPackingLists(), mAssetList(), mRootDir(rWorkingDir), mIsDirty(true), mIsIngest(false), mpJobQueue(NULL) {
+QAbstractTableModel(NULL), mpAssetMap(NULL), mPackingLists(), mAssetList(), mRootDir(rWorkingDir), mIsDirty(true), mIsIngest(false), mpJobQueue(NULL), mCplList() {
 
 	mpAssetMap = new AssetMap(this, mRootDir.absoluteFilePath(ASSET_SEARCH_NAME), rAnnotationText, rIssuer);
 	QUuid pkl_id = QUuid::createUuid();
@@ -109,6 +109,7 @@ ImfError ImfPackage::Ingest() {
 			mAssetList.clear(); // dismiss all Assets
 			endResetModel();
 			error = ParseAssetMap(mRootDir.absoluteFilePath(ASSET_SEARCH_NAME));
+			if (!error) CheckIfSupplemental();
 		}
 		else {
 			// search sub dirs for ASSETMAP.xml
@@ -233,7 +234,14 @@ ImfError ImfPackage::Outgest() {
 			asset_map.setAssetList(am::AssetMapType_AssetListType());
 			asset_map.getAssetList().setAsset(am::AssetMapType_AssetListType::AssetSequence());
 			for(int i = 0; i < mAssetList.size(); i++) {
-				if(mAssetList.at(i)->Exists()) asset_map.getAssetList().getAsset().push_back(mAssetList.at(i)->WriteAm());
+				bool dont_write = false;
+				if(mAssetList.at(i)->Exists()) {
+					QSharedPointer<AssetMxfTrack> asset = mAssetList.at(i).objectCast<AssetMxfTrack>();
+						if (!asset.isNull()) {
+							if (asset->GetIsOutsidePackage()) dont_write = true;
+						}
+					if (!dont_write) asset_map.getAssetList().getAsset().push_back(mAssetList.at(i)->WriteAm());
+				}
 				else qWarning() << "Asset doesn't exist on file system. Asset will not be written into Packing List.";
 			}
 
@@ -420,6 +428,7 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 														QSharedPointer<AssetCpl> cpl(new AssetCpl(new_asset_path, am_asset, pkl_asset));
 														AddAsset(cpl, ImfXmlHelper::Convert(packing_list->getId()));
 														//WR
+														mCplList << *cpl_data;
 														mImpEditRates.push_back(ImfXmlHelper::Convert(cpl_data->getEditRate()));
 														qDebug() << "CPL Edit Rate: " << mImpEditRates.last().GetNumerator()  << mImpEditRates.last().GetDenominator();
 														//WR
@@ -470,7 +479,7 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 										qDebug() << "Error in qSharedPointerCast";
 										break;
 									}
-									if (assetMxfTrack && !mImpEditRates.isEmpty()){
+									if (!assetMxfTrack.isNull() && !mImpEditRates.isEmpty()){
 										if (assetMxfTrack->GetEssenceType() == Metadata::TimedText) {
 											if (!assetMxfTrack->GetTimedTextFrameRate().IsValid()) break;  //CPLs arbitrarily expose EssenceType == Metadata::TimedText
 											qDebug() << "Metadata::TimedText" << assetMxfTrack->GetId();
@@ -558,8 +567,19 @@ bool ImfPackage::AddAsset(const QSharedPointer<Asset> &rAsset, const QUuid &rPac
 					rAsset->AffinityWon(mpAssetMap);
 				}
 				else {
-					success = false;
-					qWarning() << "Couldn't add Asset: " << rAsset->GetId() << ": No Packing List available.";
+					if (rAsset->GetIsOutsidePackage()) {
+						success = true;
+						qDebug() << "Adding OV Asset" << rAsset->GetId() << rAsset->HasAffinity();
+						connect(rAsset.data(), SIGNAL(AssetModified(Asset *)), this, SLOT(rAssetModified(Asset *)));
+						beginInsertRows(QModelIndex(), mAssetList.size(), mAssetList.size());
+						mAssetList.push_back(rAsset);
+						endInsertRows();
+						// Notify all GraphicWidgetResource with unknown mAsset
+						emit ImpAssetModified(QSharedPointer<Asset>(rAsset));
+					} else {
+						success = false;
+						qWarning() << "Couldn't add Asset: " << rAsset->GetId() << ": No Packing List available.";
+					}
 				}
 			}
 			else {
@@ -641,6 +661,9 @@ QVariant ImfPackage::data(const QModelIndex &rIndex, int role /*= Qt::DisplayRol
 	const int column = rIndex.column();
 
 	if(row < mAssetList.size()) {
+		if (role == Qt::ForegroundRole && mAssetList.at(row)->GetIsOutsidePackage()) { // Assets not belonging to the IMP are yellow.
+			return QColor(mAssetList.at(row)->GetColor());
+		}
 		if(column == ImfPackage::ColumnIcon) {
 			// icon
 			if(role == Qt::DecorationRole) {
@@ -801,7 +824,7 @@ Qt::ItemFlags ImfPackage::flags(const QModelIndex &rIndex) const {
 	const int column = rIndex.column();
 	Qt::ItemFlags ret = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 
-	if(column == ImfPackage::ColumnAnnotation) ret |= Qt::ItemIsEditable;
+	if ((column == ImfPackage::ColumnAnnotation) && (row < mAssetList.size()) && !mAssetList.at(row)->GetIsOutsidePackage())ret |= Qt::ItemIsEditable;
 	else ret |= Qt::ItemIsDragEnabled;
 	return ret;
 }
@@ -887,6 +910,60 @@ void ImfPackage::rJobQueueFinished() {
 		mpMsgBox->exec();
 	}
 }
+
+bool ImfPackage::selectedIsOutsidePackage(const QModelIndex &selected) {
+
+		const int row = selected.row();
+
+		if (mAssetList.at(row)->GetIsOutsidePackage())
+			return true;
+		else
+			return false;
+}
+
+/*
+ * This method checks if an IMP is Supplemental, i.e. if at least one resource referenced by a CPL is missing.
+ */
+void ImfPackage::CheckIfSupplemental() {
+	// Loop all CPLs
+	QList<QUuid> cpl_track_file_uuids;
+	for (unsigned int i = 0; i < mCplList.size(); i++ ) {
+		// Loop segments
+		for(unsigned int ii = 0; ii < mCplList.at(i).getSegmentList().getSegment().size(); ii++) {
+
+			cpl2016::CompositionPlaylistType_SegmentListType::SegmentType *r_segment = new cpl2016::CompositionPlaylistType_SegmentListType::SegmentType(mCplList.at(i).getSegmentList().getSegment().at(ii));
+			cpl2016::SegmentType::SequenceListType &r_sequence_list = r_segment->getSequenceList();
+			cpl2016::SegmentType_SequenceListType::AnySequence &r_any_sequence(r_sequence_list.getAny());
+			// Loop sequences
+			for(cpl2016::SegmentType_SequenceListType::AnySequence::iterator sequence_iter(r_any_sequence.begin()); sequence_iter != r_any_sequence.end(); ++sequence_iter) {
+				xercesc::DOMElement& element(*sequence_iter);
+				cpl2016::SequenceType sequence(element);
+				// Loop resources
+				for(cpl2016::SequenceType_ResourceListType::ResourceIterator resource_iter(sequence.getResourceList().getResource().begin()); resource_iter != sequence.getResourceList().getResource().end(); ++resource_iter) {
+					cpl2016::TrackFileResourceType *p_file_resource = dynamic_cast<cpl2016::TrackFileResourceType*>(&(*resource_iter));
+					if(p_file_resource) {
+						//Add CPL Track File IDs to QList
+						cpl_track_file_uuids << ImfXmlHelper::Convert(p_file_resource->getTrackFileId());
+					}
+				}
+			}
+		}
+	}
+	// Loop CPL Track File IDs
+	for (unsigned int i = 0; i < cpl_track_file_uuids.size(); i++) {
+		bool found = false;
+		// Loop ASSETMAP Assets
+		for (unsigned int ii=0; ii < mAssetList.size(); ii++) {
+			QSharedPointer <AssetMxfTrack> assetMxfTrack = qSharedPointerCast<AssetMxfTrack>(mAssetList.at(ii));
+			if (!assetMxfTrack.isNull())
+				if (cpl_track_file_uuids.at(i) == assetMxfTrack->GetId())
+					found = true; // CPL Track File UUID belongs to a resource contained in the ASSETMAP!
+		}
+		if (!found) // It's a Supplemental Package!
+			mIsSupplemental = true;
+	}
+}
+
 //WR
 
 AssetMap::AssetMap(ImfPackage *pParent, const QFileInfo &rFilePath, const am::AssetMapType &rAssetMap) :
@@ -957,7 +1034,7 @@ const pkl2016::PackingListType& PackingList::Write() {
 Asset::Asset(eAssetType type, const QFileInfo &rFilePath, const QUuid &rId, const UserText &rAnnotationText /*= QString()*/) :
 QObject(NULL), mpAssetMap(NULL), mpPackageList(NULL), mType(type), mFilePath(rFilePath),
 mAmData(ImfXmlHelper::Convert(QUuid() /*empty*/), am::AssetType_ChunkListType() /*empty*/),
-mpPklData(NULL), mFileNeedsNewHash(true) {
+mpPklData(NULL), mFileNeedsNewHash(true), mIsOutsidePackage(false) {
 
 	if(mType != pkl) {
 		mpPklData = std::auto_ptr<pkl2016::AssetType>(new pkl2016::AssetType(
@@ -994,7 +1071,7 @@ mpPklData(NULL), mFileNeedsNewHash(true) {
 
 // Import existing Asset
 Asset::Asset(eAssetType type, const QFileInfo &rFilePath, const am::AssetType &rAsset, std::auto_ptr<pkl2016::AssetType> assetType /*= std::auto_ptr<pkl2016::AssetType>(NULL)*/) :
-QObject(NULL), mpAssetMap(NULL), mpPackageList(NULL), mType(type), mFilePath(rFilePath), mAmData(rAsset), mpPklData(assetType), mFileNeedsNewHash(false) {
+QObject(NULL), mpAssetMap(NULL), mpPackageList(NULL), mType(type), mFilePath(rFilePath), mAmData(rAsset), mpPklData(assetType), mFileNeedsNewHash(false), mIsOutsidePackage(false) {
 
 	connect(this, SIGNAL(AssetModified(Asset*)), this, SLOT(rAssetModified(Asset*)));
 }

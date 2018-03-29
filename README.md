@@ -13,7 +13,8 @@ Introductory videos are available on YouTube [2], [3].
 
 ## Workflows supported:
 -	Open an IMP, visualize the timeline of the CPL(s) included in the IMP
-- 	NEW: Create Photon[4] QC report
+-	NEW: Load ancesotor Original Versions of Supplemental IMPs for preview and versioning
+- 	Create Photon[4] QC report
 -	Edit CPL metadata
 -	Add new virtual tracks (limited to audio, subtitles and markers)
 -	Import and wrap audio and timed text resources
@@ -30,7 +31,7 @@ Introductory videos are available on YouTube [2], [3].
 -	Editing of the ContentVersionList element
 
 ## CREDITS
-The initial development of this tool has kindly been sponsored by Netflix Inc.
+The development of this tool has kindly been sponsored by Netflix Inc.
 
 ## What IMF Tool NOT is
 An IMF Authoring Tool. For creating IMF packages, please check for the wide variety of commercial solutions available on the market.

@@ -50,4 +50,7 @@ private:
 	void InitLayout();
 
 	QGraphicsLinearLayout *mpLayout;
+
+signals:
+	void updatePlaylist();
 };

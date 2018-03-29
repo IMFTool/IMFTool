@@ -90,10 +90,11 @@
 #define FIELD_NAME_MCA_AUDIO_ELEMENT_KIND "MCAAudioElementKind"
 #define FIELD_NAME_CPL_EDIT_RATE "CplEditRate"
 
-#define IMSC1_NS_TT XMLString::transcode("http://www.w3.org/ns/ttml")
-#define IMSC1_NS_TTP XMLString::transcode("http://www.w3.org/ns/ttml#parameter")
-#define IMSC1_NS_TTS XMLString::transcode("http://www.w3.org/ns/ttml#styling")
-#define IMSC1_NS_SMPTE XMLString::transcode("http://www.smpte-ra.org/schemas/2052-1/2010/smpte-tt")
+#define IMSC1_NS_TT 		XMLString::transcode("http://www.w3.org/ns/ttml")
+#define IMSC1_NS_TTP 		XMLString::transcode("http://www.w3.org/ns/ttml#parameter")
+#define IMSC1_NS_TTS 		XMLString::transcode("http://www.w3.org/ns/ttml#styling")
+#define IMSC1_NS_SMPTE 		XMLString::transcode("http://www.smpte-ra.org/schemas/2052-1/2010/smpte-tt")
+#define XML_NAMESPACE 		XMLString::transcode("http://www.w3.org/XML/1998/namespace")
 //WR
 
 enum eUserEventType {

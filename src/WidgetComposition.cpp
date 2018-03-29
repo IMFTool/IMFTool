@@ -834,11 +834,11 @@ ImfError WidgetComposition::ParseCpl() {
 						switch(p_graphics_sequence->GetType()) {
 							case MainImageSequence: 
 								ImageSequenceIndex++;
-								if (mImp) p_graphics_sequence->AddResource(new GraphicsWidgetVideoResource(p_graphics_sequence, p_file_resource->_clone(), mImp->GetAsset(ImfXmlHelper::Convert(p_file_resource->getTrackFileId())).objectCast<AssetMxfTrack>(), ImageSequenceIndex), p_graphics_sequence->GetResourceCount());
+								if (mImp) p_graphics_sequence->AddResource(new GraphicsWidgetVideoResource(p_graphics_sequence, p_file_resource->_clone(), mImp->GetAsset(ImfXmlHelper::Convert(p_file_resource->getTrackFileId())).objectCast<AssetMxfTrack>(), ImageSequenceIndex, mImp), p_graphics_sequence->GetResourceCount());
 								else p_graphics_sequence->AddResource(new GraphicsWidgetVideoResource(p_graphics_sequence, p_file_resource->_clone()), p_graphics_sequence->GetResourceCount());
 								break;
 							case MainAudioSequence:
-								if(mImp) p_graphics_sequence->AddResource(new GraphicsWidgetAudioResource(p_graphics_sequence, p_file_resource->_clone(), mImp->GetAsset(ImfXmlHelper::Convert(p_file_resource->getTrackFileId())).objectCast<AssetMxfTrack>()), p_graphics_sequence->GetResourceCount());
+								if(mImp) p_graphics_sequence->AddResource(new GraphicsWidgetAudioResource(p_graphics_sequence, p_file_resource->_clone(), mImp->GetAsset(ImfXmlHelper::Convert(p_file_resource->getTrackFileId())).objectCast<AssetMxfTrack>(), 0, mImp), p_graphics_sequence->GetResourceCount());
 								else p_graphics_sequence->AddResource(new GraphicsWidgetAudioResource(p_graphics_sequence, p_file_resource->_clone()), p_graphics_sequence->GetResourceCount());
 								break;
 							case CommentarySequence:
@@ -846,16 +846,16 @@ ImfError WidgetComposition::ParseCpl() {
 							case KaraokeSequence:
 							case SubtitlesSequence:
 							case VisuallyImpairedTextSequence:
-								if(mImp) p_graphics_sequence->AddResource(new GraphicsWidgetTimedTextResource(p_graphics_sequence, p_file_resource->_clone(), mImp->GetAsset(ImfXmlHelper::Convert(p_file_resource->getTrackFileId())).objectCast<AssetMxfTrack>()), p_graphics_sequence->GetResourceCount());
+								if(mImp) p_graphics_sequence->AddResource(new GraphicsWidgetTimedTextResource(p_graphics_sequence, p_file_resource->_clone(), mImp->GetAsset(ImfXmlHelper::Convert(p_file_resource->getTrackFileId())).objectCast<AssetMxfTrack>(), 0, mImp), p_graphics_sequence->GetResourceCount());
 								else p_graphics_sequence->AddResource(new GraphicsWidgetTimedTextResource(p_graphics_sequence, p_file_resource->_clone()), p_graphics_sequence->GetResourceCount());
 								break;
 							case AncillaryDataSequence:
-								if(mImp) p_graphics_sequence->AddResource(new GraphicsWidgetAncillaryDataResource(p_graphics_sequence, p_file_resource->_clone(), mImp->GetAsset(ImfXmlHelper::Convert(p_file_resource->getTrackFileId())).objectCast<AssetMxfTrack>()), p_graphics_sequence->GetResourceCount());
+								if(mImp) p_graphics_sequence->AddResource(new GraphicsWidgetAncillaryDataResource(p_graphics_sequence, p_file_resource->_clone(), mImp->GetAsset(ImfXmlHelper::Convert(p_file_resource->getTrackFileId())).objectCast<AssetMxfTrack>(), 0, mImp), p_graphics_sequence->GetResourceCount());
 								else p_graphics_sequence->AddResource(new GraphicsWidgetAncillaryDataResource(p_graphics_sequence, p_file_resource->_clone()), p_graphics_sequence->GetResourceCount());
 								break;
 							case Unknown:
 								qDebug() << "A generic file resource will be added to unknown sequence.";
-								if(mImp) p_graphics_sequence->AddResource(new GraphicsWidgetFileResource(p_graphics_sequence, p_file_resource->_clone(), mImp->GetAsset(ImfXmlHelper::Convert(p_file_resource->getTrackFileId())).objectCast<AssetMxfTrack>()), p_graphics_sequence->GetResourceCount());
+								if(mImp) p_graphics_sequence->AddResource(new GraphicsWidgetFileResource(p_graphics_sequence, p_file_resource->_clone(), mImp->GetAsset(ImfXmlHelper::Convert(p_file_resource->getTrackFileId())).objectCast<AssetMxfTrack>(), QColor(Qt::white), mImp), p_graphics_sequence->GetResourceCount());
 								else p_graphics_sequence->AddResource(new GraphicsWidgetFileResource(p_graphics_sequence, p_file_resource->_clone()), p_graphics_sequence->GetResourceCount());
 								break;
 							default:
@@ -1026,8 +1026,9 @@ void WidgetComposition::AddNewSegmentRequest(int segmentIndex) {
 		}
 	}
 	mpUndoStack->push(p_root);
-	p_segment->SetDuration(60); // TODO: size depending on zoom level.
-	mpCompositionGraphicsWidget->layout()->activate();
+	qint64 total_duration = this->GetTotalDuration();
+	total_duration = (total_duration >= 600 ? total_duration : 600);
+	p_segment->SetDuration(total_duration / 5);  // Set duration of new segment to 20% of the total CPL duration	mpCompositionGraphicsWidget->layout()->activate();
 	mpTimelineGraphicsWidget->layout()->activate();
 }
 
@@ -1265,6 +1266,37 @@ void WidgetComposition::SetApplicationIdentification(const UserText &rApplicatio
 
 }
 
+qint64 WidgetComposition::GetTotalDuration() {
+
+	qint64 total_duration = 0;
+	for (int i = 0; i < mpCompositionGraphicsWidget->GetSegmentCount(); i++) {
+		GraphicsWidgetSegment *p_segment = mpCompositionGraphicsWidget->GetSegment(i);
+
+		if (p_segment) {
+			for (int ii = 0; ii < p_segment->GetSequenceCount(); ii++) {
+				GraphicsWidgetSequence *p_sequence = p_segment->GetSequence(ii);
+
+				if (p_sequence && !p_sequence->IsEmpty() && p_sequence != nullptr) {
+
+					for (int iii = 0; iii < p_sequence->GetResourceCount(); iii++) {
+						AbstractGraphicsWidgetResource *p_resource = p_sequence->GetResource(iii);
+
+						//qDebug() << i << ii << iii;
+						//qDebug() << p_resource->type();
+
+						if (p_resource->type() == GraphicsWidgetVideoResourceType) {
+
+							// VideoResource found
+							GraphicsWidgetVideoResource *timelineWidget = dynamic_cast<GraphicsWidgetVideoResource*>(p_resource);
+							total_duration += timelineWidget->GetRepeatCount() * timelineWidget->GetSourceDuration().GetCount();
+						}
+					}
+				}
+			}
+		}
+	}
+	return total_duration;
+}
 
 ImprovedSplitter::ImprovedSplitter(QWidget *pParent /*= NULL*/) :
 QSplitter(pParent), mpDummyWidget(NULL) {

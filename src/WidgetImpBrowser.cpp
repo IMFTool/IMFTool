@@ -35,7 +35,6 @@
 #include <QToolBar>
 #include <QSplitter>
 #include <QDrag>
-#include <QToolButton>
 #include <QFileDialog>
 #include <list>
 #include <cmath>
@@ -103,7 +102,7 @@ void WidgetImpBrowser::InitLayout() {
 	mpViewAssets->setSelectionMode(QAbstractItemView::SingleSelection);
 	mpViewAssets->setFrameShape(QFrame::NoFrame);
 	mpViewAssets->setDragEnabled(true);
-	mpViewImp->setDragDropMode(QAbstractItemView::DragOnly);
+	mpViewAssets->setDragDropMode(QAbstractItemView::DragOnly);
 
 	mpViewAssets->setItemDelegateForColumn(ImfPackage::ColumnMetadata, new DelegateMetadata(this));
 
@@ -156,10 +155,24 @@ void WidgetImpBrowser::InitToolbar() {
 
 	p_button_add_track->setMenu(p_add_track_menu);
 
+	mpButtonAddOv = new QToolButton(NULL);
+	mpButtonAddOv->setIcon(QIcon(":/add.png"));
+	mpButtonAddOv->setText(tr("Load OV IMP"));
+	mpButtonAddOv->setToolTip("Load all MXF assets from an Original Version to enable full timeline view of Supplemental IMPs. Assets will not be added to the current IMP.");
+	mpButtonAddOv->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+	mpButtonAddOv->setPopupMode(QToolButton::InstantPopup);
+	mpButtonAddOv->setDisabled(true);
+	QMenu *p_add_ov_menu = new QMenu(tr("Add Asset"), this);
+	QAction *p_add_ov = p_add_ov_menu->addAction(QIcon(":/asset_mxf.png"), tr("Select OV location"));
+	connect(p_add_ov, SIGNAL(triggered(bool)), this, SLOT(rLoadRequest()));
+	mpButtonAddOv->setMenu(p_add_ov_menu);
+
 	mpToolBar->addAction(p_action_undo);
 	mpToolBar->addAction(p_action_redo);
 	mpToolBar->addSeparator();
 	mpToolBar->addWidget(p_button_add_track);
+	mpToolBar->addSeparator();
+	mpToolBar->addWidget(mpButtonAddOv);
 }
 
 void WidgetImpBrowser::InstallImp(const QSharedPointer<ImfPackage> &rImfPackage, bool validateHash /*= false*/) {
@@ -181,6 +194,7 @@ void WidgetImpBrowser::InstallImp(const QSharedPointer<ImfPackage> &rImfPackage,
 	mpViewImp->horizontalHeader()->setSectionResizeMode(ImfPackage::ColumnIcon, QHeaderView::ResizeToContents);
 	mpViewImp->horizontalHeader()->setSectionResizeMode(ImfPackage::ColumnFileSize, QHeaderView::ResizeToContents);
 	mpViewImp->horizontalHeader()->setSectionResizeMode(ImfPackage::ColumnFinalized, QHeaderView::ResizeToContents);
+	connect(mpViewImp->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(slotCurrentChanged(const QModelIndex &, const QModelIndex &)));
 
 	mpSortProxyModelAssets = new QSortFilterProxyModel(this);
 	mpSortProxyModelAssets->setFilterRegExp("(?:mxf)");
@@ -199,6 +213,10 @@ void WidgetImpBrowser::InstallImp(const QSharedPointer<ImfPackage> &rImfPackage,
 	connect(mpViewAssets->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(rMapCurrentRowSelectionChanged(const QModelIndex&, const QModelIndex&)));
 	connect(mpViewImp->selectionModel(), SIGNAL(currentRowChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(rMapCurrentRowSelectionChanged(const QModelIndex&, const QModelIndex&)));
 	connect(mpImfPackage.data(), SIGNAL(DirtyChanged(bool)), this, SIGNAL(ImpSaveStateChanged(bool)));
+	connect(mpImfPackage.data(), SIGNAL(rIsSupplemental(bool)), mpButtonAddOv, SLOT(setEnabled(bool)));
+	if (mpImfPackage->GetIsSupplemental()) {
+		emit mpImfPackage.data()->rIsSupplemental(true);
+	}
 	emit ImplInstalled(true);
 	emit ImpSaveStateChanged(mpImfPackage->IsDirty());
 	if(validateHash == true) ValidateHash();
@@ -209,6 +227,7 @@ void WidgetImpBrowser::UninstallImp() {
 	/* if (mpImfPackage.data() != nullptr) {
 		disconnect(mpImfPackage.data(), NULL, this, NULL);
 	} (k) */
+	mpButtonAddOv->setEnabled(false);
 
 	disconnect(mpViewAssets->selectionModel(), NULL, this, NULL);
 	//disconnect(mpViewImp, NULL, this, NULL);
@@ -229,6 +248,10 @@ void WidgetImpBrowser::UninstallImp() {
 	mpViewAssets->setModel(NULL);
 	delete selection_model; // Delete old selection model.
 	mpImfPackage.clear();
+	//WR
+	mAdditionalPackages.clear();
+	mAdditionalAssets.clear();
+
 }
 
 QSize WidgetImpBrowser::sizeHint() const {
@@ -271,6 +294,7 @@ void WidgetImpBrowser::rCustomMenuRequested(QPoint pos) {
 			menu.addSeparator();
 			QSharedPointer<Asset> asset = mpImfPackage->GetAsset(mpSortProxyModelImp->mapToSource(index).row());
 			if(asset) {
+				if (asset->GetIsOutsidePackage()) remove_action->setDisabled(true);
 				//if(asset->Exists() == true) edit_action->setDisabled(true);
 				//if(asset->Exists() == false) delete_action->setDisabled(true);
 				if(asset->Exists() == true && asset->GetType() == Asset::cpl)
@@ -290,6 +314,8 @@ void WidgetImpBrowser::rCustomMenuRequested(QPoint pos) {
 void WidgetImpBrowser::rRemoveSelectedRow() {
 
 	if(mpImfPackage) {
+		// Don't allow deleting assets that do not belong to the current IMP
+		if (!mpImfPackage->GetAsset(mpSortProxyModelImp->mapToSource(mpViewImp->currentIndex()).row())->GetIsOutsidePackage())
 		mpUndoStack->push(new RemoveAssetCommand(mpImfPackage, mpImfPackage->GetAsset(mpSortProxyModelImp->mapToSource(mpViewImp->currentIndex()).row())));
 	}
 }
@@ -386,8 +412,8 @@ void WidgetImpBrowser::ShowResourceGeneratorMxfMode() {
 	mpFileDialog->setIconProvider(new IconProviderExrWav(this));
 	connect(mpFileDialog, SIGNAL(directoryEntered(const QString&)), this, SLOT(SetMxfFileDirectory(const QString&)));
 	connect(mpFileDialog, SIGNAL(filesSelected(const QStringList &)), this, SLOT(SetMxfFile(const QStringList &)));
-    QToolButton* backButton = this->findChild<QToolButton *>("backButton");
-    QToolButton* forwardButton = this->findChild<QToolButton *>("forwardButton");
+    QToolButton* backButton = mpFileDialog->findChild<QToolButton *>("backButton");
+    QToolButton* forwardButton = mpFileDialog->findChild<QToolButton *>("forwardButton");
     backButton->setVisible(false);
     forwardButton->setVisible(false);
 
@@ -912,6 +938,78 @@ void WidgetImpBrowser::ExportPartialImp(QString &rDir, QString &rIssuer, QString
 	//WR
 	Save();
 }
+
+void WidgetImpBrowser::LoadAdditionalImpPackage(const QSharedPointer<ImfPackage> &rImfPackage) {
+	for (int i = 0; i < rImfPackage->GetAssetCount(); i++) {
+		QSharedPointer<AssetMxfTrack> asset = rImfPackage->GetAsset(i).objectCast<AssetMxfTrack>();
+		if (!asset.isNull()) {
+			asset->SetIsOutsidePackage(true);
+			// Create a fancy color for the additional IMP
+			QColor asset_color = QColor(Qt::yellow); //.darker(120*mAdditionalPackages.size() - 20);
+			float hueF = 360.0 * asset_color.hueF() * (1.25 -  (mAdditionalPackages.size()%5) * 0.25);
+			hueF = (hueF < 0 ? 0.0 : hueF);
+			asset_color.setHsv(hueF, asset_color.saturation(), asset_color.value(), asset_color.alpha());
+			asset->SetColor(asset_color);
+
+			if (mpImfPackage->AddAsset(asset, QUuid(0)))
+				mAdditionalAssets.append(asset);
+		}
+	}
+	return;
+}
+
+void WidgetImpBrowser::slotCurrentChanged(const QModelIndex &selected, const QModelIndex &deselected) {
+	QModelIndex modelIndex = mpSortProxyModelImp->mapToSource(selected);
+	QSharedPointer<AssetMxfTrack> asset = mpImfPackage->GetAsset(modelIndex.row()).objectCast<AssetMxfTrack>();
+
+	if (mpImfPackage->selectedIsOutsidePackage(modelIndex)) {
+		QSharedPointer<AssetMxfTrack> asset = mpImfPackage->GetAsset(modelIndex.row()).objectCast<AssetMxfTrack>();
+		int r = 255, g = 255, b = 255, a = 255;
+		if (!asset.isNull()) asset->GetColor().getRgb(&r,&g,&b,&a);
+		mpViewImp->setStyleSheet("QTableView {selection-color: rgb(" + QString::number(r)+ "," + QString::number(g)+ ","+ QString::number(b)+ ");}");
+	} else {
+		mpViewImp->setStyleSheet("QTableView {selection-color: #FFFFFF;}");
+	}
+}
+
+void WidgetImpBrowser::rLoadRequest() {
+	QFileDialog* pFileDialog = new QFileDialog(this, QString("Select MXF file"));
+	//pFileDialog->setOption(QFileDialog::DontUseNativeDialog);
+	pFileDialog->setFileMode(QFileDialog::DirectoryOnly);
+	pFileDialog->setViewMode(QFileDialog::Detail);
+
+	if(pFileDialog->exec()) {
+		QStringList dir_list = pFileDialog->selectedFiles();
+		if(dir_list.isEmpty() == false) {
+			QString dir = dir_list.first();
+			QSharedPointer<ImfPackage> imf_package(new ImfPackage(dir));
+			ImfError error = imf_package->Ingest();
+			if(error.IsError() == false) {
+				if(error.IsRecoverableError() == true) {
+					QString error_msg = QString("%1\n%2").arg(error.GetErrorMsg()).arg(error.GetErrorDescription());
+					mpMsgBox->setText(tr("Load OV Warning"));
+					mpMsgBox->setIcon(QMessageBox::Warning);
+					mpMsgBox->setInformativeText(error_msg);
+					mpMsgBox->setStandardButtons(QMessageBox::Ok);
+					mpMsgBox->setDefaultButton(QMessageBox::Ok);
+					mpMsgBox->exec();
+				}
+				mAdditionalPackages.append(imf_package);
+				this->LoadAdditionalImpPackage(imf_package);
+			} else {
+				QString error_msg = QString("%1\n%2").arg(error.GetErrorMsg()).arg(error.GetErrorDescription());
+				mpMsgBox->setText(tr("Load OV Error"));
+				mpMsgBox->setIcon(QMessageBox::Critical);
+				mpMsgBox->setInformativeText(error_msg);
+				mpMsgBox->setStandardButtons(QMessageBox::Ok);
+				mpMsgBox->setDefaultButton(QMessageBox::Ok);
+				mpMsgBox->exec();
+			}
+
+		}
+	}
+}
+
 
 CustomTableView::CustomTableView(QWidget *pParent /*= NULL*/) :
 QTableView(pParent) {

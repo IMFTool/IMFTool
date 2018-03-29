@@ -34,7 +34,6 @@ include("${asdcplib_Targets_PATH}") # Import asdcplib targets.
 find_package(Qt5Core)
 find_package(Qt5Gui)
 find_package(Qt5Widgets)
-find_package(Qt5Multimedia)
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
@@ -106,7 +105,7 @@ if(ARCHIVIST)
 target_link_libraries(${EXE_NAME} general Qt5::Widgets general Qt5::Multimedia debug "${ZLib_Debug_PATH}" optimized "${ZLib_PATH}" debug "${IlmBaseLib_Half_Debug_PATH}" optimized "${IlmBaseLib_Half_PATH}" debug "${IlmBaseLib_IlmThread_Debug_PATH}" optimized "${IlmBaseLib_IlmThread_PATH}" debug "${IlmBaseLib_Iex_Debug_PATH}" optimized "${IlmBaseLib_Iex_PATH}"
 	 debug "${IlmBaseLib_Imath_Debug_PATH}" optimized "${IlmBaseLib_Imath_PATH}" debug "${OpenEXRLib_IlmImf_Debug_PATH}" optimized "${OpenEXRLib_IlmImf_PATH}" general libas02 debug "${XercescppLib_Debug_PATH}" optimized "${XercescppLib_PATH}")
 else(ARCHIVIST)
-target_link_libraries(${EXE_NAME} general Qt5::Widgets general Qt5::Multimedia 
+target_link_libraries(${EXE_NAME} general Qt5::Widgets
 	 general libas02 debug "${XercescppLib_Debug_PATH}" optimized "${XercescppLib_PATH}" debug "${OpenJPEGLib_Debug_Path}" optimized "${OpenJPEGLib_Path}"
 	 regxmllibc debug openjp2 optimized openjp2
 	 )

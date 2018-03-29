@@ -226,9 +226,24 @@ void GraphicsWidgetTimeline::contextMenuEvent(QGraphicsSceneContextMenuEvent *pE
 		QMenu menu;
 		QAction *p_delete_action = menu.addAction(QIcon(":/delete.png"), tr("&Remove Segment"));
 		if(GetSegmentIndicatorCount() <= 1) p_delete_action->setDisabled(true);
+		QAction *p_add_left_action = menu.addAction(QIcon(":/add.png"), tr("&Insert Segment to the left"));
+		QAction *p_add_right_action = menu.addAction(QIcon(":/add.png"), tr("&Insert Segment to the right"));
 		QAction *p_selected_action = menu.exec(pEvent->screenPos());
 		if(p_selected_action == p_delete_action) {
 			emit DeleteSegmentRequest(p_indicator->GetId());
+		}
+		int segment_offset = 0;
+		if((p_selected_action == p_add_left_action) || (p_selected_action == p_add_right_action)) {
+			if (p_selected_action == p_add_right_action) segment_offset = 1;
+			for(int i = 0; i < mpSegmentLayout->count(); i++) {
+				GraphicsWidgetSegmentIndicator *p_seqment_indicator = dynamic_cast<GraphicsWidgetSegmentIndicator*>(mpSegmentLayout->itemAt(i));
+				if (p_seqment_indicator) {
+					if (p_indicator->GetId() == p_seqment_indicator->GetId()) {
+						emit NewSegmentRequest(i / 2 + segment_offset);
+						break;
+					}
+				}
+			}
 		}
 	}
 }
