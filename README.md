@@ -13,7 +13,7 @@ Introductory videos are available on YouTube [2], [3].
 
 ## Workflows supported:
 -	Open an IMP, visualize the timeline of the CPL(s) included in the IMP
--	NEW: Load ancesotor Original Versions of Supplemental IMPs for preview and versioning
+-	NEW: Load ancestor Original Versions of Supplemental IMPs for preview and versioning
 - 	Create Photon[4] QC report
 -	Edit CPL metadata
 -	Add new virtual tracks (limited to audio, subtitles and markers)
