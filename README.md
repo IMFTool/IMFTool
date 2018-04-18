@@ -41,6 +41,8 @@ Please visit
 [Releases](../../releases/)
 to download the latest binary installers.
 
+**For being notified about new releases, please "Watch" IMF Tool (on the top of this page).**
+
 
 ## Building
 IMF Tool is multi-platform and has been susccesfully built under Mac OS X 10.10 and 10.11, Windows 7 and Linux 64 bit.
