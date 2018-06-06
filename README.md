@@ -53,7 +53,7 @@ Prerequisites:
 -	libxsd
 -	Xerces 3.1
 -	Requires OpenJPEG 2.2 (with multi-threading support), available at https://github.com/uclouvain/openjpeg
--	regxmllibc (fork) at https://github.com/IMFTool/regxmllib/tree/FEATURE-regxmllibc
+-	regxmllibc (fork) at https://github.com/IMFTool/regxmllib
 
 ## DISCLAIMER
   THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
