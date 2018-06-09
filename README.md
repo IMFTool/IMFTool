@@ -7,14 +7,14 @@ The latest binary installers are available at
 
 
 ## What is IMF Tool
-IMF Tool supports browsing and limited editing of IMF [1] packages (IMPs).
+IMF Tool supports browsing and limited editing of IMF [[1]](#imf-intro) packages (IMPs).
 In particular, it supports the addition and deletion of audio tracks and subtitle tracks (versioning).
-Introductory videos are available on YouTube [2], [3].
+Introductory videos are available on YouTube [[2]](#imf-video), [[3]](#imf-video2).
 
 ## Workflows supported:
 -	Open an IMP, visualize the timeline of the CPL(s) included in the IMP
 -	NEW: Load ancestor Original Versions of Supplemental IMPs for preview and versioning
-- 	Create Photon[4] QC report
+- 	Create Photon[[4]](#photon) QC report
 -	Edit CPL metadata
 -	Add new virtual tracks (limited to audio, subtitles and markers)
 -	Import and wrap audio and timed text resources
@@ -67,12 +67,12 @@ ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
 
 
 
-[1] IMF: Interoperable Master Format. For an introduction see here:
+<a name="imf-intro"></a>[1] IMF: Interoperable Master Format. For an introduction see here:
 http://techblog.netflix.com/2016/03/imf-prescription-for-versionitis.html
 
-[2] IMF-Tool introductory video: https://www.youtube.com/watch?v=Zi3p8oElPM8
+<a name="imf-video"></a>[2] IMF-Tool introductory video: https://www.youtube.com/watch?v=Zi3p8oElPM8
 
-[3] IMF-Tool introductory video Part 2: https://www.youtube.com/watch?v=k6OIx7WfF8s
+<a name="imf-video2"></a>[3] IMF-Tool introductory video Part 2: https://www.youtube.com/watch?v=k6OIx7WfF8s
 
-[4] Photon IMF QC tool https://github.com/Netflix/photon
+<a name="photon"></a>[4] Photon IMF QC tool https://github.com/Netflix/photon
 
