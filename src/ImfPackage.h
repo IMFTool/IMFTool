@@ -17,6 +17,7 @@
 #include "ImfPackageCommon.h"
 #include "SMPTE-429-8-2014-AM.h"
 #include "SMPTE-429-8-2006-PKL.h"
+#include "SMPTE-2067-9a-2018-Sidecar.h"
 #include "MetadataExtractor.h"
 #include "MetadataExtractorCommon.h"
 #include <QObject>
@@ -49,6 +50,7 @@ class AssetMap;
 class PackingList;
 class QAbstractItemModel;
 //WR
+class AssetScm;
 class QMessageBox;
 class QProgressDialog;
 class JobQueue;
@@ -149,6 +151,7 @@ private:
 	QVector<EditRate> mImpEditRates; //required for creating TT assets
 	bool mIsSupplemental = false;
 	QList<cpl2016::CompositionPlaylistType> mCplList;
+	QList<QSharedPointer<AssetScm> > mScmList;
 	//WR
 };
 
@@ -214,7 +217,6 @@ public:
 	pkl2016::PackingListType	mData;
 };
 
-
 //! Represents Entry in Packing List AND Asset Map.
 class Asset : public QObject {
 
@@ -226,6 +228,8 @@ public:
 		opl,			// text/xml
 		cpl,			// text/xml
 		pkl,			// text/xml
+		scm,			// text/xml
+		sidecar,		// multiple
 		unknown
 	};
 	//! Import existing Asset
@@ -250,6 +254,10 @@ public:
 	QUuid GetId() const { return ImfXmlHelper::Convert(mAmData.getId()); }
 	QUuid GetPklId() const { if(mpPackageList) return mpPackageList->GetId(); else return QUuid(); }
 	QUuid GetAmId() const { if(mpAssetMap) return mpAssetMap->GetId(); else return QUuid(); }
+	am::AssetType GetAmData() { return mAmData; }
+	void SetAmData(am::AssetType rAmData) { mAmData = rAmData; }
+	pkl2016::AssetType* GetPklData() { return mpPklData.get(); }
+
 	UserText GetAnnotationText() const;
 	QByteArray GetHash() const { if(mpPklData.get()) return ImfXmlHelper::Convert(mpPklData->getHash()); else return QByteArray(); }
 	quint64 GetSize() const { if(mpPklData.get()) return mpPklData->getSize(); else return quint64(0); }
@@ -449,6 +457,66 @@ private:
 	bool mIsNew;
 	EditRate mCplEditRate;
 //WR end
+};
+
+
+class AssetScm : public Asset {
+
+	Q_OBJECT
+
+public:
+	//! Import SCM.
+	AssetScm(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl2016::AssetType &rPklAsset, const scm::SidecarCompositionMapType &rSidecarCompositionMap);
+	//! Create New SCM.
+	AssetScm(const QFileInfo &rFilePath, const QUuid &rId, const UserText &rAnnotationText = QString());
+	virtual ~AssetScm() {}
+	bool GetIsNew() {return mIsNew;}
+	void SetIsNew(bool rIsNew) { mIsNew = rIsNew;}
+	void SetAnnotationText(const UserText &rAnnotationText) { mData.getProperties().setAnnotation(ImfXmlHelper::Convert(rAnnotationText)); }
+	void SetIssuer(const UserText &rIssuer) { mData.getProperties().setIssuer(ImfXmlHelper::Convert(rIssuer)); }
+	UserText GetAnnotationText() const { if(mData.getProperties().getAnnotation().present() == true) return ImfXmlHelper::Convert(mData.getProperties().getAnnotation().get()); else return UserText(); }
+	UserText GetIssuer() const { if(mData.getProperties().getIssuer().present() == true) return ImfXmlHelper::Convert(mData.getProperties().getIssuer().get()); else return UserText(); }
+	QDateTime GetIssueDate() const { return ImfXmlHelper::Convert(mData.getProperties().getIssueDate()); }
+	const scm::SidecarCompositionMapType& WriteScm();
+	const scm::SidecarCompositionMapType& GetScm() { return mData; }
+
+	typedef struct  {
+		QFileInfo filepath;
+		QUuid id;
+		QVector< QSharedPointer<AssetCpl> > mAssociatedCplAssets;
+		QList<QUuid> mCplIdsNotInCurrentImp;
+	} SidecarCompositionMapEntry;
+	bool AddSidecarCompositionMapEntry(const SidecarCompositionMapEntry &rSidecarCompositionMapEntry);
+	QList<SidecarCompositionMapEntry> GetSidecarCompositionMapEntries() const { return mSidecarCompositionMapEntries; }
+
+
+private:
+	Q_DISABLE_COPY(AssetScm);
+	bool mIsNew;
+	scm::SidecarCompositionMapType mData;
+	QList<SidecarCompositionMapEntry> mSidecarCompositionMapEntries;
+};
+
+
+class AssetSidecar : public Asset {
+
+	Q_OBJECT
+
+public:
+	//! Import Sidecar Asset.
+	AssetSidecar(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl2016::AssetType &rPklAsset);
+	//! Create New Sidecar Asset.
+	AssetSidecar(const QFileInfo &rFilePath, const QUuid &rId, const UserText &rAnnotationText = QString());
+	virtual ~AssetSidecar() {}
+	bool GetIsNew() {return mIsNew;}
+	void SetIsNew(bool rIsNew) { mIsNew = rIsNew;}
+
+private:
+	Q_DISABLE_COPY(AssetSidecar);
+	QUuid mUuid;
+	bool mIsNew;
+
+
 };
 
 

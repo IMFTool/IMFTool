@@ -3,6 +3,8 @@
         <file>add.png</file>
         <file>asset_cpl.png</file>
         <file>asset_mxf.png</file>
+        <file>asset_scm.png</file>
+        <file>asset_sidecar.png</file>
         <file>asset_opl.png</file>
         <file>asset_unknown.png</file>
         <file>attach.png</file>

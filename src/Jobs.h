@@ -17,6 +17,7 @@
 #include "JobQueue.h"
 #include "info.h"
 #include "ImfCommon.h"
+#include "ImfPackage.h"
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/framework/LocalFileFormatTarget.hpp>
@@ -187,3 +188,22 @@ private:
 	const QString mWorkingDirectory;
 
 };
+
+class JobCreateScm : public AbstractJob {
+
+	Q_OBJECT
+
+public:
+	JobCreateScm(const QSharedPointer<AssetScm> rAssetScm);
+	virtual ~JobCreateScm() {}
+
+protected:
+	virtual Error Execute();
+
+private:
+	Q_DISABLE_COPY(JobCreateScm);
+
+	const QSharedPointer<AssetScm> mAssetScm;
+
+};
+

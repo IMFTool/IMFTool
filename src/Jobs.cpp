@@ -446,3 +446,54 @@ Error JobCallPhoton::Execute() {
 	return error;
 }
 
+JobCreateScm::JobCreateScm(const QSharedPointer<AssetScm> rAssetScm) :
+AbstractJob("Generating Sidecar Composition Map"), mAssetScm(rAssetScm) {
+
+}
+
+Error JobCreateScm::Execute() {
+
+	Error error = Error::None;
+	xml_schema::NamespaceInfomap scm_namespace;
+	scm_namespace[""].name = XML_NAMESPACE_SCM;
+	scm_namespace["scm"].name = XML_NAMESPACE_SCM;
+	scm_namespace["dcml"].name = XML_NAMESPACE_DCML;
+	scm_namespace["ds"].name = XML_NAMESPACE_DS;
+	scm_namespace["xs"].name = XML_NAMESPACE_XS;
+
+	scm::SidecarCompositionMapType scm = mAssetScm->WriteScm();
+	// Create a scm::SidecarCompositionMapType instance
+	std::auto_ptr< scm::SidecarCompositionMapType> scm_data;
+	std::auto_ptr< scm::SidecarCompositionMapType_PropertiesType> scm_properties;
+
+	QString destination(mAssetScm->GetPath().absoluteFilePath());
+	if(destination.isEmpty() == false) {
+		XmlSerializationError serialization_error;
+		std::ofstream scm_ofs(destination.toStdString().c_str(), std::ofstream::out);
+		try {
+			scm::serializeSidecarCompositionMap(scm_ofs, scm, scm_namespace, "UTF-8", xml_schema::Flags::dont_initialize );
+		}
+		catch(xml_schema::Serialization &e) { serialization_error = XmlSerializationError(e); }
+		catch(xml_schema::UnexpectedElement &e) { serialization_error = XmlSerializationError(e); }
+		catch(xml_schema::NoTypeInfo &e) { serialization_error = XmlSerializationError(e); }
+		catch(...) { serialization_error = XmlSerializationError(XmlSerializationError::Unknown); }
+		scm_ofs.close();
+		if(serialization_error.IsError() == true) {
+			qDebug() << serialization_error;
+			error = Error::Unknown;
+		} else {
+		if (ImfXmlHelper::RemoveWhiteSpaces(destination))
+			qDebug() << "Error removing XML whitespaces from " << destination;
+		}
+	}
+	else {
+		error = Error::Unknown;
+	}
+	if(!error.IsError()) {
+		//if(mAssetCpl) mAssetCpl->FileModified();
+		//WR begin
+		//if(mAssetCpl) mAssetCpl->SetIsNewOrModified(true);
+		//WR end
+	}
+	return error;
+}

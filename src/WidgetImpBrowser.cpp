@@ -17,6 +17,7 @@
 #include "global.h"
 #include "ImfPackageCommands.h"
 #include "WizardResourceGenerator.h"
+#include "WizardSidecarCompositionMapGenerator.h"
 #include "MetadataExtractor.h"
 #include "DelegateMetadata.h"
 #include "WidgetComposition.h"
@@ -39,7 +40,12 @@
 #include <list>
 #include <cmath>
 #include <QTextEdit>
+#include <QByteArray>
 #include "WizardEssenceDescriptor.h"
+#include "SMPTE-2067-9a-2018-Sidecar.h"
+
+constexpr quint8 const UUIDVersion5::s_asset_id_prefix[UUIDVersion5::NS_ID_LENGTH];
+
 
 WidgetImpBrowser::WidgetImpBrowser(QWidget *pParent /*= NULL*/) :
 QFrame(pParent), mpViewImp(NULL), mpViewAssets(NULL), mpImfPackage(NULL), mpToolBar(NULL), mpUndoStack(NULL), mpUndoProxyModel(NULL), mpSortProxyModelImp(NULL), mpSortProxyModelAssets(NULL), mpMsgBox(NULL), mpJobQueue(NULL), mPartialOutgestInProgress(false) {
@@ -152,6 +158,9 @@ void WidgetImpBrowser::InitToolbar() {
 	QAction *p_add_mxf_resource = p_add_track_menu->addAction(QIcon(":/asset_mxf.png"), tr("Add existing MXF Track File"));
 	connect(p_add_mxf_resource, SIGNAL(triggered(bool)), this, SLOT(ShowResourceGeneratorMxfMode()));
 	//p_add_mxf_resource->setDisabled(true);
+	QAction *p_add_scm_resource = p_add_track_menu->addAction(QIcon(":/asset_scm.png"), tr("Add Sidecar Assets"));
+	connect(p_add_scm_resource, SIGNAL(triggered(bool)), this, SLOT(ShowSidecarCompositionMapGenerator()));
+	//p_add_scm_resource->setDisabled(true);
 
 	p_button_add_track->setMenu(p_add_track_menu);
 
@@ -277,12 +286,15 @@ void WidgetImpBrowser::rCustomMenuRequested(QPoint pos) {
 			QAction *remove_action = new QAction(QIcon(":/delete.png"), tr("Remove selected Asset from IMP"), this);
 			//QAction *delete_action = new QAction(QIcon(":/close.png"), tr("Delete selected Asset from IMP and from disk"), this);
 			//edit_action disabled, because Empty TT cannot be added afterwards AND assets already dragged into a timeline don't get updated after editing
-			//QAction *edit_action = new QAction(QIcon(":/edit.png"), tr("Edit selected Asset"), this);
+			QAction *view_scm_action = new QAction(QIcon(":/information.png"), tr("View SCM"), this);
+			QAction *edit_scm_action = new QAction(QIcon(":/edit.png"), tr("Edit SCM"), this);
 			QAction *open_action = new QAction(QIcon(":/edit.png"), tr("Open CPL"), this);
 			QAction *view_metadata_action = new QAction(QIcon(":/information.png"), tr("View metadata"), this);
 			QAction *view_essence_descriptor_action = new QAction(QIcon(":/information.png"), tr("View essence descriptor"), this);
 			connect(remove_action, SIGNAL(triggered(bool)), this, SLOT(rRemoveSelectedRow()));
 			//connect(delete_action, SIGNAL(triggered(bool)), this, SLOT(rDeleteSelectedRow()));
+			connect(view_scm_action, SIGNAL(triggered(bool)), this, SLOT(rShowSidecarCompositionMapGeneratorView()));
+			connect(edit_scm_action, SIGNAL(triggered(bool)), this, SLOT(rShowSidecarCompositionMapGeneratorEdit()));
 			connect(open_action, SIGNAL(triggered(bool)), this, SLOT(rOpenCplTimeline()));
 			//connect(edit_action, SIGNAL(triggered(bool)), this, SLOT(rShowResourceGeneratorForSelectedRow()));
 			connect(view_metadata_action, SIGNAL(triggered(bool)), this, SLOT(rShowMetadata()));
@@ -304,6 +316,10 @@ void WidgetImpBrowser::rCustomMenuRequested(QPoint pos) {
 					if (asset->Exists() || assetMxfTrack->HasSourceFiles())
 						menu.addAction(view_metadata_action);
 					if(asset->Exists()) menu.addAction(view_essence_descriptor_action);
+				}
+				if(asset->GetType() == Asset::scm) {
+					menu.addAction(view_scm_action);
+					menu.addAction(edit_scm_action);
 				}
 			}
 		}
@@ -359,6 +375,13 @@ void WidgetImpBrowser::Save() {
 						/* -----Denis Manthey End----- */
 
 				}
+				QSharedPointer<AssetScm> scm_asset = mpImfPackage->GetAsset(i).objectCast<AssetScm>();
+				if(scm_asset && scm_asset->Exists() == false) {
+					JobCreateScm *p_scm_job = new JobCreateScm(scm_asset);
+					connect(p_scm_job, SIGNAL(Success()), scm_asset.data(), SLOT(FileModified()));
+					mpJobQueue->AddJob(p_scm_job);
+				}
+
 				QSharedPointer<Asset> abstract_asset = mpImfPackage->GetAsset(i);
 				if(abstract_asset && abstract_asset->NeedsNewHash() && abstract_asset->GetType() != Asset::pkl) {
 					JobCalculateHash *p_hash_job = new JobCalculateHash(abstract_asset->GetPath().absoluteFilePath());
@@ -401,6 +424,40 @@ void WidgetImpBrowser::ShowResourceGeneratorTimedTextMode() {
 	connect(p_wizard_resource_generator, SIGNAL(accepted()), this, SLOT(rResourceGeneratorAccepted()));
 }
 		/* -----Denis Manthey End----- */
+
+		/* -----Sidecar Composition Map----- */
+void WidgetImpBrowser::ShowSidecarCompositionMapGenerator(QSharedPointer<AssetScm> rAssetScm /* = QSharedPointer<AssetScm>() */,
+		WizardSidecarCompositionMapGenerator::eMode rMode /*= WizardSidecarCompositionMapGenerator::eMode::NewScm*/) {
+	QVector<QSharedPointer<AssetCpl>> CPLfiles;
+
+	for (int i = 0; i < mpImfPackage->GetAssetCount(); i++) {
+		if (mpImfPackage->GetAsset(i)->GetType() == Asset::cpl) {
+			CPLfiles.append(mpImfPackage->GetAsset(i).objectCast<AssetCpl>());
+		}
+	}
+	WizardSidecarCompositionMapGenerator *p_wizard_scm_generator;
+	switch (rMode) {
+	case WizardSidecarCompositionMapGenerator::eMode::NewScm://default value for rMode
+		p_wizard_scm_generator = new WizardSidecarCompositionMapGenerator(this, mpImfPackage, CPLfiles);
+		p_wizard_scm_generator->SwitchMode(WizardSidecarCompositionMapGenerator::NewScm);
+		break;
+	case WizardSidecarCompositionMapGenerator::eMode::EditScm:
+		p_wizard_scm_generator = new WizardSidecarCompositionMapGenerator(this, mpImfPackage, CPLfiles, rAssetScm);
+		p_wizard_scm_generator->SwitchMode(WizardSidecarCompositionMapGenerator::EditScm);
+		break;
+	case WizardSidecarCompositionMapGenerator::eMode::ViewScm:
+		p_wizard_scm_generator = new WizardSidecarCompositionMapGenerator(this, mpImfPackage, CPLfiles, rAssetScm);
+		p_wizard_scm_generator->SwitchMode(WizardSidecarCompositionMapGenerator::ViewScm);
+		break;
+	default:
+		break;
+	}
+	p_wizard_scm_generator->setAttribute(Qt::WA_DeleteOnClose, true);
+	p_wizard_scm_generator->resize(QSize(600, 600).expandedTo(minimumSizeHint()));
+	p_wizard_scm_generator->show();
+	connect(p_wizard_scm_generator, SIGNAL(accepted()), this, SLOT(rSidecarCompositionMapGeneratorAccepted()));
+}
+
 //WR
 void WidgetImpBrowser::ShowResourceGeneratorMxfMode() {
 	mpFileDialog = new QFileDialog(this, QString("Select MXF file"), mpImfPackage->GetRootDir().absolutePath());
@@ -420,6 +477,7 @@ void WidgetImpBrowser::ShowResourceGeneratorMxfMode() {
 	mpFileDialog->show();
 }
 //WR
+
 
 void WidgetImpBrowser::rShowResourceGeneratorForSelectedRow() {
 
@@ -553,6 +611,61 @@ void WidgetImpBrowser::rResourceGeneratorAccepted() {
 	}
 }
 
+// This slot is triggered by SIGNAL(accepted) from Wizard (FINISH button)
+void WidgetImpBrowser::rSidecarCompositionMapGeneratorAccepted() {
+
+	WizardSidecarCompositionMapGenerator *p_sidecar_composition_map_generator = qobject_cast<WizardSidecarCompositionMapGenerator *>(sender());
+	if(p_sidecar_composition_map_generator) {
+		QList<AssetScm::SidecarCompositionMapEntry*> sidecar_composition_map_entries = p_sidecar_composition_map_generator->getSidecarCompositionMapEntryList();
+		WizardSidecarCompositionMapGenerator::eMode mode = p_sidecar_composition_map_generator->GetMode();
+		QUuid scm_id;
+		QSharedPointer<AssetScm> asset_scm;
+		QFileInfo file_name;
+		QString annotation_text, issuer;
+		switch (mode) {
+
+		case WizardSidecarCompositionMapGenerator::NewScm:
+		case WizardSidecarCompositionMapGenerator::EditScm:
+			scm_id = QUuid::createUuid();
+			annotation_text = p_sidecar_composition_map_generator->getAnnotation();
+			issuer = p_sidecar_composition_map_generator->getIssuer();
+			file_name = QFileInfo(mpImfPackage->GetRootDir().absoluteFilePath(QString("SCM_%1.xml").arg(strip_uuid(scm_id))));
+			asset_scm = QSharedPointer<AssetScm>(new AssetScm(file_name, scm_id, annotation_text));
+			asset_scm->SetIsNew(true);
+			asset_scm->SetIssuer(UserText(issuer));
+			for (int i=0; i < sidecar_composition_map_entries.size(); i++) {
+				QFileInfo sidecar_file_path = sidecar_composition_map_entries[i]->filepath;
+				Error hash_error = Error(UUIDVersion5::CalculateFromEntireFile(
+						UUIDVersion5::s_asset_id_prefix,
+						sidecar_file_path.absoluteFilePath(),
+						sidecar_composition_map_entries[i]->id)
+				);
+				if (!hash_error.IsError() && !hash_error.IsRecoverableError()) {
+					if (mpImfPackage->GetAsset(sidecar_composition_map_entries[i]->id).isNull()) {
+						QSharedPointer<AssetSidecar> sidecar_asset(new AssetSidecar(sidecar_file_path, sidecar_composition_map_entries[i]->id));
+						sidecar_asset->GetPklData()->setType(MediaType::GetMediaType(sidecar_file_path));
+						if (sidecar_asset) {
+							mpUndoStack->push(new AddAssetCommand(mpImfPackage, sidecar_asset, mpImfPackage->GetPackingListId()));
+
+						}
+					}
+					asset_scm->AddSidecarCompositionMapEntry(*sidecar_composition_map_entries[i]);
+			    }
+			}
+			mpUndoStack->push(new AddAssetCommand(mpImfPackage, asset_scm, mpImfPackage->GetPackingListId()));
+			if ( mode == WizardSidecarCompositionMapGenerator::NewScm) break;
+
+			mpUndoStack->push(new RemoveAssetCommand(mpImfPackage, mpImfPackage->GetAsset(mpSortProxyModelImp->mapToSource(mpViewImp->currentIndex()).row())));
+			break;
+		case WizardSidecarCompositionMapGenerator::ViewScm: // Do nothing when in View mode
+		default:
+			break;
+		}
+
+
+	}
+}
+
 
 
 				/* -----Denis Manthey Beg----- */
@@ -683,6 +796,10 @@ void WidgetImpBrowser::rImpViewDoubleClicked(const QModelIndex &rIndex) {
 				if(asset_cpl && asset_cpl->Exists() == true) {
 					emit ShowCpl(asset_cpl->GetId());
 				}
+				QSharedPointer<AssetScm> asset_scm = mpImfPackage->GetAsset(index.row()).objectCast<AssetScm>();
+				if(asset_scm) {
+					rShowSidecarCompositionMapGeneratorView();
+				}
 			}
 		}
 	}
@@ -712,6 +829,19 @@ void WidgetImpBrowser::rShowEssenceDescriptor() {
 
 }
 
+void WidgetImpBrowser::rShowSidecarCompositionMapGeneratorEdit() {
+	QSharedPointer<AssetScm> asset = mpImfPackage->GetAsset(mpSortProxyModelImp->mapToSource(mpViewImp->currentIndex()).row()).objectCast<AssetScm>();
+	if(asset) {
+		ShowSidecarCompositionMapGenerator(asset, WizardSidecarCompositionMapGenerator::EditScm);
+	}
+}
+
+void WidgetImpBrowser::rShowSidecarCompositionMapGeneratorView() {
+	QSharedPointer<AssetScm> asset = mpImfPackage->GetAsset(mpSortProxyModelImp->mapToSource(mpViewImp->currentIndex()).row()).objectCast<AssetScm>();
+	if(asset) {
+		ShowSidecarCompositionMapGenerator(asset, WizardSidecarCompositionMapGenerator::ViewScm);
+	}
+}
 
 void WidgetImpBrowser::StartOutgest(bool clearUndoStack /*= true*/) {
 
@@ -753,6 +883,29 @@ void WidgetImpBrowser::StartOutgest(bool clearUndoStack /*= true*/) {
 						newMXF->SetHash(asset_mxf->GetHash());
 						QFile::remove(asset_mxf->GetPath().absoluteFilePath());
 						PartialImp->AddAsset(newMXF, PartialImp->GetPackingListId());
+					}
+				}
+				//Add new SCMs to the Partial IMP
+				if (mpImfPackage->GetAsset(i)->GetType() == Asset::scm) {
+					QSharedPointer<AssetScm> asset_scm = mpImfPackage->GetAsset(i).objectCast<AssetScm>();
+					if (asset_scm->GetIsNew() == true) {
+						QFile::copy(asset_scm->GetPath().absoluteFilePath(), QString("%1/%2").arg(PartialImp->GetRootDir().absolutePath()).arg(asset_scm->GetOriginalFileName().first));
+						QSharedPointer<AssetScm> newSCM(new AssetScm(QString("%1/%2").arg(PartialImp->GetRootDir().absolutePath()).arg(asset_scm->GetOriginalFileName().first), asset_scm->GetId(), asset_scm->GetAnnotationText()));
+						newSCM->SetHash(asset_scm->GetHash());
+						QFile::remove(asset_scm->GetPath().absoluteFilePath());
+						PartialImp->AddAsset(newSCM, PartialImp->GetPackingListId());
+						// Copy all sidecar assets to new Partial IMP
+						foreach (AssetScm::SidecarCompositionMapEntry entry, asset_scm.data()->GetSidecarCompositionMapEntries()) {
+							QSharedPointer<AssetSidecar> asset_sidecar = mpImfPackage.data()->GetAsset(entry.id).objectCast<AssetSidecar>();
+							if (asset_sidecar) {
+								// Copy asset, but do not delete. Per ST2067-9, all sidecar assets need to be present in the new IMP.
+								QFile::copy(asset_sidecar->GetPath().absoluteFilePath(), QString("%1/%2").arg(PartialImp->GetRootDir().absolutePath()).arg(asset_sidecar->GetOriginalFileName().first));
+								QSharedPointer<AssetSidecar> newSidecar(new AssetSidecar(QString("%1/%2").arg(PartialImp->GetRootDir().absolutePath()).arg(asset_sidecar->GetOriginalFileName().first), asset_sidecar->GetId()));
+								newSidecar->SetHash(asset_sidecar->GetHash());
+								newSidecar->GetPklData()->setType(asset_sidecar->GetPklData()->getType());
+								PartialImp->AddAsset(newSidecar, PartialImp->GetPackingListId());
+							}
+						}
 					}
 				}
 			}
@@ -910,7 +1063,23 @@ void WidgetImpBrowser::SetMxfFile(const QStringList &rFiles) {
 
 		mpFileDialog->hide();
 }
+
+void WidgetImpBrowser::SetScmFile(const QStringList &rFiles) {
+	//Reading and validating file here
+	
+	mpMsgBox->setText(tr("Read File"));
+	mpMsgBox->setInformativeText("Reading SCM XML File from: " + QDir(rFiles.at(0)).absolutePath());
+	mpMsgBox->setStandardButtons(QMessageBox::Ok);
+	mpMsgBox->setDefaultButton(QMessageBox::Ok);
+	mpMsgBox->setIcon(QMessageBox::Information);
+	mpMsgBox->exec();
+}
+
 void WidgetImpBrowser::SetMxfFileDirectory(const QString& rPath) {
+	if (!rPath.contains(mpImfPackage->GetRootDir().absolutePath())) mpFileDialog->setDirectory(mpImfPackage->GetRootDir().absolutePath());
+}
+
+void WidgetImpBrowser::SetScmFileDirectory(const QString& rPath) {
 	if (!rPath.contains(mpImfPackage->GetRootDir().absolutePath())) mpFileDialog->setDirectory(mpImfPackage->GetRootDir().absolutePath());
 }
 
@@ -956,6 +1125,71 @@ void WidgetImpBrowser::LoadAdditionalImpPackage(const QSharedPointer<ImfPackage>
 		}
 	}
 	return;
+}
+
+void WidgetImpBrowser::AddQcReportAsSidecar(const QString rQcReport) {
+	QString report_file_name = this->GetImfPackage().data()->GetRootDir().absolutePath();
+	report_file_name.append(QString("/photon-qc-report-%1.txt").arg(QDateTime::currentDateTime().toString(Qt::DateFormat::ISODate).remove(':')));
+	QFile file(report_file_name);
+	bool success = file.open(QIODevice::WriteOnly);
+	if(success) {
+		file.write(rQcReport.toUtf8());
+		file.close();
+	} else {
+		QString error_msg = QString("Cannot write to file: %1").arg(report_file_name);
+		mpMsgBox->setText(tr("Error saving QC report"));
+		mpMsgBox->setIcon(QMessageBox::Warning);
+		mpMsgBox->setInformativeText(error_msg);
+		mpMsgBox->setStandardButtons(QMessageBox::Ok);
+		mpMsgBox->setDefaultButton(QMessageBox::Ok);
+		mpMsgBox->exec();
+		return;
+	}
+	QFileInfo report_file_info(report_file_name);
+	QUuid id;
+	Error hash_error = Error(UUIDVersion5::CalculateFromEntireFile(
+			UUIDVersion5::s_asset_id_prefix,
+			report_file_info.absoluteFilePath(),
+			id)
+	);
+	if (!hash_error.IsError() && !hash_error.IsRecoverableError()) {
+
+		QSharedPointer<AssetSidecar> sidecar_asset(new AssetSidecar(report_file_info, id));
+		sidecar_asset->GetPklData()->setType(MediaType::GetMediaType(report_file_info));
+		if (sidecar_asset) {
+			mpUndoStack->push(new AddAssetCommand(mpImfPackage, sidecar_asset, mpImfPackage->GetPackingListId()));
+
+		}
+	} else {
+		return;
+	}
+	QUuid scm_id = QUuid::createUuid();
+	QString annotation_text = "Photon QC report";
+	QString issuer = "IMF Tool";
+	QFileInfo scm_file_info = QFileInfo(mpImfPackage->GetRootDir().absoluteFilePath(QString("SCM_%1.xml").arg(strip_uuid(scm_id))));
+	QSharedPointer<AssetScm> asset_scm = QSharedPointer<AssetScm>(new AssetScm(scm_file_info, scm_id, annotation_text));
+	asset_scm->SetIsNew(true);
+	asset_scm->SetIssuer(UserText(issuer));
+	AssetScm::SidecarCompositionMapEntry entry;
+	entry.filepath =  report_file_info;
+	entry.id = id;
+	for (int i = 0; i < mpImfPackage->GetAssetCount(); i++) {
+		if (mpImfPackage->GetAsset(i).data()->GetType() == Asset::cpl) {
+			QSharedPointer<AssetCpl> asset_cpl = mpImfPackage->GetAsset(i).objectCast<AssetCpl>();
+			if (asset_cpl) entry.mAssociatedCplAssets.append(asset_cpl);
+		}
+	}
+	asset_scm->AddSidecarCompositionMapEntry(entry);
+	mpUndoStack->push(new AddAssetCommand(mpImfPackage, asset_scm, mpImfPackage->GetPackingListId()));
+	QString error_msg = QString("It is recommended to export the Sidecar QC Report as a Partial IMP to a separate folder! \n\nThis will leave the Original IMP unmodified.");
+	mpMsgBox->setText(tr("Hint"));
+	mpMsgBox->setIcon(QMessageBox::Information);
+	mpMsgBox->setInformativeText(error_msg);
+	mpMsgBox->setStandardButtons(QMessageBox::Ok);
+	mpMsgBox->setDefaultButton(QMessageBox::Ok);
+	mpMsgBox->exec();
+	return;
+
 }
 
 void WidgetImpBrowser::slotCurrentChanged(const QModelIndex &selected, const QModelIndex &deselected) {

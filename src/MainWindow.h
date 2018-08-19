@@ -72,6 +72,7 @@ private slots:
 	//WR
 	void ShowQcReport(const QString &rQcResult, const QVariant &rIdentifier);
 	void CopyQcReport();
+	void AddQcReportAsSidecar();
 	void rCallPhoton();
 	void rAutoInstallImp(const bool rOpenAllCpls = false);
 	void informIsSupplementalImp();

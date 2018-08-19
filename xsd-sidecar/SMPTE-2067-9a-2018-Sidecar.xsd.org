@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://www.smpte-ra.org/ns/2067-9/2018"
+	xmlns:scm="http://www.smpte-ra.org/ns/2067-9/2018"
+	xmlns:dcml="http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/"
+	xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+	xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	elementFormDefault="qualified"
+	attributeFormDefault="unqualified">
+	<xs:import namespace="http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/" />
+	<xs:import namespace="http://www.w3.org/2000/09/xmldsig#" />
+	<xs:element name="SidecarCompositionMap" type="scm:SidecarCompositionMapType" />
+	<xs:complexType name="SidecarCompositionMapType">
+		<xs:sequence>
+			<xs:element name="Id" type="dcml:UUIDType"/>
+			<xs:element name="Properties">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Annotation" type="dcml:UserTextType" minOccurs="0"/>
+						<xs:element name="IssueDate" type="xs:dateTime"/>
+						<xs:element name="Issuer" type="dcml:UserTextType" minOccurs="0"/>
+						<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="SidecarAssetList">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="SidecarAsset" type="scm:SidecarAssetType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Signer" type="ds:KeyInfoType" minOccurs="0"/>
+			<xs:element name="Signature" type="ds:SignatureType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SidecarAssetType">
+		<xs:sequence>
+			<xs:element name="Id" type="dcml:UUIDType"/>
+			<xs:element name="AssociatedCPLList">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element maxOccurs="unbounded" name="CPLId" type="dcml:UUIDType"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

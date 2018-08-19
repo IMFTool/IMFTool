@@ -1,5 +1,5 @@
 // Copyright(C) Krispin Weiss, Wolfgang Ruppel
-// Generated 28/10/2017 @ 05:20:20 by Wolfgangs-MacBook-Pro.local!
+// Generated 27/06/2018 @ 18:33:11 by Wolfgangs-MacBook-Pro.local!
 
 #pragma once
 #include <QObject>
@@ -18,6 +18,8 @@ namespace SMPTE {
 		TransferCharacteristic_ITU2020,
 		TransferCharacteristic_SMPTEST2084,
 		TransferCharacteristic_HLG_OETF,
+		TransferCharacteristic_Gamma_2_6,
+		TransferCharacteristic_sRGB,
 	};
 
 
@@ -33,6 +35,8 @@ namespace SMPTE {
 		{ "060e2b34.0401010e.04010101.01090000", TransferCharacteristic_ITU2020 },
 		{ "060e2b34.0401010d.04010101.010a0000", TransferCharacteristic_SMPTEST2084 },
 		{ "060e2b34.0401010d.04010101.010b0000", TransferCharacteristic_HLG_OETF },
+		{ "060e2b34.0401010d.04010101.010c0000", TransferCharacteristic_Gamma_2_6 },
+		{ "060e2b34.0401010d.04010101.010d0000", TransferCharacteristic_sRGB },
 	};
 
 
@@ -48,6 +52,8 @@ namespace SMPTE {
 		{ TransferCharacteristic_ITU2020, "ITU2020" },
 		{ TransferCharacteristic_SMPTEST2084, "SMPTEST2084" },
 		{ TransferCharacteristic_HLG_OETF, "HLGOETF" },
+		{ TransferCharacteristic_Gamma_2_6, "Gamma26" },
+		{ TransferCharacteristic_sRGB, "sRGB" },
 	};
 
 
@@ -58,6 +64,8 @@ namespace SMPTE {
 		ColorPrimaries_ITU2020,
 		ColorPrimaries_SMPTE_DCDM,
 		ColorPrimaries_P3D65,
+		ColorPrimaries_ACES,
+		ColorPrimaries_CinemaMezzanine,
 	};
 
 
@@ -68,6 +76,8 @@ namespace SMPTE {
 		{ "060e2b34.0401010d.04010101.03040000", ColorPrimaries_ITU2020 },
 		{ "060e2b34.0401010d.04010101.03050000", ColorPrimaries_SMPTE_DCDM },
 		{ "060e2b34.0401010d.04010101.03060000", ColorPrimaries_P3D65 },
+		{ "060e2b34.0401010d.04010101.03070000", ColorPrimaries_ACES },
+		{ "060e2b34.0401010d.04010101.03080000", ColorPrimaries_CinemaMezzanine },
 	};
 
 
@@ -78,6 +88,8 @@ namespace SMPTE {
 		{ ColorPrimaries_ITU2020, "ITU2020" },
 		{ ColorPrimaries_SMPTE_DCDM, "SMPTEDCDM" },
 		{ ColorPrimaries_P3D65, "P3D65" },
+		{ ColorPrimaries_ACES, "ACES" },
+		{ ColorPrimaries_CinemaMezzanine, "CinemaMezzanine" },
 	};
 
 

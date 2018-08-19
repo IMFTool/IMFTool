@@ -15,6 +15,8 @@
  */
 #include "ImfPackageCommon.h"
 #include <fstream>
+#include <QCryptographicHash>
+#include <QMimeDatabase>
 
 
 XmlSerializationError::XmlSerializationError(const xml_schema::Serialization &rError) {
@@ -313,3 +315,53 @@ int ImfXmlHelper::RemoveWhiteSpaces(const QString &rPathName) {
 
 
 //WR
+Error UUIDVersion5::CalculateFromEntireFile(const quint8 rNameSpaceId[UUIDVersion5::NS_ID_LENGTH], const QString rPath, QUuid& rUuid) {
+	if (!QFile::exists(rPath))
+		return Error::SourceFileOpenError;
+	const QByteArray asset_id_prefix = QByteArray(reinterpret_cast<const char*>(rNameSpaceId), UUIDVersion5::NS_ID_LENGTH);
+    QFile file(rPath);
+    if (file.open(QFile::ReadOnly)) {
+        QCryptographicHash hash(QCryptographicHash::Sha1);
+        hash.addData(asset_id_prefix);
+        if (!hash.addData(&file)) {
+        	qDebug() << "Cannot add file " << rPath << " to hash";
+        	return Error::HashCalculation;
+        }
+        QByteArray uuid;
+        uuid.replace(0, 16, hash.result().mid(0, 16));
+        uuid.data()[6] &= 0x0f; // clear bits 4-7
+        uuid.data()[6] |= 0x50; // set UUID version 'digest'
+        uuid.data()[8] &= 0x3f; // clear bits 6&7
+        uuid.data()[8] |= 0x80; // set bit 7
+        rUuid = QUuid::fromRfc4122(uuid);
+    } else {
+		return Error::SourceFileOpenError;
+    }
+	return Error::None;
+}
+
+Error UUIDVersion5::CalculateFromString(const quint8 rNameSpaceId[UUIDVersion5::NS_ID_LENGTH], const QString rString, QUuid& rUuid) {
+	if (rString.isNull() || rString.isEmpty())
+		return Error::HashCalculation;
+	const QByteArray asset_id_prefix = QByteArray(reinterpret_cast<const char*>(rNameSpaceId), UUIDVersion5::NS_ID_LENGTH);
+	QCryptographicHash hash(QCryptographicHash::Sha1);
+	hash.addData(asset_id_prefix);
+	hash.addData(rString.toLocal8Bit());
+	QByteArray uuid;
+	uuid.replace(0, 16, hash.result().mid(0, 16));
+	uuid.data()[6] &= 0x0f; // clear bits 4-7
+	uuid.data()[6] |= 0x50; // set UUID version 'digest'
+	uuid.data()[8] &= 0x3f; // clear bits 6&7
+	uuid.data()[8] |= 0x80; // set bit 7
+	rUuid = QUuid::fromRfc4122(uuid);
+	return Error::None;
+}
+
+pkl2016::AssetType::TypeType MediaType::GetMediaType(QFileInfo rFileInfo) {
+	QMimeDatabase db;
+	QString return_value;
+	QMimeType mime = db.mimeTypeForFile(rFileInfo, QMimeDatabase::MatchDefault);
+	return_value = mime.name();
+	if (return_value == "application/xml") return_value = "text/xml"; //Qt does it wrong
+	return pkl2016::AssetType::TypeType(return_value.toStdString());
+}

@@ -64,8 +64,8 @@ int EmptyTimedTextGenerator::GenerateEmptyXml()
 
                 rootElem->setAttribute(Xuni("xmlns:ittp"), Xuni("http://www.w3.org/ns/ttml/profile/imsc1#parameter"));
                 rootElem->setAttribute(Xuni("xmlns:ittm"), Xuni("http://www.w3.org/ns/ttml/profile/imsc1#metadata"));
-                rootElem->setAttribute(Xuni("xmlns:ttm"), Xuni("http://www.w3.org/ns/ttml#metadata"));
-                rootElem->setAttribute(Xuni("xmlns:ttp"), Xuni("http://www.w3.org/ns/ttml#parameter"));
+                rootElem->setAttribute(Xuni("xmlns:ttm"), IMSC1_NS_TTM);
+                rootElem->setAttribute(Xuni("xmlns:ttp"), IMSC1_NS_TTP);
 
                 rootElem->setAttribute(Xuni("xml:lang"), Xuni("en"));
                 rootElem->setAttribute(Xuni("ttp:profile"), Xuni("http://www.w3.org/ns/ttml/profile/imsc1/text"));
@@ -78,27 +78,27 @@ int EmptyTimedTextGenerator::GenerateEmptyXml()
                 //WR
 
                 // <head>
-                DOMElement* headElem = doc->createElement(Xuni("head"));
+                DOMElement* headElem = doc->createElementNS(IMSC1_NS_TT, Xuni("head"));
                 rootElem->appendChild(headElem);
 
-                DOMElement* metaElem = doc->createElement(Xuni("metadata"));
+                DOMElement* metaElem = doc->createElementNS(IMSC1_NS_TT, Xuni("metadata"));
                 headElem->appendChild(metaElem);
 
-                DOMElement* titleElem = doc->createElement(Xuni("ttm:title"));
+                DOMElement* titleElem = doc->createElementNS(IMSC1_NS_TTM, Xuni("title"));
                 metaElem->appendChild(titleElem);
                 DOMText* titleDataVal = doc->createTextNode(Xuni("Empty imsc1 document"));
                 titleElem->appendChild(titleDataVal);
 
-                DOMElement* descElem = doc->createElement(Xuni("ttm:desc"));
+                DOMElement* descElem = doc->createElementNS(IMSC1_NS_TTM, Xuni("desc"));
                 metaElem->appendChild(descElem);
                 DOMText* descDataVal = doc->createTextNode(Xuni("this document can be used to fill gaps in the IMF CPL"));
                 descElem->appendChild(descDataVal);
 
                 // <body>
-                DOMElement* bodyElem = doc->createElement(Xuni("body"));
+                DOMElement* bodyElem = doc->createElementNS(IMSC1_NS_TT, Xuni("body"));
                 rootElem->appendChild(bodyElem);
 
-                DOMElement* divElem = doc->createElement(Xuni("div"));
+                DOMElement* divElem = doc->createElementNS(IMSC1_NS_TT, Xuni("div"));
                 bodyElem->appendChild(divElem);
 
                 divElem->setAttribute(Xuni("begin"), Xuni("0f"));

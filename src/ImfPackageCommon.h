@@ -29,7 +29,8 @@
 #include <QStringList>
 #include <QPair>
 #include <QVector>
-
+#include "Error.h"
+#include "st2067-2b-2016-PKL.h"
 
 
 
@@ -246,6 +247,7 @@ public:
 		UnknownInheritance,
 		XMLParsing,
 		XMLSerialization,
+		MissingSidecarAsset,
 		Unknown
 	};
 	//! Constructs empty error (IsError returns false).
@@ -288,6 +290,8 @@ public:
 				ret = QObject::tr("The XML parsing failed."); break;
 			case XMLSerialization:
 				ret = QObject::tr("The XML serialization failed."); break;
+			case  MissingSidecarAsset:
+				ret = QObject::tr("Sidecar Asset referenced is not present in IMP. Sidecar Asset will be deleted from SCM:"); break;
 			case Unknown:
 				ret = QObject::tr("Unknown error"); break;
 			default:
@@ -473,4 +477,24 @@ public:
 
 	//WR
 	static int RemoveWhiteSpaces(const QString &rPathName);
+};
+
+class UUIDVersion5 {
+
+public:
+	static int const NS_ID_LENGTH = 16;
+	static Error CalculateFromEntireFile(const quint8 rNameSpaceId[NS_ID_LENGTH], const QString rPath, QUuid& rUuid);
+	static Error CalculateFromString(const quint8 rNameSpaceId[NS_ID_LENGTH], const QString rString, QUuid& rUuid);
+	static constexpr quint8 const s_asset_id_prefix[UUIDVersion5::NS_ID_LENGTH] = {
+	  // RFC 4122 type 5
+	  // 2067-2:2016 7.3.1
+			0xaf, 0x86, 0xb7, 0xec, 0x4c, 0xdf, 0x4f, 0x9f,
+			0x82, 0x0f, 0x6f, 0xd8, 0xd3, 0x00, 0x30, 0x23
+	};
+
+};
+
+class MediaType {
+public:
+	static pkl2016::AssetType::TypeType GetMediaType(QFileInfo rFileInfo);
 };

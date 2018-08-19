@@ -38,7 +38,7 @@ QString third_party = QString("Third Party:\n\n"
 															"regxmllib: Copyright (c) 2014, Pierre-Anthony Lemieux (pal@sandflow.com) All rights reserved.\n\n"
 															"CodeSynthesis XSD: Provided under GPLv2 by Code Synthesis, http://www.codesynthesis.com/licenses/gpl-2.txt.\n\n"
 															"Window Icon: Toma4025 http://toma4025.deviantart.com/art/RumixIP-107029752\n\n"
-															"Other Icons: Copyright 2009-2014 FatCow Web Hosting\n\n"
+															"Other Icons: Copyright 2009-2018 FatCow Web Hosting, http://www.fatcow.com/free-icons\n\n"
 															"QtWaitingSpinner: Original Work Copyright (c) 2012-2014 Alexander Turkin Modified 2014 by William Hallatt\n\n"
 															"Marker Icon: This icon is provided by icons8.com as Creative Commons Attribution-NoDerivs 3.0 Unported\n\n"
 															"Photon: Available at https://github.com/Netflix/photon/ under Apache 2.0 License\n\n"
@@ -123,7 +123,7 @@ void WidgetAbout::InitLayout() {
 	p_text_third_party->setText(third_party);
 	QLabel *p_label_name = new QLabel(PROJECT_NAME, this);
 	p_label_name->setFont(QFont("Arial", 20, QFont::Bold));
-	QLabel *p_label_author = new QLabel(tr("Author: ").append("Björn Stresing, Denis Manthey, Krispin Weiß, Wolfgang Ruppel"), this);
+	QLabel *p_label_author = new QLabel(tr("Authors: ").append("Björn Stresing, Denis Manthey, Krispin Weiß, Justin Hug, Wolfgang Ruppel"), this);
 	QLabel *p_label_version = new QLabel(tr("Version: ").append(VERSION_MAJOR"." VERSION_MINOR"." SVN_REV), this);
 	QLabel *p_label_notice = new QLabel(notice, this);
 	QLabel *p_label_icon = new QLabel(this);

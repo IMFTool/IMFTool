@@ -19,6 +19,7 @@
 #include <QTableView>
 #include <QFileDialog>
 #include <QToolButton>
+#include "WizardSidecarCompositionMapGenerator.h"
 
 class ImfPackage;
 class QToolBar;
@@ -66,6 +67,7 @@ public:
 	QString GetPartialImpPath () {return mPartialImpPath;}
 	QSharedPointer<ImfPackage> GetImfPackage () {return mpImfPackage;}
 	void LoadAdditionalImpPackage(const QSharedPointer<ImfPackage> &rImfPackage);
+	void AddQcReportAsSidecar(const QString rQcReport);
 	//WR
 
 signals:
@@ -85,6 +87,7 @@ signals:
 	void ShowResourceGeneratorMxfMode();
 	void slotCurrentChanged(const QModelIndex &selected, const QModelIndex &deselected);
 	//WR end
+	void ShowSidecarCompositionMapGenerator(QSharedPointer<AssetScm> rAssetScm = QSharedPointer<AssetScm>(), WizardSidecarCompositionMapGenerator::eMode rMode = WizardSidecarCompositionMapGenerator::NewScm);
 
 	private slots :
 	void rRemoveSelectedRow();
@@ -92,6 +95,7 @@ signals:
 	void rShowResourceGeneratorForSelectedRow();
 	void rShowResourceGeneratorForAsset(const QUuid &rAssetId);
 	void rResourceGeneratorAccepted();
+	void rSidecarCompositionMapGeneratorAccepted();
 	void rShowEssenceDescriptorForAsset(const QSharedPointer<AssetMxfTrack> &rAsset);
 	void rCustomMenuRequested(QPoint pos);
 	void rMapCurrentRowSelectionChanged(const QModelIndex &rCurrent, const QModelIndex &rPrevious);
@@ -105,7 +109,13 @@ signals:
 	void SetMxfFile(const QStringList &rFiles);
 	void SetMxfFileDirectory(const QString&);
 	void rLoadRequest();
+	void rShowSidecarCompositionMapGeneratorView();
+	void rShowSidecarCompositionMapGeneratorEdit();
 	//WR
+
+	//---- SCM ---- 
+	void SetScmFile(const QStringList &rFiles);
+	void SetScmFileDirectory(const QString&);
 
 protected:
 	virtual void keyPressEvent(QKeyEvent *pEvent);

@@ -13,7 +13,10 @@ Introductory videos are available on YouTube [[2]](#imf-video), [[3]](#imf-video
 
 ## Workflows supported:
 -	Open an IMP, visualize the timeline of the CPL(s) included in the IMP
--	NEW: Load ancestor Original Versions of Supplemental IMPs for preview and versioning
+-	NEW: Add Sidecar Assets to an IMP ("Add Asset" --> Add Sidecar Assets)
+-	NEW: Create, view and edit Sidecar Composition Maps (SCMs)
+-	NEW: Add a Photon QC report as sidecar file (hint: export the sidecar QC report as a Partial IMP, this leaves the Original IMP unmodified!)
+-	Load ancestor Original Versions of Supplemental IMPs for preview and versioning
 - 	Create Photon[[4]](#photon) QC report
 -	Edit CPL metadata
 -	Add new virtual tracks (limited to audio, subtitles and markers)

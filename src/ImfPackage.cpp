@@ -360,6 +360,7 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 												else if(pkl_asset.getType().compare(MIME_TYPE_XML) == 0) {
 													// Add CPL or OPL
 													// We have to parse the file to determine the type (opl or cpl)
+													bool is_scm = true;
 													bool is_opl = true;
 													bool is_cpl = true;
 													bool is_cpl2013 = true;
@@ -423,7 +424,10 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 													}
 													try { opl::parseOutputProfileList(new_asset_path.absoluteFilePath().toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize); }
 													catch(...) { is_opl = false; }
-													if(is_cpl && !is_opl) {
+													::std::auto_ptr< ::scm::SidecarCompositionMapType> scm;
+													try { scm = scm::parseSidecarCompositionMap(new_asset_path.absoluteFilePath().toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize); }
+													catch(...) { is_scm = false; }
+													if(is_cpl && !is_opl && !is_scm) {
 														// Add CPL
 														QSharedPointer<AssetCpl> cpl(new AssetCpl(new_asset_path, am_asset, pkl_asset));
 														AddAsset(cpl, ImfXmlHelper::Convert(packing_list->getId()));
@@ -433,21 +437,25 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 														qDebug() << "CPL Edit Rate: " << mImpEditRates.last().GetNumerator()  << mImpEditRates.last().GetDenominator();
 														//WR
 													}
-													else if(is_opl && !is_cpl) {
+													else if(is_opl && !is_cpl && !is_scm) {
 														// Add Opl
 														QSharedPointer<AssetOpl> opl(new AssetOpl(new_asset_path, am_asset, pkl_asset));
 														AddAsset(opl, ImfXmlHelper::Convert(packing_list->getId()));
 													}
+													else if(is_scm && !is_cpl && !is_opl) {
+														// Add Scm
+														QSharedPointer<AssetScm> scm_asset(new AssetScm(new_asset_path, am_asset, pkl_asset, *scm.get()));
+														AddAsset(scm_asset, ImfXmlHelper::Convert(packing_list->getId()));
+														mScmList << scm_asset;
+													}
 													else {
-														qDebug() << "Unknown " MIME_TYPE_XML " Asset found: " << ImfXmlHelper::Convert(am_asset.getId());
-														error = ImfError(ImfError::UnknownAsset, am_asset.getId().c_str(), true);
+														// It will be checked below if the unknown asset is a sidecar asset
 														QSharedPointer<Asset> unknown(new Asset(Asset::unknown, new_asset_path, am_asset, std::auto_ptr<pkl2016::AssetType>(new pkl2016::AssetType(pkl_asset))));
 														AddAsset(unknown, ImfXmlHelper::Convert(packing_list->getId()));
 													}
 												}
-												else {
-													qWarning() << "Unsupported Asset type element " << pkl_asset.getType().c_str() << " found: " << ImfXmlHelper::Convert(am_asset.getId());
-													error = ImfError(ImfError::UnknownAsset, am_asset.getId().c_str(), true);
+												else { // MIME Type neither XML nor MXF
+													// It will be checked below if the unknown asset is a sidecar asset
 													QSharedPointer<Asset> unknown(new Asset(Asset::unknown, new_asset_path, am_asset, std::auto_ptr<pkl2016::AssetType>(new pkl2016::AssetType(pkl_asset))));
 													AddAsset(unknown, ImfXmlHelper::Convert(packing_list->getId()));
 												}
@@ -469,8 +477,28 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 									count ++;
 								}*/
 								foreach(QSharedPointer<Asset> asset, mAssetList) {
-									// TTML XF assets only: Set Edit Rate in metadata object to CPL Edit Rate, re-calculate duration in CPL Edit Rate units
+									// All assets: Check, if they are sidecar assets. If so, change type to Asset:scm
+									// TTML XF assets: Set Edit Rate in metadata object to CPL Edit Rate, re-calculate duration in CPL Edit Rate units
 									// Uses the first CPL Edit Rate in mImpEditRates, this can be an issue in multi-edit rate IMPs
+									bool converted_to_sidecar = false;
+									for (int i = 0; i < mScmList.length(); i++) {
+										scm::SidecarCompositionMapType scm = mScmList[i].data()->GetScm();
+										for (scm::SidecarCompositionMapType_SidecarAssetListType::SidecarAssetSequence::iterator
+												it = scm.getSidecarAssetList().getSidecarAsset().begin();
+												it < scm.getSidecarAssetList().getSidecarAsset().end();
+												it++) {
+											if (asset->GetId() == ImfXmlHelper::Convert(it->getId())) {
+												const pkl2016::AssetType pkl_asset(*asset->WritePkl());
+												QSharedPointer<AssetSidecar> sidecar_asset(new AssetSidecar(asset->GetPath(), asset->GetAmData(), pkl_asset));
+												QUuid packing_list_id = asset->GetPklId();
+												RemoveAsset(asset->GetId());
+												AddAsset(sidecar_asset, packing_list_id);
+												converted_to_sidecar = true;
+												break;
+											}
+										}
+										if (converted_to_sidecar) break;
+									}
 									QSharedPointer <AssetMxfTrack> assetMxfTrack;
 									try {
 										assetMxfTrack = qSharedPointerCast<AssetMxfTrack>(asset);
@@ -494,6 +522,77 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 										}
 									}
 								}
+								// Refresh list of SCMs. Note: Users may have picked SCM files, that don't belong to the IMP, as sidecar assets
+								mScmList.clear();
+								foreach(QSharedPointer<Asset> asset, mAssetList) {
+									if (asset->GetType() == Asset::scm) {
+										QSharedPointer <AssetScm> asset_scm = qSharedPointerCast<AssetScm>(asset);
+										if (asset_scm) mScmList << asset_scm;
+
+									}
+								}
+								// Loop through all SCMs
+								for (int i = 0; i < mScmList.length(); i++) {
+									scm::SidecarCompositionMapType_SidecarAssetListType::SidecarAssetSequence sidecar_asset_sequence_assets_found;
+									scm::SidecarCompositionMapType scm = mScmList[i].data()->GetScm();
+									// Loop through all sidecar assets
+									for (scm::SidecarCompositionMapType_SidecarAssetListType::SidecarAssetSequence::iterator
+											it = scm.getSidecarAssetList().getSidecarAsset().begin();
+											it < scm.getSidecarAssetList().getSidecarAsset().end(); it++) {
+										bool found = false;
+										AssetScm::SidecarCompositionMapEntry entry;
+										// Loop through all IMP assets
+										foreach(QSharedPointer<Asset> asset, mAssetList) {
+											// collect all sidecar assets that are present in sidecar_asset_sequence_assets_found
+											if (asset->GetId() == ImfXmlHelper::Convert(it->getId())) {
+												found = true;
+												sidecar_asset_sequence_assets_found.push_back(*it);
+												if (scm.getProperties().getAnnotation().present())
+													mScmList[i].data()->SetAnnotationText(ImfXmlHelper::Convert(scm.getProperties().getAnnotation().get()));
+												if (scm.getProperties().getIssuer().present())
+													mScmList[i].data()->SetIssuer(ImfXmlHelper::Convert(scm.getProperties().getIssuer().get()));
+												entry.id = ImfXmlHelper::Convert(it->getId());
+												entry.filepath = asset.data()->GetPath();
+												scm::SidecarAssetType::AssociatedCPLListType& cpl_list = it->getAssociatedCPLList();
+												for (scm::SidecarAssetType_AssociatedCPLListType::CPLIdSequence::iterator
+														it_cpl_id = cpl_list.getCPLId().begin();
+														it_cpl_id < cpl_list.getCPLId().end(); it_cpl_id++) {
+													//const QUuid sidecar_id = ImfXmlHelper::Convert(*it_cpl_id);
+													bool cpl_found = false;
+													foreach(QSharedPointer<Asset> asset, mAssetList) {
+														if ((asset.data()->GetType() == Asset::cpl) && (asset.data()->GetId() == ImfXmlHelper::Convert(*it_cpl_id)) ) {
+															QSharedPointer<AssetCpl> asset_cpl = asset.staticCast<AssetCpl>();
+															if (asset_cpl) {
+																entry.mAssociatedCplAssets.append(asset_cpl);
+																cpl_found = true;
+																break;
+															}
+														}
+													}
+													if (cpl_found == false) {
+														entry.mCplIdsNotInCurrentImp.append(ImfXmlHelper::Convert(*it_cpl_id));
+													}
+												}
+												mScmList[i].data()->AddSidecarCompositionMapEntry(entry);
+
+												break;
+											}
+										}
+										if (!found) {
+											error = ImfError(ImfError::MissingSidecarAsset, ImfXmlHelper::Convert(mScmList[i].data()->GetScm().getId()).toString(), true);
+										}
+									}
+									// Replace original SidecarAssetSequence with SidecarAssetSequence containing only sidecar assets that are present in IMP
+									scm.getSidecarAssetList().setSidecarAsset(sidecar_asset_sequence_assets_found);
+								} // END Loop through all SCMs
+								foreach(QSharedPointer<Asset> asset, mAssetList) {
+									if (asset->GetType() == Asset::unknown) {
+										// Throw an error for each remaining unknown asset
+										qDebug() << "Unknown Asset found: " << asset->GetId().toString();
+										error = ImfError(ImfError::UnknownAsset, asset->GetId().toString(), true);
+									}
+								}
+
 							}
 							else {
 								qDebug() << parse_error;
@@ -677,6 +776,12 @@ QVariant ImfPackage::data(const QModelIndex &rIndex, int role /*= Qt::DisplayRol
 					case Asset::opl:
 						return QVariant(QPixmap(":/asset_opl.png"));
 						break;
+					case Asset::scm:
+						return QVariant(QPixmap(":/asset_scm.png"));
+						break;
+					case Asset::sidecar:
+						return QVariant(QPixmap(":/asset_sidecar.png"));
+						break;
 					default:
 						return QVariant(QPixmap(":/asset_unknown.png"));
 						break;
@@ -726,6 +831,11 @@ QVariant ImfPackage::data(const QModelIndex &rIndex, int role /*= Qt::DisplayRol
 				else if (mAssetList.at(row)->GetType() == Asset::mxf) {
 					QSharedPointer <AssetMxfTrack> assetMxfTrack = qSharedPointerCast<AssetMxfTrack>(mAssetList.at(row));
 					if (!assetMxfTrack->HasSourceFiles()) return QVariant(tr("Missing file"));
+					else return QVariant(tr("Not Finalized"));
+				}
+				else if (mAssetList.at(row)->GetType() == Asset::scm) {
+					QSharedPointer <AssetScm> assetScm = qSharedPointerCast<AssetScm>(mAssetList.at(row));
+					if (!assetScm->GetIsNew()) return QVariant(tr("Missing file"));
 					else return QVariant(tr("Not Finalized"));
 				}
 				else return QVariant(tr("Missing file"));
@@ -1029,7 +1139,6 @@ const pkl2016::PackingListType& PackingList::Write() {
 	return mData;
 }
 
-
 // Creates new Asset. rFilePath must be the prospective path of the asset. If the asset doesn't exist on the file system when ImfPackage::Outgest() is invoked the asset will be ignored.
 Asset::Asset(eAssetType type, const QFileInfo &rFilePath, const QUuid &rId, const UserText &rAnnotationText /*= QString()*/) :
 QObject(NULL), mpAssetMap(NULL), mpPackageList(NULL), mType(type), mFilePath(rFilePath),
@@ -1175,6 +1284,17 @@ void Asset::FileModified() {
 		//assetMxfTrack->ExtractEssenceDescriptor(QString(this->GetPath().absoluteFilePath()));
 		assetMxfTrack->ExtractEssenceDescriptor(QString(this->GetPath().absoluteFilePath()));
 		qDebug() << "Essence Descriptor updated for " << this->GetPath().absoluteFilePath();
+	}
+	AssetScm *asset_scm = dynamic_cast<AssetScm*>(this);
+	if (asset_scm) {
+		// Per ST 2067-2, SCM Id in AM and PKL are RFC4122 Type 5 UUIDs using the entire asset as name.
+		// Thus, a new Id needs to be calculated if an SCM is modified or created.
+		QUuid new_type5_uuid;
+		UUIDVersion5::CalculateFromEntireFile(UUIDVersion5::s_asset_id_prefix, asset_scm->GetPath().absoluteFilePath(), new_type5_uuid);
+		am::AssetType new_am_data = asset_scm->GetAmData();
+		new_am_data.setId(ImfXmlHelper::Convert(new_type5_uuid));
+		asset_scm->SetAmData(new_am_data);
+		asset_scm->GetPklData()->setId(ImfXmlHelper::Convert(new_type5_uuid));
 	}
 	//WR end
 }
@@ -1548,5 +1668,82 @@ void AssetMxfTrack::SetEssenceDescriptor(const DOMDocument* dom_result) {
 	  //delete parser;
 	}
 }
+//! Import SCM.
+AssetScm::AssetScm(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl2016::AssetType &rPklAsset, const scm::SidecarCompositionMapType &rSidecarCompositionMap) :
+Asset(Asset::scm, rFilePath, rAmAsset, std::auto_ptr<pkl2016::AssetType>(new pkl2016::AssetType(rPklAsset))), mIsNew(false), mData(rSidecarCompositionMap) {
+
+		//mData.setProperties(scm::SidecarCompositionMapType_PropertiesType());
+		if(mData.getSigner().present() == true) qWarning() << "Signer is in Packing List not supported.";
+		if(mData.getSignature().present() == true) qWarning() << "Signature is in Packing List not supported.";
+}
+
+//! Create New SCM.
+AssetScm::AssetScm(const QFileInfo &rFilePath, const QUuid &rId, const UserText &rAnnotationText /*= QString()*/) :
+Asset(Asset::scm, rFilePath, rId, rAnnotationText), mIsNew(true),
+			mData(ImfXmlHelper::Convert(rId),
+			scm::SidecarCompositionMapType_PropertiesType(ImfXmlHelper::Convert(QDateTime::currentDateTimeUtc())),
+			scm::SidecarCompositionMapType_SidecarAssetListType()
+			) {
+		if(rAnnotationText.IsEmpty() == false) SetAnnotationText(rAnnotationText);
+
+}
+
+const scm::SidecarCompositionMapType& AssetScm::WriteScm() {
+
+	scm::SidecarCompositionMapType::IdType uuid = ImfXmlHelper::Convert(QUuid::createUuid());
+	scm::SidecarCompositionMapType::PropertiesType scm_props(ImfXmlHelper::Convert(QDateTime::currentDateTimeUtc()));
+	scm::SidecarCompositionMapType::SidecarAssetListType::SidecarAssetSequence  scm_asset_sequence;
+	scm::SidecarCompositionMapType_SidecarAssetListType scm_asset_list;
+	mData.getProperties().setAnnotation(ImfXmlHelper::Convert(this->GetAnnotationText()));
+	mData.getProperties().setIssuer(ImfXmlHelper::Convert(this->GetIssuer()));
+	for (int i = 0; i < this->GetSidecarCompositionMapEntries().length(); i++) {
+		scm::SidecarAssetType_AssociatedCPLListType cpl_list;
+		scm::SidecarAssetType_AssociatedCPLListType::CPLIdSequence cpl_sequence;
+		for (int j = 0; j < this->GetSidecarCompositionMapEntries()[i].mAssociatedCplAssets.length(); j++) {
+			QUuid cpl_id = GetSidecarCompositionMapEntries()[i].mAssociatedCplAssets[j].data()->GetId();
+			cpl_sequence.push_back(ImfXmlHelper::Convert(cpl_id));
+		}
+		for (int j = 0; j < this->GetSidecarCompositionMapEntries()[i].mCplIdsNotInCurrentImp.length(); j++) {
+			QUuid cpl_id = GetSidecarCompositionMapEntries()[i].mCplIdsNotInCurrentImp[j];
+			cpl_sequence.push_back(ImfXmlHelper::Convert(cpl_id));
+		}
+		cpl_list.setCPLId(cpl_sequence);
+		scm::SidecarAssetType  scm_asset(ImfXmlHelper::Convert(this->GetSidecarCompositionMapEntries()[i].id), cpl_list);
+		scm_asset_sequence.push_back(scm_asset);
+	}
+	scm_asset_list.setSidecarAsset(scm_asset_sequence);
+	mData.setSidecarAssetList(scm_asset_list);
+	// Update values before serialization.
+	mData.getProperties().setIssueDate(ImfXmlHelper::Convert(QDateTime::currentDateTimeUtc()));
+	// Remove Signature and Signer. We don't support this.
+	mData.setSignature(std::auto_ptr<ds::SignatureType>(NULL));
+	mData.setSigner(std::auto_ptr<ds::KeyInfoType>(NULL));
+	return mData;
+}
+
+bool AssetScm::AddSidecarCompositionMapEntry(const SidecarCompositionMapEntry &rSidecarCompositionMapEntry) {
+	bool return_value = true;
+	for ( int i=0; i < mSidecarCompositionMapEntries.count(); i++) {
+		if (mSidecarCompositionMapEntries.at(i).filepath == rSidecarCompositionMapEntry.filepath ) {
+			return_value = false;
+			break;
+		}
+	}
+	if (return_value) mSidecarCompositionMapEntries.append(rSidecarCompositionMapEntry);
+	return return_value;
+}
+
+
+AssetSidecar::AssetSidecar(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl2016::AssetType &rPklAsset) :
+Asset(Asset::sidecar, rFilePath, rAmAsset, std::auto_ptr<pkl2016::AssetType>(new pkl2016::AssetType(rPklAsset))) {
+
+}
+
+AssetSidecar::AssetSidecar(const QFileInfo &rFilePath, const QUuid &rId, const UserText &rAnnotationText /*= QString()*/) :
+Asset(Asset::sidecar, rFilePath, rId, rAnnotationText) {
+
+}
+
+
 
 //WR end

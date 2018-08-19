@@ -208,7 +208,7 @@ void MainWindow::InitMenuAndToolbar() {
 void MainWindow::rSaveCPLRequest() {
 
 	mpMsgBox->setText(tr("Overwrite CPL?"));
-	mpMsgBox->setInformativeText(tr("This action can not be undone!"));
+	mpMsgBox->setInformativeText(tr("It is recommended to save modified CPLs as New CPL, do you really want to overwrite the existing CPL ? \nThis action can not be undone and the Id of the CPL will not be updated!"));
 	mpMsgBox->setStandardButtons(QMessageBox::Save | QMessageBox::Cancel);
 	mpMsgBox->setDefaultButton(QMessageBox::Cancel);
 	mpMsgBox->setIcon(QMessageBox::Warning);
@@ -640,9 +640,14 @@ void MainWindow::ShowQcReport(const QString &rQcResult, const QVariant &rIdentif
 	QList<QWizard::WizardButton> layout;
 	qc_report_wizard->setOption(QWizard::HaveCustomButton1, true);
 	qc_report_wizard->setButtonText(QWizard::CustomButton1, tr("Copy to Clipboard"));
-	layout << QWizard::CustomButton1 << QWizard::Stretch << QWizard::CancelButton;
+	qc_report_wizard->setOption(QWizard::HaveCustomButton2, true);
+	qc_report_wizard->setButtonText(QWizard::CustomButton2, tr("Add report as sidecar asset"));
+	layout << QWizard::CustomButton1 << QWizard::Stretch << QWizard::CustomButton2 << QWizard::Stretch << QWizard::CancelButton;
 	qc_report_wizard->setButtonLayout(layout);
 	connect(qc_report_wizard->button(QWizard::CustomButton1), SIGNAL(clicked()), this, SLOT(CopyQcReport()));
+	connect(qc_report_wizard->button(QWizard::CustomButton1), SIGNAL(clicked()), qc_report_wizard, SLOT(close()));
+	connect(qc_report_wizard->button(QWizard::CustomButton2), SIGNAL(clicked()), this, SLOT(AddQcReportAsSidecar()));
+	connect(qc_report_wizard->button(QWizard::CustomButton2), SIGNAL(clicked()), qc_report_wizard, SLOT(close()));
 
 	qc_report_wizard->setAttribute(Qt::WA_DeleteOnClose, true);
 	qc_report_wizard->show();
@@ -655,7 +660,9 @@ void MainWindow::CopyQcReport() {
 	QClipboard *clipboard = QGuiApplication::clipboard();
 	clipboard->setText(mQcReport);
 }
-
+void MainWindow::AddQcReportAsSidecar() {
+	mpWidgetImpBrowser->AddQcReportAsSidecar(mQcReport);
+}
 void MainWindow::setStartupDirectory (const QString &rStartupDirectory, const bool rOpenAllCpls) {
 	mpRootDirection = rStartupDirectory;
 	rAutoInstallImp(rOpenAllCpls);
