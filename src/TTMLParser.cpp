@@ -32,6 +32,7 @@
 #include <xercesc/dom/DOMImplementationRegistry.hpp>
 #include <xercesc/dom/DOMLSSerializer.hpp>
 #include <xercesc/framework/MemBufInputSource.hpp>
+#include <xercesc/util/TransService.hpp>
 
 using namespace xercesc;
 //#define DEBUG_TTML
@@ -394,7 +395,26 @@ QString elem::serializeTT(DOMElement *rEl) {
 
 	DOMImplementation *implementation = DOMImplementationRegistry::getDOMImplementation(X("LS"));
 	DOMLSSerializer *serializer = ((DOMImplementationLS*)implementation)->createLSSerializer();
-	return QString(XMLString::transcode(serializer->writeToString(rEl)));
+	// On Windows, a transcoder is required to interpret unicode UTF-8
+	XMLTranscoder* utf8Transcoder;
+	XMLTransService::Codes failReason;
+	// Force UTF-8 transcoding (instead of transcoding to local code page)
+	utf8Transcoder = XMLPlatformUtils::fgTransService->makeNewTranscoderFor("UTF-8", failReason, 16 * 1024);
+
+	const XMLCh* xmlch = serializer->writeToString(rEl);
+	size_t len = XMLString::stringLen(xmlch);
+	XMLByte* utf8 = new XMLByte[(len * 4) + 1];  
+	XMLSize_t eaten;
+	unsigned int utf8Len = utf8Transcoder->transcodeTo(xmlch, len, utf8, len * 4,
+		eaten, XMLTranscoder::UnRep_Throw);
+
+	utf8[utf8Len] = '\0';
+	QString retval = QString::fromUtf8((const char*)utf8);
+
+	delete[] utf8; 
+	delete xmlch;
+	return retval;
+	//return QString::fromUtf8(XMLString::transcode(serializer->writeToString(rEl)));
 }
 
 

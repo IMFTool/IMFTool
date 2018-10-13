@@ -358,7 +358,7 @@ void WidgetImpBrowser::Save() {
 			mpJobQueue->FlushQueue();
 			for(int i = 0; i < mpImfPackage->GetAssetCount(); i++) {
 				QSharedPointer<AssetMxfTrack> mxf_asset = mpImfPackage->GetAsset(i).objectCast<AssetMxfTrack>();
-				if(mxf_asset && mxf_asset->Exists() == false) {
+				if((!mxf_asset.isNull()) && (!mxf_asset->GetIsOutsidePackage()) && mxf_asset->Exists() == false) {
 					if(mxf_asset->GetEssenceType() == Metadata::Pcm) {
 						JobWrapWav *p_wrap_job = new JobWrapWav(mxf_asset->GetSourceFiles(), mxf_asset->GetPath().absoluteFilePath(), mxf_asset->GetSoundfieldGroup(), mxf_asset->GetId(), mxf_asset->GetLanguageTag(), mxf_asset->GetMCATitle(), mxf_asset->GetMCATitleVersion(), mxf_asset->GetMCAAudioContentKind(), mxf_asset->GetMCAAudioElementKind());
 						connect(p_wrap_job, SIGNAL(Success()), mxf_asset.data(), SLOT(FileModified()));

@@ -36,7 +36,7 @@
 #include <QStatusBar>
 #include <QDir>
 
-#include <Qshortcut> //(k)
+#include <QShortcut> //(k)
 //WR
 #include <QProcess>
 #include "JobQueue.h"
@@ -276,7 +276,7 @@ void MainWindow::rCallPhoton() {
 			    QString minor = match.captured(2);
 			    if ((major.toInt() != 1) || (minor.toInt() < 8)) {
 			    	error_msg = "Java version mismatch, current version is " + match.captured(0);
-					mpMsgBox->setText(tr("IMF Tool requires Java SDK 1.8 or higher - Exported CPLs will not contain Essence Descriptors!"));
+					mpMsgBox->setText(tr("Photon requires Java SDK 1.8 or higher - Photon QC report cannot be created!"));
 					mpMsgBox->setIcon(QMessageBox::Warning);
 					mpMsgBox->setInformativeText(error_msg);
 					mpMsgBox->setStandardButtons(QMessageBox::Ok);
@@ -396,7 +396,7 @@ void MainWindow::rWorkspaceLauncherAccepted() {
 void MainWindow::rWorkspaceLauncherPartialImpAccepted() {
 
 	WizardPartialImpGenerator *p_partial_imp_generator = qobject_cast<WizardPartialImpGenerator *>(sender());
-	bool success;
+	bool success = false;
 	if (p_partial_imp_generator) {
 		QString partial_imp_dir = QString("%1/%2").arg(p_partial_imp_generator->field(FIELD_NAME_PARTIAL_DIR).toString()).arg(p_partial_imp_generator->field(FIELD_NAME_PARTIAL_NAME).toString());
 		QString partial_imp_issuer = QString("%1").arg(p_partial_imp_generator->field(FIELD_NAME_PARTIAL_ISSUER).toString());
@@ -411,6 +411,7 @@ void MainWindow::rWorkspaceLauncherPartialImpAccepted() {
 			mpMsgBox->setStandardButtons(QMessageBox::Ok);
 			mpMsgBox->setDefaultButton(QMessageBox::Ok);
 			mpMsgBox->exec();
+			return;
 		}
 		//check writing permissions
 		if (success == true) {
@@ -473,11 +474,6 @@ void MainWindow::rFocusChanged(QWidget *pOld, QWidget *pNow) {
 	else mpUndoGroup->setActiveStack(NULL);
 }
 
-	CenterWidget(p_settings_widget, true);
-	connect(p_settings_widget, SIGNAL(SettingsSaved()), this, SIGNAL(SettingsSaved()));
-	p_settings_widget->show();
-}
-#endif
 
 void MainWindow::CenterWidget(QWidget *pWidget, bool useSizeHint) {
 

@@ -105,6 +105,7 @@ void WidgetTimedTextPreview::InitLayout() {
 	// create fonts
 	font_small = QFont("Times", 9);
 	font_medium = QFont("Times", 15);
+	font_html = QFont("Times", 18);
 
 	setLayout(p_layout);
 }
@@ -206,7 +207,7 @@ void WidgetTimedTextPreview::rShowTTML(const QVector<visibleTTtrack> &rttmls, in
 		ttml_text->setHtml(QString(text).remove(QRegExp("<[^>]*>")));
 		break;
 	case 2: // HTML
-		ttml_text->setFont(font_small);
+		ttml_text->setFont(font_html);
 		ttml_text->setHtml(text);
 		break;
 	}
@@ -276,7 +277,7 @@ void WidgetTimedTextPreview::showSelection(int track, int col, int item) {
 		break;
 	case 8: // HTML
 		render_style = 2;
-		ttml_text->setFont(font_small);
+		ttml_text->setFont(font_html);
 		ttml_text->setHtml(ttmls->at(track).elements.at(item).text);
 		break;
 	}

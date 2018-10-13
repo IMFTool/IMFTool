@@ -22,12 +22,12 @@
 #include <QLabel>
 #include <QComboBox>
 #include <QListWidget>
-#include <QGridlayout>
+#include <QGridLayout>
 #include <QPushButton>
 #include <QButtonGroup>
 #include <QSplitter>
 #include <QStandardItemModel>
-#include <QTableview>
+#include <QTableView>
 #include <QHeaderView>
 #include "ImfCommon.h"
 
@@ -53,6 +53,7 @@ private:
 	const QVector<visibleTTtrack> *ttmls;
 	QFont font_small;
 	QFont font_medium;
+	QFont font_html;
 	int render_style = 2; // 0 : TEXT, 1 : pTEXT, 2 : HTML
 	void createButton(int, int, int, int, bool);
 	QVector<QPushButton*> highlighted_btns;

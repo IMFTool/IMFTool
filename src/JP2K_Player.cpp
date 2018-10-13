@@ -19,7 +19,7 @@
 #include <QRunnable>
 #include <QTime>
 #include "AS_DCP_internal.h"
-#include <QThreadpool>  
+#include <QThreadPool>
 //#define DEBUG_MSGS
 
 JP2K_Player::JP2K_Player() {

@@ -20,7 +20,7 @@
 #include <QTime>
 #include "openjpeg.h"
 #include "AS_DCP_internal.h"
-#include <QThreadpool>  
+#include <QThreadPool>
 
 //#define DEBUG_JP2K
 

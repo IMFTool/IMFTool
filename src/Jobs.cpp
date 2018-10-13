@@ -69,8 +69,10 @@ Error JobCalculateHash::Execute() {
 		}
 		bytes_read += count;
 		progress = bytes_read * 100 / file_size;
-		if(progress != last_progress) emit Progress(progress);
-		last_progress = progress;
+		if (progress >= last_progress + 10) {
+			emit Progress(progress);
+			last_progress = progress;
+		}
 		hasher.addData(buffer, count);
 	} while(!file.atEnd());
 
@@ -224,7 +226,7 @@ Error JobWrapTimedText::Execute() {
 	QString dirCopyPath = QDir::currentPath();
 	QDir::setCurrent(file_info.absolutePath());
 
-	Result_t result = Parser.OpenRead(file_info.absoluteFilePath().toStdString(), mProfile.toStdString());
+	Result_t result = Parser.OpenRead(file_info.absoluteFilePath().toStdString());
 	result = Parser.FillTimedTextDescriptor(TDesc);
 
 	TDesc.EditRate = ASDCP::Rational(mEditRate.GetNumerator(), mEditRate.GetDenominator());
