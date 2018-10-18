@@ -39,6 +39,9 @@ public:
 private:
 
 	Q_DISABLE_COPY(MetadataExtractor);
+#ifdef APP5_ACES
+	Error ReadAcesMxfDescriptor(Metadata &rMetadata, const QFileInfo &rSourceFile);
+#endif
 	Error ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileInfo &rSourceFile);
 	Error ReadPcmMxfDescriptor(Metadata &rMetadata, const QFileInfo &rSourceFile);
 	Error ReadWavHeader(Metadata &rMetadata, const QFileInfo &rSourceFile);

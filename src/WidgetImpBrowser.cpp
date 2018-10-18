@@ -1033,6 +1033,7 @@ void WidgetImpBrowser::SetMxfFile(const QStringList &rFiles) {
 						break;
 				#endif
 					case ASDCP::ESS_AS02_JPEG_2000:
+					case ASDCP::ESS_AS02_ACES:
 					case ASDCP::ESS_AS02_PCM_24b_48k:
 					case ASDCP::ESS_AS02_PCM_24b_96k:
 						break;

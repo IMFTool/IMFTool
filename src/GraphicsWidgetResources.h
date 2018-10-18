@@ -19,6 +19,9 @@
 #include "ImfPackage.h"
 #include "GraphicsViewScaleable.h"
 #include "JP2K_Preview.h" // (k)
+#ifdef APP5_ACES
+#include "ACES_Preview.h" // (WR)
+#endif
 
 class GraphicsWidgetSequence;
 
@@ -258,11 +261,16 @@ private:
 	void RefreshSecondProxy();
 
 	JP2K_Preview *mpJP2K; // (k) JP2K decoder
-	QThread *decodeProxyThread;
+#ifdef APP5_ACES
+	ACES_Preview *mpACES; // (WR) ACES decoder
+#endif
+	QThread *decodeProxyThread = 0;
 	QImage mLeftProxyImage;
 	QImage mRightProxyImage;
 	bool mTrimActive;
 	bool proxysVisible = false; // default
+	//WR
+	eImfApplications mImfApplication = ::App2e;
 };
 
 

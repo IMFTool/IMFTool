@@ -24,6 +24,7 @@
 #include <QTime>
 #include <QCheckBox>
 #include "JP2K_Preview.h"
+#include "ACES_Preview.h"
 #include "ImfPackage.h"
 #include <QThread>
 #include <QLineEdit>
@@ -45,6 +46,21 @@ WidgetVideoPreview::WidgetVideoPreview(QWidget *pParent) : QWidget(pParent) {
 	}
 	// ####################################################################
 
+#ifdef APP5_ACES
+	// ############## - create 2 single frame extractors - ###################
+	for (int i = 0; i <= 1; i++) {
+		mpACESDecoders[i] = new ACES_Preview();
+		mpACESDecodingThreads[i] = new QThread();
+		mpACESDecoders[i]->moveToThread(mpACESDecodingThreads[i]);
+
+		connect(mpACESDecodingThreads[i], SIGNAL(started()), mpACESDecoders[i], SLOT(decode()));
+		connect(mpACESDecoders[i], SIGNAL(finished()), mpACESDecodingThreads[i], SLOT(quit())); // quit thread after work is completed
+		connect(mpACESDecoders[i], SIGNAL(decodingStatus(qint64, QString)), this, SLOT(decodingStatus(qint64,QString))); // decoder -> this
+		mACESRunning[i] = false; // default
+	}
+	// ####################################################################
+#endif
+
 	// create player
 	player = new JP2K_Player();
 	player->setFps(decode_speed); // set default speed
@@ -63,11 +79,32 @@ WidgetVideoPreview::WidgetVideoPreview(QWidget *pParent) : QWidget(pParent) {
 	mpMsgBox->setIcon(QMessageBox::Warning);
 	connect(player, SIGNAL(ShowMsgBox(const QString&, int)), this, SLOT(rShowMsgBox(const QString&, int)));
 
+#ifdef APP5_ACES
+	// create player
+	mpACESPlayer = new ACES_Player();
+	mpACESPlayer->setFps(decode_speed); // set default speed
+
+	mpACESPlayerThread = new QThread();
+	mpACESPlayer->moveToThread(mpACESPlayerThread);
+	mpACESPlayer->setLayer(decode_layer); // set default layer
+
+	connect(mpACESPlayerThread, SIGNAL(started()), mpACESPlayer, SLOT(startPlay()));
+	connect(mpACESPlayer, SIGNAL(currentPlayerPosition(qint64, bool)), this, SLOT(forwardPlayerPosition(qint64, bool)));
+	connect(mpACESPlayer, SIGNAL(playTTML()), this, SLOT(getTTML()));
+	connect(mpACESPlayer, SIGNAL(playbackEnded()), this, SLOT(rPlaybackEnded())); // player -> this
+
+	connect(mpACESPlayer, SIGNAL(ShowMsgBox(const QString&, int)), this, SLOT(rShowMsgBox(const QString&, int)));
+
+#endif
+
 	InitLayout();
 }
 
 WidgetVideoPreview::~WidgetVideoPreview(){
 	player->~JP2K_Player();
+#ifdef APP5_ACES
+	mpACESPlayer->~ACES_Player();
+#endif
 }
 
 
@@ -88,6 +125,11 @@ void WidgetVideoPreview::InitLayout() {
 	connect(decoders[0], SIGNAL(ShowFrame(const QImage&)), mpImagePreview, SLOT(ShowImage(const QImage&))); // decoder -> glWidget
 	connect(decoders[1], SIGNAL(ShowFrame(const QImage&)), mpImagePreview, SLOT(ShowImage(const QImage&))); // decoder -> glWidget
 	connect(mpImagePreview, SIGNAL(keyPressed(QKeyEvent*)), this, SLOT(keyPressEvent(QKeyEvent*)));
+#ifdef APP5_ACES
+	connect(mpACESPlayer, SIGNAL(showFrame(const QImage&)), mpImagePreview, SLOT(ShowImage(const QImage&))); // player -> glWidget
+	connect(mpACESDecoders[0], SIGNAL(ShowFrame(const QImage&)), mpImagePreview, SLOT(ShowImage(const QImage&))); // decoder -> glWidget
+	connect(mpACESDecoders[1], SIGNAL(ShowFrame(const QImage&)), mpImagePreview, SLOT(ShowImage(const QImage&))); // decoder -> glWidget
+#endif
 
 	// create menue bar
 	menuBar = new QMenuBar(this);
@@ -210,7 +252,9 @@ void WidgetVideoPreview::InitLayout() {
 	decoding_time->setText("");
 	decoding_time->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	connect(player, SIGNAL(playerInfo(const QString&)), decoding_time, SLOT(setText(const QString&)));
-
+#ifdef APP5_ACES
+	connect(mpACESPlayer, SIGNAL(playerInfo(const QString&)), decoding_time, SLOT(setText(const QString&)));
+#endif
 	// full screen
 	menuView = new QMenu(tr("View"));
 	menuBar->addMenu(menuView);
@@ -235,16 +279,36 @@ void WidgetVideoPreview::forwardPlayerPosition(qint64 frameNr, bool decode_at_ne
 // stop playback
 void WidgetVideoPreview::stopPlayback(bool clicked) {
 
-	player->clean(); // reset player
+	if (mImfApplication != ::App5)
+		player->clean(); // reset player
+#ifdef APP5_ACES
+	else
+		mpACESPlayer->clean();
+#endif
 	if (currentPlaylist.length() > 0) player->setPos(currentPlaylist[0].in, 0, 0);
 
-	if (playerThread->isRunning()) playerThread->quit();
+	if (mImfApplication != ::App5) {
+		if (playerThread->isRunning()) playerThread->quit();
+	}
+#ifdef APP5_ACES
+	else {
+		if (mpACESPlayerThread->isRunning()) mpACESPlayerThread->quit();
+	}
+#endif
 
 	mpPlayPauseButton->setIcon(QIcon(":/play.png"));
 	
 	// reset preview decoder
-	if (decodingThreads[0]->isRunning()) decodingThreads[0]->quit();
-	if (decodingThreads[1]->isRunning()) decodingThreads[1]->quit();
+	if (mImfApplication != ::App5) {
+		if (decodingThreads[0]->isRunning()) decodingThreads[0]->quit();
+		if (decodingThreads[1]->isRunning()) decodingThreads[1]->quit();
+	}
+#ifdef APP5_ACES
+	else {
+		if (mpACESDecodingThreads[0]->isRunning()) mpACESDecodingThreads[0]->quit();
+		if (mpACESDecodingThreads[1]->isRunning()) mpACESDecodingThreads[1]->quit();
+	}
+#endif
 
 	if(currentPlaylist.length() > 0) decodingFrame = -1; // force preview refresh
 	setFrameIndicator = false;
@@ -280,15 +344,30 @@ void WidgetVideoPreview::rShowMsgBox(const QString &msg, int new_fps) {
 		speeds[decode_speed]->setChecked(false); // uncheck old value
 		decode_speed = new_fps;
 		speeds[new_fps]->setChecked(true); // check new value
-		player->setFps(new_fps); // set new framreate in player
-		playerThread->start(QThread::TimeCriticalPriority); // resume playback
+		if (mImfApplication != ::App5) {
+			player->setFps(new_fps); // set new framreate in player
+			playerThread->start(QThread::TimeCriticalPriority); // resume playback
+		}
+#ifdef APP5_ACES
+		else {
+			mpACESPlayer->setFps(new_fps); // set new framreate in player
+			mpACESPlayerThread->start(QThread::TimeCriticalPriority); // resume playback
+		}
+#endif
 		mpPlayPauseButton->setIcon(QIcon(":/pause.png"));
 	}
 }
 
 void WidgetVideoPreview::rPlaybackEnded() {
 	mpPlayPauseButton->setIcon(QIcon(":/play.png"));
-	if(playerThread->isRunning()) playerThread->quit();
+	if (mImfApplication != ::App5) {
+		if(playerThread->isRunning()) playerThread->quit();
+	}
+#ifdef APP5_ACES
+	else {
+		if(mpACESPlayerThread->isRunning()) mpACESPlayerThread->quit();
+	}
+#endif
 }
 
 void WidgetVideoPreview::xPosChanged(const QSharedPointer<AssetMxfTrack> &rAsset, const qint64 &rOffset, const Timecode &rTimecode, const int &playlist_index){
@@ -309,6 +388,13 @@ void WidgetVideoPreview::xPosChanged(const QSharedPointer<AssetMxfTrack> &rAsset
 		playerThread->quit();
 		mpPlayPauseButton->setIcon(QIcon(":/play.png"));
 	}
+#ifdef APP5_ACES
+	else if (mpACESPlayer->playing) { // pause playback!
+		mpACESPlayer->playing = false;
+		mpACESPlayerThread->quit();
+		mpPlayPauseButton->setIcon(QIcon(":/play.png"));
+	}
+#endif
 
 #ifdef DEBUG_JP2K
 	qDebug() << "xpos asset:" << xSliderFrame << "total:" << xSliderTotal << "current_playlist_index:" << current_playlist_index;
@@ -318,37 +404,76 @@ void WidgetVideoPreview::xPosChanged(const QSharedPointer<AssetMxfTrack> &rAsset
 
 	if (decodingFrame != xSliderTotal) {
 
-		player->setPos(xSliderFrame, xSliderTotal, playlist_index); // set current frame in player
-		// Terminate running decodes
-		if (decodingThreads[run]->isRunning()) decodingThreads[run]->quit();
-		run = (int)now_running;
+		if (mImfApplication != ::App5) {
+			player->setPos(xSliderFrame, xSliderTotal, playlist_index); // set current frame in player
+			// Terminate running decodes
+			if (decodingThreads[run]->isRunning()) decodingThreads[run]->quit();
+			run = (int)now_running;
 #ifdef DEBUG_JP2K
-		qDebug() << run << running[0] << running[1] << decodingThreads[0]->isRunning() << decodingThreads[1]->isRunning();
+			qDebug() << run << running[0] << running[1] << decodingThreads[0]->isRunning() << decodingThreads[1]->isRunning();
 #endif
 
-		if (running[run] == false && !decodingThreads[run]->isRunning()) {
-			running[run] = true;
+			if (running[run] == false && !decodingThreads[run]->isRunning()) {
+				running[run] = true;
 
-			//emit setVerticalIndicator(const Timecode &rCplTimecode);
+				//emit setVerticalIndicator(const Timecode &rCplTimecode);
 #ifdef DEBUG_JP2K
-			qDebug() << "start generating preview nr:" << xSliderFrame << currentAsset.isNull();
+				qDebug() << "start generating preview nr:" << xSliderFrame << currentAsset.isNull();
 #endif
-			decodingFrame = xSliderTotal;
+				decodingFrame = xSliderTotal;
 
-			decoders[run]->asset = currentAsset; // set new asset in current decoder
-			//decoders[run]->frameNr = xSliderFrame; // set current frame number in decoder
-			if (currentPlaylist.length() == 0) {//Under some race conditions during Outgest currentPlaylist can be empty here.
+				decoders[run]->asset = currentAsset; // set new asset in current decoder
+				//decoders[run]->frameNr = xSliderFrame; // set current frame number in decoder
+				if (currentPlaylist.length() == 0) {//Under some race conditions during Outgest currentPlaylist can be empty here.
 #ifdef DEBUG_JP2K
-				qDebug() << "WidgetVideoPreview::xPosChanged called with empty currentPlaylist";
+					qDebug() << "WidgetVideoPreview::xPosChanged called with empty currentPlaylist";
 #endif
-				running[run] = false;
-			} else {
-				VideoResource vr = currentPlaylist[current_playlist_index];
-				decoders[run]->mFrameNr = vr.in + (xSliderFrame - vr.in) % vr.Duration; // set current frame number in decoder
-				decodingThreads[run]->start(QThread::HighestPriority); // start decoder
-				decoding_time->setText("loading...");
+					running[run] = false;
+				} else {
+					VideoResource vr = currentPlaylist[current_playlist_index];
+					decoders[run]->mFrameNr = vr.in + (xSliderFrame - vr.in) % vr.Duration; // set current frame number in decoder
+					decodingThreads[run]->start(QThread::HighestPriority); // start decoder
+					decoding_time->setText("loading...");
+				}
 			}
 		}
+#ifdef APP5_ACES
+		else {
+			mpACESPlayer->setPos(xSliderFrame, xSliderTotal, playlist_index); // set current frame in player
+			// Terminate running decodes
+			if (mpACESDecodingThreads[0]->isRunning()) mpACESDecodingThreads[0]->quit();
+			if (mpACESDecodingThreads[1]->isRunning()) mpACESDecodingThreads[1]->quit();
+			run = (int)now_running;
+#ifdef DEBUG_JP2K
+			qDebug() << run << running[0] << running[1] << decodingThreads[0]->isRunning() << decodingThreads[1]->isRunning();
+#endif
+
+			if (running[run] == false && !mpACESDecodingThreads[run]->isRunning()) {
+				running[run] = true;
+
+				//emit setVerticalIndicator(const Timecode &rCplTimecode);
+#ifdef DEBUG_JP2K
+				qDebug() << "start generating preview nr:" << xSliderFrame << currentAsset.isNull();
+#endif
+				decodingFrame = xSliderTotal;
+
+				mpACESDecoders[run]->asset = currentAsset; // set new asset in current decoder
+				//decoders[run]->frameNr = xSliderFrame; // set current frame number in decoder
+				if (currentPlaylist.length() == 0) {//Under some race conditions during Outgest currentPlaylist can be empty here.
+#ifdef DEBUG_JP2K
+					qDebug() << "WidgetVideoPreview::xPosChanged called with empty currentPlaylist";
+#endif
+					running[run] = false;
+				} else {
+					VideoResource vr = currentPlaylist[current_playlist_index];
+					mpACESDecoders[run]->mFrameNr = vr.in + (xSliderFrame - vr.in) % vr.Duration; // set current frame number in decoder
+					mpACESDecodingThreads[run]->start(QThread::HighestPriority); // start decoder
+					decoding_time->setText("loading...");
+				}
+			}
+
+		}
+#endif
 	}
 }
 
@@ -370,13 +495,27 @@ void WidgetVideoPreview::decodingStatus(qint64 frameNr,QString status) {
 		qDebug() << "now start decoding nr" << xSliderFrame;
 #endif
 		//TODO
-		decoders[run]->asset = currentAsset; // set new asset in current decoder
-		//decoders[run]->frameNr = xSliderFrame; // set frame number in decoder
-		VideoResource vr = currentPlaylist[current_playlist_index];
-		decoders[run]->mFrameNr = vr.in + (xSliderFrame - vr.in) % vr.Duration; // set current frame number in decoder
-		player->setPos(xSliderFrame, xSliderTotal, current_playlist_index); // set current frame in player
+		if (mImfApplication != ::App5) {
+			decoders[run]->asset = currentAsset; // set new asset in current decoder
+			//decoders[run]->frameNr = xSliderFrame; // set frame number in decoder
+			VideoResource vr = currentPlaylist[current_playlist_index];
+			decoders[run]->mFrameNr = vr.in + (xSliderFrame - vr.in) % vr.Duration; // set current frame number in decoder
+			player->setPos(xSliderFrame, xSliderTotal, current_playlist_index); // set current frame in player
 
-		decodingThreads[run]->start(QThread::HighestPriority); // start decoder
+			decodingThreads[run]->start(QThread::HighestPriority); // start decoder
+		}
+#ifdef APP5_ACES
+		else {
+			mpACESDecoders[run]->asset = currentAsset; // set new asset in current decoder
+			//decoders[run]->frameNr = xSliderFrame; // set frame number in decoder
+			VideoResource vr = currentPlaylist[current_playlist_index];
+			mpACESDecoders[run]->mFrameNr = vr.in + (xSliderFrame - vr.in) % vr.Duration; // set current frame number in decoder
+			mpACESPlayer->setPos(xSliderFrame, xSliderTotal, current_playlist_index); // set current frame in player
+
+			mpACESDecodingThreads[run]->start(QThread::HighestPriority); // start decoder
+
+		}
+#endif
 		decoding_time->setText("loading...");
 
 		// TTML
@@ -389,33 +528,67 @@ void WidgetVideoPreview::rPlayPauseButtonClicked(bool checked) {
 	
 	mpImagePreview->ttml_regions.clear();
 
-	if (playerThread->isRunning() && player->playing) { // pause playback
+	if (mImfApplication != ::App5) {
+		if (playerThread->isRunning() && player->playing) { // pause playback
 
-		player->playing = false;
-		playerThread->quit();
-		mpPlayPauseButton->setIcon(QIcon(":/play.png"));
+			player->playing = false;
+			playerThread->quit();
+			mpPlayPauseButton->setIcon(QIcon(":/play.png"));
 
-		// set current position in timeline
-		if(player->realspeed)
+			// set current position in timeline
+			if(player->realspeed)
+			{
+				currentPlayerPosition((int)(player->frame_playing_total_float - player->skip_frames));
+			}
+			else {
+				currentPlayerPosition((int)(player->frame_playing_total_float - 1));
+			}
+		}
+		else if (player->playing) { // player is paused
+			playerThread->start(QThread::TimeCriticalPriority); // resume playback
+			mpPlayPauseButton->setIcon(QIcon(":/pause.png"));
+		}
+		else if(currentPlaylist.length() > 0){ // start player
+			mpPlayPauseButton->setIcon(QIcon(":/pause.png"));
+			playerThread->start(QThread::TimeCriticalPriority);
+			emit ttmlChanged(QVector<visibleTTtrack>(), ttml_search_time.elapsed()); // clear subtitle preview
+		}else
 		{
-			currentPlayerPosition((int)(player->frame_playing_total_float - player->skip_frames));
-		}
-		else {
-			currentPlayerPosition((int)(player->frame_playing_total_float - 1));
+			decoding_time->setText("Player could not be started - please open a CPL with a video track first!");
 		}
 	}
-	else if (player->playing) { // player is paused
-		playerThread->start(QThread::TimeCriticalPriority); // resume playback
-		mpPlayPauseButton->setIcon(QIcon(":/pause.png"));
+#ifdef APP5_ACES
+	else {
+		if (mpACESPlayerThread->isRunning() && mpACESPlayer->playing) { // pause playback
+
+			mpACESPlayer->playing = false;
+			mpACESPlayerThread->quit();
+			mpPlayPauseButton->setIcon(QIcon(":/play.png"));
+
+			// set current position in timeline
+			if(mpACESPlayer->realspeed)
+			{
+				currentPlayerPosition((int)(mpACESPlayer->frame_playing_total_float - player->skip_frames));
+			}
+			else {
+				currentPlayerPosition((int)(mpACESPlayer->frame_playing_total_float - 1));
+			}
+		}
+		else if (mpACESPlayer->playing) { // player is paused
+			mpACESPlayerThread->start(QThread::TimeCriticalPriority); // resume playback
+			mpPlayPauseButton->setIcon(QIcon(":/pause.png"));
+		}
+		else if(currentPlaylist.length() > 0){ // start player
+			mpPlayPauseButton->setIcon(QIcon(":/pause.png"));
+			mpACESPlayerThread->start(QThread::TimeCriticalPriority);
+			emit ttmlChanged(QVector<visibleTTtrack>(), ttml_search_time.elapsed()); // clear subtitle preview
+		}else
+		{
+			decoding_time->setText("Player could not be started - please open a CPL with a video track first!");
+		}
+
 	}
-	else if(currentPlaylist.length() > 0){ // start player
-		mpPlayPauseButton->setIcon(QIcon(":/pause.png"));
-		playerThread->start(QThread::TimeCriticalPriority);
-		emit ttmlChanged(QVector<visibleTTtrack>(), ttml_search_time.elapsed()); // clear subtitle preview
-	}else
-	{
-		decoding_time->setText("Player could not be started - please open a CPL with a video track first!");
-	}
+#endif
 }
 
 void WidgetVideoPreview::keyPressEvent(QKeyEvent *pEvent) {
@@ -451,7 +624,12 @@ void WidgetVideoPreview::setPlaylist(QVector<VideoResource> &rPlayList, QVector<
 
 	ttmls = &rTTMLs; // set timed text elements
 	currentPlaylist = rPlayList; // set playlist
-	player->setPlaylist(rPlayList); // set playlist in player
+	if (mImfApplication != ::App5)
+		player->setPlaylist(rPlayList); // set playlist in player
+#ifdef APP5_ACES
+	else
+		mpACESPlayer->setPlaylist(rPlayList); // set playlist in player
+#endif
 	menuQuality->clear(); // clear prev. resolutions from menu
 	current_playlist_index = 0; // set to first item in playlist 
 
@@ -503,16 +681,31 @@ void WidgetVideoPreview::setPlaylist(QVector<VideoResource> &rPlayList, QVector<
 		decoding_time->setText("loading...");
 		currentAsset = rPlayList[0].asset;
 		now_running = !now_running; // use same decoder (relevant frame is still set)
-		decoders[0]->asset = currentAsset; // set new asset in decoder 1
-		decoders[1]->asset = currentAsset; // set new asset in decoder 2
-		decoders[(int)(now_running)]->mFrameNr = rPlayList[0].in; // set first frame
-		decodingThreads[(int)(now_running)]->start(QThread::HighestPriority); // start decoder (again)
+		if (mImfApplication != ::App5) {
+			decoders[0]->asset = currentAsset; // set new asset in decoder 1
+			decoders[1]->asset = currentAsset; // set new asset in decoder 2
+			decoders[(int)(now_running)]->mFrameNr = rPlayList[0].in; // set first frame
+			decodingThreads[(int)(now_running)]->start(QThread::HighestPriority); // start decoder (again)
+		}
+#ifdef APP5_ACES
+		else {
+			mpACESDecoders[0]->asset = currentAsset; // set new asset in decoder 1
+			mpACESDecoders[1]->asset = currentAsset; // set new asset in decoder 2
+			mpACESDecoders[(int)(now_running)]->mFrameNr = rPlayList[0].in; // set first frame
+			mpACESDecodingThreads[(int)(now_running)]->start(QThread::HighestPriority); // start decoder (again)
+		}
+#endif
 
 		if (showTTML) getTTML(); // look for TTML
 #ifdef DEBUG_JP2K
 		qDebug() << "setPos(rPlayList.at(0).in, xSliderTotal, current_playlist_index)" << rPlayList.at(0).in <<  xSliderTotal;
 #endif
-		player->setPos(rPlayList.at(0).in, xSliderTotal, current_playlist_index); // set current frame in player
+		if (mImfApplication != ::App5)
+			player->setPos(rPlayList.at(0).in, xSliderTotal, current_playlist_index); // set current frame in player
+#ifdef APP5_ACES
+		else
+			mpACESPlayer->setPos(rPlayList.at(0).in, xSliderTotal, current_playlist_index); // set current frame in player
+#endif
 	}
 	else {
 		xSliderFrame = 0;
@@ -534,15 +727,31 @@ void WidgetVideoPreview::rChangeSpeed(QAction *action) {
 		decode_speed = action->data().value<int>();
 		decode_speed_index = decode_speed;
 	
-		bool was_playing = player->playing;
-		if (playerThread->isRunning()) playerThread->quit();
-		player->setFps(decode_speed);
-		player->clean();
+		if (mImfApplication != ::App5) {
+			bool was_playing = player->playing;
+			if (playerThread->isRunning()) playerThread->quit();
+			player->setFps(decode_speed);
+			player->clean();
 
-		if (was_playing) {
-			player->playing = true;
-			playerThread->start(QThread::TimeCriticalPriority); // resume playback
+			if (was_playing) {
+				player->playing = true;
+				playerThread->start(QThread::TimeCriticalPriority); // resume playback
+			}
 		}
+#ifdef APP5_ACES
+		else {
+			bool was_playing = mpACESPlayer->playing;
+			if (mpACESPlayerThread->isRunning()) mpACESPlayerThread->quit();
+			mpACESPlayer->setFps(decode_speed);
+			mpACESPlayer->clean();
+
+			if (was_playing) {
+				mpACESPlayer->playing = true;
+				mpACESPlayerThread->start(QThread::TimeCriticalPriority); // resume playback
+			}
+
+		}
+#endif
 	}
 	else {
 		if (decode_speed > 30) decode_speed_index = (decode_speed - 30) / 5;
@@ -556,16 +765,21 @@ void WidgetVideoPreview::rChangeQuality(QAction *action) {
 		qualities[decode_layer]->setChecked(false); // uncheck 'old' layer
 
 		decode_layer = action->data().value<int>();
-		player->setLayer(decode_layer);
-		decoders[0]->setLayer(decode_layer);
-		decoders[1]->setLayer(decode_layer);
+		if (mImfApplication != ::App5) {
+			player->setLayer(decode_layer);
+			decoders[0]->setLayer(decode_layer);
+			decoders[1]->setLayer(decode_layer);
 
-		// reload the same frame again (if player is not playing)
-		if (!player->playing) {
-			now_running = !now_running; // use same decoder (relevant frame is still set)
-			decodingThreads[(int)now_running]->start(QThread::HighestPriority); // start decoder (again)
-			decoding_time->setText("loading...");
+			// reload the same frame again (if player is not playing)
+			if (!player->playing) {
+				now_running = !now_running; // use same decoder (relevant frame is still set)
+				decodingThreads[(int)now_running]->start(QThread::HighestPriority); // start decoder (again)
+				decoding_time->setText("loading...");
+			}
 		}
+#ifdef APP5_ACES
+		// No layers in App 5
+#endif
 	}
 	else {
 		qualities[decode_layer]->setChecked(true); // check again!
@@ -575,7 +789,13 @@ void WidgetVideoPreview::rChangeQuality(QAction *action) {
 void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 	
 	int nr = action->data().value<int>();
-	bool player_playing = player->playing;
+	bool player_playing;
+	if (mImfApplication != ::App5)
+		player_playing = player->playing;
+#ifdef APP5_ACES
+	else
+		player_playing = mpACESPlayer->playing;
+#endif
 
 	switch (nr) {
 	case 0: // smoothing
@@ -599,34 +819,74 @@ void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 		}
 		break;
 	case 2:
-		player->show_subtitles = action->isChecked();
-		if (!player->show_subtitles) {
-			emit ttmlChanged(QVector<visibleTTtrack>(), ttml_search_time.elapsed()); // clear subtitle preview
+		if (mImfApplication != ::App5) {
+			player->show_subtitles = action->isChecked();
+			if (!player->show_subtitles) {
+				emit ttmlChanged(QVector<visibleTTtrack>(), ttml_search_time.elapsed()); // clear subtitle preview
+			}
 		}
+#ifdef APP5_ACES
+		else {
+			mpACESPlayer->show_subtitles = action->isChecked();
+			if (!mpACESPlayer->show_subtitles) {
+				emit ttmlChanged(QVector<visibleTTtrack>(), ttml_search_time.elapsed()); // clear subtitle preview
+			}
+		}
+#endif
 		break;
 	case 3: // real speed
 
-		if(playerThread->isRunning()) playerThread->quit();
-		player->realspeed = action->isChecked();
-		player->clean();
+		if (mImfApplication != ::App5) {
+			if(playerThread->isRunning()) playerThread->quit();
+			player->realspeed = action->isChecked();
+			player->clean();
 
-		if (player_playing) {
-			player->playing = true;
-			playerThread->start(QThread::TimeCriticalPriority); // resume playback
+			if (player_playing) {
+				player->playing = true;
+				playerThread->start(QThread::TimeCriticalPriority); // resume playback
+			}
 		}
+#ifdef APP5_ACES
+		else {
+			if(mpACESPlayerThread->isRunning()) mpACESPlayerThread->quit();
+			mpACESPlayer->realspeed = action->isChecked();
+			mpACESPlayer->clean();
 
+			if (player_playing) {
+				mpACESPlayer->playing = true;
+				mpACESPlayerThread->start(QThread::TimeCriticalPriority); // resume playback
+			}
+		}
+#endif
 		break;
 	case 4: // color space conversion
-		decoders[0]->convert_to_709 = action->isChecked(); // set in decoder 0
-		decoders[1]->convert_to_709 = action->isChecked(); // set in decoder 1
-		player->convert_to_709(action->isChecked()); // set in player
+		if (mImfApplication != ::App5) {
+			decoders[0]->convert_to_709 = action->isChecked(); // set in decoder 0
+			decoders[1]->convert_to_709 = action->isChecked(); // set in decoder 1
+			player->convert_to_709(action->isChecked()); // set in player
 
-		if (!player_playing) {
-			// reload current preview
-			decoding_time->setText("loading...");
-			now_running = !now_running; // use same decoder (relevant frame is still set)
-			decodingThreads[(int)(now_running)]->start(QThread::HighestPriority); // start decoder (again)
+			if (!player_playing) {
+				// reload current preview
+				decoding_time->setText("loading...");
+				now_running = !now_running; // use same decoder (relevant frame is still set)
+				decodingThreads[(int)(now_running)]->start(QThread::HighestPriority); // start decoder (again)
+			}
 		}
+#ifdef APP5_ACES
+		else {
+			mpACESDecoders[0]->convert_to_709 = action->isChecked(); // set in decoder 0
+			mpACESDecoders[1]->convert_to_709 = action->isChecked(); // set in decoder 1
+			mpACESPlayer->convert_to_709(action->isChecked()); // set in player
+
+			if (!player_playing) {
+				// reload current preview
+				decoding_time->setText("loading...");
+				now_running = !now_running; // use same decoder (relevant frame is still set)
+				mpACESDecodingThreads[(int)(now_running)]->start(QThread::HighestPriority); // start decoder (again)
+			}
+
+		}
+#endif
 
 		break;
 	case 5: // save image
@@ -811,3 +1071,13 @@ void WidgetVideoPreview::rPrevNextSubClicked(bool direction) {
 #endif
 	}
 }
+
+void WidgetVideoPreview::setApplication(eImfApplications rImfApplication) {
+	qDebug() << "Setting Application to" << rImfApplication;
+	mImfApplication = rImfApplication;
+}
+
+eImfApplications WidgetVideoPreview::getApplication() {
+	return mImfApplication;
+}
+

@@ -263,6 +263,10 @@ void WidgetCentral::rCurrentChanged(int tabWidgetIndex) {
 		mpContentVersionListWidget->SetComposition(p_composition);
 		mpLocaleListWidget->SetComposition(p_composition);
 
+		//WR
+		if (mApplicationIdentificationMap.contains(p_composition->GetApplicationIdentification().first)) {
+			mpPreview->setApplication(mApplicationIdentificationMap[p_composition->GetApplicationIdentification().first]);
+		}
 		// (k) - start
 		mpPreview->CPLEditRate = p_composition->GetEditRate().GetQuotient(); // set CPL edit rate
 		rUpdatePlaylist(); // update playlist

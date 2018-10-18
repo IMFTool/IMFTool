@@ -1,10 +1,9 @@
 # IMFTool
 A tool for editing IMF CPLs and creating new versions of an existing IMF package
 
-### NEW
-The latest binary installers are available at
-[Releases](../../releases/)
-
+## NEW IN THIS BRANCH
+This branch contains beta code for App#5 ACES support in IMF Tool
+Binary installers are available in Folder Binary_Installers/
 
 ## What is IMF Tool
 IMF Tool supports browsing and limited editing of IMF [[1]](#imf-intro) packages (IMPs).
@@ -13,9 +12,10 @@ Introductory videos are available on YouTube [[2]](#imf-video), [[3]](#imf-video
 
 ## Workflows supported:
 -	Open an IMP, visualize the timeline of the CPL(s) included in the IMP
--	NEW: Add Sidecar Assets to an IMP ("Add Asset" --> Add Sidecar Assets)
--	NEW: Create, view and edit Sidecar Composition Maps (SCMs)
--	NEW: Add a Photon QC report as sidecar file (hint: export the sidecar QC report as a Partial IMP, this leaves the Original IMP unmodified!)
+-	NEW: Support for IMF App#5 ACES
+-	Add Sidecar Assets to an IMP ("Add Asset" --> Add Sidecar Assets)
+-	Create, view and edit Sidecar Composition Maps (SCMs)
+-	Add a Photon QC report as sidecar file (hint: export the sidecar QC report as a Partial IMP, this leaves the Original IMP unmodified!)
 -	Load ancestor Original Versions of Supplemental IMPs for preview and versioning
 - 	Create Photon[[4]](#photon) QC report
 -	Edit CPL metadata
@@ -35,14 +35,15 @@ Introductory videos are available on YouTube [[2]](#imf-video), [[3]](#imf-video
 
 ## CREDITS
 The development of this tool has kindly been sponsored by Netflix Inc.
+The App#5 extensions are supported by the Academy of Motion Picture Arts and Sciences, Sony Pictures, Warner Bros., Universal Studios and 20th Century Fox
 
 ## What IMF Tool NOT is
 An IMF Authoring Tool. For creating IMF packages, please check for the wide variety of commercial solutions available on the market.
 
 ## Binary installers
 Please visit
-[Releases](../../releases/)
-to download the latest binary installers.
+Folder Binary_Installers
+to download the latest binary installers. (currently for macOS only)
 
 **For being notified about new releases, please "Watch" IMF Tool (on the top of this page).**
 

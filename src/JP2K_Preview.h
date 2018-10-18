@@ -106,7 +106,6 @@ private:
 	bool decodeImage();
 	void setAsset();
 	bool extractFrame(qint64 frameNr);
-	void save2File(); // save JP2K bytestream to file
 	
 	int mCpus = 0; // nr of threads used for decoding
 	QTime mDecode_time; // time (ms) needed to decode/convert the image

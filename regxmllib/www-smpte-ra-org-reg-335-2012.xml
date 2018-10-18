@@ -1,8 +1,723 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--Created: Fri Oct 07 09:05:40 PDT 2016--><!--By: regxmllib build c989a02ac80facc24e018a54c4010dd8c2d27451--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
+<!--Created: Thu Jun 14 10:36:33 CEST 2018--><!--By: regxmllib build 940d358383f70f4bfef3b548c7f569bbe71e4dc4--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
 <SchemeID>urn:uuid:e9ad45b5-abdb-5f16-7ffc-ff560e475a87</SchemeID>
 <SchemeURI>http://www.smpte-ra.org/reg/335/2012</SchemeURI>
 <MetaDefinitions>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310101.00000000</Identification>
+<Symbol>ApplicationIdentifier</Symbol>
+<Description>Identifying an application and its defining document in the SMPTE ST 2094 suite</Description>
+<Name>Application Identifier</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13825</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310101.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310102.00000000</Identification>
+<Symbol>ApplicationVersionNumber</Symbol>
+<Description>The Application Version of the identified SMPTE ST 2094 application</Description>
+<Name>Application Version Number</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13826</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310101.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310103.00000000</Identification>
+<Symbol>BackwardsVersion</Symbol>
+<Description>The lowest Application Version for which this metadata set is valid</Description>
+<Name>Backwards Version</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13827</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310101.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310104.00000000</Identification>
+<Symbol>TimeIntervalStart</Symbol>
+<Description>Start point of the portion of image essence for which the metadata set is specified, as an index</Description>
+<Name>Time Interval Start</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13828</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310101.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310105.00000000</Identification>
+<Symbol>TimeIntervalDuration</Symbol>
+<Description>Duration of the portion of image essence for which the metadata set is specified, as a count of index positions</Description>
+<Name>Time Interval Duration</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13829</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310101.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310106.00000000</Identification>
+<Symbol>UpperLeftCorner</Symbol>
+<Description>Coordinate of the top-left pixel of the Processing Window</Description>
+<Name>Upper Left Corner</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04011200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13830</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310101.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310107.00000000</Identification>
+<Symbol>LowerRightCorner</Symbol>
+<Description>Coordinate of the bottom-right pixel of the Processing Window</Description>
+<Name>Lower Right Corner</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04011200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13831</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310101.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310108.00000000</Identification>
+<Symbol>WindowNumber</Symbol>
+<Description>Identifier of the Processing Window</Description>
+<Name>Window Number</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13832</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310101.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310109.00000000</Identification>
+<Symbol>TargetedSystemDisplayPrimaries</Symbol>
+<Description>xy chromaticity coordinates of the three primaries of the targeted system display</Description>
+<Name>Targeted System Display Primaries</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04020200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13833</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310101.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531010a.00000000</Identification>
+<Symbol>TargetedSystemDisplayWhitePointChromaticity</Symbol>
+<Description>xy chromaticity coordinate of the targeted system display's white point</Description>
+<Name>Targeted System Display White Point Chromaticity</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04020200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13834</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310101.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531010b.00000000</Identification>
+<Symbol>TargetedSystemDisplayMaximumLuminance</Symbol>
+<Description>Maximum luminance of the targeted system's display</Description>
+<Name>Targeted System Display Maximum Luminance</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13835</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310101.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531010c.00000000</Identification>
+<Symbol>TargetedSystemDisplayMinimumLuminance</Symbol>
+<Description>Minimum luminance of the targeted system's display</Description>
+<Name>Targeted System Display Minimum Luminance</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13836</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310101.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531010d.00000000</Identification>
+<Symbol>MinimumPqencodedMaxrgb</Symbol>
+<Description>The lowest PQ-encoded maxRGB value of the reduced pixel set</Description>
+<Name>Minimum PQ-encoded maxRGB</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13837</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310201.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531010e.00000000</Identification>
+<Symbol>AveragePqencodedMaxrgb</Symbol>
+<Description>The average of the PQ-encoded maxRGB values of the reduced pixel set</Description>
+<Name>Average PQ-encoded maxRGB</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13838</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310201.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531010f.00000000</Identification>
+<Symbol>MaximumPqencodedMaxrgb</Symbol>
+<Description>The highest PQ-encoded maxRGB value of the reduced pixel set</Description>
+<Name>Maximum PQ-encoded maxRGB</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13839</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310201.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310110.00000000</Identification>
+<Symbol>MinimumPqencodedMaxrgbOffset</Symbol>
+<Description>Offset to be added to Minimum PQ-encoded maxRGB</Description>
+<Name>Minimum PQ-encoded maxRGB Offset</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13840</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310201.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310111.00000000</Identification>
+<Symbol>AveragePqencodedMaxrgbOffset</Symbol>
+<Description>Offset to be added to Average PQ-encoded maxRGB</Description>
+<Name>Average PQ-encoded maxRGB Offset</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13841</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310201.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310112.00000000</Identification>
+<Symbol>MaximumPqencodedMaxrgbOffset</Symbol>
+<Description>Offset to be added to Maximum PQ-encoded maxRGB</Description>
+<Name>Maximum PQ-encoded maxRGB Offset</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13842</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310201.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310113.00000000</Identification>
+<Symbol>ToneMappingOffset</Symbol>
+<Description>Tone Mapping Offset</Description>
+<Name>Tone Mapping Offset</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13843</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310201.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310114.00000000</Identification>
+<Symbol>ToneMappingGain</Symbol>
+<Description>Tone Mapping Gain</Description>
+<Name>Tone Mapping Gain</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13844</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310201.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310115.00000000</Identification>
+<Symbol>ToneMappingGamma</Symbol>
+<Description>Tone Mapping Gamma</Description>
+<Name>Tone Mapping Gamma</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13845</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310201.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310116.00000000</Identification>
+<Symbol>ChromaCompensationWeight</Symbol>
+<Description>Amount of chroma adjustment</Description>
+<Name>Chroma Compensation Weight</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13846</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310201.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310117.00000000</Identification>
+<Symbol>SaturationGain</Symbol>
+<Description>Amount of saturation adjustment</Description>
+<Name>Saturation Gain</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13847</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310201.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310118.00000000</Identification>
+<Symbol>ToneDetailFactor</Symbol>
+<Description>Contribution of the detail management function</Description>
+<Name>Tone Detail Factor</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13848</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310201.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310119.00000000</Identification>
+<Symbol>LuminanceLowerBound</Symbol>
+<Description>Encoding of a lower bound of luminance</Description>
+<Name>Luminance Lower Bound</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13849</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310202.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531011a.00000000</Identification>
+<Symbol>LuminanceUpperBound</Symbol>
+<Description>Encoding of an upper bound of luminance</Description>
+<Name>Luminance Upper Bound</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13850</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310202.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531011b.00000000</Identification>
+<Symbol>LuminanceRangeSelector</Symbol>
+<Description>True indicates inner luminance range</Description>
+<Name>Luminance Range Selector</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01040100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13851</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310202.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531011c.00000000</Identification>
+<Symbol>ChromaticityDiskCenter</Symbol>
+<Description>Center of the Chromaticity Disk</Description>
+<Name>Chromaticity Disk Center</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04020200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13852</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310202.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531011d.00000000</Identification>
+<Symbol>ChromaticityDiskRadius</Symbol>
+<Description>Radius of the Chromaticity Disk</Description>
+<Name>Chromaticity Disk Radius</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13853</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310202.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531011e.00000000</Identification>
+<Symbol>ChromaticityAreaSelector</Symbol>
+<Description>True indicates the area of the Chromaticity Disk</Description>
+<Name>Chromaticity Area Selector</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01040100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13854</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310202.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531011f.00000000</Identification>
+<Symbol>SaturationGainFunction</Symbol>
+<Description>Sampled function, mapping a luminance based input value to a saturation scaling factor</Description>
+<Name>Saturation Gain Function</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04020200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13855</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310202.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310120.00000000</Identification>
+<Symbol>ToneMappingInputSignalWeights</Symbol>
+<Description>Weights of R, G, B, and Y components</Description>
+<Name>Tone Mapping Input Signal Weights</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04020200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13856</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310202.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310121.00000000</Identification>
+<Symbol>ToneMappingInputSignalBlackLevelOffset</Symbol>
+<Description>Used to calculate the gain of the signal as a first step in the Tone Mapping process</Description>
+<Name>Tone Mapping Input Signal Black Level Offset</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13857</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310202.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310122.00000000</Identification>
+<Symbol>ToneMappingInputSignalWhiteLevelOffset</Symbol>
+<Description>Used to calculate the gain of the signal as a second step in the Tone Mapping process</Description>
+<Name>Tone Mapping Input Signal White Level Offset</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13858</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310202.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310123.00000000</Identification>
+<Symbol>ShadowGainControl</Symbol>
+<Description>Control for the steepness of the curve in its shadow (darker) region</Description>
+<Name>Shadow Gain Control</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13859</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310202.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310124.00000000</Identification>
+<Symbol>HighlightGainControl</Symbol>
+<Description>Control for the steepness of the curve in its highlight (brighter) region</Description>
+<Name>Highlight Gain Control</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13860</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310202.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310125.00000000</Identification>
+<Symbol>MidToneWidthAdjustmentFactor</Symbol>
+<Description>Control for the width of the mid-tone region of the curve</Description>
+<Name>Mid-Tone Width Adjustment Factor</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13861</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310202.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310126.00000000</Identification>
+<Symbol>ToneMappingOutputFineTuningFunction</Symbol>
+<Description>Sampled function, for tone mapping</Description>
+<Name>Tone Mapping Output Fine Tuning Function</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04020200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13862</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310202.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310127.00000000</Identification>
+<Symbol>TargetedSystemDisplaySignalFormat</Symbol>
+<Description>Enumerator of the signal format of the targeted system display</Description>
+<Name>Targeted System Display Signal Format</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13863</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310203.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310128.00000000</Identification>
+<Symbol>MetadataColorCodingWorkspace</Symbol>
+<Description>Enumerator of the color components and quantization range</Description>
+<Name>Metadata Color Coding Workspace</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13864</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310203.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310129.00000000</Identification>
+<Symbol>PreMatrixToneMapping1</Symbol>
+<Description>Sampled function for first input color component, in units of 1/16 383</Description>
+<Name>Pre-Matrix Tone Mapping 1</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04011200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13865</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310203.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531012a.00000000</Identification>
+<Symbol>PreMatrixToneMapping2</Symbol>
+<Description>Sampled function for second input color component, in units of 1/16 383</Description>
+<Name>Pre-Matrix Tone Mapping 2</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04011200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13866</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310203.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531012b.00000000</Identification>
+<Symbol>PreMatrixToneMapping3</Symbol>
+<Description>Sampled function for third input color component, in units of 1/16 383</Description>
+<Name>Pre-Matrix Tone Mapping 3</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04011200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13867</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310203.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531012c.00000000</Identification>
+<Symbol>ColorRemappingMatrix</Symbol>
+<Description>A 3x3 matrix between tone mapping stages</Description>
+<Name>Color Remapping Matrix</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04020200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13868</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310203.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531012d.00000000</Identification>
+<Symbol>PostMatrixToneMapping1</Symbol>
+<Description>Sampled function for first post matrix color component, in units of 1/16 383</Description>
+<Name>Post-Matrix Tone Mapping 1</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04011200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13869</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310203.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531012e.00000000</Identification>
+<Symbol>PostMatrixToneMapping2</Symbol>
+<Description>Sampled function for second post matrix color component, in units of 1/16 383</Description>
+<Name>Post-Matrix Tone Mapping 2</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04011200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13870</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310203.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531012f.00000000</Identification>
+<Symbol>PostMatrixToneMapping3</Symbol>
+<Description>Sampled function for third post matrix color component, in units of 1/16 383</Description>
+<Name>Post-Matrix Tone Mapping 3</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04011200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13871</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310203.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310130.00000000</Identification>
+<Symbol>CenterOfEllipse</Symbol>
+<Description>Center position of the ellipses</Description>
+<Name>Center Of Ellipse</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04011200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13872</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310204.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310131.00000000</Identification>
+<Symbol>RotationAngle</Symbol>
+<Description>Clockwise rotation angle with respect to the positive direction of the x-axis of the ellipses</Description>
+<Name>Rotation Angle</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13873</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310204.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310132.00000000</Identification>
+<Symbol>SemiMajorAxisInternalEllipse</Symbol>
+<Description>Semi-major axis value of the internal ellipse</Description>
+<Name>Semi-Major Axis Internal Ellipse</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13874</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310204.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310133.00000000</Identification>
+<Symbol>SemiMajorAxisExternalEllipse</Symbol>
+<Description>Semi-major axis value of the external ellipse</Description>
+<Name>Semi-Major Axis External Ellipse</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13875</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310204.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310134.00000000</Identification>
+<Symbol>SemiMinorAxisExternalEllipse</Symbol>
+<Description>Semi-minor axis value of the external ellipse</Description>
+<Name>Semi-Minor Axis External Ellipse</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13876</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310204.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310135.00000000</Identification>
+<Symbol>OverlapProcessOption</Symbol>
+<Description>Enumerator that indicates one of the two methods of combining rendered pixels</Description>
+<Name>Overlap Process Option</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13877</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310204.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310136.00000000</Identification>
+<Symbol>TargetedSystemDisplayActualPeakLuminance</Symbol>
+<Description>Two-input sampled function representing the normalized actual peak luminance of the targeted system display, in units of 1/15. The four most significant bits in each UInt8 are zero.</Description>
+<Name>Targeted System Display Actual Peak Luminance</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13878</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310204.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310137.00000000</Identification>
+<Symbol>RowsInTargetedSystemDisplayActualPeakLuminance</Symbol>
+<Description>Number of rows (M) in the Targeted System Display Actual Peak Luminance array</Description>
+<Name>Rows In Targeted System Display Actual Peak Luminance</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13879</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310204.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310138.00000000</Identification>
+<Symbol>MasteringDisplayActualPeakLuminance</Symbol>
+<Description>Two-input sampled function representing the normalized actual peak luminance of the mastering display, in units of 1/15. The four most significant bits in each UInt8 are zero.</Description>
+<Name>Mastering Display Actual Peak Luminance</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13880</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310204.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310139.00000000</Identification>
+<Symbol>RowsInMasteringDisplayActualPeakLuminance</Symbol>
+<Description>Number of rows (M) in the Mastering Display Actual Peak Luminance array</Description>
+<Name>Rows In Mastering Display Actual Peak Luminance</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13881</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310204.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531013a.00000000</Identification>
+<Symbol>MaxSCL</Symbol>
+<Description>Maximum of each component of linearized RGB values</Description>
+<Name>Maximum Scene Color Component Levels</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04020200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13882</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310204.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531013b.00000000</Identification>
+<Symbol>AverageMaxRGB</Symbol>
+<Description>Average of linearized maxRGB values</Description>
+<Name>Average MaxRGB</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13883</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310204.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531013c.00000000</Identification>
+<Symbol>DistributionMaxRGBPercentages</Symbol>
+<Description>First vector of DistributionMaxRGB with Integer percentage values</Description>
+<Name>Distribution MaxRGB Percentages</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13884</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310204.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531013d.00000000</Identification>
+<Symbol>DistributionMaxRGBPercentiles</Symbol>
+<Description>Second vector of DistributionMaxRGB with Linearized maxRGB value at given percentile</Description>
+<Name>Distribution MaxRGB Percentiles</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04020200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13885</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310204.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531013e.00000000</Identification>
+<Symbol>FractionBrightPixels</Symbol>
+<Description>Fraction of pixels that contains the brightest pixel</Description>
+<Name>Fraction Bright Pixels</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13886</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310204.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531013f.00000000</Identification>
+<Symbol>KneePoint</Symbol>
+<Description>Separation point (K_S,K_F) between the linear part and the curved part of the tone mapping function, ordered K_S,K_F</Description>
+<Name>Knee Point</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04020200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13887</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310204.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310140.00000000</Identification>
+<Symbol>BezierCurveAnchors</Symbol>
+<Description>Intermediate anchor parameters, ordered P1 to PN-1</Description>
+<Name>Bezier Curve Anchors</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04020200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13888</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310204.00000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310141.00000000</Identification>
+<Symbol>ColorSaturationWeight</Symbol>
+<Description>Adjusts the color saturation gain</Description>
+<Name>Color Saturation Weight</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>13889</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.05310204.00000000</MemberOf>
+</PropertyDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.01010101.01011502.00000000</Identification>
 <Symbol>InstanceID</Symbol>
@@ -14,6 +729,90 @@
 <LocalIdentification>15370</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.01010000</MemberOf>
 </PropertyDefinition>
+<PropertyAliasDefinition>
+<Identification>urn:smpte:ul:060e2b34.01010101.01011502.00000000</Identification>
+<Symbol>InstanceID</Symbol>
+<Description>Unique ID of an instance</Description>
+<Name>Instance ID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>15370</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
+<OriginalProperty>urn:smpte:ul:060e2b34.01010101.01011502.00000000</OriginalProperty>
+</PropertyAliasDefinition>
+<PropertyAliasDefinition>
+<Identification>urn:smpte:ul:060e2b34.01010101.01011502.00000000</Identification>
+<Symbol>InstanceID</Symbol>
+<Description>Unique ID of an instance</Description>
+<Name>Instance ID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>15370</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.7f010000</MemberOf>
+<OriginalProperty>urn:smpte:ul:060e2b34.01010101.01011502.00000000</OriginalProperty>
+</PropertyAliasDefinition>
+<PropertyAliasDefinition>
+<Identification>urn:smpte:ul:060e2b34.01010101.01011502.00000000</Identification>
+<Symbol>InstanceID</Symbol>
+<Description>Unique ID of an instance</Description>
+<Name>Instance ID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>15370</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</MemberOf>
+<OriginalProperty>urn:smpte:ul:060e2b34.01010101.01011502.00000000</OriginalProperty>
+</PropertyAliasDefinition>
+<PropertyAliasDefinition>
+<Identification>urn:smpte:ul:060e2b34.01010101.01011502.00000000</Identification>
+<Symbol>InstanceID</Symbol>
+<Description>Unique ID of an instance</Description>
+<Name>Instance ID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>15370</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017f00</MemberOf>
+<OriginalProperty>urn:smpte:ul:060e2b34.01010101.01011502.00000000</OriginalProperty>
+</PropertyAliasDefinition>
+<PropertyAliasDefinition>
+<Identification>urn:smpte:ul:060e2b34.01010101.01011502.00000000</Identification>
+<Symbol>InstanceID</Symbol>
+<Description>Unique ID of an instance</Description>
+<Name>Instance ID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>15370</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.02260000</MemberOf>
+<OriginalProperty>urn:smpte:ul:060e2b34.01010101.01011502.00000000</OriginalProperty>
+</PropertyAliasDefinition>
+<PropertyAliasDefinition>
+<Identification>urn:smpte:ul:060e2b34.01010101.01011502.00000000</Identification>
+<Symbol>InstanceID</Symbol>
+<Description>Unique ID of an instance</Description>
+<Name>Instance ID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>15370</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.03000000</MemberOf>
+<OriginalProperty>urn:smpte:ul:060e2b34.01010101.01011502.00000000</OriginalProperty>
+</PropertyAliasDefinition>
+<PropertyAliasDefinition>
+<Identification>urn:smpte:ul:060e2b34.01010101.01011502.00000000</Identification>
+<Symbol>InstanceID</Symbol>
+<Description>Unique ID of an instance</Description>
+<Name>Instance ID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>15370</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010201.01100100</MemberOf>
+<OriginalProperty>urn:smpte:ul:060e2b34.01010101.01011502.00000000</OriginalProperty>
+</PropertyAliasDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010d.04200202.01000000</Identification>
 <Symbol>IrisFNumber</Symbol>
@@ -102,18 +901,6 @@
 <LocalIdentification>32775</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.01010000</MemberOf>
 </PropertyDefinition>
-<PropertyAliasDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010101.01011502.00000000</Identification>
-<Symbol>InstanceID</Symbol>
-<Description>Unique ID of an instance</Description>
-<Name>Instance ID</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
-<IsOptional>true</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>15370</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
-<OriginalProperty>urn:smpte:ul:060e2b34.01010101.01011502.00000000</OriginalProperty>
-</PropertyAliasDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010d.04200103.01010000</Identification>
 <Symbol>AutoExposureMode</Symbol>
@@ -356,6 +1143,18 @@
 <LocalIdentification>12816</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
 </PropertyDefinition>
+<PropertyAliasDefinition>
+<Identification>urn:smpte:ul:060e2b34.01010102.04010201.01010200</Identification>
+<Symbol>TransferCharacteristic</Symbol>
+<Description>Specifies the non-linear relationship between linear scene light levels and amplitude-compressed video signal levels at signal origination.</Description>
+<Name>Transfer Characteristic</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.02020102.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>12816</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01012700</MemberOf>
+<OriginalProperty>urn:smpte:ul:060e2b34.01010102.04010201.01010200</OriginalProperty>
+</PropertyAliasDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010e.04200103.02070000</Identification>
 <Symbol>GammaForCDL</Symbol>
@@ -389,18 +1188,6 @@
 <LocalIdentification>33044</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
 </PropertyDefinition>
-<PropertyAliasDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010101.01011502.00000000</Identification>
-<Symbol>InstanceID</Symbol>
-<Description>Unique ID of an instance</Description>
-<Name>Instance ID</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
-<IsOptional>true</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>15370</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.7f010000</MemberOf>
-<OriginalProperty>urn:smpte:ul:060e2b34.01010101.01011502.00000000</OriginalProperty>
-</PropertyAliasDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010d.04060805.00000000</Identification>
 <Symbol>UDAMSetIdentifier</Symbol>
@@ -412,18 +1199,6 @@
 <LocalIdentification>57344</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.7f010000</MemberOf>
 </PropertyDefinition>
-<PropertyAliasDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010101.01011502.00000000</Identification>
-<Symbol>InstanceID</Symbol>
-<Description>Unique ID of an instance</Description>
-<Name>Instance ID</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
-<IsOptional>true</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>15370</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</MemberOf>
-<OriginalProperty>urn:smpte:ul:060e2b34.01010101.01011502.00000000</OriginalProperty>
-</PropertyAliasDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.01010102.06010104.01010000</Identification>
 <Symbol>ObjectClass</Symbol>
@@ -1238,6 +2013,18 @@
 <LocalIdentification>8710</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01011e00</MemberOf>
 </PropertyDefinition>
+<PropertyAliasDefinition>
+<Identification>urn:smpte:ul:060e2b34.01010102.010a0101.01010000</Identification>
+<Symbol>DeviceManufacturerName</Symbol>
+<Description>The manufacturer or maker of the device</Description>
+<Name>Device Manufacturer Name</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.011e0100</MemberOf>
+<OriginalProperty>urn:smpte:ul:060e2b34.01010102.010a0101.01010000</OriginalProperty>
+</PropertyAliasDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.01010102.06010104.020b0000</Identification>
 <Symbol>ManufacturerInfo</Symbol>
@@ -1590,6 +2377,30 @@
 <LocalIdentification>16135</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01012300</MemberOf>
 </PropertyDefinition>
+<PropertyAliasDefinition>
+<Identification>urn:smpte:ul:060e2b34.01010104.01030404.00000000</Identification>
+<Symbol>EssenceStreamID</Symbol>
+<Description>Essence (or its container) stream ID</Description>
+<Name>Essence Stream ID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01016500</MemberOf>
+<OriginalProperty>urn:smpte:ul:060e2b34.01010104.01030404.00000000</OriginalProperty>
+</PropertyAliasDefinition>
+<PropertyAliasDefinition>
+<Identification>urn:smpte:ul:060e2b34.01010104.01030404.00000000</Identification>
+<Symbol>EssenceStreamID</Symbol>
+<Description>Essence (or its container) stream ID</Description>
+<Name>Essence Stream ID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>16135</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010201.01100100</MemberOf>
+<OriginalProperty>urn:smpte:ul:060e2b34.01010104.01030404.00000000</OriginalProperty>
+</PropertyAliasDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.01010104.01030405.00000000</Identification>
 <Symbol>IndexStreamID</Symbol>
@@ -1601,6 +2412,18 @@
 <LocalIdentification>16134</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01012300</MemberOf>
 </PropertyDefinition>
+<PropertyAliasDefinition>
+<Identification>urn:smpte:ul:060e2b34.01010104.01030405.00000000</Identification>
+<Symbol>IndexStreamID</Symbol>
+<Description>Index table stream ID</Description>
+<Name>Index Stream ID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>16134</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010201.01100100</MemberOf>
+<OriginalProperty>urn:smpte:ul:060e2b34.01010104.01030405.00000000</OriginalProperty>
+</PropertyAliasDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010e.04040504.00000000</Identification>
 <Symbol>PrecedingIndexTable</Symbol>
@@ -1664,7 +2487,7 @@
 <Type>urn:smpte:ul:060e2b34.01040101.05060e00.00000000</Type>
 <IsOptional>true</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>12034</LocalIdentification>
+<LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01012400</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
@@ -1898,18 +2721,6 @@
 <LocalIdentification>12815</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01012700</MemberOf>
 </PropertyDefinition>
-<PropertyAliasDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010102.04010201.01010200</Identification>
-<Symbol>TransferCharacteristic</Symbol>
-<Description>Specifies the non-linear relationship between linear scene light levels and amplitude-compressed video signal levels at signal origination.</Description>
-<Name>Transfer Characteristic</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.02020102.00000000</Type>
-<IsOptional>true</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>12816</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01012700</MemberOf>
-<OriginalProperty>urn:smpte:ul:060e2b34.01010102.04010201.01010200</OriginalProperty>
-</PropertyAliasDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.01010109.04010201.01060100</Identification>
 <Symbol>ColorPrimaries</Symbol>
@@ -2089,9 +2900,7 @@
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010e.04200401.01020000</Identification>
 <Symbol>MasteringDisplayWhitePointChromaticity</Symbol>
-<Description>
-Chromaticity of White Point metadata as specified in ST 2086
-</Description>
+<Description>Chromaticity of White Point metadata as specified in ST 2086</Description>
 <Name>Mastering Display White Point Chromaticity</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.03010c00.00000000</Type>
 <IsOptional>true</IsOptional>
@@ -2102,9 +2911,7 @@ Chromaticity of White Point metadata as specified in ST 2086
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010e.04200401.01030000</Identification>
 <Symbol>MasteringDisplayMaximumLuminance</Symbol>
-<Description>
-Maximum Display Mastering Luminance metadata as specified in ST 2086
-</Description>
+<Description>Maximum Display Mastering Luminance metadata as specified in ST 2086</Description>
 <Name>Mastering Display Maximum Luminance</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
 <IsOptional>true</IsOptional>
@@ -2115,9 +2922,7 @@ Maximum Display Mastering Luminance metadata as specified in ST 2086
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010e.04200401.01040000</Identification>
 <Symbol>MasteringDisplayMinimumLuminance</Symbol>
-<Description>
-Minimum Display Mastering Luminance metadata as specified in ST 2086
-</Description>
+<Description>Minimum Display Mastering Luminance metadata as specified in ST 2086</Description>
 <Name>Mastering Display Minimum Luminance</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
 <IsOptional>true</IsOptional>
@@ -3698,6 +4503,18 @@ Minimum Display Mastering Luminance metadata as specified in ST 2086
 <LocalIdentification>19985</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01014e00</MemberOf>
 </PropertyDefinition>
+<PropertyAliasDefinition>
+<Identification>urn:smpte:ul:060e2b34.01010107.04090201.00000000</Identification>
+<Symbol>MIMEType</Symbol>
+<Description>Specifies the MIME media type as defined by IETF</Description>
+<Name>MIME Media Type</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01016500</MemberOf>
+<OriginalProperty>urn:smpte:ul:060e2b34.01010107.04090201.00000000</OriginalProperty>
+</PropertyAliasDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.01010108.04090300.00000000</Identification>
 <Symbol>CharSet</Symbol>
@@ -4133,7 +4950,7 @@ Minimum Display Mastering Luminance metadata as specified in ST 2086
 <Description>An enumerated value that defines the decoder capabilities. Values are defined in ISO/IEC 15444-1 Annex A.5 Table A-10. Other values may be defined in amendments to ISO/IEC 15444-1 or in related international standards documents.</Description>
 <Name>Rsiz</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
-<IsOptional>true</IsOptional>
+<IsOptional>false</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01015a00</MemberOf>
@@ -4144,7 +4961,7 @@ Minimum Display Mastering Luminance metadata as specified in ST 2086
 <Description>Width of the reference grid, as defined in ISO/IEC 15444-1 Annex A.5.1.</Description>
 <Name>Xsiz</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
-<IsOptional>true</IsOptional>
+<IsOptional>false</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01015a00</MemberOf>
@@ -4155,7 +4972,7 @@ Minimum Display Mastering Luminance metadata as specified in ST 2086
 <Description>Height of the reference grid, as defined in ISO/IEC 15444-1 Annex A.5.1.</Description>
 <Name>Ysiz</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
-<IsOptional>true</IsOptional>
+<IsOptional>false</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01015a00</MemberOf>
@@ -4166,7 +4983,7 @@ Minimum Display Mastering Luminance metadata as specified in ST 2086
 <Description>Horizontal offset from the origin of the reference grid to the left side of the image area, as defined in ISO/IEC 15444-1 Annex A.5.1.</Description>
 <Name>XOsiz</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
-<IsOptional>true</IsOptional>
+<IsOptional>false</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01015a00</MemberOf>
@@ -4177,7 +4994,7 @@ Minimum Display Mastering Luminance metadata as specified in ST 2086
 <Description>Vertical offset from the origin of the reference grid to the top side of the image area, as defined in ISO/IEC 15444-1 Annex A.5.1.</Description>
 <Name>YOsiz</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
-<IsOptional>true</IsOptional>
+<IsOptional>false</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01015a00</MemberOf>
@@ -4188,7 +5005,7 @@ Minimum Display Mastering Luminance metadata as specified in ST 2086
 <Description>Width of one reference tile with respect to the reference grid, as defined in ISO/IEC 15444-1 Annex A.5.1.</Description>
 <Name>XTsiz</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
-<IsOptional>true</IsOptional>
+<IsOptional>false</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01015a00</MemberOf>
@@ -4199,7 +5016,7 @@ Minimum Display Mastering Luminance metadata as specified in ST 2086
 <Description>Height of one reference tile with respect to the reference grid, as defined in ISO/IEC 15444-1 Annex A.5.1.</Description>
 <Name>YTsiz</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
-<IsOptional>true</IsOptional>
+<IsOptional>false</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01015a00</MemberOf>
@@ -4210,7 +5027,7 @@ Minimum Display Mastering Luminance metadata as specified in ST 2086
 <Description>Horizontal offset from the origin of the reference grid to the left side of the first tile, as defined in ISO/IEC 15444-1 Annex A.5.1.</Description>
 <Name>XTOsiz</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
-<IsOptional>true</IsOptional>
+<IsOptional>false</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01015a00</MemberOf>
@@ -4221,7 +5038,7 @@ Minimum Display Mastering Luminance metadata as specified in ST 2086
 <Description>Vertical offset from the origin of the reference grid to the top side of the first tile, as defined in ISO/IEC 15444-1 Annex A.5.1.</Description>
 <Name>YTOsiz</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
-<IsOptional>true</IsOptional>
+<IsOptional>false</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01015a00</MemberOf>
@@ -4232,7 +5049,7 @@ Minimum Display Mastering Luminance metadata as specified in ST 2086
 <Description>The number of components in the picture as defined in ISO/IEC 15444-1 Annex A.5.1. If this Sub Descriptor is referenced by the CDCI Descriptor, the order and kind of components shall be as defined by the Essence Container UL in the MXF File Descriptor. If this Sub Descriptor is referenced by the RGBA Descriptor, the order and kind of components shall be as defined by the Pixel Layout property of the RGBA Descriptor.</Description>
 <Name>Csiz</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
-<IsOptional>true</IsOptional>
+<IsOptional>false</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01015a00</MemberOf>
@@ -4243,7 +5060,7 @@ Minimum Display Mastering Luminance metadata as specified in ST 2086
 <Description>Array of picture components where each component comprises 3 bytes named Ssizi, XRSizi, YRSizi (as defined in ISO/IEC 15444-1 Annex A.5.1). The array of 3-byte groups is preceded by the array header comprising a 4-byte value of the number of components followed by a 4-byte value of '3'.</Description>
 <Name>Picture Component Sizing</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.04020900.00000000</Type>
-<IsOptional>true</IsOptional>
+<IsOptional>false</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01015a00</MemberOf>
@@ -4287,6 +5104,17 @@ Minimum Display Mastering Luminance metadata as specified in ST 2086
 <Description>Specifies the rate of a compressed MPEG audio bitstream in kbit/s. The allowed values are typically determined by a given MPEG audio layer and mode.</Description>
 <Name>MPEG Audio Bit Rate</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01015e00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020403.01050000</Identification>
+<Symbol>MPEGAudioChannelAssignment</Symbol>
+<Description>UL enumerating the channel assignment in use</Description>
+<Name>MPEG Audio Channel Assignment</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01030100.00000000</Type>
 <IsOptional>true</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>0</LocalIdentification>
@@ -4501,37 +5329,13 @@ Minimum Display Mastering Luminance metadata as specified in ST 2086
 <LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01016500</MemberOf>
 </PropertyDefinition>
-<PropertyAliasDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010107.04090201.00000000</Identification>
-<Symbol>MIMEType</Symbol>
-<Description>Specifies the MIME media type as defined by IETF</Description>
-<Name>MIME Media Type</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
-<IsOptional>false</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>0</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01016500</MemberOf>
-<OriginalProperty>urn:smpte:ul:060e2b34.01010107.04090201.00000000</OriginalProperty>
-</PropertyAliasDefinition>
-<PropertyAliasDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010104.01030404.00000000</Identification>
-<Symbol>EssenceStreamID</Symbol>
-<Description>Essence (or its container) stream ID</Description>
-<Name>Essence Stream ID</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
-<IsOptional>false</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>0</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01016500</MemberOf>
-<OriginalProperty>urn:smpte:ul:060e2b34.01010104.01030404.00000000</OriginalProperty>
-</PropertyAliasDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010c.06010104.010b0000</Identification>
 <Symbol>BaseClass</Symbol>
 <Description>Class identifier of the immediate superclass defined in an MXF specification that this object extends.</Description>
 <Name>Base Class</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.01030100.00000000</Type>
-<IsOptional>false</IsOptional>
+<IsOptional>true</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01016600</MemberOf>
@@ -4899,6 +5703,18 @@ Minimum Display Mastering Luminance metadata as specified in ST 2086
 <LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01016f00</MemberOf>
 </PropertyDefinition>
+<PropertyAliasDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010d.03010102.02150000</Identification>
+<Symbol>EventTextLanguageCode</Symbol>
+<Description>Specifies the language of the event text using RFC 5646 tags</Description>
+<Name>Event Text Language Code</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017100</MemberOf>
+<OriginalProperty>urn:smpte:ul:060e2b34.0101010d.03010102.02150000</OriginalProperty>
+</PropertyAliasDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010e.07020102.02020000</Identification>
 <Symbol>STLReferencePointTimecode</Symbol>
@@ -4921,18 +5737,6 @@ Minimum Display Mastering Luminance metadata as specified in ST 2086
 <LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017100</MemberOf>
 </PropertyDefinition>
-<PropertyAliasDefinition>
-<Identification>urn:smpte:ul:060e2b34.0101010d.03010102.02150000</Identification>
-<Symbol>EventTextLanguageCode</Symbol>
-<Description>Specifies the language of the event text using RFC 5646 tags</Description>
-<Name>Event Text Language Code</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
-<IsOptional>false</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>0</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017100</MemberOf>
-<OriginalProperty>urn:smpte:ul:060e2b34.0101010d.03010102.02150000</OriginalProperty>
-</PropertyAliasDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010e.01030703.01000000</Identification>
 <Symbol>StereoscopicEyeID</Symbol>
@@ -4955,18 +5759,424 @@ Minimum Display Mastering Luminance metadata as specified in ST 2086
 <LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017200</MemberOf>
 </PropertyDefinition>
-<PropertyAliasDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010101.01011502.00000000</Identification>
-<Symbol>InstanceID</Symbol>
-<Description>Unique ID of an instance</Description>
-<Name>Instance ID</Name>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010607.01000000</Identification>
+<Symbol>VC2MajorVersion</Symbol>
+<Description>VC-2 Major Version Number as defined in SMPTE ST 2042-1</Description>
+<Name>VC-2 Major Version</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017400</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010607.02000000</Identification>
+<Symbol>VC2MinorVersion</Symbol>
+<Description>VC-2 Minor Version Number as defined in SMPTE ST 2042-1</Description>
+<Name>VC-2 Minor Version</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017400</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010607.03000000</Identification>
+<Symbol>VC2Profile</Symbol>
+<Description>VC-2 Profile as defined in SMPTE ST 2042-1</Description>
+<Name>VC-2 Profile</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017400</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010607.04000000</Identification>
+<Symbol>VC2Level</Symbol>
+<Description>VC-2 Level as defined in SMPTE ST 2042-1</Description>
+<Name>VC-2 Level</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017400</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010607.05000000</Identification>
+<Symbol>VC2WaveletFilters</Symbol>
+<Description>The distinct values of state[wavelet_index] across the entire wrapped VC-2 stream(each value used in the wrapped VC-2 stream appears only once in this array). This identifies the wavelet filters used.</Description>
+<Name>VC-2 Wavelet Filters</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04011400.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017400</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010607.06000000</Identification>
+<Symbol>VC2SequenceHeadersIdentical</Symbol>
+<Description>A flag to indicate whether all VC-2 Sequence Headers in the entire wrapped VC-2 stream are byte-for-byte identical</Description>
+<Name>VC-2 Sequence Headers Identical</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01040100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017400</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010607.07000000</Identification>
+<Symbol>VC2EditUnitsAreCompleteSequences</Symbol>
+<Description>A flag to indicate whether every Edit Unit comprises a single valid VC-2 sequence in its entirety</Description>
+<Name>VC-2 Edit Units Are Complete Sequences</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01040100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017400</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310201.00000000</Identification>
+<Symbol>DMCVTApplicationIdentifier</Symbol>
+<Description>Identifying an application and its defining document in the SMPTE ST 2094 suite</Description>
+<Name>DMCVT Application Identifier</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017500</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310202.00000000</Identification>
+<Symbol>DMCVTApplicationVersionNumber</Symbol>
+<Description>The Application Version of the identified SMPTE ST 2094 application</Description>
+<Name>DMCVT Application Version Number</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017500</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310203.00000000</Identification>
+<Symbol>DMCVTBackwardsVersion</Symbol>
+<Description>The lowest Application Version for which this metadata set is valid</Description>
+<Name>DMCVT Backwards Version</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017500</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310209.00000000</Identification>
+<Symbol>DMCVTTargetedSystemDisplayPrimaries</Symbol>
+<Description>xy chromaticity coordinates of the three primaries of the targeted system display</Description>
+<Name>DMCVT Targeted System Display Primaries</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04020200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017500</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531020a.00000000</Identification>
+<Symbol>DMCVTTargetedSystemDisplayWhitePointChromaticity</Symbol>
+<Description>xy chromaticity coordinate of the targeted system display's white point</Description>
+<Name>DMCVT Targeted System Display White Point Chromaticity</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04020200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017500</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531020b.00000000</Identification>
+<Symbol>DMCVTTargetedSystemDisplayMaximumLuminance</Symbol>
+<Description>Maximum luminance of the targeted system's display</Description>
+<Name>DMCVT Targeted System Display Maximum Luminance</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017500</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0531020c.00000000</Identification>
+<Symbol>DMCVTTargetedSystemDisplayMinimumLuminance</Symbol>
+<Description>Minimum luminance of the targeted system's display</Description>
+<Name>DMCVT Targeted System Display Minimum Luminance</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017500</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310227.00000000</Identification>
+<Symbol>DMCVTTargetedSystemDisplaySignalFormat</Symbol>
+<Description>Enumerator of the signal format of the targeted system display</Description>
+<Name>DMCVT Targeted System Display Signal Format</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017500</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310236.00000000</Identification>
+<Symbol>DMCVTTargetedSystemDisplayActualPeakLuminance</Symbol>
+<Description>Two-input sampled function representing the normalized actual peak luminance of the targeted system display, in units of 1/15. The four most significant bits in each UInt8 are zero.</Description>
+<Name>DMCVT Targeted System Display Actual Peak Luminance</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017500</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05310237.00000000</Identification>
+<Symbol>DMCVTRowsInTargetedSystemDisplayActualPeakLuminance</Symbol>
+<Description>Number of rows (M) in the DMCVT Targeted System Display Actual Peak Luminance array</Description>
+<Name>DMCVT Rows In Targeted System Display Actual Peak Luminance</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017500</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010608.02000000</Identification>
+<Symbol>VC5BayerComponentPattern</Symbol>
+<Description>Bayer component order and bit depth of each component (See SMPTE ST 377-1)</Description>
+<Name>VC-5 Bayer Component Pattern</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04020100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017600</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010608.03000000</Identification>
+<Symbol>VC5BayerComponentBlackLevel</Symbol>
+<Description>Value of each Bayer component that corresponds to black</Description>
+<Name>VC-5 Bayer Component Black Level</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017600</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010608.04000000</Identification>
+<Symbol>VC5BayerComponentWhiteLevel</Symbol>
+<Description>Value of each Bayer component that corresponds to the white clipping point</Description>
+<Name>VC-5 Bayer Component White Level</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017600</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010608.01000000</Identification>
+<Symbol>VC5AlphaSampling</Symbol>
+<Description>VC-5 AlphaSampling codec state parameter defined in SMPTE ST 2073-4</Description>
+<Name>VC-5 Alpha Sampling</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017700</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020403.01040000</Identification>
+<Symbol>AACSamplingFrequency</Symbol>
+<Description>Low order 4 bits of Sampling Frequency Index.  Upper 4 bits are zeros</Description>
+<Name>AAC Sampling Frequency</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017800</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020403.01030000</Identification>
+<Symbol>AACChannelConfiguration</Symbol>
+<Description>Low order 4 bits of Channel Configuration.  Upper 4 bits are zeros</Description>
+<Name>AAC Channel Configuration</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017800</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060a.01000000</Identification>
+<Symbol>ACESAuthoringInformation</Symbol>
+<Description>Human readable information on the system used to author the ACES image essence contained in the track file</Description>
+<Name>ACES Authoring Information</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017900</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060a.02000000</Identification>
+<Symbol>ACESMasteringDisplayPrimaries</Symbol>
+<Description>Display Primaries metadata as specified in ST 2086</Description>
+<Name>ACES Mastering Display Primaries</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04020a00.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017900</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060a.03000000</Identification>
+<Symbol>ACESMasteringDisplayWhitePointChromaticity</Symbol>
+<Description>Chromaticity of White Point metadata as specified in ST 2086</Description>
+<Name>ACES Mastering Display White Point Chromaticity</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010c00.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017900</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060a.04000000</Identification>
+<Symbol>ACESMasteringDisplayMaximumLuminance</Symbol>
+<Description>Maximum Display Mastering Luminance metadata as specified in ST 2086</Description>
+<Name>ACES Mastering Display Maximum Luminance</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017900</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060a.05000000</Identification>
+<Symbol>ACESMasteringDisplayMinimumLuminance</Symbol>
+<Description>Minimum Display Mastering Luminance metadata as specified in ST 2086</Description>
+<Name>ACES Mastering Display Minimum Luminance</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017900</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010609.01000000</Identification>
+<Symbol>TargetFrameAncillaryResourceID</Symbol>
+<Description>UUID value that identifies the ancillary resource</Description>
+<Name>Target Frame Ancillary ResourceID</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
 <IsOptional>false</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>15370</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017f00</MemberOf>
-<OriginalProperty>urn:smpte:ul:060e2b34.01010101.01011502.00000000</OriginalProperty>
-</PropertyAliasDefinition>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017a00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010609.02000000</Identification>
+<Symbol>MediaType</Symbol>
+<Description>Specifies the Media Type as defined by IETF</Description>
+<Name>Media Type</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017a00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010609.03000000</Identification>
+<Symbol>TargetFrameIndex</Symbol>
+<Description>Specifies the offset of the corresponding frame in the image essence</Description>
+<Name>Target Frame Index</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010400.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017a00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010609.04000000</Identification>
+<Symbol>TargetFrameTransferCharacteristic</Symbol>
+<Description>Specifies the non-linear relationship between linear scene light levels and amplitude-compressed video signal levels</Description>
+<Name>Target Frame Transfer Characteristic</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.02020102.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017a00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010609.05000000</Identification>
+<Symbol>TargetFrameColorPrimaries</Symbol>
+<Description>The set of color primaries used</Description>
+<Name>Target Frame Color Primaries</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.02020105.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017a00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010609.06000000</Identification>
+<Symbol>TargetFrameComponentMaxRef</Symbol>
+<Description>Maximum value for RGB components, e.g. 60160 or 65535 (16 bits)</Description>
+<Name>Target Frame Component Max Ref</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017a00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010609.07000000</Identification>
+<Symbol>TargetFrameComponentMinRef</Symbol>
+<Description>Minimum value for RGB components, e.g. 0 or 4096 (16 bits)</Description>
+<Name>Target Frame Component Min Ref</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017a00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010609.08000000</Identification>
+<Symbol>TargetFrameEssenceStreamID</Symbol>
+<Description>Essence (or its container) stream ID</Description>
+<Name>Target Frame Essence StreamID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017a00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010609.09000000</Identification>
+<Symbol>ACESPictureSubDescriptorInstanceID</Symbol>
+<Description>Specifies the Instance ID of an ACES Picture Essence SubDescriptor</Description>
+<Name>ACES Picture SubDescriptor Instance ID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017a00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010609.0a000000</Identification>
+<Symbol>TargetFrameViewingEnvironment</Symbol>
+<Description>Specifies a Viewing Environment for a Target Frame</Description>
+<Name>Target Frame Viewing Environment</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.02020108.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017a00</MemberOf>
+</PropertyDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.01010102.06010107.01000000</Identification>
 <Symbol>ParentClass</Symbol>
@@ -5297,18 +6507,6 @@ Minimum Display Mastering Luminance metadata as specified in ST 2086
 <LocalIdentification>4</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.02250000</MemberOf>
 </PropertyDefinition>
-<PropertyAliasDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010101.01011502.00000000</Identification>
-<Symbol>InstanceID</Symbol>
-<Description>Unique ID of an instance</Description>
-<Name>Instance ID</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
-<IsOptional>false</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>15370</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.02260000</MemberOf>
-<OriginalProperty>urn:smpte:ul:060e2b34.01010101.01011502.00000000</OriginalProperty>
-</PropertyAliasDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010d.06010107.1b000000</Identification>
 <Symbol>ExtensionSchemeID</Symbol>
@@ -5364,18 +6562,6 @@ Minimum Display Mastering Luminance metadata as specified in ST 2086
 <LocalIdentification>40</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.02260000</MemberOf>
 </PropertyDefinition>
-<PropertyAliasDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010101.01011502.00000000</Identification>
-<Symbol>InstanceID</Symbol>
-<Description>Unique ID of an instance</Description>
-<Name>Instance ID</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
-<IsOptional>false</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>15370</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.03000000</MemberOf>
-<OriginalProperty>urn:smpte:ul:060e2b34.01010101.01011502.00000000</OriginalProperty>
-</PropertyAliasDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010a.06010107.16000000</Identification>
 <Symbol>RootMetaDictionary</Symbol>
@@ -5420,18 +6606,6 @@ Minimum Display Mastering Luminance metadata as specified in ST 2086
 <LocalIdentification>34</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.03000000</MemberOf>
 </PropertyDefinition>
-<PropertyAliasDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010101.01011502.00000000</Identification>
-<Symbol>InstanceID</Symbol>
-<Description>Unique ID of an instance</Description>
-<Name>Instance ID</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
-<IsOptional>false</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>15370</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010201.01100100</MemberOf>
-<OriginalProperty>urn:smpte:ul:060e2b34.01010101.01011502.00000000</OriginalProperty>
-</PropertyAliasDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.01010105.05300406.00000000</Identification>
 <Symbol>IndexEditRate</Symbol>
@@ -5476,30 +6650,6 @@ Minimum Display Mastering Luminance metadata as specified in ST 2086
 <LocalIdentification>16133</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010201.01100100</MemberOf>
 </PropertyDefinition>
-<PropertyAliasDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010104.01030405.00000000</Identification>
-<Symbol>IndexStreamID</Symbol>
-<Description>Index table stream ID</Description>
-<Name>Index Stream ID</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
-<IsOptional>true</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>16134</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010201.01100100</MemberOf>
-<OriginalProperty>urn:smpte:ul:060e2b34.01010104.01030405.00000000</OriginalProperty>
-</PropertyAliasDefinition>
-<PropertyAliasDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010104.01030404.00000000</Identification>
-<Symbol>EssenceStreamID</Symbol>
-<Description>Essence (or its container) stream ID</Description>
-<Name>Essence Stream ID</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
-<IsOptional>false</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>16135</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010201.01100100</MemberOf>
-<OriginalProperty>urn:smpte:ul:060e2b34.01010104.01030404.00000000</OriginalProperty>
-</PropertyAliasDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.01010104.04040401.01000000</Identification>
 <Symbol>SliceCount</Symbol>
@@ -5616,7 +6766,7 @@ Minimum Display Mastering Luminance metadata as specified in ST 2086
 <Description>Weak Reference to the DM Segment that (directly or indirectly) strongly references this Description instance</Description>
 <Name>Linked Descriptive Framework Plug-In ID</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.05090500.00000000</Type>
-<IsOptional>false</IsOptional>
+<IsOptional>true</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.00000000</MemberOf>
@@ -6579,17 +7729,6 @@ Minimum Display Mastering Luminance metadata as specified in ST 2086
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.01180100</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010103.02300501.02000000</Identification>
-<Symbol>JobFunctionCode</Symbol>
-<Description>Code for the function of the participating parties (e.g., editor, actor)</Description>
-<Name>Job Function Code</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.02020204.00000000</Type>
-<IsOptional>true</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>0</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.01180100</MemberOf>
-</PropertyDefinition>
-<PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.01010103.02300502.01000000</Identification>
 <Symbol>RoleName</Symbol>
 <Description>eg. Name of character played</Description>
@@ -7326,18 +8465,6 @@ Minimum Display Mastering Luminance metadata as specified in ST 2086
 <LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.011e0100</MemberOf>
 </PropertyDefinition>
-<PropertyAliasDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010102.010a0101.01010000</Identification>
-<Symbol>DeviceManufacturerName</Symbol>
-<Description>The manufacturer or maker of the device</Description>
-<Name>Device Manufacturer Name</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
-<IsOptional>true</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>0</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.011e0100</MemberOf>
-<OriginalProperty>urn:smpte:ul:060e2b34.01010102.010a0101.01010000</OriginalProperty>
-</PropertyAliasDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.01010101.01012003.00000000</Identification>
 <Symbol>DeviceModel</Symbol>

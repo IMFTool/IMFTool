@@ -109,5 +109,6 @@ private:
 			//{"http://www.smpte-ra.org/schemas/2067-40/2016", "App #4"},
 			{"http://www.smpte-ra.org/schemas/2067-20/2013", "App #2 2013"},
 			{"http://www.smpte-ra.org/schemas/2067-21/2014", "App #2E 2014"},
+			{"http://www.smpte-ra.org/ns/2067-50/2017", "App #5 ACES"},
 	};
 };

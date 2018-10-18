@@ -65,9 +65,14 @@ Error MetadataExtractor::ReadMetadata(Metadata &rMetadata, const QString &rSourc
 		EssenceType_t essence_type = ESS_UNKNOWN;
 		if(is_mxf_file(rSourceFile)) {
 			Result_t result = ASDCP::EssenceType(source_file.absoluteFilePath().toStdString(), essence_type);
-			//qDebug()<<essence_type;
+			qDebug()<< QString(source_file.absoluteFilePath()) << essence_type;
 			if(ASDCP_SUCCESS(result)) {
 				switch(essence_type) {
+#ifdef APP5_ACES
+					case  ASDCP::ESS_AS02_ACES:
+						error = ReadAcesMxfDescriptor(rMetadata, source_file);
+						break;
+#endif
 					case ASDCP::ESS_AS02_JPEG_2000:
 						error = ReadJP2KMxfDescriptor(rMetadata, source_file);
 						break;
@@ -99,6 +104,91 @@ Error MetadataExtractor::ReadMetadata(Metadata &rMetadata, const QString &rSourc
 	return error;
 }
 
+#ifdef APP5_ACES
+Error MetadataExtractor::ReadAcesMxfDescriptor(Metadata &rMetadata, const QFileInfo &rSourceFile) {
+
+	Error error;
+	Metadata metadata(Metadata::Aces);
+	metadata.fileName = rSourceFile.fileName();
+	metadata.filePath = rSourceFile.filePath();
+	AESDecContext* p_context = NULL;
+	HMACContext* p_hmac = NULL;
+	AS_02::ACES::MXFReader reader;
+	AS_02::ACES::FrameBuffer frame_buffer;
+	quint32 frame_count = 0;
+
+	Result_t result = reader.OpenRead(rSourceFile.absoluteFilePath().toStdString());
+
+	if(ASDCP_SUCCESS(result)) {
+		WriterInfo writerinfo;
+		result = reader.FillWriterInfo(writerinfo);
+		if(KM_SUCCESS(result)) {
+			char str_buf[16], str_buf2[40];
+			metadata.assetId = convert_uuid((unsigned char*)writerinfo.AssetUUID);
+		}
+		ASDCP::MXF::RGBAEssenceDescriptor *aces_descriptor = NULL;
+		result = reader.OP1aHeader().GetMDObjectByType(DefaultCompositeDict().ul(MDD_RGBAEssenceDescriptor), reinterpret_cast<MXF::InterchangeObject**>(&aces_descriptor));
+
+		if(KM_SUCCESS(result) && aces_descriptor) {
+			if(aces_descriptor->ContainerDuration.empty() == false) frame_count = aces_descriptor->ContainerDuration.get();
+			else 			frame_count = reader.AS02IndexReader().GetDuration();
+		}
+		if(frame_count == 0) {
+			error = Error(Error::UnknownDuration, QString(), true);
+		}
+		metadata.duration = Duration(frame_count);
+		if(aces_descriptor) {
+			metadata.colorEncoding = Metadata::RGBA;
+			metadata.editRate = EditRate(aces_descriptor->SampleRate.Numerator, aces_descriptor->SampleRate.Denominator);
+			metadata.aspectRatio = aces_descriptor->AspectRatio;
+			if(aces_descriptor->DisplayHeight.empty() == false) metadata.displayHeight = aces_descriptor->DisplayHeight;
+			else if(aces_descriptor->SampledHeight.empty() == false) metadata.displayHeight = aces_descriptor->SampledHeight;
+			else metadata.displayHeight = aces_descriptor->StoredHeight;
+			if(aces_descriptor->DisplayWidth.empty() == false) metadata.displayWidth = aces_descriptor->DisplayWidth;
+			else if(aces_descriptor->SampledWidth.empty() == false) metadata.displayWidth = aces_descriptor->SampledWidth;
+			else metadata.displayWidth = aces_descriptor->StoredWidth;
+			metadata.storedHeight = aces_descriptor->StoredHeight;
+			metadata.storedWidth = aces_descriptor->StoredWidth;
+			metadata.horizontalSubsampling = 1;
+			metadata.componentDepth = 253;
+			ASDCP::UL TransferCharacteristic; // (k)
+			ASDCP::UL ColorPrimaries; // (k)
+			ColorPrimaries = aces_descriptor->ColorPrimaries;
+			TransferCharacteristic = aces_descriptor->TransferCharacteristic;
+			// get ColorPrimaries
+			char buf[64];
+			QString CP;
+			if (ColorPrimaries.HasValue()) {
+
+				CP = ColorPrimaries.EncodeString(buf, 64);
+				CP = CP.toLower(); //.replace(".", "");
+				metadata.colorPrimaries = SMPTE::ColorPrimariesMap[CP];
+			}
+
+			// get TransferCharacteristic
+			QString TC;
+			if (TransferCharacteristic.HasValue()){
+				TC = TransferCharacteristic.EncodeString(buf, 64);
+				TC = TC.toLower(); //.replace(".", "");
+				metadata.transferCharcteristics = SMPTE::TransferCharacteristicMap[TC];
+
+			}
+			if (aces_descriptor->PictureEssenceCoding.HasValue()) {
+				char buf[64];
+				metadata.pictureEssenceCoding = QString(aces_descriptor->PictureEssenceCoding.EncodeString(buf, 64));
+			}
+			result = reader.FillAncillaryResourceList(metadata.AncillaryResources);
+			if(KM_FAILURE(result)) qWarning() << "Couldn't extract informations about anc. resources";
+		}
+	}
+	else {
+		error = Error(result);
+		return error;
+	}
+	rMetadata = metadata;
+	return error;
+}
+#endif
 
 Error MetadataExtractor::ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileInfo &rSourceFile) {
 

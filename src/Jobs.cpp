@@ -404,13 +404,20 @@ Error JobExtractEssenceDescriptor::Execute() {
 //WR
 
 
-JobCallPhoton::JobCallPhoton(const QString &rWorkingDirectory) :
-AbstractJob("Generating Photon IMP QC Report"), mWorkingDirectory(rWorkingDirectory) {
+JobCallPhoton::JobCallPhoton(const QString &rWorkingDirectory, WidgetImpBrowser* &rWidgetImpBrowser) :
+AbstractJob("Generating Photon IMP QC Report"), mWorkingDirectory(rWorkingDirectory),  mWidgetImpBrowser(rWidgetImpBrowser){
 
 }
 
 Error JobCallPhoton::Execute() {
 
+	//Figure out IMF App
+	QVector<QString> appList = mWidgetImpBrowser->GetImfPackage().data()->GetApplicationIdentificationList();
+	QString appString = "app2or2E";
+	if ( appList.contains("http://www.smpte-ra.org/ns/2067-50/2017") &&
+			appList.contains("http://www.smpte-ra.org/ns/2067-50/2017") ) appString = "all";
+	else if (appList.contains("http://www.smpte-ra.org/ns/2067-50/2017")) appString = "app5";
+	qDebug() << appString;
 	Error error;
 	QString qresult;
 	QProcess *myProcess = new QProcess();
@@ -424,6 +431,8 @@ Error JobCallPhoton::Execute() {
 #endif
 	arg << "com.netflix.imflibrary.app.IMPAnalyzer";
 	arg << mWorkingDirectory;
+	arg << "--application";
+	arg << appString;
 	emit Progress(20);
 	myProcess->start(program, arg);
 	emit Progress(40);

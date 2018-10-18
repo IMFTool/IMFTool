@@ -82,6 +82,9 @@ void WizardResourceGenerator::InitLayout() {
 		case Metadata::Jpeg2000:
 			SwitchMode(eMode::Jpeg2000Mode);
 			break;
+		case Metadata::Aces:
+			SwitchMode(eMode::ExrMode);
+			break;
 		case Metadata::Pcm:
 			SwitchMode(eMode::WavMode);
 			break;
@@ -354,6 +357,8 @@ void WizardResourceGeneratorPage::InitLayout() {
 		p_wrapper_layout_four->addWidget(new QLabel(tr("Picture Essence Encoding:")), 1, 0, 1, 1);
 		if (SMPTE::J2K_ProfilesMap.contains(metadata.pictureEssenceCoding))
 			p_wrapper_layout_four->addWidget(new QLabel(SMPTE::vJ2K_Profiles[SMPTE::J2K_ProfilesMap[metadata.pictureEssenceCoding]]), 1, 1, 1, 1);
+		else if (SMPTE::ACES_ProfilesMap.contains(metadata.pictureEssenceCoding))
+			p_wrapper_layout_four->addWidget(new QLabel(SMPTE::vACES_Profiles[SMPTE::ACES_ProfilesMap[metadata.pictureEssenceCoding]]), 1, 1, 1, 1);
 		else
 			p_wrapper_layout_four->addWidget(new QLabel("Unknown"), 1, 1, 1, 1);
 //		p_wrapper_layout_four->addWidget(new QLabel(metadata.GetAsString()), 2, 0, 1, 2);
@@ -385,7 +390,7 @@ void WizardResourceGeneratorPage::InitLayout() {
 			p_wrapper_layout_four->addWidget(new QLabel(QObject::tr("%1:%2:%3").arg(4).arg(4 / metadata.horizontalSubsampling).arg(4 / metadata.horizontalSubsampling)), 8, 1, 1, 1);
 		p_wrapper_layout_four->addWidget(new QLabel(tr("Color Depth:")), 9, 0, 1, 1);
 		if(metadata.componentDepth != 0)
-			p_wrapper_layout_four->addWidget(new QLabel(QObject::tr("%1 bit").arg(metadata.componentDepth)), 9, 1, 1, 1);
+			p_wrapper_layout_four->addWidget(new QLabel(QObject::tr("%1").arg((metadata.componentDepth == 253 ? "16 bit float" : metadata.componentDepth+" bit"))), 9, 1, 1, 1);
 		p_wrapper_layout_four->addWidget(new QLabel(tr("Primaries:")), 10, 0, 1, 1);
 		p_wrapper_layout_four->addWidget(new QLabel(SMPTE::vColorPrimaries[metadata.colorPrimaries]), 10, 1, 1, 1);
 		p_wrapper_layout_four->addWidget(new QLabel(tr("OETF:")), 11, 0, 1, 1);
@@ -406,6 +411,7 @@ void WizardResourceGeneratorPage::InitLayout() {
 	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::WavIndex, p_wrapper_widget_two);
 	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::TTMLIndex, p_wrapper_widget_three);
 	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::Jpeg2000Index, p_wrapper_widget_four);
+	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::ExrIndex, p_wrapper_widget_four);
 	setLayout(mpStackedLayout);
 
 	registerField(FIELD_NAME_SELECTED_FILES"*", this, "FilesSelected", SIGNAL(FilesListChanged()));
@@ -801,6 +807,9 @@ bool WizardResourceGeneratorPage::isComplete() const {
 void WizardResourceGeneratorPage::SwitchMode(WizardResourceGenerator::eMode mode) {
 
 	switch(mode) {
+		case WizardResourceGenerator::ExrMode:
+			mpStackedLayout->setCurrentIndex(ExrIndex);
+			break;
 		case WizardResourceGenerator::WavMode:
 			mpStackedLayout->setCurrentIndex(WavIndex);
 			mpFileDialog->setNameFilters(QStringList() << "*.wav" );

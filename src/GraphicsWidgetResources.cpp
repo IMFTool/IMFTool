@@ -751,39 +751,62 @@ void GraphicsWidgetFileResource::slotAssetAdded(QSharedPointer<Asset> rAsset) {
 }
 
 void GraphicsWidgetVideoResource::restartThread(QSharedPointer<AssetMxfTrack> rAsset) {
-	if (decodeProxyThread->isRunning()) {
+	if (decodeProxyThread && decodeProxyThread->isRunning()) {
 		decodeProxyThread->quit();
 		decodeProxyThread->wait();
 	}
-	mpJP2K = new JP2K_Preview(); // (k)
-	mpJP2K->asset = rAsset; // (k)
+	// mImfApplication may change, e.g. when an OV is loaded on top of a Partial IMP
+	if (!rAsset.isNull()) {
+		switch (mAssset->GetEssenceType()) {
+		case Metadata::Jpeg2000:
+			mImfApplication = ::App2e;
+			break;
 
-	decodeProxyThread = new QThread();
-	mpJP2K->moveToThread(decodeProxyThread);
+		case Metadata::Aces:
+			mImfApplication = ::App5;
+			break;
 
-	connect(decodeProxyThread, SIGNAL(started()), mpJP2K, SLOT(getProxy()));
-	connect(mpJP2K, SIGNAL(finished()), decodeProxyThread, SLOT(quit()));
-	connect(mpJP2K, SIGNAL(proxyFinished(const QImage&, const QImage&)), this, SLOT(rShowProxyImage(const QImage&, const QImage&)));
+		default:
+			mImfApplication = ::App2e;
+		}
+
+	}
+	if (mImfApplication != ::App5) {
+		mpJP2K = new JP2K_Preview(); // (k)
+		mpJP2K->asset = rAsset; // (k)
+
+		decodeProxyThread = new QThread();
+		mpJP2K->moveToThread(decodeProxyThread);
+
+		connect(decodeProxyThread, SIGNAL(started()), mpJP2K, SLOT(getProxy()));
+		connect(mpJP2K, SIGNAL(finished()), decodeProxyThread, SLOT(quit()));
+		connect(mpJP2K, SIGNAL(proxyFinished(const QImage&, const QImage&)), this, SLOT(rShowProxyImage(const QImage&, const QImage&)));
+	}
+#ifdef APP5_ACES
+	else {
+		mpACES = new ACES_Preview(); // (k)
+		mpACES->asset = rAsset; // (k)
+
+		decodeProxyThread = new QThread();
+		mpACES->moveToThread(decodeProxyThread);
+
+		connect(decodeProxyThread, SIGNAL(started()), mpACES, SLOT(getProxy()));
+		connect(mpACES, SIGNAL(finished()), decodeProxyThread, SLOT(quit()));
+		connect(mpACES, SIGNAL(proxyFinished(const QImage&, const QImage&)), this, SLOT(rShowProxyImage(const QImage&, const QImage&)));
+
+	}
+#endif
 
 
 }
 
 GraphicsWidgetVideoResource::GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/, int video_timeline_index,
 		const QSharedPointer<ImfPackage> rImfPackage /* = 0 */) :
-mpJP2K(0), // (k)
+mpJP2K(0), mpACES(0), // (k)
 GraphicsWidgetFileResource(pParent, pResource, rAsset, QColor(CPL_COLOR_VIDEO_RESOURCE), rImfPackage), mLeftProxyImage(":/proxy_film.png"), mRightProxyImage(":/proxy_film.png"), mTrimActive(false) {
 
 
-
-	mpJP2K = new JP2K_Preview(); // (k)
-	mpJP2K->asset = mAssset; // (k)
-
-	decodeProxyThread = new QThread();
-	mpJP2K->moveToThread(decodeProxyThread);
-
-	connect(decodeProxyThread, SIGNAL(started()), mpJP2K, SLOT(getProxy()));
-	connect(mpJP2K, SIGNAL(finished()), decodeProxyThread, SLOT(quit()));
-	connect(mpJP2K, SIGNAL(proxyFinished(const QImage&, const QImage&)), this, SLOT(rShowProxyImage(const QImage&, const QImage&)));
+	this->restartThread(mAssset);
 
 	connect(this, SIGNAL(SourceDurationChanged(const Duration&, const Duration&)), this, SLOT(rSourceDurationChanged()));
 	connect(this, SIGNAL(EntryPointChanged(const Duration&, const Duration&)), this, SLOT(rEntryPointChanged()));
@@ -793,18 +816,11 @@ GraphicsWidgetFileResource(pParent, pResource, rAsset, QColor(CPL_COLOR_VIDEO_RE
 }
 
 GraphicsWidgetVideoResource::GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, const QSharedPointer<AssetMxfTrack> &rAsset) :
-mpJP2K(0), // (k)
+mpJP2K(0), mpACES(0), // (k)
 GraphicsWidgetFileResource(pParent, rAsset, QColor(CPL_COLOR_VIDEO_RESOURCE)), mLeftProxyImage(":/proxy_film.png"), mRightProxyImage(":/proxy_film.png"), mTrimActive(false) {
 
 
-	mpJP2K = new JP2K_Preview(); // (k)
-	mpJP2K->asset = mAssset; // (k)
-	decodeProxyThread = new QThread();
-	mpJP2K->moveToThread(decodeProxyThread);
-
-	connect(decodeProxyThread, SIGNAL(started()), mpJP2K, SLOT(getProxy()));
-	connect(mpJP2K, SIGNAL(finished()), decodeProxyThread, SLOT(quit()));
-	connect(mpJP2K, SIGNAL(proxyFinished(const QImage&, const QImage&)), this, SLOT(rShowProxyImage(const QImage&, const QImage&)));
+	this->restartThread(mAssset);
 
 	connect(this, SIGNAL(SourceDurationChanged(const Duration&, const Duration&)), this, SLOT(rSourceDurationChanged()));
 	connect(this, SIGNAL(EntryPointChanged(const Duration&, const Duration&)), this, SLOT(rEntryPointChanged()));
@@ -848,6 +864,7 @@ void GraphicsWidgetVideoResource::paint(QPainter *pPainter, const QStyleOptionGr
 		
 			// (k) - start
 			if (!proxysVisible) {
+				qDebug() << "Call RefreshProxy";
 				proxysVisible = true; // (so proxies don't get loaded twice...)
 				RefreshProxy();
 			}
@@ -959,19 +976,33 @@ void GraphicsWidgetVideoResource::rEntryPointChanged() {
 }
 
 void GraphicsWidgetVideoResource::RefreshProxy() {
-
 	if (decodeProxyThread->isRunning()) decodeProxyThread->quit();
 
-	// first proxy
-	Timecode first_frame = GetFirstVisibleFrame();
-	mpJP2K->mFirst_proxy = first_frame.GetTargetFrame(); // set frame number
+	if (mImfApplication != ::App5) {
+		// first proxy
+		Timecode first_frame = GetFirstVisibleFrame();
+		mpJP2K->mFirst_proxy = first_frame.GetTargetFrame(); // set frame number
 
-	// second proxy
-	Timecode last_frame = GetLastVisibleFrame();
-	mpJP2K->mSecond_proxy = last_frame.GetTargetFrame(); // set frame number
+		// second proxy
+		Timecode last_frame = GetLastVisibleFrame();
+		mpJP2K->mSecond_proxy = last_frame.GetTargetFrame(); // set frame number
+	}
+#ifdef APP5_ACES
+	else {
+		// first proxy
+		Timecode first_frame = GetFirstVisibleFrame();
+		mpACES->mFirst_proxy = first_frame.GetTargetFrame(); // set frame number
 
+
+		// second proxy
+		Timecode last_frame = GetLastVisibleFrame();
+		mpACES->mSecond_proxy = last_frame.GetTargetFrame(); // set frame number
+
+	}
+#endif
 	// start decoding process
 	decodeProxyThread->start(QThread::LowPriority);
+
 }
 
 void GraphicsWidgetVideoResource::RefreshFirstProxy() {
