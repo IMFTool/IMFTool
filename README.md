@@ -2,8 +2,8 @@
 A tool for editing IMF CPLs and creating new versions of an existing IMF package
 
 ## NEW IN THIS BRANCH
-This branch contains beta code for App#5 ACES support in IMF Tool
-Binary installers are available in Folder Binary_Installers/
+This branch contains beta code for App#5 ACES support in IMF Tool.
+Binary installers are available in Folder [Binary_Installers](https://github.com/IMFTool/IMFTool/tree/App%235_ACES/Binary_Installers)
 
 ## What is IMF Tool
 IMF Tool supports browsing and limited editing of IMF [[1]](#imf-intro) packages (IMPs).
