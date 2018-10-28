@@ -56,9 +56,6 @@ public:
 	//QSharedPointer<AS_02::JP2K::MXFReader> reader_shared;
 	int src_bitdepth, prec_shift, max, layer = 3, RGBrange, RGBmaxcv;
 
-	// enable conversion? (much slower!!)
-	bool convert_to_709 = true; // default
-
 	opj_dparameters_t params; // decoding parameters
 
 	Metadata::eColorEncoding ColorEncoding; // YCbCr or RGB

@@ -66,7 +66,6 @@ void ACES_Preview::getProxy() {
 
 
 	mCpus = 1; // (default for proxys)
-	convert_to_709 = false; // (default for proxys)
 	params.cp_reduce = 4; // (default for proxy)
 
 	setAsset(); // initialize reader
@@ -147,7 +146,7 @@ void ACES_Preview::decode() {
 		setAsset();
 	}
 
-	if (!err && extractFrame(mFrameNr)) { // frame extraction was successfull -> decode frame
+	if (!err && extractFrame(mFrameNr)) { // frame extraction was successful -> decode frame
 
 		// try to decode image
 		if ( !err) {
@@ -182,6 +181,7 @@ bool ACES_Preview::extractFrame(qint64 frameNr) {
 
 	// create new buffer
 	buff = new AS_02::ACES::FrameBuffer();
+	bool retValue = false;
 
 	// calculate neccessary buffer size
 	if (ASDCP_SUCCESS(reader->AS02IndexReader().Lookup((frameNr + 1), IndexF2))) { // next frame
@@ -207,15 +207,15 @@ bool ACES_Preview::extractFrame(qint64 frameNr) {
 	if (ASDCP_SUCCESS(reader->ReadFrame(frameNr, *buff, NULL, NULL))) {
 		pAcesIStream = new As02AcesIStream();
 		pAcesIStream->InitBuffer(*buff);
-		return true;
+		retValue = true;
 	}
 	else {
 		mMsg = "Error reading frame!"; // ERROR
 		err = true;
-		return false;
 	}
+	buff->~FrameBuffer();
 
-	return false; // default
+	return retValue;
 }
 
 
@@ -239,6 +239,7 @@ QImage ACES::DataToQImage()
 			Rgba pix = inPixels[y][x];
 			Imath::Vec3<float> vec3in(pix.r, pix.g, pix.b);
 			Imath::Vec3<float> vec3out;
+			//vec3out.x = 0.1; vec3out.y = 0.2; vec3out.z = 0.3;
 			A0Rec709TransformMatrix.multVecMatrix(vec3in, vec3out);
 			int r,g,b,a;
 			r = max_f_*vec3out[0]; if (r>=max_f) r = max_f - 1; if (r<0) r = 0;
@@ -250,6 +251,8 @@ QImage ACES::DataToQImage()
 			image.setPixelColor(x, y, QColor(r,g,b));
 		}
 	}
+	// Clean up
+	if (pAcesIStream) pAcesIStream->~As02AcesIStream();
 	return image;
 }
 

@@ -28,7 +28,6 @@
 
 //#define DEBUG_JP2K
 
- // #################################################### MXFP_decode #######################################################
 ACES_Decoder::ACES_Decoder(QSharedPointer<DecodedFrames> &rdecoded_shared, QSharedPointer<ACES_FrameRequest> &rRequest, float* &Roetf_709_shared, float* &Reotf_2020_shared, float* &Reotf_PQ_shared) {
 
 	// set stuff
@@ -41,7 +40,6 @@ ACES_Decoder::ACES_Decoder(QSharedPointer<DecodedFrames> &rdecoded_shared, QShar
 	max_f = 1 << bitdepth;
 	max_f_ = (float)(max_f)-1.0;
 
-	//reader = new AS_02::JP2K::MXFReader();
 	reader = new AS_02::ACES::MXFReader();
 
 }
@@ -71,15 +69,15 @@ void ACES_Decoder::run() {
 		if (!ASDCP_SUCCESS(result_o)) {
 
 			request->errorMsg = QString("Failed to open reader: %1").arg(result_o.Label());
-			request->error = true; // an error occured processing the frame
+			request->error = true; // an error occurred processing the frame
 			return;
 		}
 		else {
 			current_asset = request->asset;
 		}
-	} // else : correct reader is alrady open
+	} // else : correct reader is already open
 
-	// calculate neccessary buffer size
+	// calculate necessary buffer size
 	Result_t f_next = reader->AS02IndexReader().Lookup((request->frameNr + 1), IndexF2);
 	if (ASDCP_SUCCESS(f_next)) { // next frame
 		Result_t f_this = reader->AS02IndexReader().Lookup(request->frameNr, IndexF1);
@@ -103,32 +101,10 @@ void ACES_Decoder::run() {
 	else {
 		//		request->errorMsg = QString("%1 -> Slow HDD? (speed: ~%2 Mb/s)").arg(res.Label()).arg((request->fps * pMemoryStream.dataSize) / 1024 / 1024);
 		request->errorMsg = QString("Slow HDD? (speed: N.N. Mb/s)");
-		request->error = true; // an error occured processing the frame
+		request->error = true; // an error occurred processing the frame
 		return;
 	}
 	
-/*	pMemoryStream.offset = 0;
-	pStream = opj_stream_create_default_memory_stream(&pMemoryStream, OPJ_TRUE);
-	params.cp_reduce = request->layer; // set current layer
-	pDecompressor = OPENJPEG_H::opj_create_decompress(OPJ_CODEC_J2K); // create new decompresser*/
-
-	// Setup the decoder
-
-	// try reading header
-
-	// try decoding image
-/*	if (!OPENJPEG_H::opj_decode(pDecompressor, pStream, psImage)) {
-
-		request->errorMsg = "Failed to decode JPX image";
-		request->error = true; // an error occured processing the frame
-
-		buff->~FrameBuffer();
-		OPENJPEG_H::opj_destroy_codec(pDecompressor);
-		OPENJPEG_H::opj_stream_destroy(pStream);
-		OPENJPEG_H::opj_image_destroy(psImage);
-		return;
-	}*/
-
 	// success:
 	request->decoded = DataToQImage(); // create image
 	request->done = true; // image is ready

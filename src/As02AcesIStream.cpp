@@ -48,7 +48,7 @@ void As02AcesIStream::seekg(Imf::Int64 pos) {
 
 void As02AcesIStream::clear() {
 
-	qDebug() << "Clear was called. Nothing to do here.";
+	//qDebug() << "Clear was called. Nothing to do here.";
 }
 
 void As02AcesIStream::InitBuffer(const AS_02::ACES::FrameBuffer &rBuffer) {

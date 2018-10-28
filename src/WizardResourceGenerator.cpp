@@ -287,11 +287,6 @@ void WizardResourceGeneratorPage::InitLayout() {
 			/* -----Denis Manthey----- */
 
 
-	QWidget *p_wrapper_widget_one = new QWidget(this);
-	QGridLayout *p_wrapper_layout_one = new QGridLayout();
-	p_wrapper_layout_one->setContentsMargins(0, 0, 0, 0);
-	p_wrapper_layout_one->addWidget(new QLabel(tr("Frame Rate:"), this), 0, 0, 1, 1);
-	p_wrapper_layout_one->addWidget(mpComboBoxEditRate, 0, 1, 1, 1);
 	QWidget *p_wrapper_widget_two = new QWidget(this);
 	QGridLayout *p_wrapper_layout_two = new QGridLayout();
 	p_wrapper_layout_two->setContentsMargins(0, 0, 0, 0);
@@ -348,54 +343,60 @@ void WizardResourceGeneratorPage::InitLayout() {
 	p_wrapper_layout_four->setContentsMargins(0, 0, 0, 0);
 
 	if (mReadOnly && mAsset) {
+		int i = -1;
 		Metadata metadata = mAsset->GetMetadata();
 		QLabel* label = new QLabel();
-		label->setText(metadata.pictureEssenceCoding);
 		label->setTextInteractionFlags(Qt::TextSelectableByMouse);
-		p_wrapper_layout_four->addWidget(new QLabel(tr("Picture Essence Encoding UL:")), 0, 0, 1, 1);
-		p_wrapper_layout_four->addWidget(label, 0, 1, 1, 1);
-		p_wrapper_layout_four->addWidget(new QLabel(tr("Picture Essence Encoding:")), 1, 0, 1, 1);
+		label->setText(metadata.assetId.toString());
+		p_wrapper_layout_four->addWidget(new QLabel(tr("Track File ID:")), ++i, 0, 1, 1);
+		p_wrapper_layout_four->addWidget(label, i, 1, 1, 1);
+		label = new QLabel();
+		label->setTextInteractionFlags(Qt::TextSelectableByMouse);
+		label->setText(metadata.pictureEssenceCoding);
+		p_wrapper_layout_four->addWidget(new QLabel(tr("Picture Essence Encoding UL:")), ++i, 0, 1, 1);
+		p_wrapper_layout_four->addWidget(label, i, 1, 1, 1);
+		p_wrapper_layout_four->addWidget(new QLabel(tr("Picture Essence Encoding:")), ++i, 0, 1, 1);
 		if (SMPTE::J2K_ProfilesMap.contains(metadata.pictureEssenceCoding))
-			p_wrapper_layout_four->addWidget(new QLabel(SMPTE::vJ2K_Profiles[SMPTE::J2K_ProfilesMap[metadata.pictureEssenceCoding]]), 1, 1, 1, 1);
+			p_wrapper_layout_four->addWidget(new QLabel(SMPTE::vJ2K_Profiles[SMPTE::J2K_ProfilesMap[metadata.pictureEssenceCoding]]), i, 1, 1, 1);
 		else if (SMPTE::ACES_ProfilesMap.contains(metadata.pictureEssenceCoding))
-			p_wrapper_layout_four->addWidget(new QLabel(SMPTE::vACES_Profiles[SMPTE::ACES_ProfilesMap[metadata.pictureEssenceCoding]]), 1, 1, 1, 1);
+			p_wrapper_layout_four->addWidget(new QLabel(SMPTE::vACES_Profiles[SMPTE::ACES_ProfilesMap[metadata.pictureEssenceCoding]]), i, 1, 1, 1);
 		else
-			p_wrapper_layout_four->addWidget(new QLabel("Unknown"), 1, 1, 1, 1);
-//		p_wrapper_layout_four->addWidget(new QLabel(metadata.GetAsString()), 2, 0, 1, 2);
-
-		p_wrapper_layout_four->addWidget(new QLabel(tr("Duration:")), 2, 0, 1, 1);
+			p_wrapper_layout_four->addWidget(new QLabel("Unknown"), ++i, 1, 1, 1);
+		p_wrapper_layout_four->addWidget(new QLabel(tr("Duration:")), ++i, 0, 1, 1);
 		if(metadata.duration.IsValid() && metadata.editRate.IsValid())
-			p_wrapper_layout_four->addWidget(new QLabel(metadata.duration.GetAsString(metadata.editRate)), 2, 1, 1, 1);
-		p_wrapper_layout_four->addWidget(new QLabel(tr("Frame Rate:")), 3, 0, 1, 1);
+			p_wrapper_layout_four->addWidget(new QLabel(metadata.duration.GetAsString(metadata.editRate)), i, 1, 1, 1);
+		p_wrapper_layout_four->addWidget(new QLabel(tr("Frame Rate:")), ++i, 0, 1, 1);
 		if(metadata.editRate.IsValid() == true)
-			p_wrapper_layout_four->addWidget(new QLabel(metadata.editRate.GetName()), 3, 1, 1, 1);
-		p_wrapper_layout_four->addWidget(new QLabel(tr("Stored Resolution:")), 4, 0, 1, 1);
+			p_wrapper_layout_four->addWidget(new QLabel(metadata.editRate.GetName()), i, 1, 1, 1);
+		p_wrapper_layout_four->addWidget(new QLabel(tr("Stored Resolution:")), ++i, 0, 1, 1);
 		if(metadata.storedHeight != 0 || metadata.storedWidth != 0)
-			p_wrapper_layout_four->addWidget(new QLabel(QObject::tr("%1 x %2").arg(metadata.storedWidth).arg(metadata.storedHeight)), 4, 1, 1, 1);
-		p_wrapper_layout_four->addWidget(new QLabel(tr("Displayed Resolution:")), 5, 0, 1, 1);
+			p_wrapper_layout_four->addWidget(new QLabel(QObject::tr("%1 x %2").arg(metadata.storedWidth).arg(metadata.storedHeight)), i, 1, 1, 1);
+		p_wrapper_layout_four->addWidget(new QLabel(tr("Displayed Resolution:")), ++i, 0, 1, 1);
 		if(metadata.displayHeight != 0 || metadata.displayWidth != 0)
-			p_wrapper_layout_four->addWidget(new QLabel(QObject::tr("%1 x %2").arg(metadata.displayWidth).arg(metadata.displayHeight)), 5, 1, 1, 1);
-		p_wrapper_layout_four->addWidget(new QLabel(tr("Aspect Ratio:")), 6, 0, 1, 1);
+			p_wrapper_layout_four->addWidget(new QLabel(QObject::tr("%1 x %2").arg(metadata.displayWidth).arg(metadata.displayHeight)), i, 1, 1, 1);
+		p_wrapper_layout_four->addWidget(new QLabel(tr("Aspect Ratio:")), ++i, 0, 1, 1);
 		if(metadata.aspectRatio != ASDCP::Rational())
-			p_wrapper_layout_four->addWidget(new QLabel(QObject::tr("%1 (%2:%3)").arg(metadata.aspectRatio.Quotient()).arg(metadata.aspectRatio.Numerator).arg(metadata.aspectRatio.Denominator)), 6, 1, 1, 1);
-		p_wrapper_layout_four->addWidget(new QLabel(tr("Color Mode:")), 7, 0, 1, 1);
+			p_wrapper_layout_four->addWidget(new QLabel(QObject::tr("%1 (%2:%3)").arg(metadata.aspectRatio.Quotient()).arg(metadata.aspectRatio.Numerator).arg(metadata.aspectRatio.Denominator)), i, 1, 1, 1);
+		p_wrapper_layout_four->addWidget(new QLabel(tr("Color Mode:")), ++i, 0, 1, 1);
 		if(metadata.horizontalSubsampling != 0 && metadata.colorEncoding != metadata.Unknown_Color_Encoding) {
 			if(metadata.colorEncoding == Metadata::RGBA)
-				p_wrapper_layout_four->addWidget(new QLabel("RGB"), 7, 1, 1, 1);
+				p_wrapper_layout_four->addWidget(new QLabel("RGB"), i, 1, 1, 1);
 			else if(metadata.colorEncoding == Metadata::CDCI)
-				p_wrapper_layout_four->addWidget(new QLabel("YCbCr"), 7, 1, 1, 1);
+				p_wrapper_layout_four->addWidget(new QLabel("YCbCr"), i, 1, 1, 1);
 		}
-		p_wrapper_layout_four->addWidget(new QLabel(tr("Color Sampling:")), 8, 0, 1, 1);
+		p_wrapper_layout_four->addWidget(new QLabel(tr("Color Sampling:")), ++i, 0, 1, 1);
 		if(metadata.horizontalSubsampling != 0)
-			p_wrapper_layout_four->addWidget(new QLabel(QObject::tr("%1:%2:%3").arg(4).arg(4 / metadata.horizontalSubsampling).arg(4 / metadata.horizontalSubsampling)), 8, 1, 1, 1);
-		p_wrapper_layout_four->addWidget(new QLabel(tr("Color Depth:")), 9, 0, 1, 1);
-		if(metadata.componentDepth != 0)
-			p_wrapper_layout_four->addWidget(new QLabel(QObject::tr("%1").arg((metadata.componentDepth == 253 ? "16 bit float" : metadata.componentDepth+" bit"))), 9, 1, 1, 1);
-		p_wrapper_layout_four->addWidget(new QLabel(tr("Primaries:")), 10, 0, 1, 1);
-		p_wrapper_layout_four->addWidget(new QLabel(SMPTE::vColorPrimaries[metadata.colorPrimaries]), 10, 1, 1, 1);
-		p_wrapper_layout_four->addWidget(new QLabel(tr("OETF:")), 11, 0, 1, 1);
-		p_wrapper_layout_four->addWidget(new QLabel(SMPTE::vTransferCharacteristic[metadata.transferCharcteristics]), 11, 1, 1, 1);
-
+			p_wrapper_layout_four->addWidget(new QLabel(QObject::tr("%1:%2:%3").arg(4).arg(4 / metadata.horizontalSubsampling).arg(4 / metadata.horizontalSubsampling)), i, 1, 1, 1);
+		p_wrapper_layout_four->addWidget(new QLabel(tr("Color Depth:")), ++i, 0, 1, 1);
+		if(metadata.componentDepth == 253) {
+			p_wrapper_layout_four->addWidget(new QLabel(QObject::tr("16 bit float")), i, 1, 1, 1);
+		} else if(metadata.componentDepth != 0) {
+			p_wrapper_layout_four->addWidget(new QLabel(QObject::tr("%1 bit").arg(metadata.componentDepth)), i, 1, 1, 1);
+		}
+		p_wrapper_layout_four->addWidget(new QLabel(tr("Primaries:")), ++i, 0, 1, 1);
+		p_wrapper_layout_four->addWidget(new QLabel(SMPTE::vColorPrimaries[metadata.colorPrimaries]), i, 1, 1, 1);
+		p_wrapper_layout_four->addWidget(new QLabel(tr("OETF:")), ++i, 0, 1, 1);
+		p_wrapper_layout_four->addWidget(new QLabel(SMPTE::vTransferCharacteristic[metadata.transferCharcteristics]), i, 1, 1, 1);
 
 		QWidget* empty = new QWidget();
 		empty->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
@@ -407,7 +408,6 @@ void WizardResourceGeneratorPage::InitLayout() {
 
 
 	mpStackedLayout = new QStackedLayout();
-	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::ExrIndex, p_wrapper_widget_one);
 	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::WavIndex, p_wrapper_widget_two);
 	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::TTMLIndex, p_wrapper_widget_three);
 	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::Jpeg2000Index, p_wrapper_widget_four);

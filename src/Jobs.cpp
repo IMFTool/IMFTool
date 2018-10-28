@@ -411,15 +411,17 @@ AbstractJob("Generating Photon IMP QC Report"), mWorkingDirectory(rWorkingDirect
 
 Error JobCallPhoton::Execute() {
 
-	//Figure out IMF App
-	QVector<QString> appList = mWidgetImpBrowser->GetImfPackage().data()->GetApplicationIdentificationList();
-	QString appString = "app2or2E";
-	if ( appList.contains("http://www.smpte-ra.org/ns/2067-50/2017") &&
-			appList.contains("http://www.smpte-ra.org/ns/2067-50/2017") ) appString = "all";
-	else if (appList.contains("http://www.smpte-ra.org/ns/2067-50/2017")) appString = "app5";
-	qDebug() << appString;
 	Error error;
 	QString qresult;
+
+	//Figure out IMF App
+	QString appString = "app2or2E";
+	if (mWidgetImpBrowser && mWidgetImpBrowser->GetImfPackage()) {
+		QVector<QString> appList = mWidgetImpBrowser->GetImfPackage().data()->GetApplicationIdentificationList();
+		if ( appList.contains("http://www.smpte-ra.org/ns/2067-50/2017") &&
+				appList.contains("http://www.smpte-ra.org/ns/2067-50/2017") ) appString = "all";
+		else if (appList.contains("http://www.smpte-ra.org/ns/2067-50/2017")) appString = "app5";
+	}
 	QProcess *myProcess = new QProcess();
 	const QString program = "java";
 	QStringList arg;

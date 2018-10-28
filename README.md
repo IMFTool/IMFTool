@@ -2,7 +2,7 @@
 A tool for editing IMF CPLs and creating new versions of an existing IMF package
 
 ## NEW IN THIS BRANCH
-This branch contains beta code for App#5 ACES support in IMF Tool.
+This branch contains beta code for App#5 ACES support in IMF Tooli (in addition to App #2/2E).
 Binary installers are available in Folder [Binary_Installers](https://github.com/IMFTool/IMFTool/tree/App%235_ACES/Binary_Installers)
 
 ## What is IMF Tool
@@ -53,7 +53,7 @@ IMF Tool is multi-platform and has been susccesfully built under Mac OS X 10.10 
 The build system is based on CMake. Please use CMake to create make files and project files for eclipse or Visual Studio. Installation instructions including CMake screenshots are provided as pdf file here.
 Prerequisites:
 -	Qt Version 5.x
--	asdcplib, see http://www.cinecert.com. IMPORTANT: A few files of asdcplib-2.x.xx need to be replaced by the files provided in folder asdcplib-2.x.xx-patches
+-	asdcplib, see http://www.cinecert.com. 
 -	libxsd
 -	Xerces 3.1
 -	Requires OpenJPEG 2.2 (with multi-threading support), available at https://github.com/uclouvain/openjpeg

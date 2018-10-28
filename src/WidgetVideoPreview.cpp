@@ -667,16 +667,21 @@ void WidgetVideoPreview::setPlaylist(QVector<VideoResource> &rPlayList, QVector<
 			height = rPlayList.at(count).asset->GetMetadata().storedHeight;
 		}
 
-		for (int i = 0; i <= 5; i++) {
-			int w = width / pow(2, i);
-			int h = height / pow(2, i);
-			qualities[i] = new QAction(QString("%1 x %2").arg(w).arg(h)); // create new action
-			qualities[i]->setData(i);
-			qualities[i]->setCheckable(true);
-			if (i == decode_layer) qualities[i]->setChecked(true); // default
-			menuQuality->addAction(qualities[i]);
+		if (mImfApplication != ::App5) {
+			for (int i = 0; i <= 5; i++) {
+				int w = width / pow(2, i);
+				int h = height / pow(2, i);
+				qualities[i] = new QAction(QString("%1 x %2").arg(w).arg(h)); // create new action
+				qualities[i]->setData(i);
+				qualities[i]->setCheckable(true);
+				if (i == decode_layer) qualities[i]->setChecked(true); // default
+				menuQuality->addAction(qualities[i]);
+			}
+		} else {
+			qualities[0] = new QAction(QString("%1 x %2").arg(width).arg(height));
+			qualities[0]->setData(0);
+			menuQuality->addAction(qualities[0]);
 		}
-
 		// load first picture in preview
 		decoding_time->setText("loading...");
 		currentAsset = rPlayList[0].asset;
@@ -761,11 +766,11 @@ void WidgetVideoPreview::rChangeSpeed(QAction *action) {
 
 void WidgetVideoPreview::rChangeQuality(QAction *action) {
 
-	if (decode_layer != action->data().value<int>()) {
-		qualities[decode_layer]->setChecked(false); // uncheck 'old' layer
+	if (mImfApplication != ::App5) {
+		if (decode_layer != action->data().value<int>()) {
+			qualities[decode_layer]->setChecked(false); // uncheck 'old' layer
 
-		decode_layer = action->data().value<int>();
-		if (mImfApplication != ::App5) {
+			decode_layer = action->data().value<int>();
 			player->setLayer(decode_layer);
 			decoders[0]->setLayer(decode_layer);
 			decoders[1]->setLayer(decode_layer);
@@ -777,12 +782,9 @@ void WidgetVideoPreview::rChangeQuality(QAction *action) {
 				decoding_time->setText("loading...");
 			}
 		}
-#ifdef APP5_ACES
-		// No layers in App 5
-#endif
-	}
-	else {
-		qualities[decode_layer]->setChecked(true); // check again!
+		else {
+			qualities[decode_layer]->setChecked(true); // check again!
+		}
 	}
 }
 
@@ -874,17 +876,7 @@ void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 		}
 #ifdef APP5_ACES
 		else {
-			mpACESDecoders[0]->convert_to_709 = action->isChecked(); // set in decoder 0
-			mpACESDecoders[1]->convert_to_709 = action->isChecked(); // set in decoder 1
-			mpACESPlayer->convert_to_709(action->isChecked()); // set in player
-
-			if (!player_playing) {
-				// reload current preview
-				decoding_time->setText("loading...");
-				now_running = !now_running; // use same decoder (relevant frame is still set)
-				mpACESDecodingThreads[(int)(now_running)]->start(QThread::HighestPriority); // start decoder (again)
-			}
-
+			action->setChecked(true);
 		}
 #endif
 

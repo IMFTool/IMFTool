@@ -49,7 +49,6 @@ public:
 	void setPlaylist(QVector<VideoResource>& rPlaylist);
 	void setPos(qint64 frameNr, qint64 frame_total, int playlist_index);
 	void clean();
-	void convert_to_709(bool convert);
 
 	float frame_playing_total_float = 0; // current playing position (within track)
 	bool playing = false; // currently playing
@@ -63,7 +62,7 @@ private:
 	void playLoop();
 
 	// decoders
-	static const int decoders = 5;
+	static const int decoders = 50;
 	QThreadPool* threadPool; // threadpool used by the n decoders
 	ACES_FrameRequest* request_queue[decoders]; // array were n frame requests are stored
 	ACES_Decoder* decoder_queue[decoders]; // array were n decoder instances are stored

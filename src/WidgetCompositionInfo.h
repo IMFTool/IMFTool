@@ -45,12 +45,13 @@ private:
 	QDataWidgetMapper *mpMapper;
 	CompositionInfoModel *mpModel;
 	UndoProxyModel *mpProxyModel;
-	const QMap<QString, QString> mApplicationIdentificationMap {
+	const QMap<QString, QString> mApplicationIdentificationSelectionMap {
 			{"http://www.smpte-ra.org/schemas/2067-20/2016", "App #2"},
 			{"http://www.smpte-ra.org/schemas/2067-21/2016", "App #2E"},
 			//{"http://www.smpte-ra.org/schemas/2067-40/2016", "App #4"},
 			{"http://www.smpte-ra.org/schemas/2067-20/2013", "App #2 2013"},
 			{"http://www.smpte-ra.org/schemas/2067-21/2014", "App #2E 2014"},
+			{"http://www.smpte-ra.org/ns/2067-50/2017", "App #5 ACES"},
 	};
 	const QStringList mContentKindList {
 		"advertisement",
@@ -106,9 +107,11 @@ private:
 	const QMap<QString, QString> mApplicationIdentificationMap {
 			{"http://www.smpte-ra.org/schemas/2067-20/2016", "App #2"},
 			{"http://www.smpte-ra.org/schemas/2067-21/2016", "App #2E"},
-			//{"http://www.smpte-ra.org/schemas/2067-40/2016", "App #4"},
+			{"http://www.smpte-ra.org/schemas/2067-40/2016", "App #4"},
 			{"http://www.smpte-ra.org/schemas/2067-20/2013", "App #2 2013"},
 			{"http://www.smpte-ra.org/schemas/2067-21/2014", "App #2E 2014"},
 			{"http://www.smpte-ra.org/ns/2067-50/2017", "App #5 ACES"},
+			{"tag:apple.com,2017:imf:rdd45:2017", "App ProRes"},
+			{"http://www.digitalproductionpartnership.co.uk/schema/imf/TSP2121-1/2018", "Application DPP (ProRes)"},
 	};
 };

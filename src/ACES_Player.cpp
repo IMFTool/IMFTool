@@ -439,10 +439,3 @@ void ACES_Player::setFps(int set_fps){
 void ACES_Player::setLayer(int rLayer){
 	layer = rLayer;
 }
-
-void ACES_Player::convert_to_709(bool convert) {
-
-	for (int i = 0; i < decoders; i++) {
-		decoder_queue[i]->convert_to_709 = convert; // set in decoder [i]
-	}
-}
