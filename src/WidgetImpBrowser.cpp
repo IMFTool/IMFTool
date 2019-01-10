@@ -41,6 +41,10 @@
 #include <cmath>
 #include <QTextEdit>
 #include <QByteArray>
+#include <QLabel>
+#include <QFile>
+#include <QPushButton>
+#include <QDesktopServices>
 #include "WizardEssenceDescriptor.h"
 #include "SMPTE-2067-9a-2018-Sidecar.h"
 
@@ -55,7 +59,8 @@ QFrame(pParent), mpViewImp(NULL), mpViewAssets(NULL), mpImfPackage(NULL), mpTool
 	mpUndoStack = new QUndoStack(this);
 	mpJobQueue = new JobQueue(this);
 	mpJobQueue->SetInterruptIfError(true);
-	connect(mpJobQueue, SIGNAL(finished()), this, SLOT(rJobQueueFinished()));
+	//connect moved to StartQueue() calls:
+	//connect(mpJobQueue, SIGNAL(finished()), this, SLOT(rJobQueueFinished()));
 	InitLayout();
 	InitToolbar();
 }
@@ -237,10 +242,9 @@ void WidgetImpBrowser::UninstallImp() {
 		disconnect(mpImfPackage.data(), NULL, this, NULL);
 	} (k) */
 	mpButtonAddOv->setEnabled(false);
-
-	disconnect(mpViewAssets->selectionModel(), NULL, this, NULL);
+	if (mpViewAssets->selectionModel()) disconnect(mpViewAssets->selectionModel(), NULL, this, NULL);
 	//disconnect(mpViewImp, NULL, this, NULL);
-	disconnect(mpImfPackage.data(), NULL, this, NULL);
+	if (mpImfPackage.data()) disconnect(mpImfPackage.data(), NULL, this, NULL);
 	emit ImplInstalled(false);
 	emit ImpSaveStateChanged(false);
 	mpUndoStack->clear();
@@ -291,6 +295,7 @@ void WidgetImpBrowser::rCustomMenuRequested(QPoint pos) {
 			QAction *open_action = new QAction(QIcon(":/edit.png"), tr("Open CPL"), this);
 			QAction *view_metadata_action = new QAction(QIcon(":/information.png"), tr("View metadata"), this);
 			QAction *view_essence_descriptor_action = new QAction(QIcon(":/information.png"), tr("View essence descriptor"), this);
+			QAction *extract_targetframe_action = new QAction(QIcon(":/folder.png"), tr("Extract target frames"), this);
 			connect(remove_action, SIGNAL(triggered(bool)), this, SLOT(rRemoveSelectedRow()));
 			//connect(delete_action, SIGNAL(triggered(bool)), this, SLOT(rDeleteSelectedRow()));
 			connect(view_scm_action, SIGNAL(triggered(bool)), this, SLOT(rShowSidecarCompositionMapGeneratorView()));
@@ -299,6 +304,7 @@ void WidgetImpBrowser::rCustomMenuRequested(QPoint pos) {
 			//connect(edit_action, SIGNAL(triggered(bool)), this, SLOT(rShowResourceGeneratorForSelectedRow()));
 			connect(view_metadata_action, SIGNAL(triggered(bool)), this, SLOT(rShowMetadata()));
 			connect(view_essence_descriptor_action, SIGNAL(triggered(bool)), this, SLOT(rShowEssenceDescriptor()));
+			connect(extract_targetframe_action, SIGNAL(triggered(bool)), this, SLOT(rExtractTargetFrames()));
 			menu.addAction(remove_action);
 			//menu.addAction(delete_action);
 			//menu.addSeparator();
@@ -316,6 +322,9 @@ void WidgetImpBrowser::rCustomMenuRequested(QPoint pos) {
 					if (asset->Exists() || assetMxfTrack->HasSourceFiles())
 						menu.addAction(view_metadata_action);
 					if(asset->Exists()) menu.addAction(view_essence_descriptor_action);
+					if (assetMxfTrack->GetEssenceType() == Metadata::Aces) {
+						menu.addAction(extract_targetframe_action);
+					}
 				}
 				if(asset->GetType() == Asset::scm) {
 					menu.addAction(view_scm_action);
@@ -389,6 +398,8 @@ void WidgetImpBrowser::Save() {
 					mpJobQueue->AddJob(p_hash_job);
 				}
 			}
+			disconnect(mpJobQueue, SIGNAL(finished()), 0, 0);
+			connect(mpJobQueue, SIGNAL(finished()), this, SLOT(rJobQueueFinished()));
 			mpJobQueue->StartQueue();
 			//connect(mpJobQueue, SIGNAL(finished()), this, SLOT(rReinstallImp()));
 		}
@@ -781,6 +792,25 @@ void WidgetImpBrowser::rJobQueueFinished() {
 	}
 }
 
+void WidgetImpBrowser::rJobQueueFinishedTargetFrames() {
+	mpProgressDialog->reset();
+	QString error_msg;
+	QList<Error> errors = mpJobQueue->GetErrors();
+	for(int i = 0; i < errors.size(); i++) {
+		error_msg.append(QString("%1: %2\n%3\n").arg(i + 1).arg(errors.at(i).GetErrorMsg()).arg(errors.at(i).GetErrorDescription()));
+	}
+	error_msg.chop(1); // remove last \n
+	if (error_msg != "") {
+		qDebug() << "rJobQueueFinishedTargetFrames error:" << error_msg;
+		mpMsgBox->setText(tr("Critical error, can't extract Target Frames:"));
+		mpMsgBox->setInformativeText(error_msg + "\n\n Aborting to extract Target Frames");
+		mpMsgBox->setStandardButtons(QMessageBox::Ok);
+		mpMsgBox->setDefaultButton(QMessageBox::Ok);
+		mpMsgBox->setIcon(QMessageBox::Critical);
+		mpMsgBox->exec();
+	}
+}
+
 void WidgetImpBrowser::rImpViewDoubleClicked(const QModelIndex &rIndex) {
 
 	if(mpImfPackage) {
@@ -825,6 +855,20 @@ void WidgetImpBrowser::rShowEssenceDescriptor() {
 	QSharedPointer<AssetMxfTrack> asset = mpImfPackage->GetAsset(mpSortProxyModelImp->mapToSource(mpViewImp->currentIndex()).row()).objectCast<AssetMxfTrack>();
 	if(asset) {
 		rShowEssenceDescriptorForAsset(asset);
+	}
+
+}
+
+void WidgetImpBrowser::rExtractTargetFrames() {
+	QSharedPointer<AssetMxfTrack> asset = mpImfPackage->GetAsset(mpSortProxyModelImp->mapToSource(mpViewImp->currentIndex()).row()).objectCast<AssetMxfTrack>();
+	if(asset) {
+		mpJobQueue->FlushQueue();
+		JobExtractTargetFrames *p_extract_job = new JobExtractTargetFrames(asset);
+		connect(p_extract_job, SIGNAL(Result(const QStringList, const QVariant)), this, SLOT(rExtractTargetFramesWidget(const QStringList, const QVariant)));
+		mpJobQueue->AddJob(p_extract_job);
+		disconnect(mpJobQueue, SIGNAL(finished()), 0, 0);
+		connect(mpJobQueue, SIGNAL(finished()), this, SLOT(rJobQueueFinishedTargetFrames()));
+		mpJobQueue->StartQueue();
 	}
 
 }
@@ -988,6 +1032,8 @@ void WidgetImpBrowser::RecalcHashForCpls() {
 			asset_cpl->SetIsNewOrModified(false);
 		}
 	}
+	disconnect(mpJobQueue, SIGNAL(finished()), 0, 0);
+	connect(mpJobQueue, SIGNAL(finished()), this, SLOT(rJobQueueFinished()));
 	mpJobQueue->StartQueue();
 	qDebug() << "mpJobQueue->StartQueue";
 	//mpJobQueue will send signal finished(), calling SLOT WidgetImpBrowser::rJobQueueFinished
@@ -1242,6 +1288,103 @@ void WidgetImpBrowser::rLoadRequest() {
 			}
 
 		}
+	}
+}
+
+void WidgetImpBrowser::rExtractTargetFramesWidget(const QStringList target_frame_file_list, const QVariant &rIdentifier) {
+	mTargetFrameFileList = target_frame_file_list;
+	QWizard *target_frame_wizard = new QWizard(0, Qt::Popup | Qt::Dialog );
+	// Create wizard page
+	QWizardPage *target_frame_wizard_page = new QWizardPage(target_frame_wizard);
+	target_frame_wizard->addPage(target_frame_wizard_page);
+	target_frame_wizard->resize(600,600);
+	target_frame_wizard->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	target_frame_wizard->setWindowModality(Qt::WindowModal);
+	target_frame_wizard->setWindowTitle(tr("Target Frames"));
+	target_frame_wizard->setWizardStyle(QWizard::ModernStyle);
+	target_frame_wizard->setStyleSheet("QWizard QPushButton {min-width: 60 px;}");
+
+	// Create layout for text widget and buttons
+	QVBoxLayout *vbox_layout = new QVBoxLayout();
+	QList<QLineEdit*> entry_list;
+	if (mTargetFrameFileList.isEmpty()) {
+		vbox_layout->addWidget(new QLabel("<No Target Frames present>"));
+		target_frame_wizard_page->setLayout(vbox_layout);
+	} else {
+		QGridLayout *p_grid_layout = new QGridLayout();
+		p_grid_layout->setVerticalSpacing(3);
+
+		for (int i=0; i < mTargetFrameFileList.size(); i++) {
+			QLineEdit* entry = new QLineEdit(QFileInfo(mTargetFrameFileList.at(i)).fileName());
+			QPushButton* button = new QPushButton("Preview");
+			connect(button, &QPushButton::clicked,
+			[this, i]() {
+				this->slotPreviewClicked(i);
+			}
+			);
+			p_grid_layout->addWidget(button, i+1, 1, 1, 1, Qt::AlignTop);
+			p_grid_layout->addWidget(entry, i+1, 2, 1, 1, Qt::AlignTop);
+
+		}
+		target_frame_wizard_page->setLayout(p_grid_layout);
+	}
+
+	QList<QWizard::WizardButton> layout;
+	target_frame_wizard->setOption(QWizard::HaveCustomButton1, true);
+	target_frame_wizard->setButtonText(QWizard::CustomButton1, tr("Copy Target Frames to IMP directory"));
+	layout << QWizard::CustomButton1 << QWizard::Stretch <<  QWizard::CancelButton;
+	target_frame_wizard->setButtonLayout(layout);
+	connect(target_frame_wizard->button(QWizard::CustomButton1), SIGNAL(clicked()), this, SLOT(SaveTargetFrames()));
+	connect(target_frame_wizard->button(QWizard::CustomButton1), SIGNAL(clicked()), target_frame_wizard, SLOT(close()));
+
+	if (mTargetFrameFileList.isEmpty())
+		target_frame_wizard->button(QWizard::CustomButton1)->setDisabled(true);
+
+	target_frame_wizard->setAttribute(Qt::WA_DeleteOnClose, true);
+	target_frame_wizard->show();
+	target_frame_wizard->activateWindow();
+}
+
+void WidgetImpBrowser::SaveTargetFrames() {
+	bool result;
+	if (!mTargetFrameFileList.isEmpty())
+		result = mpImfPackage->GetRootDir().mkpath("target_frames");
+	if (!result) {
+		mpMsgBox->setText(tr("Target Frame write error"));
+		mpMsgBox->setInformativeText(tr("Cannot create directory: %1").arg(mpImfPackage->GetRootDir().absoluteFilePath("target_frames")));
+		mpMsgBox->setStandardButtons(QMessageBox::Ok);
+		mpMsgBox->setDefaultButton(QMessageBox::Ok);
+		mpMsgBox->setIcon(QMessageBox::Critical);
+		mpMsgBox->exec();
+	}
+
+	QDir write_dir = mpImfPackage->GetRootDir();
+
+	for (int i=0; i < mTargetFrameFileList.size(); i++) {
+		QLabel* entry = new QLabel(QFileInfo(mTargetFrameFileList.at(i)).fileName(), this);
+		write_dir.cd("target_frames");
+		result = QFile::copy(QFileInfo(mTargetFrameFileList.at(i)).absoluteFilePath(), write_dir.absoluteFilePath(QFileInfo(mTargetFrameFileList.at(i)).fileName()));
+		if (!result) {
+			mpMsgBox->setText(tr("Target Frame write error"));
+			mpMsgBox->setInformativeText(tr("Cannot write file: %1").arg(write_dir.absoluteFilePath(QFileInfo(mTargetFrameFileList.at(i)).fileName())));
+			mpMsgBox->setStandardButtons(QMessageBox::Ok);
+			mpMsgBox->setDefaultButton(QMessageBox::Ok);
+			mpMsgBox->setIcon(QMessageBox::Critical);
+			mpMsgBox->exec();
+		}
+	}
+}
+
+void WidgetImpBrowser::slotPreviewClicked(int entry) {
+	bool result;
+	result = QDesktopServices::openUrl(QUrl("file:///" + QFileInfo(mTargetFrameFileList.at(entry)).absoluteFilePath(), QUrl::TolerantMode));
+	if (!result) {
+		mpMsgBox->setText(tr("Target Frame preview error"));
+		mpMsgBox->setInformativeText(tr("Cannot preview file: %1").arg(QFileInfo(mTargetFrameFileList.at(entry)).fileName()));
+		mpMsgBox->setStandardButtons(QMessageBox::Ok);
+		mpMsgBox->setDefaultButton(QMessageBox::Ok);
+		mpMsgBox->setIcon(QMessageBox::Critical);
+		mpMsgBox->exec();
 	}
 }
 

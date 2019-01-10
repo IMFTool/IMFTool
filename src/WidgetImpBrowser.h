@@ -78,7 +78,7 @@ signals:
 	void CallSaveAllCpl();
 	void AssetAdded(QSharedPointer<AssetMxfTrack> &rAsset);
 
-	public slots:
+public slots:
 	void Save();
 	void ShowResourceGeneratorWavMode();
 	void ShowResourceGeneratorTimedTextMode();
@@ -86,10 +86,13 @@ signals:
 	void RecalcHashForCpls();
 	void ShowResourceGeneratorMxfMode();
 	void slotCurrentChanged(const QModelIndex &selected, const QModelIndex &deselected);
+	void rExtractTargetFramesWidget(const QStringList, const QVariant &rIdentifier);
+	void SaveTargetFrames();
+	void slotPreviewClicked(int);
 	//WR end
 	void ShowSidecarCompositionMapGenerator(QSharedPointer<AssetScm> rAssetScm = QSharedPointer<AssetScm>(), WizardSidecarCompositionMapGenerator::eMode rMode = WizardSidecarCompositionMapGenerator::NewScm);
 
-	private slots :
+private slots :
 	void rRemoveSelectedRow();
 	void rDeleteSelectedRow();
 	void rShowResourceGeneratorForSelectedRow();
@@ -100,12 +103,14 @@ signals:
 	void rCustomMenuRequested(QPoint pos);
 	void rMapCurrentRowSelectionChanged(const QModelIndex &rCurrent, const QModelIndex &rPrevious);
 	void rJobQueueFinished();
+	void rJobQueueFinishedTargetFrames();
 	void rImpViewDoubleClicked(const QModelIndex &rIndex);
 	void rOpenCplTimeline();
 	void rReinstallImp();
 	//WR
 	void rShowMetadata();
 	void rShowEssenceDescriptor();
+	void rExtractTargetFrames();
 	void SetMxfFile(const QStringList &rFiles);
 	void SetMxfFileDirectory(const QString&);
 	void rLoadRequest();
@@ -145,6 +150,6 @@ private:
 	QList<QSharedPointer<ImfPackage> > mAdditionalPackages;
 	QList<QSharedPointer<Asset> > mAdditionalAssets;
 	QToolButton *mpButtonAddOv;
-
+	QStringList mTargetFrameFileList;
 	//WR
 };

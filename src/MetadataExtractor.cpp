@@ -65,7 +65,6 @@ Error MetadataExtractor::ReadMetadata(Metadata &rMetadata, const QString &rSourc
 		EssenceType_t essence_type = ESS_UNKNOWN;
 		if(is_mxf_file(rSourceFile)) {
 			Result_t result = ASDCP::EssenceType(source_file.absoluteFilePath().toStdString(), essence_type);
-			qDebug()<< QString(source_file.absoluteFilePath()) << essence_type;
 			if(ASDCP_SUCCESS(result)) {
 				switch(essence_type) {
 #ifdef APP5_ACES

@@ -2,7 +2,7 @@
 A tool for editing IMF CPLs and creating new versions of an existing IMF package
 
 ## NEW IN THIS BRANCH
-This branch contains beta code for App#5 ACES support in IMF Tooli (in addition to App #2/2E).
+This branch contains beta code for App#5 ACES support in IMF Tool (in addition to App #2/2E).
 Binary installers are available in Folder [Binary_Installers](https://github.com/IMFTool/IMFTool/tree/App%235_ACES/Binary_Installers)
 
 ## What is IMF Tool
@@ -13,6 +13,10 @@ Introductory videos are available on YouTube [[2]](#imf-video), [[3]](#imf-video
 ## Workflows supported:
 -	Open an IMP, visualize the timeline of the CPL(s) included in the IMP
 -	NEW: Support for IMF App#5 ACES
+        - OpenEXR ACES preview and playback
+        - Target frame export in IMF Tool
+        - SubDescriptor processing and visualization
+        - Implementations of the final SMPTE ULs registered for ST 2065-5 and ST 2067-50
 -	Add Sidecar Assets to an IMP ("Add Asset" --> Add Sidecar Assets)
 -	Create, view and edit Sidecar Composition Maps (SCMs)
 -	Add a Photon QC report as sidecar file (hint: export the sidecar QC report as a Partial IMP, this leaves the Original IMP unmodified!)
@@ -53,7 +57,7 @@ IMF Tool is multi-platform and has been susccesfully built under Mac OS X 10.10 
 The build system is based on CMake. Please use CMake to create make files and project files for eclipse or Visual Studio. Installation instructions including CMake screenshots are provided as pdf file here.
 Prerequisites:
 -	Qt Version 5.x
--	asdcplib, see http://www.cinecert.com. 
+-	asdcplib 2.10.31, see http://www.cinecert.com. 
 -	libxsd
 -	Xerces 3.1
 -	Requires OpenJPEG 2.2 (with multi-threading support), available at https://github.com/uclouvain/openjpeg

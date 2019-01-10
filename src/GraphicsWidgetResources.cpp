@@ -864,7 +864,6 @@ void GraphicsWidgetVideoResource::paint(QPainter *pPainter, const QStyleOptionGr
 		
 			// (k) - start
 			if (!proxysVisible) {
-				qDebug() << "Call RefreshProxy";
 				proxysVisible = true; // (so proxies don't get loaded twice...)
 				RefreshProxy();
 			}

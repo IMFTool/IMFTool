@@ -208,3 +208,23 @@ private:
 
 };
 
+class JobExtractTargetFrames : public AbstractJob {
+
+	Q_OBJECT
+
+public:
+	JobExtractTargetFrames(const QSharedPointer<AssetMxfTrack> rAssetMxf);
+	virtual ~JobExtractTargetFrames() {}
+
+signals:
+	void Result(const QStringList rResult, const QVariant &rIdentifier);
+
+protected:
+	virtual Error Execute();
+
+private:
+	Q_DISABLE_COPY(JobExtractTargetFrames);
+
+	const QSharedPointer<AssetMxfTrack> mAssetMxf;
+
+};
