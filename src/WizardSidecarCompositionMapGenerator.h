@@ -28,8 +28,6 @@
 #include <QStandardItemModel>
 #include <QFrame>
 
-#include <QRadioButton>
-
 
 //#define ASSET_ID_DYNAMIK_PROPERTY "AssetId"
 //#define ASSET_ESSENCE_TYPE "EssenceType"

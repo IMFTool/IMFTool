@@ -58,10 +58,9 @@ set(tool_src main.cpp MainWindow.cpp KMQtLogSink.cpp QtWaitingSpinner.cpp Widget
 	CustomProxyStyle.cpp GraphicScenes.cpp GraphicsWidgetResources.cpp GraphicsViewScaleable.cpp WidgetTrackDedails.cpp GraphicsWidgetComposition.cpp
 	GraphicsWidgetSequence.cpp Events.cpp WidgetCentral.cpp
 	WidgetCompositionInfo.cpp UndoProxyModel.cpp JobQueue.cpp Jobs.cpp Error.cpp EmptyTimedTextGenerator.cpp WizardPartialImpGenerator.cpp
-	WidgetVideoPreview.cpp WidgetImagePreview.cpp JP2K_Preview.cpp JP2K_Player.cpp JP2K_Decoder.cpp TTMLParser.cpp WidgetTimedTextPreview.cpp TimelineParser.cpp createLUTs.cpp # (k)
+	WidgetVideoPreview.cpp WidgetImagePreview.cpp JP2K_Preview.cpp JP2K_Player.cpp JP2K_Decoder.cpp TTMLParser.cpp WidgetTimedTextPreview.cpp TimelineParser.cpp # (k)
 	WidgetContentVersionList.cpp WidgetContentVersionListCommands.cpp WidgetLocaleList.cpp WidgetLocaleListCommands.cpp WizardEssenceDescriptor.cpp#WR
-	#Player.cpp Preview.cpp
-	WizardSidecarCompositionMapGenerator.cpp
+	WizardSidecarCompositionMapGenerator.cpp WizardDeliverySpecificationCheck.cpp WizardCompositionGenerator.cpp
 	)
 
 # header
@@ -72,15 +71,15 @@ set(tool_src ${tool_src} global.h MainWindow.h KMQtLogSink.h QtWaitingSpinner.h
 	CustomProxyStyle.h GraphicScenes.h GraphicsWidgetResources.h GraphicsViewScaleable.h WidgetTrackDedails.h GraphicsWidgetComposition.h
 	GraphicsWidgetSequence.h Events.h WidgetCentral.h Int24.h
 	WidgetCompositionInfo.h UndoProxyModel.h SafeBool.h JobQueue.h Jobs.h Error.h EmptyTimedTextGenerator.h WizardPartialImpGenerator.h
-	WidgetVideoPreview.h WidgetImagePreview.h JP2K_Preview.h JP2K_Player.h JP2K_Decoder.h TTMLParser.h WidgetTimedTextPreview.h TimelineParser.h createLUTs.h SMPTE_Labels.h # (k)
+	WidgetVideoPreview.h WidgetImagePreview.h JP2K_Preview.h JP2K_Player.h JP2K_Decoder.h TTMLParser.h WidgetTimedTextPreview.h TimelineParser.h SMPTE_Labels.h # (k)
 	WidgetContentVersionList.h WidgetContentVersionListCommands.h WidgetLocaleList.h WidgetLocaleListCommands.h WizardEssenceDescriptor.h# WR
-	#Player.h Preview.h
-	WizardSidecarCompositionMapGenerator.h
+	WizardSidecarCompositionMapGenerator.h WizardDeliverySpecificationCheck.h WizardCompositionGenerator.h
 	)
 
 set(synthesis_src synthesis/dcmlTypes.cpp synthesis/SMPTE-429-8-2006-PKL.cpp synthesis/SMPTE-429-8-2014-AM.cpp synthesis/SMPTE-2067-2-2013-Core.cpp 
 	synthesis/SMPTE-2067-3-2013-CPL.cpp synthesis/SMPTE-2067-100a-2014-OPL.cpp synthesis/xml.cpp synthesis/xmldsig-core-schema.cpp
 	synthesis/st2067-2a-2016-Core.cpp synthesis/st2067-2b-2016-PKL.cpp synthesis/st2067-3a-2016-CPL.cpp synthesis/SMPTE-2067-9a-2018-Sidecar.cpp
+	synthesis/IMF_DeliverySchema.cpp
 	)
 
 source_group("Resource Files" FILES ${qt_rcc_resources} ${win_resources} ${open_cl_src})

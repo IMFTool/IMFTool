@@ -18,6 +18,7 @@
 #include "info.h"
 #include "ImfCommon.h"
 #include "ImfPackage.h"
+#include "IMF_DeliverySchema.h"
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/framework/LocalFileFormatTarget.hpp>
@@ -204,6 +205,28 @@ private:
 	Q_DISABLE_COPY(JobCreateScm);
 
 	const QSharedPointer<AssetScm> mAssetScm;
+
+};
+
+class JobDeliverySpecificationCheck : public AbstractJob {
+
+	Q_OBJECT
+
+public:
+	JobDeliverySpecificationCheck(const QSharedPointer<AssetCpl> rAssetCpl, const dsl::DeliverableType_CompositionPlaylistConstraintsType* rDslConstraints);
+	virtual ~JobDeliverySpecificationCheck() {}
+
+signals:
+	void Result(const QList<QStringList> &rResult);
+
+protected:
+	virtual Error Execute();
+
+private:
+	Q_DISABLE_COPY(JobDeliverySpecificationCheck);
+
+	const QSharedPointer<AssetCpl> mAssetCpl;
+	const dsl::DeliverableType_CompositionPlaylistConstraintsType* mDslConstraints;
 
 };
 

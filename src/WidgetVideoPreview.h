@@ -26,7 +26,6 @@
 #include <QMenu>
 #include <QAction>
 #include <QTextEdit>
-#include "createLUTs.h"
 #include <QMessageBox>
 
 class WidgetImagePreview;

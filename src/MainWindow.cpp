@@ -44,6 +44,7 @@
 #include <QProgressDialog>
 #include <QTextEdit>
 #include <QClipboard>
+#include "WizardDeliverySpecificationCheck.h"
 //WR
 
 
@@ -161,11 +162,18 @@ void MainWindow::InitMenuAndToolbar() {
 	connect(this, SIGNAL(ImpClosed(bool)), p_qc_photon, SLOT(setDisabled(bool)));
 	connect(this, SIGNAL(ImpOpened(bool)), this, SLOT(informIsSupplementalImp()));
 
+	QAction *p_delivery_check = new QAction(QIcon(":/lorry.png"), tr("&Check composition(s) against a Delivery Specification"), menuBar());
+	p_delivery_check->setDisabled(true);
+	connect(p_delivery_check, SIGNAL(triggered(bool)), this, SLOT(rCallDeliveryCheck()));
+	connect(this, SIGNAL(ImpOpened(bool)), p_delivery_check, SLOT(setEnabled(bool)));
+	connect(this, SIGNAL(ImpClosed(bool)), p_delivery_check, SLOT(setDisabled(bool)));
+
 	// WR
 
 	p_menu_file->addAction(p_action_write);
 	p_menu_file->addAction(p_action_writePartial);
 	p_menu_file->addAction(p_qc_photon);
+	p_menu_file->addAction(p_delivery_check);
 	p_menu_file->addAction(p_action_open);
 	p_menu_file->addAction(p_action_close);
 	p_menu_file->addSeparator();
@@ -190,6 +198,7 @@ void MainWindow::InitMenuAndToolbar() {
 	p_tool_bar->addAction(p_action_write);
 	p_tool_bar->addAction(p_action_writePartial);
 	p_tool_bar->addAction(p_qc_photon);
+	p_tool_bar->addAction(p_delivery_check);
 	p_tool_bar->addSeparator();
 	//p_tool_bar->addAction(mpActionSaveAll);
 	p_tool_bar->addSeparator();
@@ -301,13 +310,54 @@ void MainWindow::rCallPhoton() {
 			return;
 		}
 
+		//Check if package has unsaved changes
+		bool changes = false;
+		for (int i = 0; i < mpUndoGroup->stacks().size(); i++){
+			if (mpUndoGroup->stacks().at(i)->isClean() == false)
+				changes = true;
+		}
+		if (mpWidgetImpBrowser->GetUndoStack()->isClean() == false)
+			changes = true;
 
+		if(changes == true) {
+			QMessageBox *p_message_box = new QMessageBox();
+			p_message_box->setText(tr("Photon"));
+			p_message_box->setInformativeText(QString(tr("IMP has unsaved changes.\n Photon cannot be started")));
+			p_message_box->setIcon(QMessageBox::Critical);
+			p_message_box->setStandardButtons(QMessageBox::Ok);
+			p_message_box->setDefaultButton(QMessageBox::Ok);
+			p_message_box->exec();
+			delete p_message_box;
+			return;
+		}
 
 		mpJobQueue->FlushQueue();
 		JobCallPhoton *p_qc_job = new JobCallPhoton(mpRootDirection);
 		connect(p_qc_job, SIGNAL(Result(const QString&, const QVariant&)), this, SLOT(ShowQcReport(const QString&, const QVariant&)));
 		mpJobQueue->AddJob(p_qc_job);
 		mpJobQueue->StartQueue();
+	}
+}
+
+void MainWindow::rCallDeliveryCheck() {
+	if (!mpRootDirection.isEmpty()) {
+
+		QVector<QSharedPointer<AssetCpl>> CPLfiles;
+		QSharedPointer<ImfPackage> pImfPackage = mpWidgetImpBrowser->GetImfPackage();
+		if (!pImfPackage.isNull()) {
+			for (int i = 0; i < pImfPackage->GetAssetCount(); i++) {
+				if (pImfPackage->GetAsset(i)->GetType() == Asset::cpl) {
+					CPLfiles.append(pImfPackage->GetAsset(i).objectCast<AssetCpl>());
+				}
+			}
+			WizardDeliverySpecificationCheck *p_delivery_check_generator;
+			p_delivery_check_generator = new WizardDeliverySpecificationCheck(this, CPLfiles);
+
+			p_delivery_check_generator->setAttribute(Qt::WA_DeleteOnClose, true);
+			//p_delivery_check_generator->resize(QSize(800, 600));//.expandedTo(minimumSizeHint()));
+			p_delivery_check_generator->show();
+			connect(p_delivery_check_generator, SIGNAL(accepted()), this, SLOT(rWizardDeliverySpecificationCheck()));
+		}
 	}
 }
 //WR
@@ -678,4 +728,7 @@ void MainWindow::informIsSupplementalImp() {
 
 //WR
 
-
+// This slot is triggered by SIGNAL(accepted) from WizardDeliverySpecificationCheck (FINISH button)
+void MainWindow::rWizardDeliverySpecificationCheck() {
+	return;
+}

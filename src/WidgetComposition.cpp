@@ -1163,7 +1163,8 @@ void WidgetComposition::rCurrentFrameChanged(const Timecode &rCplTimecode) {
 	}
 }
 
-XmlSerializationError WidgetComposition::WriteMinimal(const QString &rDestination, const QUuid &rId, const EditRate &rEditRate, const UserText &rContentTitle, const UserText &rIssuer /*= UserText()*/, const UserText &rContentOriginator /*= UserText()*/) {
+XmlSerializationError WidgetComposition::WriteMinimal(const QString &rDestination, const QUuid &rId, const EditRate &rEditRate, const UserText &rContentTitle,
+		const UserText &rIssuer /*= UserText()*/, const UserText &rContentOriginator /*= UserText()*/, const QString &rApplicationIdentification /* = QString() */) {
 
 	xml_schema::NamespaceInfomap cpl_namespace;
 	cpl_namespace[""].name = XML_NAMESPACE_CPL;
@@ -1202,6 +1203,29 @@ XmlSerializationError WidgetComposition::WriteMinimal(const QString &rDestinatio
 	cpl.setCreator(ImfXmlHelper::Convert(UserText(CREATOR_STRING)));
 	if(rIssuer.IsEmpty() == false) cpl.setIssuer(ImfXmlHelper::Convert(rIssuer));
 	if(rContentOriginator.IsEmpty() == false) cpl.setContentOriginator(ImfXmlHelper::Convert(rIssuer));
+
+	if (!rApplicationIdentification.isNull()) {
+		cpl2016::CompositionPlaylistType_ExtensionPropertiesType exProp;
+		cpl.setExtensionProperties(exProp);
+		cpl2016::CompositionPlaylistType_ExtensionPropertiesType sequence_list = cpl.getExtensionProperties().get();
+		cpl2016::CompositionPlaylistType_ExtensionPropertiesType::AnySequence &r_any_sequence(sequence_list.getAny());
+		try {
+			xercesc::DOMDocument &doc = sequence_list.getDomDocument();
+			xercesc::DOMElement* p_dom_element = NULL;
+			p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("cc")->second.name).c_str(),
+					(xsd::cxx::xml::string("cc:ApplicationIdentification").c_str())
+					);
+			QString ns("xmlns:");
+			ns.append(cpl_namespace.find("cc")->first.c_str());
+			p_dom_element->setAttributeNS(xsd::cxx::xml::string(XML_NAMESPACE_NS).c_str(), xsd::cxx::xml::string(ns.toStdString()).c_str(), xsd::cxx::xml::string(cpl_namespace.find("cc")->second.name).c_str());
+			p_dom_element->setTextContent(XMLString::transcode(rApplicationIdentification.toStdString().c_str()));
+			r_any_sequence.push_back(p_dom_element);
+			sequence_list.setAny(r_any_sequence);
+			cpl.setExtensionProperties(sequence_list);
+		} catch (...) {
+			qDebug() << "Error setting ApplicationIdentification!";
+		}
+	}
 
 	XmlSerializationError serialization_error;
 	std::ofstream cpl_ofs(rDestination.toStdString().c_str(), std::ofstream::out);

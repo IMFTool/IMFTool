@@ -202,6 +202,7 @@ int main(int argc, char *argv[]) {
 	qRegisterMetaType<Timecode>("Timecode");
 	qRegisterMetaType<Duration>("Duration");
 	qRegisterMetaType<WizardResourceGenerator::eMode>("WizardResourceGenerator::eMode");
+	qRegisterMetaType<QList<QStringList> >("DeliveryCheckResults");
 
 	xercesc::XMLPlatformUtils::Initialize();
 	MainWindow w;

@@ -82,6 +82,7 @@ signals:
 	void Save();
 	void ShowResourceGeneratorWavMode();
 	void ShowResourceGeneratorTimedTextMode();
+	void ShowCompositionGenerator();
 	//WR begin
 	void RecalcHashForCpls();
 	void ShowResourceGeneratorMxfMode();
@@ -97,6 +98,7 @@ signals:
 	void rResourceGeneratorAccepted();
 	void rSidecarCompositionMapGeneratorAccepted();
 	void rShowEssenceDescriptorForAsset(const QSharedPointer<AssetMxfTrack> &rAsset);
+	void rCompositionGeneratorAccepted();
 	void rCustomMenuRequested(QPoint pos);
 	void rMapCurrentRowSelectionChanged(const QModelIndex &rCurrent, const QModelIndex &rPrevious);
 	void rJobQueueFinished();

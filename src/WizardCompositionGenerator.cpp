@@ -1,4 +1,5 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel
+/* Archivist is a GUI application for interactive IMF Master Package creation.
+ * Copyright(C) 2015 Björn Stresing
  *
  * This program is free software : you can redistribute it and / or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +23,8 @@
 #include <QLineEdit>
 
 
-WizardCompositionGenerator::WizardCompositionGenerator(QWidget *pParent /*= NULL*/) :
-QWizard(pParent) {
+WizardCompositionGenerator::WizardCompositionGenerator(QWidget *pParent /*= NULL*/, EditRate rEditRate /* = EditRate::EditRate23_98 */, QStringList rApplicationIdentificationList /*= QStringList() */) :
+QWizard(pParent), mEditRate(rEditRate), mApplicationIdentificationList(rApplicationIdentificationList) {
 
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	setWindowModality(Qt::WindowModal);
@@ -43,9 +44,10 @@ QSize WizardCompositionGenerator::sizeHint() const {
 void WizardCompositionGenerator::InitLayout() {
 
 	WizardCompositionGeneratorPage *p_wizard_page = new WizardCompositionGeneratorPage(this);
+	p_wizard_page->SetEditRate(mEditRate);
 	mPageId = addPage(p_wizard_page);
 	QList<QWizard::WizardButton> layout;
-	layout << QWizard::Stretch << QWizard::CancelButton << QWizard::FinishButton;
+	layout << QWizard::Stretch << QWizard::FinishButton << QWizard::CancelButton;
 	setButtonLayout(layout);
 }
 
@@ -81,12 +83,21 @@ void WizardCompositionGeneratorPage::InitLayout() {
 	p_layout->addWidget(p_issuer, 2, 1, 1, 1);
 	p_layout->addWidget(new QLabel(tr("Content Originator (optional):"), this), 3, 0, 1, 1);
 	p_layout->addWidget(p_content_originator, 3, 1, 1, 1);
+
+	mpComboBoxApp = new QComboBox(this);
+	for (QMap<QString, QString>::const_iterator i = mApplicationIdentificationMap.cbegin(); i != mApplicationIdentificationMap.cend(); i++) {
+		mpComboBoxApp->addItem(i.key());
+	}
+	mpComboBoxApp->setEditable(true);
+	p_layout->addWidget(new QLabel(tr("Application:"), this), 4, 0, 1, 1);
+	p_layout->addWidget(mpComboBoxApp, 4, 1, 1, 1);
 	setLayout(p_layout);
 
 	registerField(FIELD_NAME_EDIT_RATE, this, "EditRateSelected", SIGNAL(EditRateChanged()));
 	registerField(FIELD_NAME_TITLE"*", p_content_title);
 	registerField(FIELD_NAME_ISSUER, p_issuer);
 	registerField(FIELD_NAME_CONTENT_ORIGINATOR, p_content_originator);
+	registerField(FIELD_NAME_APP, this, "AppSelected", SIGNAL(AppChanged()));
 }
 
 void WizardCompositionGeneratorPage::SetEditRate(const EditRate &rEditRate) {
@@ -98,4 +109,15 @@ void WizardCompositionGeneratorPage::SetEditRate(const EditRate &rEditRate) {
 EditRate WizardCompositionGeneratorPage::GetEditRate() const {
 
 	return EditRate::GetEditRate(mpComboBoxEditRate->currentText());
+}
+
+QString WizardCompositionGeneratorPage::GetApp() const {
+
+	return mpComboBoxApp->currentText();
+}
+
+void WizardCompositionGeneratorPage::SetApp(const QString &rApplicationIdentification) {
+
+	mpComboBoxApp->setCurrentText(rApplicationIdentification);
+	emit AppChanged();
 }

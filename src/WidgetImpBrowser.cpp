@@ -18,6 +18,7 @@
 #include "ImfPackageCommands.h"
 #include "WizardResourceGenerator.h"
 #include "WizardSidecarCompositionMapGenerator.h"
+#include "WizardCompositionGenerator.h"
 #include "MetadataExtractor.h"
 #include "DelegateMetadata.h"
 #include "WidgetComposition.h"
@@ -154,6 +155,9 @@ void WidgetImpBrowser::InitToolbar() {
 	QAction *p_add_ttml_resource = p_add_track_menu->addAction(QIcon(":/text.png"), tr("Wrap Timed Text Essence"));
 	connect(p_add_ttml_resource, SIGNAL(triggered(bool)), this, SLOT(ShowResourceGeneratorTimedTextMode()));
 	//p_add_ttml_resource->setDisabled(true);
+	p_add_track_menu->addSeparator();
+	QAction *p_add_cpl_asset = p_add_track_menu->addAction(QIcon(":/asset_cpl.png"), tr("Composition Playlist"));
+	connect(p_add_cpl_asset, SIGNAL(triggered(bool)), this, SLOT(ShowCompositionGenerator()));
 	p_add_track_menu->addSeparator();
 	QAction *p_add_mxf_resource = p_add_track_menu->addAction(QIcon(":/asset_mxf.png"), tr("Add existing MXF Track File"));
 	connect(p_add_mxf_resource, SIGNAL(triggered(bool)), this, SLOT(ShowResourceGeneratorMxfMode()));
@@ -478,6 +482,61 @@ void WidgetImpBrowser::ShowResourceGeneratorMxfMode() {
 }
 //WR
 
+void WidgetImpBrowser::ShowCompositionGenerator() {
+
+	EditRate edit_rate = EditRate::EditRate23_98;
+	QStringList application_identification_cpl;
+	bool found = false;
+	for (int ii = 0; ii < mpImfPackage->GetAssetCount(); ii++) {
+		if (!found) {
+			if (!mpImfPackage->GetAsset(ii).isNull()) {
+				QSharedPointer<AssetCpl> asset_cpl = mpImfPackage->GetAsset(ii).objectCast<AssetCpl>();
+
+				if (asset_cpl) {
+					QString file_path = asset_cpl->GetPath().absoluteFilePath();
+					if(QFile::exists(file_path)) {
+						std::auto_ptr< cpl2016::CompositionPlaylistType> cpl_data;
+						std::auto_ptr< cpl::CompositionPlaylistType> cpl2013_data;
+						try { cpl_data = cpl2016::parseCompositionPlaylist(file_path.toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize); }
+						catch(...) {  }
+						try { cpl2013_data = cpl::parseCompositionPlaylist(file_path.toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize); }
+						catch(...) {  }
+						if (cpl_data.get()) {
+							edit_rate = ImfXmlHelper::Convert(cpl_data->getEditRate());
+							if (cpl_data->getExtensionProperties().present()) {
+								cpl2016::CompositionPlaylistType_ExtensionPropertiesType sequence_list = cpl_data->getExtensionProperties().get();
+								cpl2016::CompositionPlaylistType_ExtensionPropertiesType::AnySequence &r_any_sequence(sequence_list.getAny());
+								for(cpl2016::CompositionPlaylistType_ExtensionPropertiesType::AnySequence::iterator sequence_iter(r_any_sequence.begin()); sequence_iter != r_any_sequence.end(); ++sequence_iter) {
+									if (QString(XMLString::transcode(sequence_iter->getNodeName())).contains("ApplicationIdentification")) {
+										application_identification_cpl << QString(XMLString::transcode(sequence_iter->getTextContent()));
+									}
+								}
+							}
+							found = true;
+						} else if (cpl2013_data.get()) {
+							edit_rate = ImfXmlHelper::Convert(cpl2013_data->getEditRate());
+							if (cpl2013_data->getExtensionProperties().present()) {
+								cpl::CompositionPlaylistType_ExtensionPropertiesType sequence_list = cpl2013_data->getExtensionProperties().get();
+								cpl::CompositionPlaylistType_ExtensionPropertiesType::AnySequence &r_any_sequence(sequence_list.getAny());
+								for(cpl::CompositionPlaylistType_ExtensionPropertiesType::AnySequence::iterator sequence_iter(r_any_sequence.begin()); sequence_iter != r_any_sequence.end(); ++sequence_iter) {
+									if (QString(XMLString::transcode(sequence_iter->getNodeName())).contains("ApplicationIdentification")) {
+										application_identification_cpl << QString(XMLString::transcode(sequence_iter->getTextContent()));
+									}
+								}
+							}
+							found = true;
+						}
+					}
+				}
+
+			}
+		}
+	}
+	WizardCompositionGenerator *p_wizard_composition_generator = new WizardCompositionGenerator(this, edit_rate, application_identification_cpl);
+	p_wizard_composition_generator->setAttribute(Qt::WA_DeleteOnClose, true);
+	p_wizard_composition_generator->show();
+	connect(p_wizard_composition_generator, SIGNAL(accepted()), this, SLOT(rCompositionGeneratorAccepted()));
+}
 
 void WidgetImpBrowser::rShowResourceGeneratorForSelectedRow() {
 
@@ -698,6 +757,37 @@ QSharedPointer<AssetCpl> WidgetImpBrowser::GenerateEmptyCPL() {
 
 
 
+void WidgetImpBrowser::rCompositionGeneratorAccepted() {
+
+	WizardCompositionGenerator *p_composition_generator = qobject_cast<WizardCompositionGenerator *>(sender());
+	if(p_composition_generator) {
+		EditRate edit_rate = qvariant_cast<EditRate>(p_composition_generator->field(FIELD_NAME_EDIT_RATE));
+		QString title = qvariant_cast<QString>(p_composition_generator->field(FIELD_NAME_TITLE));
+		QString issuer = qvariant_cast<QString>(p_composition_generator->field(FIELD_NAME_ISSUER));
+		QString content_originator = qvariant_cast<QString>(p_composition_generator->field(FIELD_NAME_CONTENT_ORIGINATOR));
+		QString application_identification = qvariant_cast<QString>(p_composition_generator->field(FIELD_NAME_APP));
+		if(mpImfPackage) {
+			QUuid id = QUuid::createUuid();
+			QString file_name = QString("CPL_%1.xml").arg(strip_uuid(id));
+			QFileInfo mxf_cpl_file_path(mpImfPackage->GetRootDir().absoluteFilePath(file_name));
+			QSharedPointer<AssetCpl> cpl_asset(new AssetCpl(mxf_cpl_file_path, id));
+			cpl_asset->SetIsNew(true);
+			cpl_asset->SetIsNewOrModified(true);
+			XmlSerializationError error = WidgetComposition::WriteMinimal(mxf_cpl_file_path.absoluteFilePath(), id, edit_rate, title, issuer, content_originator, application_identification);
+			if(error.IsError() == false) mpUndoStack->push(new AddAssetCommand(mpImfPackage, cpl_asset, mpImfPackage->GetPackingListId()));
+			else {
+				QString error_string = error.GetErrorMsg();
+				error.AppendErrorDescription(error_string);
+				mpMsgBox->setText(tr("XML Serialization Error"));
+				mpMsgBox->setInformativeText(error_string);
+				mpMsgBox->setStandardButtons(QMessageBox::Ok);
+				mpMsgBox->setDefaultButton(QMessageBox::Ok);
+				mpMsgBox->setIcon(QMessageBox::Critical);
+				mpMsgBox->exec();
+			}
+		}
+	}
+}
 
 void WidgetImpBrowser::rMapCurrentRowSelectionChanged(const QModelIndex &rCurrent, const QModelIndex &rPrevious) {
 
