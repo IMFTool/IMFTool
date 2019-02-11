@@ -1,7 +1,7 @@
 # IMFTool
 A tool for editing IMF CPLs and creating new versions of an existing IMF package
 
-##About this branch
+## About this branch
 This branch contains the code for supporting the IMFUG Delivery Specification [[1]](#dsl)
 Binary installers (IMF Tool Delivery Spec Support Beta) are available at 
 
