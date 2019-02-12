@@ -24,7 +24,9 @@
 #include <QTime>
 #include <QCheckBox>
 #include "JP2K_Preview.h"
+#ifdef APP5_ACES
 #include "ACES_Preview.h"
+#endif
 #include "ImfPackage.h"
 #include <QThread>
 #include <QLineEdit>

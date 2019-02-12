@@ -208,6 +208,7 @@ private:
 
 };
 
+#ifdef APP5_ACES
 class JobExtractTargetFrames : public AbstractJob {
 
 	Q_OBJECT
@@ -228,3 +229,4 @@ private:
 	const QSharedPointer<AssetMxfTrack> mAssetMxf;
 
 };
+#endif

@@ -82,9 +82,11 @@ void WizardResourceGenerator::InitLayout() {
 		case Metadata::Jpeg2000:
 			SwitchMode(eMode::Jpeg2000Mode);
 			break;
+#ifdef APP5_ACES
 		case Metadata::Aces:
 			SwitchMode(eMode::ExrMode);
 			break;
+#endif
 		case Metadata::Pcm:
 			SwitchMode(eMode::WavMode);
 			break;

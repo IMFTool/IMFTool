@@ -419,23 +419,27 @@ Error JobCallPhoton::Execute() {
 	QString appString = "app2or2E";
 	if (mWidgetImpBrowser && mWidgetImpBrowser->GetImfPackage()) {
 		QVector<QString> appList = mWidgetImpBrowser->GetImfPackage().data()->GetApplicationIdentificationList();
-		if ( appList.contains("http://www.smpte-ra.org/ns/2067-50/2017") &&
-				appList.contains("http://www.smpte-ra.org/ns/2067-50/2017") ) appString = "all";
-		else if (appList.contains("http://www.smpte-ra.org/ns/2067-50/2017")) appString = "app5";
+		if ( appList.contains("http://www.smpte-ra.org/ns/2067-50/2017") ) appString = "app5";
 	}
 	QProcess *myProcess = new QProcess();
 	const QString program = "java";
 	QStringList arg;
 	arg << "-cp";
+	QString lib_dir = QString("/photon/build/libs/*");
+	if (appString == "app5") {
+		lib_dir = QString("/photon/build/libs-app5/*");
+	}
 #ifdef WIN32
-	arg << QApplication::applicationDirPath() + QString("/photon/build/libs/*;");
+	arg << QApplication::applicationDirPath() + lib_dir + QString(";");
 #else
-	arg << QApplication::applicationDirPath() + QString("/photon/build/libs/*:");
+	arg << QApplication::applicationDirPath() + lib_dir + QString(":");
 #endif
 	arg << "com.netflix.imflibrary.app.IMPAnalyzer";
 	arg << mWorkingDirectory;
-	arg << "--application";
-	arg << appString;
+	if (appString == "app5") {
+		arg << "--application";
+		arg << appString;
+	}
 	emit Progress(20);
 	myProcess->start(program, arg);
 	emit Progress(40);
@@ -512,6 +516,7 @@ Error JobCreateScm::Execute() {
 	return error;
 }
 
+#ifdef APP5_ACES
 JobExtractTargetFrames::JobExtractTargetFrames(const QSharedPointer<AssetMxfTrack> rAssetMxf) :
 AbstractJob("Extracting Target Frames"), mAssetMxf(rAssetMxf) {
 
@@ -586,3 +591,4 @@ Error JobExtractTargetFrames::Execute() {
 
 	return error;
 }
+#endif

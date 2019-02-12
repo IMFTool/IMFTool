@@ -1,10 +1,6 @@
 # IMFTool
 A tool for editing IMF CPLs and creating new versions of an existing IMF package
 
-## NEW IN THIS BRANCH
-This branch contains beta code for App#5 ACES support in IMF Tool (in addition to App #2/2E).
-Binary installers are available in Folder [Binary_Installers](https://github.com/IMFTool/IMFTool/tree/App%235_ACES/Binary_Installers)
-
 ## What is IMF Tool
 IMF Tool supports browsing and limited editing of IMF [[1]](#imf-intro) packages (IMPs).
 In particular, it supports the addition and deletion of audio tracks and subtitle tracks (versioning).
@@ -39,7 +35,7 @@ Introductory videos are available on YouTube [[2]](#imf-video), [[3]](#imf-video
 
 ## CREDITS
 The development of this tool has kindly been sponsored by Netflix Inc.
-The App#5 extensions are supported by the Academy of Motion Picture Arts and Sciences, Sony Pictures, Warner Bros., Universal Studios and 20th Century Fox
+The App#5 extensions were supported by the Academy of Motion Picture Arts and Sciences, Sony Pictures, Warner Bros., Universal Studios and 20th Century Fox
 
 ## What IMF Tool NOT is
 An IMF Authoring Tool. For creating IMF packages, please check for the wide variety of commercial solutions available on the market.
@@ -53,10 +49,10 @@ to download the latest binary installers. (currently for macOS only)
 
 
 ## Building
-IMF Tool is multi-platform and has been susccesfully built under Mac OS X 10.10 and 10.11, Windows 7 and Linux 64 bit.
+IMF Tool is multi-platform and has been susccesfully built under Mac OS X 10.10 and 10.11, Windows 7/10 and Linux 64 bit.
 The build system is based on CMake. Please use CMake to create make files and project files for eclipse or Visual Studio. Installation instructions including CMake screenshots are provided as pdf file here.
 Prerequisites:
--	Qt Version 5.x
+-	Qt Version 5.7.0, more recent versions may work
 -	asdcplib 2.10.31, see http://www.cinecert.com. 
 -	libxsd
 -	Xerces 3.1

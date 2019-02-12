@@ -121,8 +121,8 @@ private:
 	QThread *playerThread;
 #ifdef APP5_ACES
 	QThread *mpACESPlayerThread;
-	eImfApplications mImfApplication = ::App2;
 #endif
+	eImfApplications mImfApplication = ::App2;
 	int current_playlist_index = 0; // frame indicator position within the playlisqt
 	QVector<VideoResource> currentPlaylist; // playlist ressources
 	bool setFrameIndicator = false; // ignore next signal xPosChanged?

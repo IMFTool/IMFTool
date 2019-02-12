@@ -110,7 +110,9 @@ private slots :
 	//WR
 	void rShowMetadata();
 	void rShowEssenceDescriptor();
+#ifdef APP5_ACES
 	void rExtractTargetFrames();
+#endif
 	void SetMxfFile(const QStringList &rFiles);
 	void SetMxfFileDirectory(const QString&);
 	void rLoadRequest();

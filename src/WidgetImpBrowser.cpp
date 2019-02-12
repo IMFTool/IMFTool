@@ -295,7 +295,9 @@ void WidgetImpBrowser::rCustomMenuRequested(QPoint pos) {
 			QAction *open_action = new QAction(QIcon(":/edit.png"), tr("Open CPL"), this);
 			QAction *view_metadata_action = new QAction(QIcon(":/information.png"), tr("View metadata"), this);
 			QAction *view_essence_descriptor_action = new QAction(QIcon(":/information.png"), tr("View essence descriptor"), this);
+#ifdef APP5_ACES
 			QAction *extract_targetframe_action = new QAction(QIcon(":/folder.png"), tr("Extract target frames"), this);
+#endif
 			connect(remove_action, SIGNAL(triggered(bool)), this, SLOT(rRemoveSelectedRow()));
 			//connect(delete_action, SIGNAL(triggered(bool)), this, SLOT(rDeleteSelectedRow()));
 			connect(view_scm_action, SIGNAL(triggered(bool)), this, SLOT(rShowSidecarCompositionMapGeneratorView()));
@@ -304,7 +306,9 @@ void WidgetImpBrowser::rCustomMenuRequested(QPoint pos) {
 			//connect(edit_action, SIGNAL(triggered(bool)), this, SLOT(rShowResourceGeneratorForSelectedRow()));
 			connect(view_metadata_action, SIGNAL(triggered(bool)), this, SLOT(rShowMetadata()));
 			connect(view_essence_descriptor_action, SIGNAL(triggered(bool)), this, SLOT(rShowEssenceDescriptor()));
+#ifdef APP5_ACES
 			connect(extract_targetframe_action, SIGNAL(triggered(bool)), this, SLOT(rExtractTargetFrames()));
+#endif
 			menu.addAction(remove_action);
 			//menu.addAction(delete_action);
 			//menu.addSeparator();
@@ -322,9 +326,11 @@ void WidgetImpBrowser::rCustomMenuRequested(QPoint pos) {
 					if (asset->Exists() || assetMxfTrack->HasSourceFiles())
 						menu.addAction(view_metadata_action);
 					if(asset->Exists()) menu.addAction(view_essence_descriptor_action);
+#ifdef APP5_ACES
 					if (assetMxfTrack->GetEssenceType() == Metadata::Aces) {
 						menu.addAction(extract_targetframe_action);
 					}
+#endif
 				}
 				if(asset->GetType() == Asset::scm) {
 					menu.addAction(view_scm_action);
@@ -859,6 +865,7 @@ void WidgetImpBrowser::rShowEssenceDescriptor() {
 
 }
 
+#ifdef APP5_ACES
 void WidgetImpBrowser::rExtractTargetFrames() {
 	QSharedPointer<AssetMxfTrack> asset = mpImfPackage->GetAsset(mpSortProxyModelImp->mapToSource(mpViewImp->currentIndex()).row()).objectCast<AssetMxfTrack>();
 	if(asset) {
@@ -872,6 +879,7 @@ void WidgetImpBrowser::rExtractTargetFrames() {
 	}
 
 }
+#endif
 
 void WidgetImpBrowser::rShowSidecarCompositionMapGeneratorEdit() {
 	QSharedPointer<AssetScm> asset = mpImfPackage->GetAsset(mpSortProxyModelImp->mapToSource(mpViewImp->currentIndex()).row()).objectCast<AssetScm>();

@@ -762,9 +762,11 @@ void GraphicsWidgetVideoResource::restartThread(QSharedPointer<AssetMxfTrack> rA
 			mImfApplication = ::App2e;
 			break;
 
+#ifdef APP5_ACES
 		case Metadata::Aces:
 			mImfApplication = ::App5;
 			break;
+#endif
 
 		default:
 			mImfApplication = ::App2e;
@@ -802,7 +804,10 @@ void GraphicsWidgetVideoResource::restartThread(QSharedPointer<AssetMxfTrack> rA
 
 GraphicsWidgetVideoResource::GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/, int video_timeline_index,
 		const QSharedPointer<ImfPackage> rImfPackage /* = 0 */) :
-mpJP2K(0), mpACES(0), // (k)
+mpJP2K(0),
+#ifdef APP5_ACES
+mpACES(0),
+#endif
 GraphicsWidgetFileResource(pParent, pResource, rAsset, QColor(CPL_COLOR_VIDEO_RESOURCE), rImfPackage), mLeftProxyImage(":/proxy_film.png"), mRightProxyImage(":/proxy_film.png"), mTrimActive(false) {
 
 
@@ -816,7 +821,10 @@ GraphicsWidgetFileResource(pParent, pResource, rAsset, QColor(CPL_COLOR_VIDEO_RE
 }
 
 GraphicsWidgetVideoResource::GraphicsWidgetVideoResource(GraphicsWidgetSequence *pParent, const QSharedPointer<AssetMxfTrack> &rAsset) :
-mpJP2K(0), mpACES(0), // (k)
+mpJP2K(0),
+#ifdef APP5_ACES
+mpACES(0),
+#endif
 GraphicsWidgetFileResource(pParent, rAsset, QColor(CPL_COLOR_VIDEO_RESOURCE)), mLeftProxyImage(":/proxy_film.png"), mRightProxyImage(":/proxy_film.png"), mTrimActive(false) {
 
 
