@@ -1,10 +1,9 @@
 # IMFTool
 A tool for editing IMF CPLs and creating new versions of an existing IMF package
 
-### NEW
-The latest binary installers are available at
+### Pre-compiled versions
+The latest binary installers for macOS and Windows are available at
 [Releases](../../releases/)
-
 
 ## What is IMF Tool
 IMF Tool supports browsing and limited editing of IMF [[1]](#imf-intro) packages (IMPs).
@@ -13,9 +12,14 @@ Introductory videos are available on YouTube [[2]](#imf-video), [[3]](#imf-video
 
 ## Workflows supported:
 -	Open an IMP, visualize the timeline of the CPL(s) included in the IMP
--	NEW: Add Sidecar Assets to an IMP ("Add Asset" --> Add Sidecar Assets)
--	NEW: Create, view and edit Sidecar Composition Maps (SCMs)
--	NEW: Add a Photon QC report as sidecar file (hint: export the sidecar QC report as a Partial IMP, this leaves the Original IMP unmodified!)
+-	NEW: Support for IMF App#5 ACES
+        - OpenEXR ACES preview and playback
+        - Target frame export in IMF Tool
+        - SubDescriptor processing and visualization
+        - Implementations of the final SMPTE ULs registered for ST 2065-5 and ST 2067-50
+-	Add Sidecar Assets to an IMP ("Add Asset" --> Add Sidecar Assets)
+-	Create, view and edit Sidecar Composition Maps (SCMs)
+-	Add a Photon QC report as sidecar file (hint: export the sidecar QC report as a Partial IMP, this leaves the Original IMP unmodified!)
 -	Load ancestor Original Versions of Supplemental IMPs for preview and versioning
 - 	Create Photon[[4]](#photon) QC report
 -	Edit CPL metadata
@@ -35,6 +39,7 @@ Introductory videos are available on YouTube [[2]](#imf-video), [[3]](#imf-video
 
 ## CREDITS
 The development of this tool has kindly been sponsored by Netflix Inc.
+The App#5 extensions were supported by the Academy of Motion Picture Arts and Sciences, Sony Pictures, Warner Bros., Universal Studios and 20th Century Fox
 
 ## What IMF Tool NOT is
 An IMF Authoring Tool. For creating IMF packages, please check for the wide variety of commercial solutions available on the market.
@@ -48,11 +53,11 @@ to download the latest binary installers.
 
 
 ## Building
-IMF Tool is multi-platform and has been susccesfully built under Mac OS X 10.10 and 10.11, Windows 7 and Linux 64 bit.
+IMF Tool is multi-platform and has been susccesfully built under Mac OS X 10.10 and 10.11, Windows 7/10 and Linux 64 bit.
 The build system is based on CMake. Please use CMake to create make files and project files for eclipse or Visual Studio. Installation instructions including CMake screenshots are provided as pdf file here.
 Prerequisites:
--	Qt Version 5.x
--	asdcplib, see http://www.cinecert.com. IMPORTANT: A few files of asdcplib-2.x.xx need to be replaced by the files provided in folder asdcplib-2.x.xx-patches
+-	Qt Version 5.7.0, more recent versions may work
+-	asdcplib 2.10.31, see http://www.cinecert.com. 
 -	libxsd
 -	Xerces 3.1
 -	Requires OpenJPEG 2.2 (with multi-threading support), available at https://github.com/uclouvain/openjpeg

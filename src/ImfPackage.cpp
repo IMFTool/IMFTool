@@ -1074,6 +1074,19 @@ void ImfPackage::CheckIfSupplemental() {
 	}
 }
 
+QVector<QString> ImfPackage::GetApplicationIdentificationList() {
+	QVector<QString> appList;
+	foreach (cpl2016::CompositionPlaylistType cpl, mCplList) {
+		if (cpl.getExtensionProperties().present()) {
+			cpl2016::CompositionPlaylistType_ExtensionPropertiesType sequence_list = cpl.getExtensionProperties().get();
+			cpl2016::CompositionPlaylistType_ExtensionPropertiesType::AnySequence &r_any_sequence(sequence_list.getAny());
+			QString app = UserText(XMLString::transcode(r_any_sequence.front().getFirstChild()->getNodeValue())).first;
+			if (!appList.contains(app)) appList << app;
+		}
+	}
+	return appList;
+}
+
 //WR
 
 AssetMap::AssetMap(ImfPackage *pParent, const QFileInfo &rFilePath, const am::AssetMapType &rAssetMap) :
@@ -1432,6 +1445,9 @@ void AssetMxfTrack::rTransformationFinished(const QImage &rImage, const QVariant
 void AssetMxfTrack::SetDefaultProxyImages() {
 
 	switch(GetEssenceType()) {
+#ifdef APP5_ACES
+		case Metadata::Aces:
+#endif
 		case Metadata::Jpeg2000:
 			mFirstProxyImage = QImage(":/proxy_film.png");
 			break;

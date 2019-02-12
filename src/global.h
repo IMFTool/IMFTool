@@ -114,6 +114,12 @@ enum eUserItemDataRole {
 	UserRoleMetadata
 };
 
+enum eImfApplications {
+	App2 = 0,
+	App2e,
+	App4,
+	App5,
+};
 
 class Id {
 

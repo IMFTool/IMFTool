@@ -25,6 +25,7 @@
 #include <QFile>
 #include <QProcess>
 #include <QDir>
+#include <QTemporaryDir>
 //regxmllibc
 #include <com/sandflow/smpte/regxml/dict/MetaDictionaryCollection.h>
 #include <com/sandflow/smpte/regxml/dict/importers/XMLImporter.h>
@@ -404,8 +405,8 @@ Error JobExtractEssenceDescriptor::Execute() {
 //WR
 
 
-JobCallPhoton::JobCallPhoton(const QString &rWorkingDirectory) :
-AbstractJob("Generating Photon IMP QC Report"), mWorkingDirectory(rWorkingDirectory) {
+JobCallPhoton::JobCallPhoton(const QString &rWorkingDirectory, WidgetImpBrowser* &rWidgetImpBrowser) :
+AbstractJob("Generating Photon IMP QC Report"), mWorkingDirectory(rWorkingDirectory),  mWidgetImpBrowser(rWidgetImpBrowser){
 
 }
 
@@ -413,17 +414,32 @@ Error JobCallPhoton::Execute() {
 
 	Error error;
 	QString qresult;
+
+	//Figure out IMF App
+	QString appString = "app2or2E";
+	if (mWidgetImpBrowser && mWidgetImpBrowser->GetImfPackage()) {
+		QVector<QString> appList = mWidgetImpBrowser->GetImfPackage().data()->GetApplicationIdentificationList();
+		if ( appList.contains("http://www.smpte-ra.org/ns/2067-50/2017") ) appString = "app5";
+	}
 	QProcess *myProcess = new QProcess();
 	const QString program = "java";
 	QStringList arg;
 	arg << "-cp";
+	QString lib_dir = QString("/photon/build/libs/*");
+	if (appString == "app5") {
+		lib_dir = QString("/photon/build/libs-app5/*");
+	}
 #ifdef WIN32
-	arg << QApplication::applicationDirPath() + QString("/photon/build/libs/*;");
+	arg << QApplication::applicationDirPath() + lib_dir + QString(";");
 #else
-	arg << QApplication::applicationDirPath() + QString("/photon/build/libs/*:");
+	arg << QApplication::applicationDirPath() + lib_dir + QString(":");
 #endif
 	arg << "com.netflix.imflibrary.app.IMPAnalyzer";
 	arg << mWorkingDirectory;
+	if (appString == "app5") {
+		arg << "--application";
+		arg << appString;
+	}
 	emit Progress(20);
 	myProcess->start(program, arg);
 	emit Progress(40);
@@ -499,3 +515,80 @@ Error JobCreateScm::Execute() {
 	}
 	return error;
 }
+
+#ifdef APP5_ACES
+JobExtractTargetFrames::JobExtractTargetFrames(const QSharedPointer<AssetMxfTrack> rAssetMxf) :
+AbstractJob("Extracting Target Frames"), mAssetMxf(rAssetMxf) {
+
+}
+
+Error JobExtractTargetFrames::Execute() {
+	QStringList result_list;
+	Error error = Error::None;
+
+	try {
+		QTemporaryDir dir;
+		if (dir.isValid()) {
+			//TODO Figure out size of ancillary resource from RIP
+			AS_02::ACES::FrameBuffer FrameBuffer(30000000);
+			AS_02::ACES::ResourceList_t resource_list_t;
+			AS_02::ACES::MXFReader Reader;
+			Result_t result = Reader.OpenRead(mAssetMxf->GetPath().absoluteFilePath().toStdString()); // open file for reading
+			if (ASDCP_SUCCESS(result)) {
+				result = Reader.FillAncillaryResourceList(resource_list_t);
+				AS_02::ACES::ResourceList_t::iterator it;
+				for (it = resource_list_t.begin(); it != resource_list_t.end(); it++) {
+					//ASDCP::MXF::RIP& rip = Reader.RIP();
+					ASDCP::UUID resource_id;
+					resource_id.Set(it->ResourceID);
+					result = Reader.ReadAncillaryResource(resource_id, FrameBuffer);
+					if (!ASDCP_SUCCESS(result)) qDebug() << "ReadAncillaryResource failed!" << result.Value();
+
+					QString filename;
+					char buf[64];
+					resource_id.EncodeString(buf, 64);
+					QString extension;
+					switch (it->Type) {
+					case AS_02::ACES::MT_PNG:
+						extension = "png";
+						break;
+					case AS_02::ACES::MT_TIFF:
+						extension = "tif";
+						break;
+					default:
+						break;
+					}
+					QFileInfo file_path = QFileInfo(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
+					if (!file_path.isDir() || !file_path.isWritable()) {
+					  error = Error::Unknown;
+					  Reader.Close();
+					  return error;
+					}
+					file_path = QFileInfo(file_path.absoluteFilePath() + "/" + "TargetFrame_" + QString(buf) + "." + extension);
+					filename = file_path.absoluteFilePath();
+
+					if (ASDCP_SUCCESS(result)) {
+						Kumu::FileWriter OutFile;
+						ui32_t write_count;
+						result = OutFile.OpenWrite(filename.toStdString());
+
+						if (ASDCP_SUCCESS(result)) {
+							result = OutFile.Write(FrameBuffer.Data(), FrameBuffer.Size(), &write_count);
+							if (ASDCP_SUCCESS(result))
+								result_list << filename;
+						}
+					}
+				}
+				Reader.Close();
+			}
+		} else {
+			error = Error::Unknown;
+		}
+	}
+	catch(...) { return Error::XMLSchemeError; }
+
+	emit Result(result_list, GetIdentifier());
+
+	return error;
+}
+#endif

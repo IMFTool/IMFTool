@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--Created: Fri Oct 07 09:05:40 PDT 2016--><!--By: regxmllib build c989a02ac80facc24e018a54c4010dd8c2d27451--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
+<!--Created: Thu Jun 14 10:36:34 CEST 2018--><!--By: regxmllib build 940d358383f70f4bfef3b548c7f569bbe71e4dc4--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
 <SchemeID>urn:uuid:21177fc2-e9cd-5fb5-7f18-50a997da0981</SchemeID>
 <SchemeURI>http://www.smpte-ra.org/reg/395/2014/13/1/aaf</SchemeURI>
 <MetaDefinitions>
@@ -848,7 +848,7 @@
 <Description>MCA Label Sub-Descriptor</Description>
 <Name>MCA Label Sub-Descriptor</Name>
 <ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
-<IsConcrete>true</IsConcrete>
+<IsConcrete>false</IsConcrete>
 </ClassDefinition>
 <ClassDefinition>
 <Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01016b00</Identification>
@@ -920,6 +920,62 @@
 <Description>Aux Data Essence Descriptor</Description>
 <Name>Aux Data Essence Descriptor</Name>
 <ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01014300</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01017400</Identification>
+<Symbol>VC2SubDescriptor</Symbol>
+<Description>VC-2 Sub-Descriptor</Description>
+<Name>VC-2 Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01017500</Identification>
+<Symbol>DMCVTTargetSubDescriptor</Symbol>
+<Description>Identifies a DMCVT Target SubDescriptor</Description>
+<Name>DMCVT Target SubDescriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01017600</Identification>
+<Symbol>VC5BayerPictureEssenceSubDescriptor</Symbol>
+<Description>Key Value for VC-5 Bayer Picture Essence Sub-Descriptor</Description>
+<Name>VC-5 Bayer Picture Essence Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01017700</Identification>
+<Symbol>VC5CDCIPictureEssenceSubDescriptor</Symbol>
+<Description>Key Value for the VC-5 CDCI Picture Essence Sub-Descriptor</Description>
+<Name>VC-5 CDCI Picture Essence Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01017800</Identification>
+<Symbol>AACSubDescriptor</Symbol>
+<Description>Advanced Audio Coding SubDescriptor</Description>
+<Name>AAC SubDescriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01017900</Identification>
+<Symbol>ACESPictureSubDescriptor</Symbol>
+<Description>ACES Picture SubDescriptor</Description>
+<Name>ACES Picture SubDescriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01017a00</Identification>
+<Symbol>TargetFrameSubDescriptor</Symbol>
+<Description>Target Frame SubDescriptor</Description>
+<Name>Target Frame SubDescriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
 <IsConcrete>true</IsConcrete>
 </ClassDefinition>
 <ClassDefinition>
@@ -1457,6 +1513,14 @@
 <Description>Cryptographic Context</Description>
 <Name>Cryptographic Context</Name>
 <ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010400.00000000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.03010000</Identification>
+<Symbol>DMS_AS_03_Framework</Symbol>
+<Description>AS_03 Descriptive Metadata</Description>
+<Name>DMS AS-03 Framework</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.00000000</ParentClass>
 <IsConcrete>true</IsConcrete>
 </ClassDefinition>
 <ClassDefinition>

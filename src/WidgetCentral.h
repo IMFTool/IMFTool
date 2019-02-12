@@ -89,4 +89,12 @@ private:
 	bool playListUpdateSuccess = true; // (k)
 	bool uninstalling_imp = false;
 	QTime *timelineParserTime;
+	const QMap<QString, eImfApplications> mApplicationIdentificationMap {
+			{"http://www.smpte-ra.org/schemas/2067-20/2016", ::App2},
+			{"http://www.smpte-ra.org/schemas/2067-21/2016", ::App2e},
+			{"http://www.smpte-ra.org/schemas/2067-40/2016", ::App4},
+			{"http://www.smpte-ra.org/schemas/2067-20/2013", ::App2},
+			{"http://www.smpte-ra.org/schemas/2067-21/2014", ::App2e},
+			{"http://www.smpte-ra.org/ns/2067-50/2017", ::App5},
+	};
 };

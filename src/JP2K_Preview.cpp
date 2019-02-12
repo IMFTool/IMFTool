@@ -375,13 +375,6 @@ void JP2K_Preview::cleanUp() {
 	opj_codec_set_threads(pDecompressor, mCpus); // set nr. of cores in new decoder
 }
 
-void JP2K_Preview::save2File() {
-	QFile file("D:/Master/Thesis/frame1.jp2");
-	file.open(QIODevice::WriteOnly);
-	//file.write(rRawData);
-	file.close();
-}
-
 QImage JP2::DataToQImage()
 {
 	w = psImage->comps->w;

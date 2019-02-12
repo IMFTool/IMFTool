@@ -52,7 +52,7 @@ void WidgetCompositionInfo::InitLayout() {
 	mpMapper->addMapping(p_content_originator, CompositionInfoModel::ColumnContentOriginator);
 
 	QComboBox *p_application_identification = new QComboBox(this);
-	for (QMap<QString, QString>::const_iterator i = mApplicationIdentificationMap.cbegin(); i != mApplicationIdentificationMap.cend(); i++) {
+	for (QMap<QString, QString>::const_iterator i = mApplicationIdentificationSelectionMap.cbegin(); i != mApplicationIdentificationSelectionMap.cend(); i++) {
 		p_application_identification->addItem(i.key());
 	}
 	p_application_identification->setEditable(true);

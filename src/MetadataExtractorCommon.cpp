@@ -52,8 +52,16 @@ QString Metadata::GetAsString() {
 
 	QString ret(QObject::tr("Essence Type: "));
 	switch(type) {
+#ifdef APP5_ACES
+		case Metadata::Aces:
+#endif
 		case Metadata::Jpeg2000:
+#ifdef APP5_ACES
+			if(type == Metadata::Aces)										ret.append(QObject::tr("%1").arg("ACES\n"));
+			else if(type == Metadata::Jpeg2000)						ret.append(QObject::tr("%1").arg("JPEG2000\n"));
+#else
 			if(type == Metadata::Jpeg2000)						ret.append(QObject::tr("%1").arg("JPEG2000\n"));
+#endif
 			if(duration.IsValid() && editRate.IsValid())	ret.append(QObject::tr("Duration: %1\n").arg(duration.GetAsString(editRate)));
 			if(editRate.IsValid() == true)								ret.append(QObject::tr("Frame Rate: %1\n").arg(editRate.GetQuotient()));
 			if(storedHeight != 0 || storedWidth != 0)			ret.append(QObject::tr("Stored Resolution: %1 x %2\n").arg(storedWidth).arg(storedHeight));
@@ -64,7 +72,10 @@ QString Metadata::GetAsString() {
 				else if(colorEncoding == Metadata::CDCI)		ret.append(QObject::tr("Color Mode: %1").arg("YCbCr"));
 				ret.append(QObject::tr("(%1:%2:%3)\n").arg(4).arg(4 / horizontalSubsampling).arg(4 / horizontalSubsampling));
 			}
-			if(componentDepth != 0)												ret.append(QObject::tr("Color Depth: %1 bit\n").arg(componentDepth));
+			if (componentDepth == 253)
+				ret.append(QObject::tr("Color Depth: 16 bit float\n").arg(componentDepth));
+			else if (componentDepth != 0)
+				ret.append(QObject::tr("Color Depth: %1 bit\n").arg(componentDepth));
 			break;
 		case Metadata::Pcm:
 			ret.append(QObject::tr("%1").arg("Pcm\n"));
@@ -129,10 +140,17 @@ void Metadata::GetAsTextDocument(QTextDocument &rDoc) {
 
 	QFontMetrics font_metrics(rDoc.defaultFont());
 
+#ifdef APP5_ACES
+	if(type == Metadata::Jpeg2000 || type == Metadata::Aces) {
+#else
 	if(type == Metadata::Jpeg2000) {
+#endif
 
 		QTextTable *table = cursor.insertTable(5, 2, tableFormat);
 		switch(type) {
+#ifdef APP5_ACES
+			case Metadata::Aces:																						table->cellAt(0, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Essence Type: %1").arg("ACES"), Qt::ElideRight, column_text_width)); break;
+#endif
 			case Metadata::Jpeg2000:																				table->cellAt(0, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Essence Type: %1").arg("JPEG2000"), Qt::ElideRight, column_text_width)); break;
 			default:																												table->cellAt(0, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Essence Type: Unknown"), Qt::ElideRight, column_text_width)); break;
 		}
@@ -151,7 +169,8 @@ void Metadata::GetAsTextDocument(QTextDocument &rDoc) {
 			else if(colorEncoding == Metadata::CDCI)												table->cellAt(3, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Color Mode: %1(%2:%3:%4)").arg("YCbCr").arg(4).arg(4 / horizontalSubsampling).arg(4 / horizontalSubsampling), Qt::ElideRight, column_text_width));
 		}
 		else																															table->cellAt(3, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Color Mode: Unknown"), Qt::ElideRight, column_text_width));
-		if(componentDepth != 0)																						table->cellAt(3, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Color Depth: %1 bit").arg(componentDepth), Qt::ElideRight, column_text_width));
+		if(componentDepth == 253)																						table->cellAt(3, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Color Depth: 16 bit float"), Qt::ElideRight, column_text_width));
+		else if(componentDepth != 0)																						table->cellAt(3, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Color Depth: %1 bit").arg(componentDepth), Qt::ElideRight, column_text_width));
 		else																															table->cellAt(3, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Color Depth: Unknown"), Qt::ElideRight, column_text_width));
 
 		// (k) - start

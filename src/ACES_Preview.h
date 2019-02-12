@@ -17,19 +17,33 @@
 #include <QObject>
 #include <QThreadPool>
 #include "Error.h"
-#include "openjpeg.h"
 #include "ImfPackage.h"
+
+#include "ACES.h"
+#include "AS_02_ACES.h"
+#include "ImfRgbaFile.h"
+#include "ImfFrameBuffer.h"
+#include "ImfStandardAttributes.h"
+#include "ImfChromaticities.h"
+#include "ImfRgba.h"
+#include "ImfArray.h"
+#include "ImathMatrix.h"
+#include "ImfRgbaFile.h"
+#include "As02AcesIStream.h"
+
+using namespace Imf;
+using namespace Imath;
 
 class AssetMxfTrack;
 
 typedef struct
 {
-	OPJ_UINT8* pData; //Our data.
-	OPJ_SIZE_T dataSize; //How big is our data.
-	OPJ_SIZE_T offset; //Where are we currently in our data.
-}opj_memory_stream;
+	uint8_t* pData; //Our data.
+	size_t dataSize; //How big is our data.
+	size_t offset; //Where are we currently in our data.
+}aces_memory_stream;
 
-class JP2 {
+class ACES {
 
 public:
 
@@ -41,9 +55,6 @@ public:
 	// change values with new asset:
 	//QSharedPointer<AS_02::JP2K::MXFReader> reader_shared;
 	int src_bitdepth, prec_shift, max, layer = 3, RGBrange, RGBmaxcv;
-
-	// enable conversion? (much slower!!)
-	bool convert_to_709 = true; // default
 
 	opj_dparameters_t params; // decoding parameters
 
@@ -60,33 +71,27 @@ protected:
 	static const int bitdepth = 16; // lookup table size (default: 16 bit)
 	int max_f; // (float)pow(2, bitdepth)
 	float max_f_; // max_f - 1;
-	float *oetf_709;
 	float *eotf_2020;
 	float *eotf_PQ;
 
-	AS_02::JP2K::MXFReader *reader;
+	//AS_02::JP2K::MXFReader *reader;
+	AS_02::ACES::MXFReader *reader;
 	ASDCP::MXF::IndexTableSegment::IndexEntry IndexF1; // current frame offset
 	ASDCP::MXF::IndexTableSegment::IndexEntry IndexF2; // next frame offset
 	int default_buffer_size = 30000000; // byte
 
-	OPENJPEG_H::opj_image_t *psImage;
-	OPENJPEG_H::opj_codec_t *pDecompressor;
-	OPENJPEG_H::opj_stream_t *pStream;
-	opj_memory_stream pMemoryStream;
+	
+	//::opj_image_t  *psImage;
+	//AS_02_aces_h__::opj_codec_t *pDecompressor;
+	//AS_02_aces_h__::opj_stream_t *pStream;
+	//aces_memory_stream pMemoryStream;
+	As02AcesIStream* pAcesIStream;
 
 	// data to qimage
-	unsigned char *img_buff;
 	int w, h, xpos, buff_pos, x, y, bytes_per_line;
 	float Y, Cb, Cr, r, g, b, out_r, out_g, out_b, out_r8, out_g8, out_b8;
 	QImage DataToQImage(); // converts opj_image_t -> QImage
 
-	// memory stream methods
-	static OPJ_SIZE_T opj_memory_stream_read(void * p_buffer, OPJ_SIZE_T p_nb_bytes, void * p_user_data);
-	static OPJ_SIZE_T opj_memory_stream_write(void * p_buffer, OPJ_SIZE_T p_nb_bytes, void * p_user_data);
-	static OPJ_OFF_T opj_memory_stream_skip(OPJ_OFF_T p_nb_bytes, void * p_user_data);
-	static OPJ_BOOL opj_memory_stream_seek(OPJ_OFF_T p_nb_bytes, void * p_user_data);
-	static void opj_memory_stream_do_nothing(void * p_user_data);
-	OPENJPEG_H::opj_stream_t* opj_stream_create_default_memory_stream(opj_memory_stream* p_memoryStream, OPJ_BOOL p_is_read_stream);
 
 	// info methods
 	static void info_callback(const char *msg, void *data);
@@ -94,10 +99,15 @@ protected:
 	static void error_callback(const char *msg, void *data);
 
 	bool err = false; // error in the decoding process?
-	ASDCP::JP2K::FrameBuffer *buff;
+	//ASDCP::JP2K::FrameBuffer *buff;
+	AS_02::ACES::FrameBuffer *buff;
+
+	static Imf::Chromaticities aces_chromaticities;
+	static Imath::M44f A0Rec709TransformMatrix;
+	float *oetf_709;
 };
 
-class JP2K_Preview : public QObject, public JP2 {
+class ACES_Preview : public QObject, public ACES {
 	Q_OBJECT
 private:
 
@@ -112,9 +122,10 @@ private:
 	QString mMsg; // error message
 	QString mMxf_path; // path to current asset
 
+
 public:
-	JP2K_Preview();
-	~JP2K_Preview();
+	ACES_Preview();
+	~ACES_Preview();
 
 	qint64 mFrameNr;
 	qint64 mFirst_proxy;
@@ -128,7 +139,6 @@ signals:
 public slots:
 	void getProxy();
 	void decode();
-	void setLayer(int);
 };
 
 

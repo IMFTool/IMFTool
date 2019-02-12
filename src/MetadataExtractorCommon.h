@@ -14,9 +14,13 @@
  * along with this program.If not, see <http://www.gnu.org/licenses/>.
  */
 #pragma once
+#ifdef APP5_ACES
+#include "AS_02_ACES.h"
+#else
 #include "AS_02.h"
 #include "Metadata.h"
 #include <vector>
+#endif
 #include "ImfCommon.h"
 #include <QString>
 #include <QTextDocument>
@@ -31,6 +35,9 @@ private:
 public:
 	enum eEssenceType {
 		Unknown_Type = 0,
+#ifdef APP5_ACES
+		Aces,
+#endif
 		Jpeg2000,
 		Pcm,
 		TimedText
@@ -82,6 +89,9 @@ public:
 	QString									pictureEssenceCoding; // J2K only
 	QString									pixelLayout; // J2K RGB only
 	//WR
+#ifdef APP5_ACES
+	AS_02::ACES::ResourceList_t AncillaryResources;
+#endif
 };
 
 

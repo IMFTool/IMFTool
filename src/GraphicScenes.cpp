@@ -866,6 +866,9 @@ void GraphicsSceneComposition::dragEnterEvent(QGraphicsSceneDragDropEvent *pEven
 				AbstractGraphicsWidgetResource *p_resource = NULL;
 				switch(asset->GetEssenceType()) {
 					case Metadata::Jpeg2000:
+#ifdef APP5_ACES
+					case Metadata::Aces:
+#endif
 						p_resource = new GraphicsWidgetVideoResource(NULL, asset);
 						p_resource->hide();
 						addItem(p_resource);

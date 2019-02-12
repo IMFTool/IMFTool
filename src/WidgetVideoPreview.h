@@ -26,8 +26,11 @@
 #include <QMenu>
 #include <QAction>
 #include <QTextEdit>
-#include "createLUTs.h"
 #include <QMessageBox>
+#ifdef APP5_ACES
+#include "ACES_Preview.h"
+#include "ACES_Player.h"
+#endif
 
 class WidgetImagePreview;
 class QPushButton;
@@ -43,6 +46,11 @@ public:
 	void UninstallImp();
 	void setPlaylist(QVector<VideoResource> &rPlayList, QVector<TTMLtimelineResource> &rTTMLs);
 	JP2K_Player *player;
+#ifdef APP5_ACES
+	ACES_Player *mpACESPlayer;
+#endif
+	void setApplication(eImfApplications rImfApplication);
+	eImfApplications getApplication();
 	~WidgetVideoPreview();
 	void Clear();
 	float CPLEditRate;
@@ -111,6 +119,10 @@ private:
 	int decode_layer = 3; // default
 	int decode_speed = 5; // default (fps in player)
 	QThread *playerThread;
+#ifdef APP5_ACES
+	QThread *mpACESPlayerThread;
+#endif
+	eImfApplications mImfApplication = ::App2;
 	int current_playlist_index = 0; // frame indicator position within the playlisqt
 	QVector<VideoResource> currentPlaylist; // playlist ressources
 	bool setFrameIndicator = false; // ignore next signal xPosChanged?
@@ -118,8 +130,13 @@ private:
 
 	// preview decoding
 	JP2K_Preview *decoders[2];
+#ifdef APP5_ACES
+	ACES_Preview *mpACESDecoders[2];
+#endif
 	QThread *decodingThreads[2];
+	QThread *mpACESDecodingThreads[2];
 	bool running[2];
+	bool mACESRunning[2];
 	bool now_running = false; // false: 0, true: 1
 	int run;
 	

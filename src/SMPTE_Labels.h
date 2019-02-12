@@ -1,5 +1,5 @@
 // Copyright(C) Krispin Weiss, Wolfgang Ruppel
-// Generated 27/06/2018 @ 18:33:11 by Wolfgangs-MacBook-Pro.local!
+// Generated 16/10/2018 @ 13:26:57 by Wolfgangs-MacBook-Pro.local!
 
 #pragma once
 #include <QObject>
@@ -54,6 +54,24 @@ namespace SMPTE {
 		{ TransferCharacteristic_HLG_OETF, "HLGOETF" },
 		{ TransferCharacteristic_Gamma_2_6, "Gamma26" },
 		{ TransferCharacteristic_sRGB, "sRGB" },
+	};
+
+
+	enum eACES_Profiles {
+		ACESUncompressedMonoscopicWithoutAlpha,
+		ACESUncompressedMonoscopicWithAlpha,
+	};
+
+
+	static QMap<QString, eACES_Profiles> ACES_ProfilesMap{
+		{ "060e2b34.0401010d.04010202.03040100", ACESUncompressedMonoscopicWithoutAlpha },
+		{ "060e2b34.0401010d.04010202.03040200", ACESUncompressedMonoscopicWithAlpha },
+	};
+
+
+	static QMap<eACES_Profiles, QString> vACES_Profiles{
+		{ ACESUncompressedMonoscopicWithoutAlpha, "ACESUncompressedMonoscopicWithoutAlpha" },
+		{ ACESUncompressedMonoscopicWithAlpha, "ACESUncompressedMonoscopicWithAlpha" },
 	};
 
 

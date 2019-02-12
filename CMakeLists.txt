@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.1.0)
 # Name of target executable
 set(EXE_NAME "IMF-Tool")
 project(${EXE_NAME})
-# Get the SVN revision number of an svn command line client is
+# Get the SVN revision number if an svn command line client is
 # available.  This version will run at build time rather than only
 # at configuration generation time.
 FIND_PROGRAM(SVN_EXECUTABLE svn
@@ -25,7 +25,7 @@ message(STATUS "SVN Last Changed Revision Number is ${SVN_REV}")
 
 # The version number.
 set(VERSION_MAJOR 1)
-set(VERSION_MINOR 4)
+set(VERSION_MINOR 5)
 set(VERSION_PATCH ${SVN_REV})
 set(VERSION_STRING ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -64,11 +64,7 @@ if(UNIX AND NOT APPLE)
 	set(CPACK_GENERATOR ${CPACK_GENERATOR};DEB;RPM)
 endif(UNIX AND NOT APPLE)
 set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
-if(ARCHIVIST)
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Generates IMF packages using ACES.")
-else(ARCHIVIST)
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Supports browsing and editing of IMF packages.")
-endif(ARCHIVIST)
 set(CPACK_PACKAGE_VENDOR "HSRM")
 set(CPACK_PACKAGE_CONTACT "wolfgang.ruppel@hs-rm.de")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
@@ -79,3 +75,4 @@ set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 set(CPACK_PACKAGE_INSTALL_DIRECTORY ${PROJECT_NAME}{CTL_MAJOR_VERSION}.${CTL_MINOR_VERSION})
 include(CPack)
 file(COPY "${PROJECT_SOURCE_DIR}/regxmllib" DESTINATION "${PROJECT_BINARY_DIR}/src")
+file(COPY "${PROJECT_SOURCE_DIR}/photon" DESTINATION "${PROJECT_BINARY_DIR}/src")

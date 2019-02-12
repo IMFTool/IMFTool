@@ -18,6 +18,7 @@
 #include "info.h"
 #include "ImfCommon.h"
 #include "ImfPackage.h"
+#include "WidgetImpBrowser.h"
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/framework/LocalFileFormatTarget.hpp>
@@ -173,7 +174,7 @@ class JobCallPhoton : public AbstractJob {
 	Q_OBJECT
 
 public:
-	JobCallPhoton(const QString &rWorkingDirectory);
+	JobCallPhoton(const QString &rWorkingDirectory, WidgetImpBrowser* &rWidgetImpBrowser);
 	virtual ~JobCallPhoton() {}
 
 signals:
@@ -186,7 +187,7 @@ private:
 	Q_DISABLE_COPY(JobCallPhoton);
 
 	const QString mWorkingDirectory;
-
+	WidgetImpBrowser* mWidgetImpBrowser;
 };
 
 class JobCreateScm : public AbstractJob {
@@ -207,3 +208,25 @@ private:
 
 };
 
+#ifdef APP5_ACES
+class JobExtractTargetFrames : public AbstractJob {
+
+	Q_OBJECT
+
+public:
+	JobExtractTargetFrames(const QSharedPointer<AssetMxfTrack> rAssetMxf);
+	virtual ~JobExtractTargetFrames() {}
+
+signals:
+	void Result(const QStringList rResult, const QVariant &rIdentifier);
+
+protected:
+	virtual Error Execute();
+
+private:
+	Q_DISABLE_COPY(JobExtractTargetFrames);
+
+	const QSharedPointer<AssetMxfTrack> mAssetMxf;
+
+};
+#endif

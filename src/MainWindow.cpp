@@ -304,7 +304,7 @@ void MainWindow::rCallPhoton() {
 
 
 		mpJobQueue->FlushQueue();
-		JobCallPhoton *p_qc_job = new JobCallPhoton(mpRootDirection);
+		JobCallPhoton *p_qc_job = new JobCallPhoton(mpRootDirection, mpWidgetImpBrowser);
 		connect(p_qc_job, SIGNAL(Result(const QString&, const QVariant&)), this, SLOT(ShowQcReport(const QString&, const QVariant&)));
 		mpJobQueue->AddJob(p_qc_job);
 		mpJobQueue->StartQueue();

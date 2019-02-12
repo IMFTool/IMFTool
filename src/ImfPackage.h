@@ -106,6 +106,7 @@ public:
 	//WR
 	QVector<EditRate> GetImpEditRates() const {return mImpEditRates;}
 	bool GetIsSupplemental() const { return mIsSupplemental;}
+	QVector<QString> GetApplicationIdentificationList();
 	//WR
 
 	//! Model View related.
