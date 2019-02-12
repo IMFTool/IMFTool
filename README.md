@@ -1,6 +1,10 @@
 # IMFTool
 A tool for editing IMF CPLs and creating new versions of an existing IMF package
 
+### Pre-compiled versions
+The latest binary installers for macOS and Windows are available at
+[Releases](../../releases/)
+
 ## What is IMF Tool
 IMF Tool supports browsing and limited editing of IMF [[1]](#imf-intro) packages (IMPs).
 In particular, it supports the addition and deletion of audio tracks and subtitle tracks (versioning).
@@ -42,8 +46,8 @@ An IMF Authoring Tool. For creating IMF packages, please check for the wide vari
 
 ## Binary installers
 Please visit
-Folder Binary_Installers
-to download the latest binary installers. (currently for macOS only)
+[Releases](../../releases/)
+to download the latest binary installers.
 
 **For being notified about new releases, please "Watch" IMF Tool (on the top of this page).**
 
