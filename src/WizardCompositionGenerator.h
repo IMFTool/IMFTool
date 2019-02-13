@@ -1,4 +1,4 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel
+/* Copyright(C) 2019 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
  *
  * This program is free software : you can redistribute it and / or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ class WizardCompositionGenerator : public QWizard {
 	Q_OBJECT
 
 public:
-	WizardCompositionGenerator(QWidget *pParent = NULL);
+	WizardCompositionGenerator(QWidget *pParent = NULL, EditRate rEditRate = EditRate::EditRate23_98, QStringList rApplicationIdentificationList = QStringList());
 	virtual ~WizardCompositionGenerator() {}
 	virtual QSize sizeHint() const;
 
@@ -34,6 +34,8 @@ private:
 	Q_DISABLE_COPY(WizardCompositionGenerator);
 	void	InitLayout();
 	int		mPageId;
+	EditRate mEditRate;
+	QStringList mApplicationIdentificationList;
 };
 
 
@@ -41,19 +43,31 @@ class WizardCompositionGeneratorPage : public QWizardPage {
 
 	Q_OBJECT
 		Q_PROPERTY(EditRate EditRateSelected READ GetEditRate WRITE SetEditRate NOTIFY EditRateChanged)
+		Q_PROPERTY(QString AppSelected READ GetApp WRITE SetApp NOTIFY AppChanged)
 
 public:
 	WizardCompositionGeneratorPage(QWidget *pParent = NULL);
 	virtual ~WizardCompositionGeneratorPage() {}
 	EditRate GetEditRate() const;
 	void SetEditRate(const EditRate &rEditRate);
+	QString GetApp() const;
+	void SetApp(const QString &rApplicationIdentification);
 
 signals:
 	void EditRateChanged();
+	void AppChanged();
 
 private:
 	Q_DISABLE_COPY(WizardCompositionGeneratorPage);
 	void InitLayout();
 
 	QComboBox *mpComboBoxEditRate;
+	QComboBox *mpComboBoxApp;
+	const QMap<QString, QString> mApplicationIdentificationMap {
+			{"http://www.smpte-ra.org/schemas/2067-20/2016", "App #2"},
+			{"http://www.smpte-ra.org/schemas/2067-21/2016", "App #2E"},
+			{"http://www.smpte-ra.org/schemas/2067-20/2013", "App #2 2013"},
+			{"http://www.smpte-ra.org/schemas/2067-21/2014", "App #2E 2014"},
+			{"http://www.smpte-ra.org/ns/2067-50/2017", "App 5 ACES"},
+	};
 };

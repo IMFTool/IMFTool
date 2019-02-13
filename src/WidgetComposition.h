@@ -111,7 +111,8 @@ public:
 	GraphicsWidgetComposition* GetComposition() { return mpCompositionScene->GetComposition(); } // (k)
 
 	//! Writes a minimalistic CPL
-	static XmlSerializationError WriteMinimal(const QString &rDestination, const QUuid &rId, const EditRate &rEditRate, const UserText &rContentTitle, const UserText &rIssuer = UserText(), const UserText &rContentOriginator = UserText());
+	static XmlSerializationError WriteMinimal(const QString &rDestination, const QUuid &rId, const EditRate &rEditRate, const UserText &rContentTitle,
+			const UserText &rIssuer = UserText(), const UserText &rContentOriginator = UserText(), const QString &rApplicationIdentification = QString());
 	qint64 GetTotalDuration();
 
 signals:

@@ -289,6 +289,11 @@ void WizardResourceGeneratorPage::InitLayout() {
 			/* -----Denis Manthey----- */
 
 
+	QWidget *p_wrapper_widget_one = new QWidget(this);
+	QGridLayout *p_wrapper_layout_one = new QGridLayout();
+	p_wrapper_layout_one->setContentsMargins(0, 0, 0, 0);
+	p_wrapper_layout_one->addWidget(new QLabel(tr("Frame Rate:"), this), 0, 0, 1, 1);
+	p_wrapper_layout_one->addWidget(mpComboBoxEditRate, 0, 1, 1, 1);
 	QWidget *p_wrapper_widget_two = new QWidget(this);
 	QGridLayout *p_wrapper_layout_two = new QGridLayout();
 	p_wrapper_layout_two->setContentsMargins(0, 0, 0, 0);

@@ -71,6 +71,7 @@
 #define FIELD_NAME_RESOURCE_NAME "ResourceName"
 #define FIELD_NAME_EDIT_RATE "EditRate"
 #define FIELD_NAME_DURATION "Duration"
+#define FIELD_NAME_APP "AppSelected"
 #define FIELD_NAME_SOUNDFIELD_GROUP "SoundfiledGourpName"
 #define FIELD_NAME_WORKING_DIR "WorkingDir"
 

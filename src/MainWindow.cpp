@@ -301,7 +301,26 @@ void MainWindow::rCallPhoton() {
 			return;
 		}
 
+		//Check if package has unsaved changes
+		bool changes = false;
+		for (int i = 0; i < mpUndoGroup->stacks().size(); i++){
+			if (mpUndoGroup->stacks().at(i)->isClean() == false)
+				changes = true;
+		}
+		if (mpWidgetImpBrowser->GetUndoStack()->isClean() == false)
+			changes = true;
 
+		if(changes == true) {
+			QMessageBox *p_message_box = new QMessageBox();
+			p_message_box->setText(tr("Photon"));
+			p_message_box->setInformativeText(QString(tr("IMP has unsaved changes.\n Photon cannot be started")));
+			p_message_box->setIcon(QMessageBox::Critical);
+			p_message_box->setStandardButtons(QMessageBox::Ok);
+			p_message_box->setDefaultButton(QMessageBox::Ok);
+			p_message_box->exec();
+			delete p_message_box;
+			return;
+		}
 
 		mpJobQueue->FlushQueue();
 		JobCallPhoton *p_qc_job = new JobCallPhoton(mpRootDirection, mpWidgetImpBrowser);
