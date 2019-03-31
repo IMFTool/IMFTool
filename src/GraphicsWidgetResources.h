@@ -378,12 +378,12 @@ public:
 	virtual GraphicsWidgetMarkerResource* Clone() const;
 	virtual std::auto_ptr<cpl2016::BaseResourceType> Write() const;
 	void SetIntrinsicDuaration(const Duration &rIntrinsicDuration);
+	virtual void RemoveIrrelevantMarkers();
 
 protected:
 	virtual double ResourceErPerCompositionEr(const EditRate &rCompositionEditRate) const;
 	virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *pEvent);
 	virtual void CplEditRateChanged();
-	virtual void resizeEvent(QGraphicsSceneResizeEvent *pEvent);
 
 private:
 	Q_DISABLE_COPY(GraphicsWidgetMarkerResource);

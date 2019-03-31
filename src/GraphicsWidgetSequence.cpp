@@ -80,7 +80,6 @@ void GraphicsWidgetSequence::MoveResource(AbstractGraphicsWidgetResource *pResou
 }
 
 void GraphicsWidgetSequence::RemoveResource(AbstractGraphicsWidgetResource *pResource) {
-
 	for(int i = 0; i < GetResourceCount(); i++) {
 		if(mpLayout->itemAt(i) == pResource) {
 			mpLayout->removeAt(i);

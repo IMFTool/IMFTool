@@ -17,6 +17,8 @@
 #include "GraphicsWidgetSequence.h"
 #include "GraphicsWidgetResources.h"
 #include "GraphicsWidgetComposition.h"
+#include "GraphicScenes.h"
+#include "CompositionPlaylistCommands.h"
 #include <QPen>
 #include <QMenu>
 #include <QPropertyAnimation>
@@ -25,7 +27,7 @@
 
 
 GraphicsWidgetSegment::GraphicsWidgetSegment(GraphicsWidgetComposition *pParent, const QColor &rColor, const QUuid &rId /*= QUuid::createUuid()*/, const UserText &rAnnotationText /*= QString()*/) :
-GraphicsWidgetBase(pParent), mId(rId), mAnnotationText(rAnnotationText), mDuration(1), mColor(rColor), mpLayout(NULL) {
+GraphicsWidgetBase(pParent), mId(rId), mAnnotationText(rAnnotationText), mDuration(1), mColor(rColor), mpLayout(NULL), mpWidgetComposition(pParent) {
 
 	setFlags(QGraphicsItem::ItemUsesExtendedStyleOption | QGraphicsItem::ItemHasNoContents); // enables pOption::exposedRect in GraphicsWidgetTimeline::paint()
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
@@ -143,14 +145,53 @@ void GraphicsWidgetSegment::InitLayout() {
 
 void GraphicsWidgetSegment::rSequenceEffectiveDurationChanged(GraphicsWidgetSequence *pSender, const Duration &rNewDuration) {
 
-	Duration max;
+	Duration max = 0;
+	int marker_sequence_index = -1;
 	for(int i = 0; i < GetSequenceCount(); i++) {
-		Duration dur = GetSequence(i)->GetEffectiveDuration();
-		if(dur > max) max = dur;
+		if (GetSequence(i)->GetType() != MarkerSequence ) {
+			Duration dur = GetSequence(i)->GetEffectiveDuration();
+			if(dur > max) max = dur;
+		} else {
+			marker_sequence_index = i;
+		}
 	}
 	if(max < 1) max = 1;
 	if(max != mDuration) {
 		mDuration = max;
+		if (marker_sequence_index >= 0 ) {
+			GraphicsWidgetSequence* marker_seq = GetSequence(marker_sequence_index);
+			int marker_seq_duration = 0;
+			int i = 0;
+			while ( (marker_seq_duration <= max.GetCount()) && (i < marker_seq->GetResourceCount())) {
+				marker_seq_duration += marker_seq->GetResource(i)->GetSourceDuration().GetCount();
+				i++;
+			}
+			for (int ii = marker_seq->GetResourceCount(); ii > i; ii--) { // delete all following marker resources, if existing
+				AbstractGraphicsWidgetResource* res = marker_seq->GetResource(ii);
+				if (res && !mpWidgetComposition->GetParseCplInProgress()) {
+					marker_seq->RemoveResource(res);
+					res->hide();
+					res->setParentItem(NULL);
+				}
+
+			}
+			i--;
+			GraphicsWidgetMarkerResource* marker_res = dynamic_cast<GraphicsWidgetMarkerResource*>(marker_seq->GetResource(i));
+			if (marker_res  && !mpWidgetComposition->GetParseCplInProgress()) {
+				Duration old_source_duration = marker_res->GetSourceDuration();
+				Duration new_source_duration = Duration(marker_res->GetSourceDuration().GetCount() + (max.GetCount() - marker_seq_duration));
+				if(old_source_duration > new_source_duration) {
+					marker_res->SetSourceDuration(new_source_duration);
+					marker_res->SetIntrinsicDuaration(Duration(marker_res->GetEntryPoint() + new_source_duration));
+				}
+				else {
+					marker_res->SetIntrinsicDuaration(Duration(marker_res->GetEntryPoint() + new_source_duration));
+					marker_res->SetSourceDuration(new_source_duration);
+				}
+				if (mpWidgetComposition && !mpWidgetComposition->GetParseCplInProgress())
+					marker_res->RemoveIrrelevantMarkers();
+			}
+		}
 		emit DurationChanged(mDuration);
 		updateGeometry();
 	}

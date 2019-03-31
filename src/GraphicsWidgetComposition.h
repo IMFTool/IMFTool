@@ -40,6 +40,8 @@ public:
 	int GetSegmentCount() const;
 	int GetSegmentIndex(GraphicsWidgetSegment *pSegment) const;
 	bool IsEmpty() const { return !GetSegmentCount(); }
+	void SetParseCplInProgress(bool flag) { mParseCplInProgress = flag; };
+	bool GetParseCplInProgress() const { return mParseCplInProgress; };
 
 protected:
 	virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const;
@@ -50,6 +52,7 @@ private:
 	void InitLayout();
 
 	QGraphicsLinearLayout *mpLayout;
+	bool mParseCplInProgress;
 
 signals:
 	void updatePlaylist();

@@ -284,7 +284,9 @@ ImfError WidgetComposition::Read() {
 				mpTimelineGraphicsWidget->RemoveSegmentIndicator(p_segment_indicator);
 				p_segment_indicator->deleteLater();
 			}
+			if (mpCompositionGraphicsWidget) mpCompositionGraphicsWidget->SetParseCplInProgress(true);
 			error = ParseCpl();
+			if (mpCompositionGraphicsWidget) mpCompositionGraphicsWidget->SetParseCplInProgress(false);
 			mpCompositionView->ensureVisible(0, 0, 1, 1);
 			mpTimelineView->ensureVisible(0, 0, 1, 1);
 
@@ -752,11 +754,11 @@ ImfError WidgetComposition::ParseCpl() {
 				cpl2016::SequenceType &r_sequence(r_marker_sequence.get());
 				AbstractWidgetTrackDetails *p_track_detail = GetTrackDetail(ImfXmlHelper::Convert(r_sequence.getTrackId()));
 				GraphicsWidgetSequence *p_graphics_sequence = new GraphicsWidgetSequence(p_graphics_segment, MarkerSequence, ImfXmlHelper::Convert(r_sequence.getTrackId()), ImfXmlHelper::Convert(r_sequence.getId()));
-				if(p_track_detail == NULL) {
+				if(p_track_detail == NULL) { //p_track_detail is NULL in the first segment
 					p_track_detail = new WidgetTrackDetails(ImfXmlHelper::Convert(r_sequence.getTrackId()), MarkerSequence, mpCompositionTracksWidget);
+					connect(p_track_detail, SIGNAL(HeightAboutToChange(qint32)), p_graphics_sequence, SLOT(SetHeight(qint32)));
+					AddTrackDetail(p_track_detail, GetTrackDetailCount());
 				}
-				connect(p_track_detail, SIGNAL(HeightAboutToChange(qint32)), p_graphics_sequence, SLOT(SetHeight(qint32)));
-				AddTrackDetail(p_track_detail, GetTrackDetailCount());
 				p_graphics_segment->AddSequence(p_graphics_sequence, p_graphics_segment->GetSequenceCount());
 
 				// Iterate marker resources.
@@ -784,6 +786,7 @@ ImfError WidgetComposition::ParseCpl() {
 				AbstractWidgetTrackDetails *p_track_detail = GetTrackDetail(ImfXmlHelper::Convert(sequence.getTrackId()));
 				// Add graphics sequence
 				GraphicsWidgetSequence *p_graphics_sequence = NULL;
+				bool is_new_virtual_track = (p_track_detail == NULL);
 				if(name == "MainImageSequence") {
 					if(p_track_detail == NULL) p_track_detail = new WidgetTrackDetails(ImfXmlHelper::Convert(sequence.getTrackId()), MainImageSequence, mpCompositionTracksWidget);
 					p_graphics_sequence = new GraphicsWidgetSequence(p_graphics_segment, MainImageSequence, ImfXmlHelper::Convert(sequence.getTrackId()), ImfXmlHelper::Convert(sequence.getId()));
@@ -823,8 +826,10 @@ ImfError WidgetComposition::ParseCpl() {
 					p_graphics_segment->setProperty("namespace", QVariant(QString(name_space.c_str())));
 					qWarning() << "Unknown sequence type found [" << name.c_str() << ", " << name_space.c_str() << "]: " << p_graphics_sequence->GetId();
 				}
-				connect(p_track_detail, SIGNAL(HeightAboutToChange(qint32)), p_graphics_sequence, SLOT(SetHeight(qint32)));
-				AddTrackDetail(p_track_detail, GetTrackDetailCount());
+				if (is_new_virtual_track) { // Add Virtual Track only once. Note: Sequences in different segments belonging to the same Virtual Track may have a different order in a CPL.
+					connect(p_track_detail, SIGNAL(HeightAboutToChange(qint32)), p_graphics_sequence, SLOT(SetHeight(qint32)));
+					AddTrackDetail(p_track_detail, GetTrackDetailCount());
+				}
 				p_graphics_segment->AddSequence(p_graphics_sequence, p_graphics_segment->GetSequenceCount());
 
 				// Iterate resources.
@@ -866,6 +871,28 @@ ImfError WidgetComposition::ParseCpl() {
 					else {
 						qWarning() << "Unknown BaseResourceType inheritance. Not complaint with SMPTE ST 2067-3:2013.";
 						error = ImfError(ImfError::UnknownInheritance, QString("Unknown BaseResourceType inheritance. Not complaint with SMPTE ST 2067-3:2013."), true);
+					}
+				}
+			}
+		}
+		for (int i = 1; i < mpCompositionGraphicsWidget->GetSegmentCount(); i++ ) {
+			//Sort Virtual Tracks by TrackId, if more than one segment exists, taking first segment as reference
+			GraphicsWidgetSegment* p_first_segment = mpCompositionGraphicsWidget->GetSegment(0);
+			GraphicsWidgetSegment* p_current_segment = mpCompositionGraphicsWidget->GetSegment(i);
+			for (int ii = 0; ii < p_first_segment->GetSequenceCount(); ii++) {
+				QUuid track_id = p_first_segment->GetSequence(ii)->GetTrackId();
+				if (p_current_segment->GetSequence(ii)->GetTrackId() != track_id ) {
+					//Start searching for TrackId at current Sequence position ii in first segment
+					bool found = false;
+					for (int iii = ii; (iii < p_current_segment->GetSequenceCount()) && !found; iii++) {
+						if (p_current_segment->GetSequence(iii)->GetTrackId() == track_id ) {
+							// Move sequence with matching TrackId to current Sequence position ii in first segment
+							p_current_segment->MoveSequence(p_current_segment->GetSequence(iii), ii);
+							found = true;
+						}
+					}
+					if (!found) {
+						qDebug() << tr("CPL ERROR: Track ID %1 not found in segment # %2").arg(track_id.toString(), ii);
 					}
 				}
 			}
@@ -1014,7 +1041,9 @@ void WidgetComposition::AddNewSegmentRequest(int segmentIndex) {
 	GraphicsWidgetSegment *p_segment = new GraphicsWidgetSegment(mpCompositionGraphicsWidget, GraphicsHelper::GetSegmentColor(mpCompositionGraphicsWidget->GetSegmentCount(), true), uuid);
 	GraphicsWidgetSegmentIndicator *p_segment_indicator = new GraphicsWidgetSegmentIndicator(mpTimelineGraphicsWidget, GraphicsHelper::GetSegmentColor(mpCompositionGraphicsWidget->GetSegmentCount()), uuid);
 	AddSegmentCommand *p_add_segment = new AddSegmentCommand(p_segment, p_segment_indicator, segmentIndex, mpCompositionGraphicsWidget, mpTimelineGraphicsWidget, p_root);
-
+	qint64 total_duration = this->GetTotalDuration();
+	total_duration = (total_duration >= 600 ? total_duration : 600);
+	p_segment->SetDuration(total_duration / 5);  // Set duration of new segment to 20% of the total CPL duration
 	for(int i = 0; i < GetTrackDetailCount(); i++) {
 		AbstractWidgetTrackDetails *p = GetTrackDetail(i);
 		GraphicsWidgetSequence *p_sequence = new GraphicsWidgetSequence(p_segment, GetTrackDetail(i)->GetType(), GetTrackDetail(i)->GetId());
@@ -1022,13 +1051,15 @@ void WidgetComposition::AddNewSegmentRequest(int segmentIndex) {
 		connect(GetTrackDetail(i), SIGNAL(HeightAboutToChange(qint32)), p_sequence, SLOT(SetHeight(qint32)));
 		AddSequenceCommand *p_add_sequence = new AddSequenceCommand(p_sequence, i, p_segment, p_root);
 		if(p_sequence->GetType() == MarkerSequence) {
-			AddResourceCommand *p_add_resource = new AddResourceCommand(new GraphicsWidgetMarkerResource(p_sequence), 0, p_sequence, p_root);
+			AbstractGraphicsWidgetResource *p_resource = new GraphicsWidgetMarkerResource(p_sequence);
+			AddResourceCommand *p_add_resource_command = new AddResourceCommand(p_resource, 0, p_sequence, p_root);
+			//AddResourceCommand *p_add_resource = new AddResourceCommand(new GraphicsWidgetMarkerResource(p_sequence), 0, p_sequence, p_root);
 		}
 	}
 	mpUndoStack->push(p_root);
-	qint64 total_duration = this->GetTotalDuration();
-	total_duration = (total_duration >= 600 ? total_duration : 600);
-	p_segment->SetDuration(total_duration / 5);  // Set duration of new segment to 20% of the total CPL duration	mpCompositionGraphicsWidget->layout()->activate();
+	// p_segment->SetDuration needs to be set again here
+	p_segment->SetDuration(total_duration / 5);  // Set duration of new segment to 20% of the total CPL duration
+	mpCompositionGraphicsWidget->layout()->activate();
 	mpTimelineGraphicsWidget->layout()->activate();
 }
 

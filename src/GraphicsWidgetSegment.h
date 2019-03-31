@@ -74,6 +74,7 @@ private:
 	Duration mDuration;
 	QColor mColor;
 	QGraphicsLinearLayout *mpLayout;
+	GraphicsWidgetComposition *mpWidgetComposition;
 };
 
 

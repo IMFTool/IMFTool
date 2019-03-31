@@ -43,7 +43,6 @@ GraphicsWidgetBase(pParent), mpData(pResource), mAssset(rAsset), mColor(rColor),
 }
 
 void AbstractGraphicsWidgetResource::resizeEvent(QGraphicsSceneResizeEvent *pEvent) {
-
 	mpLeftTrimHandle->SetHeight(pEvent->newSize().height());
 	mpRightTrimHandle->setPos(pEvent->newSize().width() / GetRepeatCount(), 0);
 	mpRightTrimHandle->SetHeight(pEvent->newSize().height());
@@ -1350,7 +1349,8 @@ std::auto_ptr<cpl2016::BaseResourceType> GraphicsWidgetMarkerResource::Write() c
 	for(int i = 0; i < child_items.size(); i++) {
 		GraphicsWidgetMarker *p_marker = dynamic_cast<GraphicsWidgetMarker*>(child_items.at(i));
 		if(p_marker) {
-			cpl2016::MarkerType marker(ImfXmlHelper::Convert(p_marker->GetMarkerLabel()), p_marker->pos().x() * ResourceErPerCompositionEr(GetCplEditRate()));
+			qint64 entry_point = p_marker_resource->getEntryPoint().present() ? p_marker_resource->getEntryPoint().get() : 0;
+			cpl2016::MarkerType marker(ImfXmlHelper::Convert(p_marker->GetMarkerLabel()), p_marker->pos().x() * ResourceErPerCompositionEr(GetCplEditRate()) + entry_point);
 			if(p_marker->GetAnnotation().IsEmpty() == false) marker.setAnnotation(ImfXmlHelper::Convert(p_marker->GetAnnotation()));
 			marker_sequence.push_back(marker);
 		}
@@ -1375,9 +1375,15 @@ void GraphicsWidgetMarkerResource::InitMarker() {
 
 	cpl2016::MarkerResourceType *p_marker_resource = static_cast<cpl2016::MarkerResourceType*>(mpData);
 	const cpl2016::MarkerResourceType::MarkerSequence &r_marker_sequence = p_marker_resource->getMarker();
+	qint64 intrinsic_duration = p_marker_resource->getIntrinsicDuration();
+	qint64 entry_point = p_marker_resource->getEntryPoint().present() ? p_marker_resource->getEntryPoint().get() : 0;
+	qint64 source_duration = p_marker_resource->getSourceDuration().present() ? p_marker_resource->getSourceDuration().get() : (intrinsic_duration-entry_point);
 	for(unsigned int i = 0; i < r_marker_sequence.size(); i++) {
-		GraphicsWidgetMarker *p_marker = new GraphicsWidgetMarker(this, 1, boundingRect().height(), ImfXmlHelper::Convert(r_marker_sequence.at(i).getLabel()), QColor(CPL_COLOR_DEFAULT_MARKER));
-		p_marker->setPos((qint64)(r_marker_sequence.at(i).getOffset() / ResourceErPerCompositionEr(GetCplEditRate())), 1);
+		// Create GraphicsWidgetMarker only when marker is on the visible timeline
+		if ((r_marker_sequence.at(i).getOffset() >= entry_point) && (r_marker_sequence.at(i).getOffset() < entry_point+source_duration)) {
+			GraphicsWidgetMarker *p_marker = new GraphicsWidgetMarker(this, 1, boundingRect().height(), ImfXmlHelper::Convert(r_marker_sequence.at(i).getLabel()), QColor(CPL_COLOR_DEFAULT_MARKER));
+			p_marker->setPos((qint64)((r_marker_sequence.at(i).getOffset() - entry_point)/ ResourceErPerCompositionEr(GetCplEditRate())), 1);
+		}
 	}
 }
 
@@ -1512,9 +1518,17 @@ void GraphicsWidgetMarkerResource::SetIntrinsicDuaration(const Duration &rIntrin
 	mpData->setIntrinsicDuration(xml_schema::NonNegativeInteger(new_intrinsic_duration.GetCount()));
 }
 
-void GraphicsWidgetMarkerResource::resizeEvent(QGraphicsSceneResizeEvent *pEvent) {
+void GraphicsWidgetMarkerResource::RemoveIrrelevantMarkers() {
 
-
+	QList<QGraphicsItem*> child_items = childItems();
+	for(int i = 0; i < child_items.size(); i++) {
+		GraphicsWidgetMarker *p_marker = dynamic_cast<GraphicsWidgetMarker*>(child_items.at(i));
+		if(p_marker) {
+			if ( (p_marker->pos().x() * ResourceErPerCompositionEr(GetCplEditRate())) > (this->GetEntryPoint().GetCount() + this->GetSourceDuration().GetCount()) ) {
+				if(GraphicsSceneComposition* p_scene = qobject_cast<GraphicsSceneComposition*>(scene())) p_scene->DelegateCommand(new RemoveMarkerCommand(p_marker, this));
+			}
+		}
+	}
 }
 
 GraphicsWidgetMarkerResource::GraphicsWidgetMarker::GraphicsWidgetMarker(GraphicsWidgetMarkerResource *pParent, qreal width, qreal height, const MarkerLabel &rLabel, const QColor &rColor) :
@@ -1576,3 +1590,4 @@ void GraphicsWidgetMarkerResource::GraphicsWidgetMarker::hoverLeaveEvent(QGraphi
 	update();
 	QToolTip::showText(pEvent->screenPos(), "");
 }
+

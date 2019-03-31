@@ -20,7 +20,7 @@
 
 
 GraphicsWidgetComposition::GraphicsWidgetComposition(QGraphicsItem *pParent /*= NULL*/) :
-GraphicsWidgetBase(NULL), mpLayout(NULL) {
+GraphicsWidgetBase(NULL), mpLayout(NULL), mParseCplInProgress(false) {
 
 	setFlag(QGraphicsItem::ItemHasNoContents);
 	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
