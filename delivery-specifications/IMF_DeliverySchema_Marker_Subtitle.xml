@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DeliverySpecificationList xmlns="http://www.imfug.com/ns/delivery-schema/2019" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Id>urn:uuid:19d6380a-28a2-4dc0-bfa6-7a6a8e5ed00a</Id>
+    <AnnotationText>Deliverable with Marker and Data Essence Virtual Track</AnnotationText>
+    <IssueDate>2019-03-22T00:00:00-00:00</IssueDate>
+    <Issuer>RheinMain University</Issuer>
+    <Creator>Wolfgang Ruppel wolfgang.ruppel@hs-rm.de</Creator>
+    <DeliverableList>
+        <Deliverable>
+            <Id>urn:uuid:3a6412f1-8bf2-4780-bcde-4c806cbff69c</Id>
+            <Label>SDR YCC with Marker and Subtitles</Label>
+            <CompositionPlaylistConstraints>
+                <OwnerId>Unspecified</OwnerId>
+                <ApplicationIdentificationList>
+                    <MatchType>exclusive</MatchType>
+                    <ValueList>
+                        <ApplicationIdentification>http://www.smpte-ra.org/schemas/2067-21/2016</ApplicationIdentification>
+                    </ValueList>
+                </ApplicationIdentificationList>
+               <SegmentCardinality>
+                   <MinItem>1</MinItem>
+                   <MaxItem>1</MaxItem>
+               </SegmentCardinality>
+                <VirtualTrackList>
+                    <ImageVirtualTrack>
+                        <TimelineComplexity type="explicit">
+                            <Sequence>
+                                <Cardinality>
+                                    <MinItem>1</MinItem>
+                                    <MaxItem>1</MaxItem>
+                                </Cardinality>
+                                <Resource>
+                                    <Cardinality>
+                                        <MinItem>1</MinItem>
+                                        <MaxItem>1</MaxItem>
+                                    </Cardinality>
+                                </Resource>
+                            </Sequence>
+                        </TimelineComplexity>
+                        <EssenceEncoding>J2K_4KIMF_SingleTileLossyProfile_M6S3</EssenceEncoding>
+                        <Colorimetry>COLOR.3</Colorimetry>
+                        <Sampling>4:2:2</Sampling>
+                        <Quantization>QE.1</Quantization>
+                        <FrameStructure>Progressive</FrameStructure>
+                        <Stereoscopy>Monoscopic</Stereoscopy>
+                        <ColorComponents>YCbCr</ColorComponents>
+                        <PixelBitDepthList>
+                            <PixelBitDepth>10</PixelBitDepth>
+                        </PixelBitDepthList>
+                        <ImageFrameWidthList>
+                            <ImageFrameWidth>3840</ImageFrameWidth>
+                        </ImageFrameWidthList>
+                        <ImageFrameHeightList>
+                            <ImageFrameHeight>2160</ImageFrameHeight>
+                        </ImageFrameHeightList>
+                        <FrameRateList>
+                            <FrameRate>24000 1001</FrameRate>
+                            <FrameRate>24 1</FrameRate>
+                            <FrameRate>25 1</FrameRate>
+                            <FrameRate>30000 1</FrameRate>
+                            <FrameRate>30 1</FrameRate>
+                        </FrameRateList>
+                    </ImageVirtualTrack>
+                    <MarkerVirtualTrack>
+                        <MarkerList>
+                            <Marker>FFOC</Marker>
+                            <Marker>LFOC</Marker>
+                        </MarkerList>
+                    </MarkerVirtualTrack>
+                    <AudioVirtualTrack>
+                        <TimelineComplexity type="explicit">
+                            <Sequence>
+                                <Cardinality>
+                                    <MinItem>1</MinItem>
+                                    <MaxItem>1</MaxItem>
+                                </Cardinality>
+                                <Resource>
+                                    <Cardinality>
+                                        <MinItem>1</MinItem>
+                                        <MaxItem>1</MaxItem>
+                                    </Cardinality>
+                                </Resource>
+                            </Sequence>
+                        </TimelineComplexity>
+                        <EssenceEncoding>MXFGCClipWrappedBroadcastWaveAudioData</EssenceEncoding>
+                        <SoundfieldGroupConfiguration>
+                            <MCATagSymbol>LtRt</MCATagSymbol>
+                        </SoundfieldGroupConfiguration>
+                        <AudioChannelMapping>
+                            <AudioChannel>
+                                <MCATagSymbol>Lt</MCATagSymbol>
+                            </AudioChannel>
+                            <AudioChannel>
+                                <MCATagSymbol>Rt</MCATagSymbol>
+                            </AudioChannel>
+                        </AudioChannelMapping>
+                        <SampleRateList>
+                            <SampleRate>48000 1</SampleRate>
+                        </SampleRateList>
+                    </AudioVirtualTrack>
+                    <AudioVirtualTrack>
+                        <TimelineComplexity type="explicit">
+                            <Sequence>
+                                <Cardinality>
+                                    <MinItem>1</MinItem>
+                                    <MaxItem>1</MaxItem>
+                                </Cardinality>
+                                <Resource>
+                                    <Cardinality>
+                                        <MinItem>1</MinItem>
+                                        <MaxItem>1</MaxItem>
+                                    </Cardinality>
+                                </Resource>
+                            </Sequence>
+                        </TimelineComplexity>
+                        <EssenceEncoding>MXFGCClipWrappedBroadcastWaveAudioData</EssenceEncoding>
+                        <SoundfieldGroupConfiguration>
+                            <MCATagSymbol>51</MCATagSymbol>
+                        </SoundfieldGroupConfiguration>
+                        <AudioChannelMapping>
+                            <AudioChannel>
+                                <MCATagSymbol>L</MCATagSymbol>
+                            </AudioChannel>
+                            <AudioChannel>
+                                <MCATagSymbol>R</MCATagSymbol>
+                            </AudioChannel>
+                            <AudioChannel>
+                                <MCATagSymbol>C</MCATagSymbol>
+                            </AudioChannel>
+                            <AudioChannel>
+                                <MCATagSymbol>LFE</MCATagSymbol>
+                            </AudioChannel>
+                            <AudioChannel>
+                                <MCATagSymbol>Ls</MCATagSymbol>
+                            </AudioChannel>
+                            <AudioChannel>
+                                <MCATagSymbol>Rs</MCATagSymbol>
+                            </AudioChannel>
+                        </AudioChannelMapping>
+                        <SampleRateList>
+                            <SampleRate>48000 1</SampleRate>
+                        </SampleRateList>
+                    </AudioVirtualTrack>
+                    <TimedTextVirtualTrack>
+                        <TimedTextSequenceType>SubtitlesSequence</TimedTextSequenceType>
+                        <NamespaceURI>http://www.w3.org/ns/ttml/profile/imsc1/text</NamespaceURI>
+                    </TimedTextVirtualTrack>
+                </VirtualTrackList>
+            </CompositionPlaylistConstraints>
+        </Deliverable>
+    </DeliverableList>
+</DeliverySpecificationList>

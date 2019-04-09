@@ -48,6 +48,9 @@
 #define XML_NAMESPACE_DS "http://www.w3.org/2000/09/xmldsig#"
 #define XML_NAMESPACE_XS "http://www.w3.org/2001/XMLSchema"
 #define XML_NAMESPACE_NS "http://www.w3.org/2000/xmlns/"
+#define XML_NAMESPACE_R0 "http://www.smpte-ra.org/reg/395/2014/13/1/aaf"
+#define XML_NAMESPACE_R1 "http://www.smpte-ra.org/reg/335/2012"
+#define XML_NAMESPACE_R2 "http://www.smpte-ra.org/reg/2003/2012"
 
 #define SETTINGS_AUDIO_DEVICE "audio/audioDevice"
 #define SETTINGS_AUDIO_CHANNEL_CONFIGURATION "audio/audioChannelConfiguration"
@@ -92,6 +95,8 @@
 #define FIELD_NAME_CPL_EDIT_RATE "CplEditRate"
 
 #define FIELD_NAME_SCM_CPL_LIST "ScmCplList"
+#define FIELD_NAME_DELIVERY_SPECIFICATION_LIST "DeliverySpecificationListSelected"
+#define FIELD_NAME_DELIVERY_SPECIFICATION "DeliverySpecificationSelected"
 
 #define IMSC1_NS_TT 		XMLString::transcode("http://www.w3.org/ns/ttml")
 #define IMSC1_NS_TTM 		XMLString::transcode("http://www.w3.org/ns/ttml#metadata")

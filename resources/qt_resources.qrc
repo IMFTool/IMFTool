@@ -62,6 +62,7 @@
         <file>inbox_upload_plus.png</file>
 		<file>ttml_bg_not_found.png</file>
 		<file>qc.png</file>
+        <file>lorry.png</file>
     </qresource>
     <qresource prefix="/other">
         <file alias="license">../LICENSE</file>

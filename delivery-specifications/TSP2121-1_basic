@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<DeliverySpecificationList xmlns="http://www.imfug.com/ns/delivery-schema/2019" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Id>urn:uuid:605ABA4B-2DB3-4A03-8709-C5A76CD021D5</Id>
+    <AnnotationText>DRAFT DPP Delivery Requirements TSP 2121-1 v0.2</AnnotationText>
+    <IssueDate>2019-02-22T18:46:10-00:00</IssueDate>
+    <Issuer>DPP Lab</Issuer>
+    <Creator>Ulrich - testlab@thedpp.com</Creator>
+    <DeliverableList>
+        <Deliverable>
+            <Id>urn:uuid:6E28376E-0059-4BD3-88AC-70D725689A75</Id>
+            <Label>DRAFT DPP Delivery Requirements TSP 2121-1 - UHD-1 4:2:2 HLG YCC</Label>
+            <CompositionPlaylistConstraints>
+                <OwnerId>http://schema.thedpp.com/delivery-schema/imf/2019/dev01</OwnerId>
+                <ApplicationIdentificationList>
+                    <MatchType>exclusive</MatchType>
+                    <ValueList>
+                        <ApplicationIdentification>http://www.digitalproductionpartnership.co.uk/schema/imf/TSP2121-1/2018</ApplicationIdentification>
+                    </ValueList>
+                </ApplicationIdentificationList>
+               <SegmentCardinality>
+                   <MinItem>2</MinItem>
+                   <MaxItem>0</MaxItem>
+               </SegmentCardinality>
+                <VirtualTrackList>
+                    <ImageVirtualTrack>
+                        <TimelineComplexity type="explicit">
+                            <Sequence>
+                                <Cardinality>
+                                    <MinItem>1</MinItem>
+                                    <MaxItem>1</MaxItem>
+                                </Cardinality>
+                                <Resource>
+                                    <Cardinality>
+                                        <MinItem>1</MinItem>
+                                        <MaxItem>1</MaxItem>
+                                    </Cardinality>
+                                </Resource>
+                            </Sequence>
+                        </TimelineComplexity>
+                        <EssenceEncoding>ProResPictureCoding422HQ</EssenceEncoding>
+                        <Colorimetry>COLOR.8DPP</Colorimetry>
+                        <Sampling>4:2:2</Sampling>
+                        <Quantization>QE.1</Quantization>
+                        <FrameStructure>Progressive</FrameStructure>
+                        <Stereoscopy>Monoscopic</Stereoscopy>
+                        <ColorComponents>YCbCr</ColorComponents>
+                        <PixelBitDepthList>
+                            <PixelBitDepth>10</PixelBitDepth>
+                        </PixelBitDepthList>
+                        <ImageFrameWidthList>
+                            <ImageFrameWidth>3840</ImageFrameWidth>
+                        </ImageFrameWidthList>
+                        <ImageFrameHeightList>
+                            <ImageFrameHeight>2160</ImageFrameHeight>
+                        </ImageFrameHeightList>
+                        <FrameRateList>
+                            <FrameRate>25 1</FrameRate>
+                            <FrameRate>50 1</FrameRate>
+                        </FrameRateList>
+                    </ImageVirtualTrack>
+                    <AudioVirtualTrack>
+                        <TimelineComplexity type="explicit">
+                            <Sequence>
+                                <Cardinality>
+                                    <MinItem>1</MinItem>
+                                    <MaxItem>1</MaxItem>
+                                </Cardinality>
+                                <Resource>
+                                    <Cardinality>
+                                        <MinItem>1</MinItem>
+                                        <MaxItem>1</MaxItem>
+                                    </Cardinality>
+                                </Resource>
+                            </Sequence>
+                        </TimelineComplexity>
+                        <EssenceEncoding>MXFGCClipWrappedBroadcastWaveAudioData</EssenceEncoding>
+                        <SoundfieldGroupConfiguration>
+                            <MCATagSymbol>LtRt</MCATagSymbol>
+                        </SoundfieldGroupConfiguration>
+                        <AudioChannelMapping>
+                            <AudioChannel>
+                                <MCATagSymbol>Lt</MCATagSymbol>
+                            </AudioChannel>
+                            <AudioChannel>
+                                <MCATagSymbol>Rt</MCATagSymbol>
+                            </AudioChannel>
+                        </AudioChannelMapping>
+                        <SampleRateList>
+                            <SampleRate>48000 1</SampleRate>
+                        </SampleRateList>
+                    </AudioVirtualTrack>
+                    <AudioVirtualTrack>
+                        <TimelineComplexity type="explicit">
+                            <Sequence>
+                                <Cardinality>
+                                    <MinItem>1</MinItem>
+                                    <MaxItem>1</MaxItem>
+                                </Cardinality>
+                                <Resource>
+                                    <Cardinality>
+                                        <MinItem>1</MinItem>
+                                        <MaxItem>1</MaxItem>
+                                    </Cardinality>
+                                </Resource>
+                            </Sequence>
+                        </TimelineComplexity>
+                        <EssenceEncoding>MXFGCClipWrappedBroadcastWaveAudioData</EssenceEncoding>
+                        <SoundfieldGroupConfiguration>
+                            <MCATagSymbol>51</MCATagSymbol>
+                        </SoundfieldGroupConfiguration>
+                        <AudioChannelMapping>
+                            <AudioChannel>
+                                <MCATagSymbol>L</MCATagSymbol>
+                            </AudioChannel>
+                            <AudioChannel>
+                                <MCATagSymbol>R</MCATagSymbol>
+                            </AudioChannel>
+                            <AudioChannel>
+                                <MCATagSymbol>C</MCATagSymbol>
+                            </AudioChannel>
+                            <AudioChannel>
+                                <MCATagSymbol>LFE</MCATagSymbol>
+                            </AudioChannel>
+                            <AudioChannel>
+                                <MCATagSymbol>Ls</MCATagSymbol>
+                            </AudioChannel>
+                            <AudioChannel>
+                                <MCATagSymbol>Rs</MCATagSymbol>
+                            </AudioChannel>
+                        </AudioChannelMapping>
+                        <SampleRateList>
+                            <SampleRate>48000 1</SampleRate>
+                        </SampleRateList>
+                    </AudioVirtualTrack>
+                </VirtualTrackList>
+            </CompositionPlaylistConstraints>
+        </Deliverable>        
+    </DeliverableList>
+</DeliverySpecificationList>
