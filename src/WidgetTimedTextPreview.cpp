@@ -103,7 +103,7 @@ void WidgetTimedTextPreview::InitLayout() {
 	splitter->addWidget(ttml_text);
 
 	// create fonts
-	font_small = QFont("Times", 9);
+	font_small = QFont("Courier", 10);
 	font_medium = QFont("Times", 15);
 	font_html = QFont("Times", 18);
 

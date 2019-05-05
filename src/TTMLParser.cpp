@@ -14,6 +14,7 @@
  * along with this program.If not, see <http://www.gnu.org/licenses/>.
  */
 #include "TTMLParser.h"
+#include "global.h"
 #include "AS_DCP_internal.h"
 #include "AS_02.h"
 #include "PCMParserList.h"
@@ -57,15 +58,15 @@ elem::elem(xercesc::DOMNode *rNode, TTMLParser *rParser, elem *rParent) {
 
 	parser = rParser;
 	parent = rParent;
-	node = rNode;
-	el = dynamic_cast<DOMElement*>(rNode);
+	mpDomNode = rNode;
+	mpDomElement = dynamic_cast<DOMElement*>(rNode);
 }
 
 bool elem::process() {
 
-	if (el) {
+	if (mpDomElement) {
 		// check if irrelevant element -> ignore
-		if(!tt_tags.contains(XMLString::transcode(el->getTagName()))){
+		if(!tt_tags.contains(XMLString::transcode(mpDomElement->getTagName()))){
 			//dur = 2; remove?
 			stop = true;
 			return stop;
@@ -97,7 +98,7 @@ void elem::GetTimeContainer() {
 	}
 
 	// check for timing attributes
-	QString timeContainerVal = XMLString::transcode(el->getAttribute(XMLString::transcode("timeContainer")));
+	QString timeContainerVal = XMLString::transcode(mpDomElement->getAttribute(XMLString::transcode("timeContainer")));
 	if (timeContainerVal.length() > 0) { // found timeContainer!
 
 		is_timed = true;
@@ -113,8 +114,8 @@ void elem::GetTimeContainer() {
 	// timing is either par or seq
 	if (is_timed) {
 
-		QString durVal = XMLString::transcode(el->getAttribute(XMLString::transcode("dur")));
-		QString endVal = XMLString::transcode(el->getAttribute(XMLString::transcode("end")));
+		QString durVal = XMLString::transcode(mpDomElement->getAttribute(XMLString::transcode("dur")));
+		QString endVal = XMLString::transcode(mpDomElement->getAttribute(XMLString::transcode("end")));
 
 		if (durVal.length() > 0) { // dur is set!
 			
@@ -161,7 +162,8 @@ void elem::GetRegion() {
 #endif
 	}
 	else { // check if current element has region
-		QString regVal = XMLString::transcode(el->getAttribute(XMLString::transcode("region")));
+		//mpDomElement is in IMSC1_NS_TT, don't use IMSC1_NS_TT for getAttribute()
+		QString regVal = XMLString::transcode(mpDomElement->getAttribute(XMLString::transcode("region")));
 		if (regVal.length() > 0) { // found region!
 #ifdef DEBUG_TTML
 			qDebug() << "region used" << regVal;
@@ -184,21 +186,19 @@ void elem::GetStyle() {
 	}
 
 	// look for style attribute
-	QString styleVal = XMLString::transcode(el->getAttribute(XMLString::transcode("style")));
+	QString styleVal = XMLString::transcode(mpDomElement->getAttribute(XMLString::transcode("style")));
 	if (!styleVal.isEmpty()) {
-		CSS = mergeCss(CSS, parser->styles[styleVal]);
-		el->removeAttribute(XMLString::transcode("style"));
+		CSS = mergeCss(CSS, parser->styles[styleVal], true);
+		mpDomElement->removeAttribute(XMLString::transcode("style"));
 	}
 
 	// loop attributes
-	if (el->hasAttributes()) { // loop them
-		for (int z = 0; z < el->getAttributes()->getLength(); z++) {
-
-			DOMAttr *attr = dynamic_cast<DOMAttr*>(el->getAttributes()->item(z));
-
-			QString name = XMLString::transcode(attr->getNodeName());
-			if (parser->cssAttr.contains(name)) { // known parameter!
-				CSS[parser->cssAttr[name]] = XMLString::transcode(attr->getNodeValue());
+	if (mpDomElement->hasAttributes()) { // loop them
+		QMap<QString, QString>::iterator it;
+		for (it = parser->cssAttr.begin(); it != parser->cssAttr.end(); it++) {
+			const XMLCh* ch = mpDomElement->getAttributeNS(IMSC1_NS_TTS, XMLString::transcode(it.key().toStdString().c_str()));
+			if (XMLString::stringLen(ch) != 0) {
+				CSS[parser->cssAttr[it.key()]] = XMLString::transcode(ch);
 			}
 		}
 	}
@@ -234,7 +234,7 @@ bool elem::processTimedElement() {
 		ttml_timed.region = new_region;
 	}
 
-	QString image = XMLString::transcode(el->getAttribute(XMLString::transcode("smpte:backgroundImage")));
+	QString image = XMLString::transcode(mpDomElement->getAttributeNS(IMSC1_NS_SMPTE, XMLString::transcode("backgroundImage")));
 	if (!image.isEmpty()) {
 
 		ttml_timed.type = 1; // set type : image
@@ -266,13 +266,13 @@ bool elem::processTimedElement() {
 		ttml_timed.type = 0; // set type : text
 	}
 
-	ttml_timed.text = serializeTT(processTimedElementStyle(el, true));
+	ttml_timed.text = serializeTT(processTimedElementStyle(mpDomElement, true));
 
 	// set processed style map in timed struct
 	ttml_timed.CSS = CSS;
 
 	// add timed item to list
-	parser->mThisResource->items.append(ttml_timed);
+	parser->mpTTMLtimelineResource->items.append(ttml_timed);
 
 	// add visible element duration to parent block duration if parent timing is seq
 	if (parent && parent->timeContainer == 2) {
@@ -284,43 +284,41 @@ bool elem::processTimedElement() {
 
 DOMElement* elem::processTimedElementStyle(DOMElement *rEl, bool HasTiming) {
 
+	QMap<QString, QString> parentCSS = CSS;
 	// timed element: get styles from parent
 	if (HasTiming) {
-
 		// get style from region
 		if (regionName.length() > 0) {
-			CSS = mergeCss(CSS,parser->regions[regionName].CSS);
+			parentCSS = mergeCss(parentCSS, parser->regions[regionName].CSS, true);
 		}
 
 		// get style from parent
 		if (parent && parent->CSS.count() > 0) {
-			CSS = mergeCss(CSS, parent->CSS);
+			parentCSS = mergeCss(parentCSS, parent->CSS, true);
 		}
 	}
 
 	// look for style attribute
 	QString style = XMLString::transcode(rEl->getAttribute(XMLString::transcode("style")));
 	if (!style.isEmpty()) {
-		CSS = mergeCss(parser->styles[style], CSS);
+		parentCSS = mergeCss(parentCSS, parser->styles[style], true);
 		rEl->removeAttribute(XMLString::transcode("style"));
 	}
 
 	// loop attributes
 	if (rEl->hasAttributes()) { // loop them
-		for (int z = 0; z < rEl->getAttributes()->getLength(); z++) {
-
-			DOMAttr *attr = dynamic_cast<DOMAttr*>(rEl->getAttributes()->item(z));
-
-			QString name = XMLString::transcode(attr->getNodeName());
-			if (parser->cssAttr.contains(name)) { // known parameter!
-				CSS[parser->cssAttr[name]] = XMLString::transcode(attr->getNodeValue());
+		QMap<QString, QString>::iterator it;
+		for (it = parser->cssAttr.begin(); it != parser->cssAttr.end(); it++) {
+			const XMLCh* ch = rEl->getAttributeNS(IMSC1_NS_TTS, XMLString::transcode(it.key().toStdString().c_str()));
+			if (XMLString::stringLen(ch) > 0) {
+				parentCSS[parser->cssAttr[it.key()]] = XMLString::transcode(ch);
+				rEl->removeAttributeNS(IMSC1_NS_TTS, XMLString::transcode(it.key().toStdString().c_str()));
 			}
 		}
 	}
 
-	if (CSS.count() > 0) { // set serialized CSS in timed element
-		rEl->setAttribute(XMLString::transcode("style"), XMLString::transcode(serializeCss(CSS).toStdString().c_str()));
-	}
+
+	if (HasTiming) CSS = parentCSS; // replace parent CSS
 
 	// loop children (if available...)
 	if (rEl->getChildNodes()) {
@@ -333,6 +331,46 @@ DOMElement* elem::processTimedElementStyle(DOMElement *rEl, bool HasTiming) {
 		}
 	}
 
+	if (parentCSS.count() > 0) { // set serialized parentCSS in timed element
+		// Work-around for limited color value formats in QtextEdit::setHtml(), see https://github.com/IMFTool/IMFTool/issues/13
+		if (parentCSS.contains("color")) {
+			QRegExp rx3("#([0-9a-zA-Z]){3}");
+			QRegExp rx8("#([0-9a-zA-Z]){8}");
+			QString col = parentCSS["color"];
+			if (rx8.exactMatch(col)) parentCSS["color"] = col.mid(0, 7);
+			else if (rx3.exactMatch(col)) parentCSS["color"] = "#"+col[1]+col[1]+col[2]+col[2]+col[3]+col[3];
+		}
+		if (parentCSS.contains("background-color")) {
+			QRegExp rx3("#([0-9a-zA-Z]){3}");
+			QRegExp rx8("#([0-9a-zA-Z]){8}");
+			QString col = parentCSS["background-color"];
+			if (rx8.exactMatch(col)) parentCSS["background-color"] = col.mid(0, 7);
+			else if (rx3.exactMatch(col)) parentCSS["background-color"] = "#"+col[1]+col[1]+col[2]+col[2]+col[3]+col[3];
+		}
+		if (parentCSS.contains("font-family")) {
+			if (parentCSS["font-family"] == "proportionalSansSerif" )
+				parentCSS["font-family"] = "Arial";
+			else if (parentCSS["font-family"] == "proportionalSerif" )
+				parentCSS["font-family"] = "Times New Roman, Times, serif";
+			else if (parentCSS["font-family"] == "monospaceSerif" )
+				parentCSS["font-family"] = "Courier";
+			else if (parentCSS["font-family"] == "monospaceSansSerif" )
+				parentCSS["font-family"] = "Courier";
+		}
+		if (parentCSS.contains("text-align")) {
+			if (parentCSS["text-align"] == "start" )
+				parentCSS["text-align"] = "left";
+			else if (parentCSS["text-align"] == "end" )
+				parentCSS["text-align"] = "right";
+		}
+		if (parentCSS.contains("text-decoration")) {
+			if (parentCSS["text-decoration"] == "lineThrough" )
+				parentCSS["text-decoration"] = "line-through";
+		}
+		rEl->setAttributeNS(IMSC1_NS_TTS, XMLString::transcode("style"), XMLString::transcode(serializeCss(parentCSS).toStdString().c_str()));
+	}
+
+
 	return rEl;
 }
 
@@ -341,26 +379,26 @@ bool elem::GetStartEndTimes() {
 	float duration = 0, end = 0, beg = 0, current_dur = 0;
 	bool end_found = false, beg_found = false, dur_found = false;
 
-	if (!el) return false;
+	if (!mpDomElement) return false;
 
-	QString tc_string = XMLString::transcode(el->getAttribute(XMLString::transcode("timeContainer")));
+	QString tc_string = XMLString::transcode(mpDomElement->getAttribute(XMLString::transcode("timeContainer")));
 	if (!tc_string.isEmpty()) {
 		return false; // abort!
 	}
 
-	QString end_string = XMLString::transcode(el->getAttribute(XMLString::transcode("end")));
+	QString end_string = XMLString::transcode(mpDomElement->getAttribute(XMLString::transcode("end")));
 	if (!end_string.isEmpty()) {
 		end = ConvertTimingQStringtoDouble(end_string, parser->framerate, parser->tickrate);
 		end_found = true;
 	}
 
-	QString beg_string = XMLString::transcode(el->getAttribute(XMLString::transcode("begin")));
+	QString beg_string = XMLString::transcode(mpDomElement->getAttribute(XMLString::transcode("begin")));
 	if (!beg_string.isEmpty()) {
 		beg = ConvertTimingQStringtoDouble(beg_string, parser->framerate, parser->tickrate);
 		beg_found = true;
 	}
 
-	QString dur_string = XMLString::transcode(el->getAttribute(XMLString::transcode("dur")));
+	QString dur_string = XMLString::transcode(mpDomElement->getAttribute(XMLString::transcode("dur")));
 	if (!dur_string.isEmpty()) {
 		current_dur = ConvertTimingQStringtoDouble(dur_string, parser->framerate, parser->tickrate);
 		dur_found = true;
@@ -426,7 +464,7 @@ Error TTMLParser::open(const QString &rSourceFile, TTMLtimelineResource &ttml_se
 
 	Error error;
 	
-	mThisResource = &ttml_segment;
+	mpTTMLtimelineResource = &ttml_segment;
 	timeline_in = ttml_segment.in;
 	timeline_out = ttml_segment.out;
 	is_wrapped = rIsWrapped;
@@ -506,12 +544,15 @@ void TTMLParser::parse(std::string xml) {
 	XercesDOMParser*   parser = NULL;
 	ErrorHandler*      errorHandler = NULL;
 
-	if (!parser)
-	{
-		XMLPlatformUtils::Initialize();
-		parser = new XercesDOMParser();
-	}
-	
+	XMLPlatformUtils::Initialize();
+	parser = new XercesDOMParser();
+	parser->setValidationScheme(XercesDOMParser::Val_Always);		//TODO:Schema validation
+	parser->setValidationSchemaFullChecking(true);
+	parser->useScanner(XMLUni::fgWFXMLScanner);
+	//parser->setErrorHandler(errHandler);
+	parser->setDoNamespaces(true);
+	parser->setDoSchema(true);
+
 	if (is_wrapped) {
 		xercesc::MemBufInputSource memBuffInput((const XMLByte*)xml.c_str(), xml.size(), "dummy");
 		parser->parse(memBuffInput);
@@ -528,16 +569,15 @@ void TTMLParser::parse(std::string xml) {
 	}
 	
 	DOMDocument *dom_doc = parser->getDocument();															
-
 	// get metadata
 	getMetadata(dom_doc);
 
 	// set framerate & doc in TTMLtimelineSegment
-	mThisResource->frameRate = framerate;
-	mThisResource->doc = QString(xml.c_str());
+	mpTTMLtimelineResource->frameRate = framerate;
+	mpTTMLtimelineResource->doc = QString(xml.c_str());
 
 	// loop styles
-	DOMNodeList	*styleList = dom_doc->getElementsByTagName(XMLString::transcode("style"));
+	DOMNodeList	*styleList = dom_doc->getElementsByTagNameNS(IMSC1_NS_TT, XMLString::transcode("style"));
 	for (int i = 0; i < styleList->getLength(); i++) {
 		QPair<QString, QMap<QString, QString>> style = parseStyle(styleList->item(i));
 		styles[style.first] = style.second; // e.g. ["white_8"] = "CSS"
@@ -547,7 +587,7 @@ void TTMLParser::parse(std::string xml) {
 	}
 	
 	// loop regions
-	DOMNodeList	*regionList = dom_doc->getElementsByTagName(XMLString::transcode("region"));
+	DOMNodeList	*regionList = dom_doc->getElementsByTagNameNS(IMSC1_NS_TT, XMLString::transcode("region"));
 	for (int i = 0; i < regionList->getLength(); i++) {
 		TTMLRegion region = parseRegion(regionList->item(i));
 		regions[ region.id ] = region; // e.g. ["region1"] = TTMLRegion
@@ -557,29 +597,29 @@ void TTMLParser::parse(std::string xml) {
 	}
 
 	// check if body has styling information
-	DOMNode *body_node = dom_doc->getElementsByTagName(XMLString::transcode("body"))->item(0);
+	DOMNode *body_node = dom_doc->getElementsByTagNameNS(IMSC1_NS_TT, XMLString::transcode("body"))->item(0);
 	DOMElement *body_el = dynamic_cast<DOMElement*>(body_node);
 
 	QString body_region;
 	QMap<QString, QString> body_style;
 
-	if (body_node->hasAttributes()) {
-		for (int z = 0; z < body_node->getAttributes()->getLength(); z++) {
-
-			DOMAttr *attr = dynamic_cast<DOMAttr*>(body_node->getAttributes()->item(z));
-			QString name = XMLString::transcode(attr->getNodeName());
-			if (cssAttr.contains(name)) { // known parameter!
-				body_style[cssAttr[name]] = XMLString::transcode(attr->getNodeValue());
+	if (body_el->hasAttributes()) {
+		QMap<QString, QString>::iterator it;
+		for (it = cssAttr.begin(); it != cssAttr.end(); it++) {
+			const XMLCh* ch = body_el->getAttributeNS(IMSC1_NS_TTS, XMLString::transcode(it.key().toStdString().c_str()));
+			if (XMLString::stringLen(ch) > 0) {
+				body_style[cssAttr[it.key()]] = XMLString::transcode(ch);
 			}
 		}
-
 		// get style
+		//body_el is in IMSC1_NS_TT, don't use IMSC1_NS_TT for getAttribute()
 		QString styleVal = XMLString::transcode(body_el->getAttribute(XMLString::transcode("style")));
 		if (!styleVal.isEmpty()) { // found style
 			body_style = mergeCss(body_style, styles[styleVal]);
 		}
 
 		// get region
+		//body_el is in IMSC1_NS_TT, don't use IMSC1_NS_TT for getAttribute()
 		QString regVal = XMLString::transcode(body_el->getAttribute(XMLString::transcode("region")));
 		if (regVal.length() > 0) { // found region!
 			body_region = regVal;
@@ -587,7 +627,7 @@ void TTMLParser::parse(std::string xml) {
 	}
 
 	// loop all children of <body>
-	DOMNodeList	*body = dom_doc->getElementsByTagName(XMLString::transcode("body"))->item(0)->getChildNodes();
+	DOMNodeList	*body = body_node->getChildNodes();
 	for (int i = 0; i < body->getLength(); i++) {
 		
 		elem *newEl = new elem(body->item(i), this, NULL); // pass current parser & parent element
@@ -604,7 +644,7 @@ void TTMLParser::parse(std::string xml) {
 	}
 
 #ifdef DEBUG_TTML
-	print2Console(mThisResource->items);
+	print2Console(mpTTMLtimelineResource->items);
 #endif
 
 	parser->~XercesDOMParser(); // delete DOM parser
@@ -614,24 +654,24 @@ TTMLRegion TTMLParser::parseRegion(DOMNode *node) {
 
 	TTMLRegion region;
 
-	DOMElement *el = dynamic_cast<DOMElement*>(node);
+	DOMElement *pDomElement = dynamic_cast<DOMElement*>(node);
 
 	// get id
-	QString idVal = XMLString::transcode(el->getAttribute(XMLString::transcode("xml:id")));
+	QString idVal = XMLString::transcode(pDomElement->getAttribute(XMLString::transcode("xml:id")));
 	if (!idVal.isEmpty()) { // found id
 		region.id = idVal;
-		el->removeAttribute(XMLString::transcode("xml:id"));
+		pDomElement->removeAttribute(XMLString::transcode("xml:id"));
 	}
 
 	// get style
-	QString styleVal = XMLString::transcode(el->getAttribute(XMLString::transcode("style")));
+	QString styleVal = XMLString::transcode(pDomElement->getAttribute(XMLString::transcode("style")));
 	if (!styleVal.isEmpty()) { // found style
 		region.CSS = mergeCss(region.CSS,styles[styleVal]);
-		el->removeAttribute(XMLString::transcode("style"));
+		pDomElement->removeAttribute(XMLString::transcode("style"));
 	}
 
 	// get origin e.g. tts:origin='12.88% 0.417%'
-	QString originVal = XMLString::transcode(el->getAttribute(XMLString::transcode("tts:origin")));
+	QString originVal = XMLString::transcode(pDomElement->getAttributeNS(IMSC1_NS_TTS, XMLString::transcode("origin")));
 	if (!originVal.isEmpty()) { // found origin
 		if (originVal.count("%") > 0) { // %
 			originVal.replace("%", ""); // remove '%'
@@ -645,11 +685,11 @@ TTMLRegion TTMLParser::parseRegion(DOMNode *node) {
 			region.origin[0] = (values[0].toFloat() / extent[0]) * 100;
 			region.origin[1] = (values[1].toFloat() / extent[1]) * 100;
 		}
-		el->removeAttribute(XMLString::transcode("tts:origin")); // remove attr
+		pDomElement->removeAttributeNS(IMSC1_NS_TTS, XMLString::transcode("origin")); // remove attr
 	}
 
 	// get extent e.g. tts:extent='580px 200px'
-	QString extentVal = XMLString::transcode(el->getAttribute(XMLString::transcode("tts:extent")));
+	QString extentVal = XMLString::transcode(pDomElement->getAttributeNS(IMSC1_NS_TTS, XMLString::transcode("extent")));
 	if (!extentVal.isEmpty()) { // found extent
 		if (extentVal.count("%") > 0) { // %
 			extentVal.replace("%", ""); // remove '%'
@@ -663,11 +703,11 @@ TTMLRegion TTMLParser::parseRegion(DOMNode *node) {
 			region.extent[0] = (values[0].toFloat() / extent[0]) * 100;
 			region.extent[1] = (values[1].toFloat() / extent[1]) * 100;
 		}
-		el->removeAttribute(XMLString::transcode("tts:extent")); // remove attr
+		pDomElement->removeAttributeNS(IMSC1_NS_TTS, XMLString::transcode("extent")); // remove attr
 	}
 
 	// check when region is active
-	QString showVal = XMLString::transcode(el->getAttribute(XMLString::transcode("tts:showBackground")));
+	QString showVal = XMLString::transcode(pDomElement->getAttributeNS(IMSC1_NS_TTS, XMLString::transcode("showBackground")));
 	if (!showVal.isEmpty()) { // found showBackground
 		if (showVal == "always") {
 			region.alwaysActive = true;
@@ -675,19 +715,17 @@ TTMLRegion TTMLParser::parseRegion(DOMNode *node) {
 		else {
 			region.alwaysActive = false;
 		}
-		el->removeAttribute(XMLString::transcode("tts:showBackground")); // remove attr
+		pDomElement->removeAttributeNS(IMSC1_NS_TTS, XMLString::transcode("showBackground")); // remove attr
 	}
 
 	// loop remaining attributes
-	if (el->hasAttributes()) { // loop them
-		for (int z = 0; z < el->getAttributes()->getLength(); z++) {
-
-			DOMAttr *attr = dynamic_cast<DOMAttr*>(el->getAttributes()->item(z));
-
-			QString name = XMLString::transcode(attr->getNodeName());
-			if (cssAttr.contains(name)) { // known parameter!
-				region.CSS[cssAttr[name]] = XMLString::transcode(attr->getNodeValue());
-			} // else : not supported parameter
+	if (pDomElement->hasAttributes()) { // loop them
+		QMap<QString, QString>::iterator it;
+		for (it = cssAttr.begin(); it != cssAttr.end(); it++) {
+			const XMLCh* ch = pDomElement->getAttributeNS(IMSC1_NS_TTS, XMLString::transcode(it.key().toStdString().c_str()));
+			if (XMLString::stringLen(ch) > 0) {
+				region.CSS[cssAttr[it.key()]] = XMLString::transcode(ch);
+			}
 		}
 	}
 
@@ -711,41 +749,48 @@ TTMLRegion TTMLParser::parseRegion(DOMNode *node) {
 }
 
 
-QPair<QString, QMap<QString, QString>> TTMLParser::parseStyle(DOMNode *el) {
+QPair<QString, QMap<QString, QString>> TTMLParser::parseStyle(DOMNode *pDomNode) {
 
 	QPair<QString, QMap<QString, QString>> result;
+	DOMElement *pDomElement = dynamic_cast<DOMElement*>(pDomNode);
 	
 	// get attributes
-	if (el->hasAttributes()) { // loop them
-		for (int z = 0; z < el->getAttributes()->getLength(); z++) {
+	if (pDomNode->hasAttributes()) { // loop them
+		for (int z = 0; z < pDomNode->getAttributes()->getLength(); z++) {
 
-			DOMNode *attr = el->getAttributes()->item(z);
+			DOMNode *attr = pDomNode->getAttributes()->item(z);
 
 			QString name = XMLString::transcode(attr->getNodeName());
 			if (name == "xml:id") {
 				result.first = XMLString::transcode(attr->getNodeValue()); // ID
 			}else if(name == "style"){ // Chained Referential Styling
 				result.second = mergeCss(result.second, styles[XMLString::transcode(attr->getNodeValue())]);
-			}else if (cssAttr.contains(name)) { // known parameter!
+			}/*else if (cssAttr.contains(name)) { // known parameter!
 				result.second[cssAttr[name]] = XMLString::transcode(attr->getNodeValue());
+			}*/
+		}
+		QMap<QString, QString>::iterator it;
+		for (it = cssAttr.begin(); it != cssAttr.end(); it++) {
+			const XMLCh* ch = pDomElement->getAttributeNS(IMSC1_NS_TTS, XMLString::transcode(it.key().toStdString().c_str()));
+			if (XMLString::stringLen(ch) > 0) {
+				result.second[cssAttr[it.key()]] = XMLString::transcode(ch);
 			}
 		}
 	}
-
 	return result;
 }
 
-void TTMLParser::RloopElements(elem *el) {
+void TTMLParser::RloopElements(elem *pElem) {
 
 
-	if (el->node) {
+	if (pElem->mpDomNode) {
 
-		DOMNodeList *children = el->node->getChildNodes();
+		DOMNodeList *children = pElem->mpDomNode->getChildNodes();
 
 		// recursively loop children
 		for (int z = 0; z < children->getLength(); z++) {
 
-			elem *newEl = new elem(children->item(z), this, el); // pass current parser & parent element
+			elem *newEl = new elem(children->item(z), this, pElem); // pass current parser & parent element
 			if (newEl->process() == false) { // continue one step deeper
 				elems.append(newEl);
 				RloopElements(newEl);
@@ -764,7 +809,7 @@ void TTMLParser::RloopElements(elem *el) {
 // Code by Denis Manthey
 void TTMLParser::getMetadata(DOMDocument *rDom) {
 
-	DOMNodeList *ttitem = rDom->getElementsByTagName(XMLString::transcode("tt"));
+	DOMNodeList *ttitem = rDom->getElementsByTagNameNS(IMSC1_NS_TT, XMLString::transcode("tt"));
 	//Check if <tt> is present
 	if (ttitem->getLength() == 0) {
 #ifdef DEBUG_TTML
@@ -776,7 +821,7 @@ void TTMLParser::getMetadata(DOMDocument *rDom) {
 	DOMElement* tteleDom = dynamic_cast<DOMElement*>(ttitem->item(0));
 
 	//Frame Rate Multiplier Extractor
-	QString mult = XMLString::transcode(tteleDom->getAttribute(XMLString::transcode("ttp:frameRateMultiplier")));
+	QString mult = XMLString::transcode(tteleDom->getAttributeNS(IMSC1_NS_TTP, XMLString::transcode("frameRateMultiplier")));
 	float num = 1;
 	float den = 1;
 	if (!mult.isEmpty()) {
@@ -786,7 +831,7 @@ void TTMLParser::getMetadata(DOMDocument *rDom) {
 
 	//Frame Rate Extractor
 	int subFrameRate = 1;
-	QString fr = XMLString::transcode(tteleDom->getAttribute(XMLString::transcode("ttp:frameRate")));
+	QString fr = XMLString::transcode(tteleDom->getAttributeNS(IMSC1_NS_TTP, XMLString::transcode("frameRate")));
 	int editrate = 30;					//editrate is for the metadata object (expects editrate*numerator, denominator)
 	framerate = 30 * (num / den);		//framerate is for calculating the duration, we need the fractal editrate!
 	if (!fr.isEmpty()) {
@@ -796,14 +841,14 @@ void TTMLParser::getMetadata(DOMDocument *rDom) {
 
 	//Tick Rate Extractor
 	tickrate = 1; //TTML1 section 6.2.10
-	QString tr = XMLString::transcode(tteleDom->getAttribute(XMLString::transcode("ttp:tickRate")));
+	QString tr = XMLString::transcode(tteleDom->getAttributeNS(IMSC1_NS_TTP, XMLString::transcode("tickRate")));
 	if (!tr.isEmpty())
 		tickrate = tr.toInt();
 	else if (!fr.isEmpty())  //TTML1 section 6.2.10
 		tickrate = ceil(framerate * subFrameRate);
 
 	// get extent (e.g. tts:extent='854px 480px')
-	QString extentVal = XMLString::transcode(tteleDom->getAttribute(XMLString::transcode("tts:extent")));
+	QString extentVal = XMLString::transcode(tteleDom->getAttributeNS(IMSC1_NS_TTS, XMLString::transcode("extent")));
 	if (!extentVal.isEmpty()) {
 		if (extentVal.count("px") > 0) {
 			extentVal.replace("px", ""); // remove 'px'
@@ -850,11 +895,11 @@ QString TTMLFns::serializeCss(QMap<QString, QString> map) {
 	return result;
 }
 
-QMap<QString, QString> TTMLFns::mergeCss(QMap<QString, QString> qm1, QMap<QString, QString> qm2) {
+QMap<QString, QString> TTMLFns::mergeCss(QMap<QString, QString> qm1, QMap<QString, QString> qm2, bool over_write /* == false */) {
 	// iterate over qm2
 	QMap<QString, QString>::iterator i;
 	for (i = qm2.begin(); i != qm2.end(); ++i) {
-		if (!qm1.contains(i.key())) {
+		if (over_write || !qm1.contains(i.key())) {
 			qm1[i.key()] = i.value();
 		}
 	}

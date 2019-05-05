@@ -28,7 +28,8 @@ class TTMLFns {
 
 protected:
 	float ConvertTimingQStringtoDouble(QString string_time, float fr, int tr);
-	QMap<QString, QString> mergeCss(QMap<QString, QString>, QMap<QString, QString>); // elements from qm1 are preferred over qm2!!!
+	QMap<QString, QString> mergeCss(QMap<QString, QString>, QMap<QString, QString>, bool over_write = false ); //Default: Do not overwrite values
+
 	QString serializeCss(QMap<QString, QString>);
 };
 
@@ -47,7 +48,7 @@ public:
 	void parse(std::string xml);
 	QPair<QString, QMap<QString, QString>> parseStyle(xercesc::DOMNode *node);
 
-	TTMLtimelineResource *mThisResource; // current timeline resource
+	TTMLtimelineResource *mpTTMLtimelineResource; // current timeline resource
 
 	float seq_timing_total_offset = 0;
 	int tickrate;
@@ -62,20 +63,20 @@ public:
 	QMap<QString, QMap<QString, QString>> styles;
 	QMap<QString, TTMLRegion> regions;
 	QMap<QString, QString> cssAttr{
-		{ "tts:backgroundColor" , "background-color" },
-		{ "tts:content" , "content" },
-		{ "tts:color" , "color" },
-		{ "tts:direction" , "direction" },
-		{ "tts:fontFamily" , "font-family" },
-		{ "tts:fontSize" , "font-size" },
-		{ "tts:fontStyle" , "font-style" },
-		{ "tts:fontWeight" , "font-weight" },
-		{ "tts:lineHeight" , "line-height" },
-		{ "tts:padding" , "padding" },
-		{ "tts:textAlign" , "text-align" },
-		{ "tts:textDecoration" , "text-decoration" },
-		{ "tts:unicodeBidi" , "unicode-bidi" },
-		{ "tts:opacity" , "opacity" }
+		{ "backgroundColor" , "background-color" },
+		{ "content" , "content" },
+		{ "color" , "color" },
+		{ "direction" , "direction" },
+		{ "fontFamily" , "font-family" },
+		{ "fontSize" , "font-size" },
+		{ "fontStyle" , "font-style" },
+		{ "fontWeight" , "font-weight" },
+		{ "lineHeight" , "line-height" },
+		{ "padding" , "padding" },
+		{ "textAlign" , "text-align" },
+		{ "textDecoration" , "text-decoration" },
+		{ "unicodeBidi" , "unicode-bidi" },
+		{ "opacity" , "opacity" }
 	}; // all supported css values
 
 	TTMLRegion nullregion;
@@ -135,8 +136,8 @@ public:
 
 	QList<QString> tt_tags {"div", "p", "span"};
 
-	xercesc::DOMElement *el;
-	xercesc::DOMNode *node;
+	xercesc::DOMElement *mpDomElement;
+	xercesc::DOMNode *mpDomNode;
 
 private:
 

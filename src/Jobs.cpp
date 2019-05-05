@@ -530,7 +530,7 @@ Error JobExtractTargetFrames::Execute() {
 		QTemporaryDir dir;
 		if (dir.isValid()) {
 			//TODO Figure out size of ancillary resource from RIP
-			AS_02::ACES::FrameBuffer FrameBuffer(30000000);
+			AS_02::ACES::FrameBuffer FrameBuffer(1000000000);
 			AS_02::ACES::ResourceList_t resource_list_t;
 			AS_02::ACES::MXFReader Reader;
 			Result_t result = Reader.OpenRead(mAssetMxf->GetPath().absoluteFilePath().toStdString()); // open file for reading

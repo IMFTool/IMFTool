@@ -200,7 +200,14 @@ bool ACES_Preview::extractFrame(qint64 frameNr) {
 		}
 	}
 	else {
-		buff->Capacity(default_buffer_size); // set default size
+		// ACES frames are of equal length, use size of previous frame
+		ASDCP::MXF::IndexTableSegment::IndexEntry IndexPrevious;
+		if (ASDCP_SUCCESS(reader->AS02IndexReader().Lookup((frameNr - 1), IndexPrevious))) { // previous frame
+			if (!ASDCP_SUCCESS(buff->Capacity((IndexF1.StreamOffset - IndexPrevious.StreamOffset)))) {
+				buff->Capacity(default_buffer_size); // set default size
+			}
+		} else
+			buff->Capacity(default_buffer_size); // set default size
 	}
 	
 	// try reading requested frame number
