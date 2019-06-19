@@ -53,7 +53,7 @@ to download the latest binary installers.
 
 
 ## Building
-IMF Tool is multi-platform and has been susccesfully built under Mac OS X 10.10 and 10.11, Windows 7/10 and Linux 64 bit.
+IMF Tool is multi-platform and has been successfully built under Mac OS X 10.10 and 10.11, Windows 7/10 and Linux 64 bit.
 The build system is based on CMake. Please use CMake to create make files and project files for eclipse or Visual Studio. Installation instructions including CMake screenshots are provided as pdf file here.
 Prerequisites:
 -	Qt Version 5.7.0, more recent versions may work
