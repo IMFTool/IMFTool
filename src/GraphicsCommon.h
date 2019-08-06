@@ -29,7 +29,9 @@
 #define CPL_COLOR_VIDEO_RESOURCE 116, 102, 171
 #define CPL_COLOR_AUDIO_RESOURCE 110, 162, 110
 #define CPL_COLOR_TIMED_TEXT_RESOURCE 191, 159, 72
-#define CPL_COLOR_ANC_RESOURCE 153, 72, 191
+#define CPL_COLOR_ISXD_RESOURCE 176, 180, 142
+#define CPL_COLOR_IAB_RESOURCE 153, 72, 191
+#define CPL_COLOR_ANC_RESOURCE 187, 104, 23
 #define CPL_COLOR_DUMMY_RESOURCE 129, 129, 129
 #define CPL_COLOR_MARKER_RESOURCE 255, 255, 255, 50
 #define CPL_COLOR_DURATION_INDICATOR 255, 0, 93
@@ -51,7 +53,9 @@ enum eSequenceType {
 	SubtitlesSequence = (1u << 6),
 	VisuallyImpairedTextSequence = (1u << 7),
 	MarkerSequence = (1u << 8),
-	Unknown = (1u << 9)
+	IABSequence  = (1u << 9),  // SMPTE ST 2067-201
+	ISXDSequence  = (1u << 10), // SMPTE RDD 47
+	Unknown = (1u << 11)
 };
 
 
@@ -70,7 +74,9 @@ enum eGraphicsItemType {
 	GraphicsWidgetMarkerResourceType,
 	GraphicsWidgetMarkerType,
 	GraphicsWidgetTimelineType,
-	GraphicsWidgetDrawnTimelineType
+	GraphicsWidgetDrawnTimelineType,
+	GraphicsWidgetIABResourceType,
+	GraphicsWidgetISXDResourceType
 };
 
 
@@ -80,7 +86,9 @@ enum eGridPosition {
 	TimedTextHorizontal = (1u << 2),
 	DataHorizontal = (1u << 3),
 	MarkerHorizontal = (1u << 4),
-	Vertical = (1u << 5),
+	ISXDHorizontal = (1u << 5),
+	IABHorizontal = (1u << 6),
+	Vertical = (1u << 7),
 };
 
 

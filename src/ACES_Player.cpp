@@ -209,6 +209,7 @@ void ACES_Player::playLoop(){
 			request_queue[request_index]->TframeNr = (int)(frame_decoding_total_float);
 			request_queue[request_index]->error = false;
 			request_queue[request_index]->layer = layer;
+			request_queue[request_index]->mShowActiveArea = mShowActiveArea;
 
 			// check if asset is valid
 			if (playlist.at(decoding_index).asset) { // asset is valid -> open reader!
@@ -412,10 +413,10 @@ void ACES_Player::setPlaylist(QVector<VideoResource> &rPlaylist) {
 				decoder_queue[i]->RGBrange = RGBrange;
 
 				// YCbCr -> RGB conv. params.
-				decoder_queue[i]->Kr = Kr;
-				decoder_queue[i]->Kg = Kg;
-				decoder_queue[i]->Kb = Kb;
-
+//				decoder_queue[i]->Kr = Kr;
+//				decoder_queue[i]->Kg = Kg;
+//				decoder_queue[i]->Kb = Kb;
+//
 				decoder_queue[i]->prec_shift = prec_shift;
 				decoder_queue[i]->max = max;
 			}
@@ -438,4 +439,8 @@ void ACES_Player::setFps(int set_fps){
 
 void ACES_Player::setLayer(int rLayer){
 	layer = rLayer;
+}
+
+void ACES_Player::showActiveArea(bool rShowActiveArea) {
+	mShowActiveArea = rShowActiveArea;
 }

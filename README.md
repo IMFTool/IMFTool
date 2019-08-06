@@ -12,11 +12,8 @@ Introductory videos are available on YouTube [[2]](#imf-video), [[3]](#imf-video
 
 ## Workflows supported:
 -	Open an IMP, visualize the timeline of the CPL(s) included in the IMP
--	NEW: Support for IMF App#5 ACES
-        - OpenEXR ACES preview and playback
-        - Target frame export in IMF Tool
-        - SubDescriptor processing and visualization
-        - Implementations of the final SMPTE ULs registered for ST 2065-5 and ST 2067-50
+-	Supports App#2/2E and App#5 ACES
+-	Track files support includes IAB (SMPTE ST 2067-201) and ISXD (SMPTE RDD 47)
 -	Add Sidecar Assets to an IMP ("Add Asset" --> Add Sidecar Assets)
 -	Create, view and edit Sidecar Composition Maps (SCMs)
 -	Add a Photon QC report as sidecar file (hint: export the sidecar QC report as a Partial IMP, this leaves the Original IMP unmodified!)
@@ -31,6 +28,7 @@ Introductory videos are available on YouTube [[2]](#imf-video), [[3]](#imf-video
 -	Export the IMP
 -	Export all new MXF files and new CPL(s) as Partial IMP 
 -	JPEG 2000 playback of all profiles supported in App #2 and App #2E for preview purposes
+-	App#5 ACES support includes ACES preview and Target Frame preview and export
 -	Decoding and rendering of IMSC1 text profile subtitles in a separate window. (TTML tab)
 -	Overlay of IMSC1 image profile subtitles
 -	Ingest of IMF 1.0 (PKL ST 429-8 and CPL ST 2067-3:2013) and IMF 1.1 (PKL ST 2067-2:2016 and CPL ST 2067-3:2016)
@@ -53,15 +51,15 @@ to download the latest binary installers.
 
 
 ## Building
-IMF Tool is multi-platform and has been susccesfully built under Mac OS X 10.10 and 10.11, Windows 7/10 and Linux 64 bit.
+IMF Tool is multi-platform and has been successfully built under Mac OS X 10.10 and 10.11, Windows 7/10 and Linux 64 bit.
 The build system is based on CMake. Please use CMake to create make files and project files for eclipse or Visual Studio. Installation instructions including CMake screenshots are provided as pdf file here.
 Prerequisites:
 -	Qt Version 5.7.0, more recent versions may work
--	asdcplib 2.10.31, see http://www.cinecert.com. 
+-	NEW: For IAB support, a patched version of asdcplib is required: https://github.com/wruppelx/asdcplib 
 -	libxsd
 -	Xerces 3.1
 -	Requires OpenJPEG 2.2 (with multi-threading support), available at https://github.com/uclouvain/openjpeg
--	regxmllibc (fork) at https://github.com/IMFTool/regxmllib
+-	regxmllibc, available at https://github.com/sandflow/regxmllib/
 
 ## DISCLAIMER
   THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY

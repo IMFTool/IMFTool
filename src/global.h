@@ -48,6 +48,8 @@
 #define XML_NAMESPACE_DS "http://www.w3.org/2000/09/xmldsig#"
 #define XML_NAMESPACE_XS "http://www.w3.org/2001/XMLSchema"
 #define XML_NAMESPACE_NS "http://www.w3.org/2000/xmlns/"
+#define XML_NAMESPACE_IAB "http://www.smpte-ra.org/ns/2067-201/2019"
+#define XML_NAMESPACE_RDD47 "http://www.dolby.com/schemas/RDD-47/2018"
 
 #define SETTINGS_AUDIO_DEVICE "audio/audioDevice"
 #define SETTINGS_AUDIO_CHANNEL_CONFIGURATION "audio/audioChannelConfiguration"

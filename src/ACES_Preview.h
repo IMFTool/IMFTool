@@ -53,15 +53,12 @@ public:
 	//WR
 
 	// change values with new asset:
-	//QSharedPointer<AS_02::JP2K::MXFReader> reader_shared;
-	int src_bitdepth, prec_shift, max, layer = 3, RGBrange, RGBmaxcv;
-
-	opj_dparameters_t params; // decoding parameters
+	int src_bitdepth, prec_shift, max, layer = 1, RGBrange, RGBmaxcv;
 
 	Metadata::eColorEncoding ColorEncoding; // YCbCr or RGB
 	SMPTE::eColorPrimaries colorPrimaries; // BT.709 / BT.2020 / DCI-P3
 	SMPTE::eTransferCharacteristic transferCharactersitics; // BT.709 / BT.2020 / PQ
-	float Kb, Kr, Kg; // YCbCr -> RGB (depending on BT.709 or BT.2020)
+	//float Kb, Kr, Kg; // YCbCr -> RGB (depending on BT.709 or BT.2020)
 
 	QSharedPointer<AssetMxfTrack> current_asset; // pointer to current asset
 
@@ -90,7 +87,7 @@ protected:
 	// data to qimage
 	int w, h, xpos, buff_pos, x, y, bytes_per_line;
 	float Y, Cb, Cr, r, g, b, out_r, out_g, out_b, out_r8, out_g8, out_b8;
-	QImage DataToQImage(); // converts opj_image_t -> QImage
+	QImage DataToQImage(quint8 rScale = 0, bool rShowActiveArea = false); // converts opj_image_t -> QImage
 
 
 	// info methods
@@ -121,6 +118,8 @@ private:
 	QTime mDecode_time; // time (ms) needed to decode/convert the image
 	QString mMsg; // error message
 	QString mMxf_path; // path to current asset
+	quint8 mScale; // scale factor for images
+	bool mShowActiveArea; // Show Active Area (true) or Show Native Resolution (false)
 
 
 public:
@@ -139,6 +138,9 @@ signals:
 public slots:
 	void getProxy();
 	void decode();
+	void setLayer(int);
+	// Show Active Area (true) or Show Native Resolution (false)
+	void showActiveArea(bool);
 };
 
 

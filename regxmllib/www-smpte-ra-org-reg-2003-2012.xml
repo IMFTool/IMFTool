@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--Created: Thu Jun 14 10:36:34 CEST 2018--><!--By: regxmllib build 940d358383f70f4bfef3b548c7f569bbe71e4dc4--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
+<!--Created: Tue Aug 06 07:07:02 CEST 2019--><!--By: regxmllib build 831a55742a9f8488e47a2831ff741a265360fc18--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
 <SchemeID>urn:uuid:eb4c6bf8-c197-5ffe-7f01-2123ea606f17</SchemeID>
 <SchemeURI>http://www.smpte-ra.org/reg/2003/2012</SchemeURI>
 <MetaDefinitions>
@@ -262,7 +262,7 @@
 <TypeDefinitionRename>
 <Identification>urn:smpte:ul:060e2b34.01040101.01200800.00000000</Identification>
 <Symbol>CanonicalEIDRIdentifierType</Symbol>
-<Description>Canonical EIDR Identifier as specified in RP 2079</Description>
+<Description>Canonical EIDR Content Identifier as specified in RP 2079. NOTE: This type refers to EIDR Content Identifiers exclusively. Other types, e.g. CanonicalEIDRServiceIdentifierType, are used to refer to other kinds of EIDR Identifiers.</Description>
 <Name>Canonical EIDR Identifier Type</Name>
 <RenamedType>urn:smpte:ul:060e2b34.01040101.01200700.00000000</RenamedType>
 </TypeDefinitionRename>
@@ -272,6 +272,13 @@
 <Description>Canonical Full Ad-ID Identifier Type</Description>
 <Name>Canonical Full Ad-ID Identifier Type</Name>
 <RenamedType>urn:smpte:ul:060e2b34.01040101.01100200.00000000</RenamedType>
+</TypeDefinitionRename>
+<TypeDefinitionRename>
+<Identification>urn:smpte:ul:060e2b34.01040101.01200b00.00000000</Identification>
+<Symbol>CanonicalEIDRServiceIdentifierType</Symbol>
+<Description>Canonical EIDR Service Identifier as specified in RP 2079</Description>
+<Name>Canonical EIDR Service Identifier Type</Name>
+<RenamedType>urn:smpte:ul:060e2b34.01040101.01200700.00000000</RenamedType>
 </TypeDefinitionRename>
 <TypeDefinitionRename>
 <Identification>urn:smpte:ul:060e2b34.01040101.01300100.00000000</Identification>

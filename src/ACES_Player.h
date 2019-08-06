@@ -34,6 +34,7 @@ public:
 	QSharedPointer<AssetMxfTrack> asset; // reference to asset
 	int fps; // current playback rate
 	int layer; // current layer to decode
+	bool mShowActiveArea; // Show Active Area (true) or Show Native Resolution (false)
 };
 
 class ACES_Player : public QObject
@@ -46,6 +47,7 @@ public:
 	// methods
 	void setFps(int fps);
 	void setLayer(int layer); // layer to decode
+	void showActiveArea (bool); // Show Active Area (true) or Show Native Resolution (false)
 	void setPlaylist(QVector<VideoResource>& rPlaylist);
 	void setPos(qint64 frameNr, qint64 frame_total, int playlist_index);
 	void clean();
@@ -71,6 +73,7 @@ private:
 
 	// player settings
 	int layer = 0; // quality layer to decode (best = 0, default = 5)
+	bool mShowActiveArea = false; // Show Native Resolution by default
 	qint64 frameNr = 0; // player position within asset
 	qint64 TframeNr = 0; // player position within track
 	int playlist_index = 0; // playlist asset index

@@ -137,6 +137,9 @@ void MainWindow::InitMenuAndToolbar() {
 	QAction *p_action_open = new QAction(QIcon(":/folder.png"), tr("&Open IMF Package"), menuBar());
 	connect(p_action_open, SIGNAL(triggered(bool)), this, SLOT(rOpenImpRequest()));
 	p_action_open->setShortcut(QKeySequence::Open);
+	QAction *p_action_new = new QAction(QIcon(":/inbox_film.png"), tr("&New IMF Package"), menuBar());
+	connect(p_action_new, SIGNAL(triggered(bool)), this, SLOT(rNewImpRequest()));
+	p_action_new->setShortcut(QKeySequence::New);
 	QAction *p_action_write = new QAction(QIcon(":/inbox_upload.png"), tr("&Write IMF Package"), menuBar());
 	p_action_write->setDisabled(true);
 	connect(p_action_write, SIGNAL(triggered(bool)), this, SLOT(WritePackage()));
@@ -163,10 +166,11 @@ void MainWindow::InitMenuAndToolbar() {
 
 	// WR
 
+	p_menu_file->addAction(p_action_open);
+	p_menu_file->addAction(p_action_new);
 	p_menu_file->addAction(p_action_write);
 	p_menu_file->addAction(p_action_writePartial);
 	p_menu_file->addAction(p_qc_photon);
-	p_menu_file->addAction(p_action_open);
 	p_menu_file->addAction(p_action_close);
 	p_menu_file->addSeparator();
 	p_menu_file->addAction(mpActionSave);
@@ -187,6 +191,7 @@ void MainWindow::InitMenuAndToolbar() {
 	QToolBar *p_tool_bar = addToolBar(tr("Main Window Toolbar"));
 	p_tool_bar->setIconSize(QSize(20, 20));
 	p_tool_bar->addAction(p_action_open);
+	p_tool_bar->addAction(p_action_new);
 	p_tool_bar->addAction(p_action_write);
 	p_tool_bar->addAction(p_action_writePartial);
 	p_tool_bar->addAction(p_qc_photon);
@@ -234,6 +239,14 @@ void MainWindow::rOpenImpRequest() {
 		return;
 	else
 		ShowWorkspaceLauncher();
+}
+
+//Check unsaved changes when opening new IMP
+void MainWindow::rNewImpRequest() {
+	if (checkUndoStack() == 1)
+		return;
+	else
+		ShowWorkspaceLauncherNewImp();
 }
 
 //Check unsaved changes when closing IMP
@@ -386,6 +399,14 @@ void MainWindow::ShowWorkspaceLauncher() {
 	p_workspace_launcher->show();
 }
 
+void MainWindow::ShowWorkspaceLauncherNewImp() {
+
+	WizardWorkspaceLauncher *p_workspace_launcher = new WizardWorkspaceLauncher(this);
+	p_workspace_launcher->setAttribute(Qt::WA_DeleteOnClose);
+	p_workspace_launcher->addPage(new WizardWorkspaceLauncherNewImpPage(p_workspace_launcher));
+	connect(p_workspace_launcher, SIGNAL(accepted()), this, SLOT(rWorkspaceLauncherAcceptedNewImp()));
+	p_workspace_launcher->show();
+}
 
 				/* -----Denis Manthey Beg----- */
 void MainWindow::ShowWorkspaceLauncherPartialImp() {
@@ -409,6 +430,20 @@ void MainWindow::rWorkspaceLauncherAccepted() {
 	}
 }
 
+void MainWindow::rWorkspaceLauncherAcceptedNewImp() {
+
+	WizardWorkspaceLauncher *p_workspace_launcher = qobject_cast<WizardWorkspaceLauncher *>(sender());
+	if(p_workspace_launcher) {
+		QString working_dir = p_workspace_launcher->field(FIELD_NAME_WORKING_DIR).toString();
+		QString issuer = p_workspace_launcher->field(FIELD_NAME_ISSUER).toString();
+		QString annotation = p_workspace_launcher->field(FIELD_NAME_ANNOTATION).toString();
+		QDir dir(working_dir);
+		QSharedPointer<ImfPackage> imf_package(new ImfPackage(dir, issuer, annotation));
+		mpWidgetImpBrowser->InstallImp(imf_package);
+		mpCentralWidget->InstallImp(imf_package);
+		mpRootDirection = working_dir;
+	}
+}
 
 
 			/* -----Denis Manthey Beg----- */

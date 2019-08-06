@@ -338,6 +338,47 @@ private:
 };
 
 
+class GraphicsWidgetIABResource : public GraphicsWidgetFileResource {
+
+public:
+	//! Import existing Resource. pResource is owned by this.
+	GraphicsWidgetIABResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL), int unused_index = 0,
+			const QSharedPointer<ImfPackage> rImfPackage = QSharedPointer<ImfPackage>());
+	//! Creates new Resource.
+	GraphicsWidgetIABResource(GraphicsWidgetSequence *pParent, const QSharedPointer<AssetMxfTrack> &rAsset);
+	virtual ~GraphicsWidgetIABResource() {}
+	virtual int type() const { return GraphicsWidgetIABResourceType; }
+	virtual void paint(QPainter *pPainter, const QStyleOptionGraphicsItem *pOption, QWidget *pWidget = NULL);
+	virtual GraphicsWidgetIABResource* Clone() const;
+
+protected:
+	virtual double ResourceErPerCompositionEr(const EditRate &rCompositionEditRate) const;
+
+private:
+	Q_DISABLE_COPY(GraphicsWidgetIABResource);
+};
+
+
+class GraphicsWidgetISXDResource : public GraphicsWidgetFileResource {
+
+public:
+	//! Import existing Resource. pResource is owned by this.
+	GraphicsWidgetISXDResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL), int unused_index = 0,
+			const QSharedPointer<ImfPackage> rImfPackage = QSharedPointer<ImfPackage>());
+	//! Creates new Resource.
+	GraphicsWidgetISXDResource(GraphicsWidgetSequence *pParent, const QSharedPointer<AssetMxfTrack> &rAsset);
+	virtual ~GraphicsWidgetISXDResource() {}
+	virtual int type() const { return GraphicsWidgetISXDResourceType; }
+	virtual void paint(QPainter *pPainter, const QStyleOptionGraphicsItem *pOption, QWidget *pWidget = NULL);
+	virtual GraphicsWidgetISXDResource* Clone() const;
+
+protected:
+	virtual double ResourceErPerCompositionEr(const EditRate &rCompositionEditRate) const;
+
+private:
+	Q_DISABLE_COPY(GraphicsWidgetISXDResource);
+};
+
 class GraphicsWidgetMarkerResource : public AbstractGraphicsWidgetResource {
 
 	Q_OBJECT

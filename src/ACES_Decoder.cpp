@@ -106,7 +106,7 @@ void ACES_Decoder::run() {
 	}
 	
 	// success:
-	request->decoded = DataToQImage(); // create image
+	request->decoded = DataToQImage(request->layer, request->mShowActiveArea); // create image
 	request->done = true; // image is ready
 	
 	decoded_shared->decoded_total++;

@@ -1180,6 +1180,8 @@ void WidgetImpBrowser::SetMxfFile(const QStringList &rFiles) {
 					case ASDCP::ESS_AS02_ACES:
 					case ASDCP::ESS_AS02_PCM_24b_48k:
 					case ASDCP::ESS_AS02_PCM_24b_96k:
+					case ASDCP::ESS_AS02_ISXD:
+					case ASDCP::ESS_AS02_IAB:
 						break;
 
 					case ASDCP::ESS_AS02_TIMED_TEXT:
@@ -1339,15 +1341,17 @@ void WidgetImpBrowser::AddQcReportAsSidecar(const QString rQcReport) {
 
 void WidgetImpBrowser::slotCurrentChanged(const QModelIndex &selected, const QModelIndex &deselected) {
 	QModelIndex modelIndex = mpSortProxyModelImp->mapToSource(selected);
-	QSharedPointer<AssetMxfTrack> asset = mpImfPackage->GetAsset(modelIndex.row()).objectCast<AssetMxfTrack>();
-
-	if (mpImfPackage->selectedIsOutsidePackage(modelIndex)) {
+	if (modelIndex.isValid()) { // modelIndex becomes invalid e.g. when the last asset of an IMP is being deleted
 		QSharedPointer<AssetMxfTrack> asset = mpImfPackage->GetAsset(modelIndex.row()).objectCast<AssetMxfTrack>();
-		int r = 255, g = 255, b = 255, a = 255;
-		if (!asset.isNull()) asset->GetColor().getRgb(&r,&g,&b,&a);
-		mpViewImp->setStyleSheet("QTableView {selection-color: rgb(" + QString::number(r)+ "," + QString::number(g)+ ","+ QString::number(b)+ ");}");
-	} else {
-		mpViewImp->setStyleSheet("QTableView {selection-color: #FFFFFF;}");
+
+		if (mpImfPackage->selectedIsOutsidePackage(modelIndex)) {
+			QSharedPointer<AssetMxfTrack> asset = mpImfPackage->GetAsset(modelIndex.row()).objectCast<AssetMxfTrack>();
+			int r = 255, g = 255, b = 255, a = 255;
+			if (!asset.isNull()) asset->GetColor().getRgb(&r,&g,&b,&a);
+			mpViewImp->setStyleSheet("QTableView {selection-color: rgb(" + QString::number(r)+ "," + QString::number(g)+ ","+ QString::number(b)+ ");}");
+		} else {
+			mpViewImp->setStyleSheet("QTableView {selection-color: #FFFFFF;}");
+		}
 	}
 }
 

@@ -83,6 +83,8 @@ public:
 	virtual ~ImfPackage() {}
 	//! Check if Imf Package is in an unsaved state
 	bool IsDirty() const { return mIsDirty; }
+	// Reset mpJobQueue, mpProgressDialog, mpMsgBox
+	void Init();
 	//! Ingests an existing Imf package from file system.
 	ImfError Ingest();
 	//! Outgests (writes) everything back to file system.

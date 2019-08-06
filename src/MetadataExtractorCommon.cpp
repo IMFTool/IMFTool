@@ -80,7 +80,7 @@ QString Metadata::GetAsString() {
 		case Metadata::Pcm:
 			ret.append(QObject::tr("%1").arg("Pcm\n"));
 			if(duration.IsValid() == false && editRate.IsValid())	ret.append(QObject::tr("Duration: %1\n").arg(duration.GetAsString(editRate)));
-			if(editRate.IsValid() == true)								ret.append(QObject::tr("Sampling Rate: %1 Hz\n").arg(editRate.GetQuotient()));
+			if(editRate.IsValid() == true)								ret.append(QObject::tr("Sample Rate: %1 Hz\n").arg(editRate.GetQuotient()));
 			if(audioQuantization != 0)										ret.append(QObject::tr("Bit Depth: %1 bit\n").arg(audioQuantization));
 			if(audioChannelCount != 0)										ret.append(QObject::tr("Channels: %1\n").arg(audioChannelCount));
 			ret.append(QObject::tr("Channel Configuration: %1\n").arg(soundfieldGroup.GetName()));
@@ -192,8 +192,8 @@ void Metadata::GetAsTextDocument(QTextDocument &rDoc) {
 		}
 		if(duration.IsValid() && editRate.IsValid())											table->cellAt(0, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Duration: %1").arg(duration.GetAsString(editRate)), Qt::ElideRight, column_text_width));
 		else																															table->cellAt(0, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Duration: Unknown"), Qt::ElideRight, column_text_width));
-		if(editRate.IsValid())																						table->cellAt(1, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Sampling Rate: %1 Hz").arg(editRate.GetQuotient()), Qt::ElideRight, column_text_width));
-		else																															table->cellAt(1, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Sampling Rate: Unknown"), Qt::ElideRight, column_text_width));
+		if(editRate.IsValid())																						table->cellAt(1, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Sample Rate: %1 Hz").arg(editRate.GetQuotient()), Qt::ElideRight, column_text_width));
+		else																															table->cellAt(1, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Sample Rate: Unknown"), Qt::ElideRight, column_text_width));
 		if(audioQuantization != 0)																				table->cellAt(1, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Bit Depth: %1 bit").arg(audioQuantization), Qt::ElideRight, column_text_width));
 		else																															table->cellAt(1, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Bit Depth: Unknown"), Qt::ElideRight, column_text_width));
 		if(audioChannelCount != 0)																				table->cellAt(2, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Channels: %1").arg(audioChannelCount), Qt::ElideRight, column_text_width));
@@ -223,5 +223,46 @@ void Metadata::GetAsTextDocument(QTextDocument &rDoc) {
 		//WR
 		if(!languageTag.isEmpty()) table->cellAt(3, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Language: %1").arg(languageTag), Qt::ElideRight, column_text_width));
 		//WR
+	}
+	else if(type == Metadata::ISXD) {
+
+		QTextTable *table = cursor.insertTable(4, 2, tableFormat);
+		//if(is_ttml_file(filePath))
+			//table->cellAt(0, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Source File Name: %1").arg(fileName), Qt::ElideRight, column_text_width));
+		table->cellAt(0, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Essence Type: %1").arg("ISXD"), Qt::ElideRight, column_text_width));
+
+		if (editRate.IsValid()) {
+			table->cellAt(1, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Duration: %1").arg(Duration(duration.GetCount()).GetAsString(editRate)), Qt::ElideRight, column_text_width));
+			table->cellAt(1, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Edit Rate: %1 fps").arg(editRate.GetQuotient()), Qt::ElideRight, column_text_width));
+		} else {
+			table->cellAt(1, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Duration: unknown"), Qt::ElideRight, column_text_width));
+			table->cellAt(1, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Edit Rate: not set"), Qt::ElideRight, column_text_width));
+		}
+		//WR
+		if(!namespaceURI.isEmpty()) {
+			table->cellAt(2, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("NSp: %1").arg(namespaceURI), Qt::ElideRight, column_text_width));
+		}
+		//WR
+	}
+	else if(type == Metadata::IAB) {
+
+		QTextTable *table = cursor.insertTable(4, 2, tableFormat);
+		//if(is_ttml_file(filePath))
+			//table->cellAt(0, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Source File Name: %1").arg(fileName), Qt::ElideRight, column_text_width));
+		table->cellAt(0, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Essence Type: %1").arg("IAB"), Qt::ElideRight, column_text_width));
+
+		if (editRate.IsValid()) {
+			table->cellAt(0, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Duration: %1").arg(Duration(duration.GetCount()).GetAsString(editRate)), Qt::ElideRight, column_text_width));
+			table->cellAt(1, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Edit Rate: %1 fps").arg(editRate.GetQuotient()), Qt::ElideRight, column_text_width));
+		} else {
+			table->cellAt(0, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Duration: unknown"), Qt::ElideRight, column_text_width));
+			table->cellAt(1, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Edit Rate: not set"), Qt::ElideRight, column_text_width));
+		}
+		if(audioQuantization != 0)
+			table->cellAt(1, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Bit Depth: %1 bit").arg(audioQuantization), Qt::ElideRight, column_text_width));
+		else
+			table->cellAt(1, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Bit Depth: Unknown"), Qt::ElideRight, column_text_width));
+		table->cellAt(2, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Sample Rate: %1").arg(audioSamplingRate.GetQuotient()), Qt::ElideRight, column_text_width));
+		table->cellAt(3, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Language: %1").arg(languageTag), Qt::ElideRight, column_text_width));
 	}
 }

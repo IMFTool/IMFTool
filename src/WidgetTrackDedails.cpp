@@ -174,6 +174,14 @@ void WidgetTrackDetails::InitLayout() {
 			p_label->setText(tr("Marker"));
 			p_tool_button->setIcon(QIcon(":/marker_bw.png"));
 			break;
+		case IABSequence:
+			p_label->setText(tr("Immersive Audio"));
+			p_tool_button->setIcon(QIcon(":/sound_bw.png"));
+			break;
+		case ISXDSequence:
+			p_label->setText(tr("ISXD RDD47"));
+			p_tool_button->setIcon(QIcon(":/xml-icon.png"));
+			break;
 		case  Unknown:
 		default:
 			p_label->setText(tr("Unknown"));

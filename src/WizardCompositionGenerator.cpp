@@ -20,6 +20,7 @@
 #include <QLabel>
 #include <QStringListModel>
 #include <QLineEdit>
+#include <QStandardItemModel>
 
 
 WizardCompositionGenerator::WizardCompositionGenerator(QWidget *pParent /*= NULL*/, EditRate rEditRate /* = EditRate::EditRate23_98 */, QStringList rApplicationIdentificationList /*= QStringList() */) :
@@ -44,11 +45,11 @@ void WizardCompositionGenerator::InitLayout() {
 
 	WizardCompositionGeneratorPage *p_wizard_page = new WizardCompositionGeneratorPage(this);
 	p_wizard_page->SetEditRate(mEditRate);
-	if (!mApplicationIdentificationList.isEmpty()) p_wizard_page->SetApp(mApplicationIdentificationList.first());
 	mPageId = addPage(p_wizard_page);
 	QList<QWizard::WizardButton> layout;
 	layout << QWizard::Stretch << QWizard::FinishButton << QWizard::CancelButton;
 	setButtonLayout(layout);
+	if (!mApplicationIdentificationList.isEmpty()) p_wizard_page->SetApp(mApplicationIdentificationList.first());
 }
 
 WizardCompositionGeneratorPage::WizardCompositionGeneratorPage(QWidget *pParent /*= NULL*/) :
@@ -85,11 +86,20 @@ void WizardCompositionGeneratorPage::InitLayout() {
 	p_layout->addWidget(p_content_originator, 3, 1, 1, 1);
 
 	mpComboBoxApp = new QComboBox(this);
+	mAppString = "-- Select Application --";
+	mpComboBoxApp->addItem(mAppString);
 	for (QMap<QString, QString>::const_iterator i = mApplicationIdentificationMap.cbegin(); i != mApplicationIdentificationMap.cend(); i++) {
 		mpComboBoxApp->addItem(i.key());
 	}
+	// From https://stackoverflow.com/questions/7632645/how-to-set-non-selectable-default-text-on-qcombobox/7633081#7633081
+	QStandardItemModel* model = qobject_cast<QStandardItemModel*>(mpComboBoxApp->model());
+	QModelIndex firstIndex = model->index(0, mpComboBoxApp->modelColumn(), mpComboBoxApp->rootModelIndex());
+	QStandardItem* firstItem = model->itemFromIndex(firstIndex);
+	firstItem->setSelectable(false);
 	mpComboBoxApp->setEditable(true);
-	p_layout->addWidget(new QLabel(tr("Application:"), this), 4, 0, 1, 1);
+	connect(mpComboBoxApp, SIGNAL(currentTextChanged(const QString)), this, SLOT(AppTextChanged(const QString)));
+
+	p_layout->addWidget(new QLabel(tr("Application (mandatory):"), this), 4, 0, 1, 1);
 	p_layout->addWidget(mpComboBoxApp, 4, 1, 1, 1);
 	setLayout(p_layout);
 
@@ -119,5 +129,21 @@ QString WizardCompositionGeneratorPage::GetApp() const {
 void WizardCompositionGeneratorPage::SetApp(const QString &rApplicationIdentification) {
 
 	mpComboBoxApp->setCurrentText(rApplicationIdentification);
+	mAppString = rApplicationIdentification;
 	emit AppChanged();
 }
+
+void WizardCompositionGeneratorPage::AppTextChanged(const QString rAppString) {
+	mAppString = rAppString;
+	emit completeChanged();
+}
+
+bool WizardCompositionGeneratorPage::isComplete() const {
+	bool complete = QWizardPage::isComplete();
+	if(mAppString.contains("-- Select Application --")) {
+		return false;
+	} else {
+		return complete;
+	}
+}
+

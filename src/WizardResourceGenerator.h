@@ -54,6 +54,7 @@ public:
 		WavMode,
 		TTMLMode,
 		Jpeg2000Mode,
+		ISXDMode,
 	};
 	WizardResourceGenerator(QWidget *pParent = NULL, QVector<EditRate> rEditRates = QVector<EditRate>(), QSharedPointer<AssetMxfTrack> rAsset = QSharedPointer<AssetMxfTrack>());
 	virtual ~WizardResourceGenerator() {}
@@ -156,6 +157,7 @@ private:
 		WavIndex,
 		TTMLIndex,
 		Jpeg2000Index,
+		ISXDIndex,
 	};
 	Q_DISABLE_COPY(WizardResourceGeneratorPage);
 	QVector<EditRate> mEditRates;

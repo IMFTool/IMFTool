@@ -45,6 +45,7 @@ ACES_Preview::~ACES_Preview()
 void ACES_Preview::setUp() {
 
 	mDecode_time.start();
+	mScale = 0;
 
 	max_f = 1 << bitdepth;
 	max_f_ = (float)(max_f)-1.0;
@@ -66,7 +67,6 @@ void ACES_Preview::getProxy() {
 
 
 	mCpus = 1; // (default for proxys)
-	params.cp_reduce = 4; // (default for proxy)
 
 	setAsset(); // initialize reader
 	QImage p1, p2;
@@ -74,7 +74,7 @@ void ACES_Preview::getProxy() {
 	// FIRST PROXY
 	//if(extractFrame(0)) {			// Frame Nr manuell auf 0 gesetzt
 	if (extractFrame(mFirst_proxy)) { 
-		p1 = DataToQImage();
+		p1 = DataToQImage(3, true);
 	}
 	else {
 		p1 = QImage(":/proxy_unknown.png");
@@ -82,7 +82,7 @@ void ACES_Preview::getProxy() {
 	
 	// SECOND PROXY
 	if (extractFrame(mSecond_proxy)) { // frame extraction was successful -> decode frame
-		p2 = DataToQImage();
+		p2 = DataToQImage(3, true);
 	}
 	else {
 		p2 = QImage(":/proxy_unknown.png");
@@ -91,6 +91,19 @@ void ACES_Preview::getProxy() {
 	emit proxyFinished(p1, p2);
 	emit finished();
 }
+
+// set decoding layer
+void ACES_Preview::setLayer(int index) {
+
+	mScale = index;
+}
+
+// Show Active Area (true) or Show Native Resolution (false)
+void ACES_Preview::showActiveArea(bool rShowActiveArea) {
+
+	mShowActiveArea = rShowActiveArea;
+}
+
 
 
 void ACES_Preview::setAsset() {
@@ -150,8 +163,7 @@ void ACES_Preview::decode() {
 
 		// try to decode image
 		if ( !err) {
-
-			emit ShowFrame(DataToQImage());
+			emit ShowFrame(DataToQImage(mScale, mShowActiveArea));
 
 			if (!err) mMsg = QString("Decoded frame %1 in %2 ms").arg(mFrameNr).arg(mDecode_time.elapsed()); // no error
 
@@ -226,24 +238,57 @@ bool ACES_Preview::extractFrame(qint64 frameNr) {
 }
 
 
-QImage ACES::DataToQImage()
+QImage ACES::DataToQImage(quint8 rScale /* = 0 */, bool rShowDisplayWindow /* = false*/)
 {
-
+	bool show_display_window = rShowDisplayWindow;
+	quint8 scale = 1 << rScale;
 	Imf::RgbaInputFile mRgbaFile(*pAcesIStream);
+	Box2i data_window;
+	Box2i display_window;
 
-	const Box2i &dw = mRgbaFile.dataWindow();
-	int w = dw.max.x - dw.min.x + 1;
-	int h = dw.max.y - dw.min.y + 1;
-	QImage image(w, h, QImage::Format_RGB888); // create image
+	data_window = mRgbaFile.dataWindow();
+	long data_w = data_window.max.x - data_window.min.x + 1;
+	long data_h = data_window.max.y - data_window.min.y + 1;
 
+	display_window = mRgbaFile.displayWindow();
+	long display_w = display_window.max.x - display_window.min.x + 1;
+	long display_h = display_window.max.y - display_window.min.y + 1;
+	long offset_x = display_window.min.x - data_window.min.x;
+	long offset_y = display_window.min.y - data_window.min.y;
 
-	Array2D<Rgba> inPixels(h, w);
+	if (!data_window.intersects(display_window)) {
+		show_display_window = false; // If dataWindow is smaller than displayWindow: show dataWindow
+	}
 
-	mRgbaFile.setFrameBuffer(&inPixels[0][0] - dw.min.x - dw.min.y * w, 1, w);
-	mRgbaFile.readPixels(dw.min.y, dw.max.y);
-	for (y = 0; y < h; y++) {
-		for (x = 0; x < w; x++) {
-			Rgba pix = inPixels[y][x];
+	if (!show_display_window) { //Ignore displayWindow
+		display_w = data_w;
+		display_h = data_h;
+		offset_x = 0;
+		offset_y = 0;
+	}
+
+	display_w /= scale;
+	display_h /= scale;
+
+	long adjusted_height;
+	if (show_display_window && (mRgbaFile.pixelAspectRatio() != 0.0)) {
+		adjusted_height = qRound((float)display_h / mRgbaFile.pixelAspectRatio());
+	} else {
+		adjusted_height = display_h;
+	}
+
+	QImage image;
+
+	Array2D<Rgba> inPixelsDataWindow(data_h, data_w);
+
+	mRgbaFile.setFrameBuffer(&inPixelsDataWindow[0][0] - data_window.min.x - data_window.min.y * data_w, 1, data_w);
+	mRgbaFile.readPixels(data_window.min.y, data_window.max.y);
+
+	image = QImage(display_w, display_h, QImage::Format_RGB888); // create image
+
+	for (int x = 0; x < display_w; x++) {
+		for (int y = 0; y < display_h; y++) {
+			Rgba pix = inPixelsDataWindow[y*scale + offset_y][x*scale + offset_x];
 			Imath::Vec3<float> vec3in(pix.r, pix.g, pix.b);
 			Imath::Vec3<float> vec3out;
 			//vec3out.x = 0.1; vec3out.y = 0.2; vec3out.z = 0.3;
@@ -258,6 +303,8 @@ QImage ACES::DataToQImage()
 			image.setPixelColor(x, y, QColor(r,g,b));
 		}
 	}
+	if (show_display_window)
+		image = image.scaled(display_w, adjusted_height);
 	// Clean up
 	if (pAcesIStream) pAcesIStream->~As02AcesIStream();
 	return image;

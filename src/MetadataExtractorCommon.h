@@ -40,7 +40,9 @@ public:
 #endif
 		Jpeg2000,
 		Pcm,
-		TimedText
+		TimedText,
+		IAB,
+		ISXD
 	};
 
 	enum eColorEncoding {
@@ -81,6 +83,12 @@ public:
 	QString									mcaTitleVersion;
 	QString									mcaAudioContentKind;
 	QString									mcaAudioElementKind;
+	QString									mcaTagName; // IAB only
+	QString									mcaTagSymbol; // IAB only
+	QString									essenceContainer; // IAB only
+	QString									essenceCoding; // IAB only
+	EditRate								referenceImageEditRate; // IAB only
+	EditRate								audioSamplingRate; // IAB only
 	EditRate								effectiveFrameRate; // For TTML only: Effective Frame Rate of TTML1/IMSC1 file
 	Duration								originalDuration; // For TTML only: Duration of TTML1/IMSC1 file expressed in effectiveFrameRate
 	quint32									componentMinRef;  // J2K RGBA only
@@ -88,6 +96,8 @@ public:
 	QUuid									assetId;
 	QString									pictureEssenceCoding; // J2K only
 	QString									pixelLayout; // J2K RGB only
+	QString									namespaceURI; // ISXD only
+	bool									isPHDR = false; // For J2K with PHDRMetadataTrackSubDescriptor
 	//WR
 #ifdef APP5_ACES
 	AS_02::ACES::ResourceList_t AncillaryResources;

@@ -1,0 +1,1607 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--Created: Tue Aug 06 07:07:02 CEST 2019--><!--By: regxmllib build 831a55742a9f8488e47a2831ff741a265360fc18--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
+<SchemeID>urn:uuid:21177fc2-e9cd-5fb5-7f18-50a997da0981</SchemeID>
+<SchemeURI>http://www.smpte-ra.org/reg/395/2014/13/1/aaf</SchemeURI>
+<MetaDefinitions>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</Identification>
+<Symbol>InterchangeObject</Symbol>
+<Description>Interchange Object</Description>
+<Name>Interchange Object</Name>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01010200</Identification>
+<Symbol>Component</Symbol>
+<Description>Component</Description>
+<Name>Component</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01010300</Identification>
+<Symbol>Segment</Symbol>
+<Description>Segment</Description>
+<Name>Segment</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010200</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01010400</Identification>
+<Symbol>EdgeCode</Symbol>
+<Description>Edge Code</Description>
+<Name>Edge Code</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010300</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01010500</Identification>
+<Symbol>EssenceGroup</Symbol>
+<Description>Essence Group</Description>
+<Name>Essence Group</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010300</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01010600</Identification>
+<Symbol>Event</Symbol>
+<Description>Event</Description>
+<Name>Event</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010300</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01010700</Identification>
+<Symbol>GPITrigger</Symbol>
+<Description>GPI Trigger</Description>
+<Name>GPI Trigger</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010600</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01010800</Identification>
+<Symbol>CommentMarker</Symbol>
+<Description>Comment Marker</Description>
+<Name>Comment Marker</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010600</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01010900</Identification>
+<Symbol>Filler</Symbol>
+<Description>Filler</Description>
+<Name>Filler</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010300</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01010a00</Identification>
+<Symbol>OperationGroup</Symbol>
+<Description>Operation Group</Description>
+<Name>Operation Group</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010300</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01010b00</Identification>
+<Symbol>NestedScope</Symbol>
+<Description>Nested Scope</Description>
+<Name>Nested Scope</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010300</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01010c00</Identification>
+<Symbol>Pulldown</Symbol>
+<Description>Pulldown</Description>
+<Name>Pulldown</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010300</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01010d00</Identification>
+<Symbol>ScopeReference</Symbol>
+<Description>Scope Reference</Description>
+<Name>Scope Reference</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010300</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01010e00</Identification>
+<Symbol>Selector</Symbol>
+<Description>Selector</Description>
+<Name>Selector</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010300</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01010f00</Identification>
+<Symbol>Sequence</Symbol>
+<Description>Sequence</Description>
+<Name>Sequence</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010300</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01011000</Identification>
+<Symbol>SourceReference</Symbol>
+<Description>Source Reference</Description>
+<Name>Source Reference</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010300</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01011100</Identification>
+<Symbol>SourceClip</Symbol>
+<Description>Source Clip</Description>
+<Name>Source Clip</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01011000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01011200</Identification>
+<Symbol>TextClip</Symbol>
+<Description>Text Clip</Description>
+<Name>Text Clip</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01011000</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01011300</Identification>
+<Symbol>HTMLClip</Symbol>
+<Description>HTML Clip</Description>
+<Name>HTML Clip</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01011200</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01011400</Identification>
+<Symbol>Timecode</Symbol>
+<Description>Timecode</Description>
+<Name>Timecode</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010300</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01011500</Identification>
+<Symbol>TimecodeStream</Symbol>
+<Description>Timecode Stream</Description>
+<Name>Timecode Stream</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010300</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01011600</Identification>
+<Symbol>TimecodeStream12M</Symbol>
+<Description>Timecode Stream 12M</Description>
+<Name>Timecode Stream 12M</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01011500</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01011700</Identification>
+<Symbol>Transition</Symbol>
+<Description>Transition</Description>
+<Name>Transition</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010200</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01011800</Identification>
+<Symbol>ContentStorage</Symbol>
+<Description>Content Storage</Description>
+<Name>Content Storage</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01011900</Identification>
+<Symbol>ControlPoint</Symbol>
+<Description>Control Point</Description>
+<Name>Control Point</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01011a00</Identification>
+<Symbol>DefinitionObject</Symbol>
+<Description>Definition Object</Description>
+<Name>Definition Object</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01011b00</Identification>
+<Symbol>DataDefinition</Symbol>
+<Description>Data Definition</Description>
+<Name>Data Definition</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01011a00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01011c00</Identification>
+<Symbol>OperationDefinition</Symbol>
+<Description>Operation Definition</Description>
+<Name>Operation Definition</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01011a00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01011d00</Identification>
+<Symbol>ParameterDefinition</Symbol>
+<Description>Parameter Definition</Description>
+<Name>Parameter Definition</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01011a00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01011e00</Identification>
+<Symbol>PluginDefinition</Symbol>
+<Description>Plugin Definition</Description>
+<Name>Plugin Definition</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01011a00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01011f00</Identification>
+<Symbol>CodecDefinition</Symbol>
+<Description>Codec Definition</Description>
+<Name>Codec Definition</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01011a00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01012000</Identification>
+<Symbol>ContainerDefinition</Symbol>
+<Description>Container Definition</Description>
+<Name>Container Definition</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01011a00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01012100</Identification>
+<Symbol>InterpolationDefinition</Symbol>
+<Description>Interpolation Definition</Description>
+<Name>Interpolation Definition</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01011a00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01012200</Identification>
+<Symbol>Dictionary</Symbol>
+<Description>Dictionary</Description>
+<Name>Dictionary</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01012300</Identification>
+<Symbol>EssenceData</Symbol>
+<Description>Essence Data</Description>
+<Name>Essence Data</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01012400</Identification>
+<Symbol>EssenceDescriptor</Symbol>
+<Description>Essence Descriptor</Description>
+<Name>Essence Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01012500</Identification>
+<Symbol>FileDescriptor</Symbol>
+<Description>File Descriptor</Description>
+<Name>File Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01012400</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01012600</Identification>
+<Symbol>AIFCDescriptor</Symbol>
+<Description>AIFC Descriptor</Description>
+<Name>AIFC Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01012500</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01012700</Identification>
+<Symbol>PictureDescriptor</Symbol>
+<Description>Picture Descriptor</Description>
+<Name>Picture Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01012500</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01012800</Identification>
+<Symbol>CDCIDescriptor</Symbol>
+<Description>CDCI Descriptor</Description>
+<Name>CDCI Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01012700</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01012900</Identification>
+<Symbol>RGBADescriptor</Symbol>
+<Description>RGBA Descriptor</Description>
+<Name>RGBA Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01012700</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01012a00</Identification>
+<Symbol>HTMLDescriptor</Symbol>
+<Description>HTML Descriptor</Description>
+<Name>HTML Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01012500</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01012b00</Identification>
+<Symbol>TIFFDescriptor</Symbol>
+<Description>TIFF Descriptor</Description>
+<Name>TIFF Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01012500</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01012c00</Identification>
+<Symbol>WAVEDescriptor</Symbol>
+<Description>WAVE Descriptor</Description>
+<Name>WAVE Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01012500</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01012d00</Identification>
+<Symbol>FilmDescriptor</Symbol>
+<Description>Film Desciptor</Description>
+<Name>Film Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01012400</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01012e00</Identification>
+<Symbol>TapeDescriptor</Symbol>
+<Description>Tape Descriptor</Description>
+<Name>Tape Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01012400</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01012f00</Identification>
+<Symbol>Preface</Symbol>
+<Description>Preface</Description>
+<Name>Preface</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01013000</Identification>
+<Symbol>Identification</Symbol>
+<Description>Identification</Description>
+<Name>Identification</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01013100</Identification>
+<Symbol>Locator</Symbol>
+<Description>Locator</Description>
+<Name>Locator</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01013200</Identification>
+<Symbol>NetworkLocator</Symbol>
+<Description>Network Locator</Description>
+<Name>Network Locator</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01013100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01013300</Identification>
+<Symbol>TextLocator</Symbol>
+<Description>Text Locator</Description>
+<Name>Text Locator</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01013100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01013400</Identification>
+<Symbol>Package</Symbol>
+<Description>Package</Description>
+<Name>Package</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01013500</Identification>
+<Symbol>CompositionPackage</Symbol>
+<Description>Composition Package</Description>
+<Name>Composition Package</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01013400</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01013600</Identification>
+<Symbol>MaterialPackage</Symbol>
+<Description>Material Package</Description>
+<Name>Material Package</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01013400</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01013700</Identification>
+<Symbol>SourcePackage</Symbol>
+<Description>Source Package</Description>
+<Name>Source Package</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01013400</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01013800</Identification>
+<Symbol>Track</Symbol>
+<Description>Track</Description>
+<Name>Track</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01013900</Identification>
+<Symbol>EventTrack</Symbol>
+<Description>Event Package</Description>
+<Name>Event Package</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01013800</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01013a00</Identification>
+<Symbol>StaticTrack</Symbol>
+<Description>Static Track</Description>
+<Name>Static Track</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01013800</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01013b00</Identification>
+<Symbol>TimelineTrack</Symbol>
+<Description>Timeline Track</Description>
+<Name>Timeline Track</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01013800</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01013c00</Identification>
+<Symbol>Parameter</Symbol>
+<Description>Parameter</Description>
+<Name>Parameter</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01013d00</Identification>
+<Symbol>ConstantValue</Symbol>
+<Description>Constant Value</Description>
+<Name>Constant Value</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01013c00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01013e00</Identification>
+<Symbol>VaryingValue</Symbol>
+<Description>Varying Value</Description>
+<Name>Varying Value</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01013c00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01013f00</Identification>
+<Symbol>TaggedValue</Symbol>
+<Description>Tagged Value</Description>
+<Name>Tagged Value</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01014000</Identification>
+<Symbol>KLVData</Symbol>
+<Description>KLV Data</Description>
+<Name>KLV Data</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01014100</Identification>
+<Symbol>DescriptiveMarker</Symbol>
+<Description>Descriptive Marker</Description>
+<Name>Descriptive Marker</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010800</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01014200</Identification>
+<Symbol>SoundDescriptor</Symbol>
+<Description>Sound Descriptor</Description>
+<Name>Sound Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01012500</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01014300</Identification>
+<Symbol>DataEssenceDescriptor</Symbol>
+<Description>Data Essence Descriptor</Description>
+<Name>Data Essence Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01012500</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01014400</Identification>
+<Symbol>MultipleDescriptor</Symbol>
+<Description>Multiple Descriptor</Description>
+<Name>Multiple Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01012500</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01014500</Identification>
+<Symbol>DescriptiveClip</Symbol>
+<Description>Descriptive Clip</Description>
+<Name>Descriptive Clip</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01011100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01014600</Identification>
+<Symbol>DateTimeDescriptor</Symbol>
+<Description>Date Time Descriptor</Description>
+<Name>Date Time Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01012500</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01014700</Identification>
+<Symbol>AES3PCMDescriptor</Symbol>
+<Description>AES3 PCM Descriptor</Description>
+<Name>AES3 PCM Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01014800</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01014800</Identification>
+<Symbol>WAVEPCMDescriptor</Symbol>
+<Description>WAVE PCM Descriptor</Description>
+<Name>WAVE PCM Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01014200</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01014900</Identification>
+<Symbol>PhysicalDescriptor</Symbol>
+<Description>Physical Descriptor</Description>
+<Name>Physical Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01012400</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01014a00</Identification>
+<Symbol>ImportDescriptor</Symbol>
+<Description>Import Descriptor</Description>
+<Name>Import Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01014900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01014b00</Identification>
+<Symbol>RecordingDescriptor</Symbol>
+<Description>Recording Descriptor</Description>
+<Name>Recording Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01014900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01014c00</Identification>
+<Symbol>TaggedValueDefinition</Symbol>
+<Description>Tagged Value Definition</Description>
+<Name>Tagged Value Definition</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01011a00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01014d00</Identification>
+<Symbol>KLVDataDefinition</Symbol>
+<Description>KLV Data Definition</Description>
+<Name>KLV Data Definition</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01011a00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01014e00</Identification>
+<Symbol>AuxiliaryDescriptor</Symbol>
+<Description>Auxiliary Descriptor</Description>
+<Name>Auxiliary Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01014900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01014f00</Identification>
+<Symbol>RIFFChunk</Symbol>
+<Description>RIFF Chunk</Description>
+<Name>RIFF Chunk</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01015000</Identification>
+<Symbol>BWFImportDescriptor</Symbol>
+<Description>BWF Import Descriptor</Description>
+<Name>BWF Import Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01014a00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01015100</Identification>
+<Symbol>MPEGVideoDescriptor</Symbol>
+<Description>MPEG Video Descriptor</Description>
+<Name>MPEG Video Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01012800</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01015200</Identification>
+<Symbol>ParsedTextDescriptor</Symbol>
+<Description>Parsed Text Descriptor</Description>
+<Name>Parsed Text Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01014300</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01015300</Identification>
+<Symbol>SGMLDescriptor</Symbol>
+<Description>SGML Descriptor</Description>
+<Name>SGML Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015200</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01015400</Identification>
+<Symbol>XMLDescriptor</Symbol>
+<Description>XML Descriptor</Description>
+<Name>XML Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015300</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01015500</Identification>
+<Symbol>HTMLParsedTextDescriptor</Symbol>
+<Description>HTML Parsed Text Descriptor</Description>
+<Name>HTML Parsed Text Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015300</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01015600</Identification>
+<Symbol>RP217Descriptor</Symbol>
+<Description>RP217 Descriptor</Description>
+<Name>RP217 Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01014300</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01015700</Identification>
+<Symbol>DynamicMarker</Symbol>
+<Description>Dynamic Marker</Description>
+<Name>Dynamic Marker</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01014100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01015800</Identification>
+<Symbol>DynamicClip</Symbol>
+<Description>Dynamic Clip</Description>
+<Name>Dynamic Clip</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015700</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</Identification>
+<Symbol>SubDescriptor</Symbol>
+<Description>Sub-Descriptor</Description>
+<Name>Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01015a00</Identification>
+<Symbol>JPEG2000SubDescriptor</Symbol>
+<Description>JPEG 2000 Sub-Descriptor</Description>
+<Name>JPEG 2000 Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01015b00</Identification>
+<Symbol>VBIDataDescriptor</Symbol>
+<Description>VBI Data Descriptor</Description>
+<Name>VBI Data Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01014300</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01015c00</Identification>
+<Symbol>ANCDataDescriptor</Symbol>
+<Description>ANC Data Descriptor</Description>
+<Name>ANC Data Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01014300</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01015d00</Identification>
+<Symbol>DCPCMSoundDescriptor</Symbol>
+<Description>DC PCM Sound Descriptor</Description>
+<Name>DC PCM Sound Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01014200</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01015e00</Identification>
+<Symbol>MPEGAudioDescriptor</Symbol>
+<Description>MPEG Audio Descriptor</Description>
+<Name>MPEG Audio Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01014200</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01015f00</Identification>
+<Symbol>VC1VideoDescriptor</Symbol>
+<Description>VC-1 Video Descriptor</Description>
+<Name>VC-1 Video Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01012800</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01016000</Identification>
+<Symbol>PackageMarker</Symbol>
+<Description>Package Marker</Description>
+<Name>Package Marker</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01016100</Identification>
+<Symbol>ApplicationPlugInObject</Symbol>
+<Description>Application Plug-In Object</Description>
+<Name>Application Plug-In Object</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01016600</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01016200</Identification>
+<Symbol>ApplicationReferencedObject</Symbol>
+<Description>Application Referenced Object</Description>
+<Name>Application Referenced Object</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01016600</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01016300</Identification>
+<Symbol>StereoscopicPictureSubDescriptor</Symbol>
+<Description>Stereoscopic Picture Sub-Descriptor</Description>
+<Name>Stereoscopic Picture Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01016400</Identification>
+<Symbol>DCTimedTextDescriptor</Symbol>
+<Description>DC Timed Text Descriptor</Description>
+<Name>DC Timed Text Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01014300</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01016500</Identification>
+<Symbol>DCTimedTextResourceSubDescriptor</Symbol>
+<Description>DC Timed Text Resource Sub-Descriptor</Description>
+<Name>DC Timed Text Resource Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01016600</Identification>
+<Symbol>ApplicationObject</Symbol>
+<Description>Application Object</Description>
+<Name>Application Object</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01016700</Identification>
+<Symbol>ContainerConstraintsSubDescriptor</Symbol>
+<Description>Container Constraints Sub-Descriptor</Description>
+<Name>Container Constraints Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01016800</Identification>
+<Symbol>MPEG4VisualSubDescriptor</Symbol>
+<Description>MPEG-4 Visual Sub-Descriptor</Description>
+<Name>MPEG-4 Visual Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01016900</Identification>
+<Symbol>TIFFPictureEssenceDescriptor</Symbol>
+<Description>TIFF Picture Essence Descriptor</Description>
+<Name>TIFF Picture Essence Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01012700</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01016a00</Identification>
+<Symbol>MCALabelSubDescriptor</Symbol>
+<Description>MCA Label Sub-Descriptor</Description>
+<Name>MCA Label Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01016b00</Identification>
+<Symbol>AudioChannelLabelSubDescriptor</Symbol>
+<Description>Audio Channel Label Sub-Descriptor</Description>
+<Name>Audio Channel Label Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01016a00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01016c00</Identification>
+<Symbol>SoundfieldGroupLabelSubDescriptor</Symbol>
+<Description>Soundfield Group Label Sub-Descriptor</Description>
+<Name>Soundfield Group Label Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01016a00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01016d00</Identification>
+<Symbol>GroupOfSoundfieldGroupsLabelSubDescriptor</Symbol>
+<Description>Group Of Soundfield Groups Label Sub-Descriptor</Description>
+<Name>Group Of Soundfield Groups Label Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01016a00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01016e00</Identification>
+<Symbol>AVCSubDescriptor</Symbol>
+<Description>AVC Sub-Descriptor</Description>
+<Name>AVC Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01016f00</Identification>
+<Symbol>EventTextDescriptor</Symbol>
+<Description>Event Text Descriptor</Description>
+<Name>Event Text Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01014300</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01017000</Identification>
+<Symbol>STLDescriptor</Symbol>
+<Description>STL Descriptor</Description>
+<Name>STL Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01016f00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01017100</Identification>
+<Symbol>STLSubDescriptor</Symbol>
+<Description>STL Sub-Descriptor</Description>
+<Name>STL Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01017200</Identification>
+<Symbol>OperationsStereoscopicSubDescriptor</Symbol>
+<Description>Operations Stereoscopic Sub-Descriptor</Description>
+<Name>Operations Stereoscopic Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01017300</Identification>
+<Symbol>AuxDataEssenceDescriptor</Symbol>
+<Description>Aux Data Essence Descriptor</Description>
+<Name>Aux Data Essence Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01014300</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01017400</Identification>
+<Symbol>VC2SubDescriptor</Symbol>
+<Description>VC-2 Sub-Descriptor</Description>
+<Name>VC-2 Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01017500</Identification>
+<Symbol>DMCVTTargetSubDescriptor</Symbol>
+<Description>Identifies a DMCVT Target SubDescriptor</Description>
+<Name>DMCVT Target SubDescriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01017600</Identification>
+<Symbol>VC5BayerPictureEssenceSubDescriptor</Symbol>
+<Description>Key Value for VC-5 Bayer Picture Essence Sub-Descriptor</Description>
+<Name>VC-5 Bayer Picture Essence Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01017700</Identification>
+<Symbol>VC5CDCIPictureEssenceSubDescriptor</Symbol>
+<Description>Key Value for the VC-5 CDCI Picture Essence Sub-Descriptor</Description>
+<Name>VC-5 CDCI Picture Essence Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01017800</Identification>
+<Symbol>AACSubDescriptor</Symbol>
+<Description>Advanced Audio Coding SubDescriptor</Description>
+<Name>AAC SubDescriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01017900</Identification>
+<Symbol>ACESPictureSubDescriptor</Symbol>
+<Description>ACES Picture SubDescriptor</Description>
+<Name>ACES Picture SubDescriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01017a00</Identification>
+<Symbol>TargetFrameSubDescriptor</Symbol>
+<Description>Target Frame SubDescriptor</Description>
+<Name>Target Frame SubDescriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01017b00</Identification>
+<Symbol>IABEssenceDescriptor</Symbol>
+<Description>Identifies an Immersive Audio Bitstream Essence Descriptor</Description>
+<Name>IAB Essence Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01014200</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01017c00</Identification>
+<Symbol>IABSoundfieldLabelSubDescriptor</Symbol>
+<Description>Identifies an IAB Soundfield Label SubDescriptor</Description>
+<Name>IAB Soundfield Label SubDescriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01016a00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01017d00</Identification>
+<Symbol>OPDefinition</Symbol>
+<Description>Operational Pattern Definition</Description>
+<Name>Operational Pattern Definition</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01011a00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01017e00</Identification>
+<Symbol>CompressionDefinition</Symbol>
+<Description>Compression Definition</Description>
+<Name>Compression Definition</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01011a00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01017f00</Identification>
+<Symbol>AbstractObject</Symbol>
+<Description>Abstract Object</Description>
+<Name>Abstract Object</Name>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.02010000</Identification>
+<Symbol>ClassDefinition</Symbol>
+<Description>Class Definition</Description>
+<Name>Class Definition</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.02240000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.02020000</Identification>
+<Symbol>PropertyDefinition</Symbol>
+<Description>Property Definition</Description>
+<Name>Property Definition</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.02240000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.02030000</Identification>
+<Symbol>TypeDefinition</Symbol>
+<Description>Type Definition</Description>
+<Name>Type Definition</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.02240000</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.02040000</Identification>
+<Symbol>TypeDefinitionInteger</Symbol>
+<Description>Type Definition Integer</Description>
+<Name>Type Definition Integer</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.02030000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.02050000</Identification>
+<Symbol>TypeDefinitionStrongObjectReference</Symbol>
+<Description>Type Definition Strong Object Reference</Description>
+<Name>Type Definition Strong Object Reference</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.02030000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.02060000</Identification>
+<Symbol>TypeDefinitionWeakObjectReference</Symbol>
+<Description>Type Definition Weak Object Reference</Description>
+<Name>Type Definition Weak Object Reference</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.02030000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.02070000</Identification>
+<Symbol>TypeDefinitionEnumeration</Symbol>
+<Description>Type Definition Enumeration</Description>
+<Name>Type Definition Enumeration</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.02030000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.02080000</Identification>
+<Symbol>TypeDefinitionFixedArray</Symbol>
+<Description>Type Definition Fixed Array</Description>
+<Name>Type Definition Fixed Array</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.02030000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.02090000</Identification>
+<Symbol>TypeDefinitionVariableArray</Symbol>
+<Description>Type Definition Variable Array</Description>
+<Name>Type Definition Variable Array</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.02030000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.020a0000</Identification>
+<Symbol>TypeDefinitionSet</Symbol>
+<Description>Type Definition Set</Description>
+<Name>Type Definition Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.02030000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.020b0000</Identification>
+<Symbol>TypeDefinitionString</Symbol>
+<Description>Type Definition String</Description>
+<Name>Type Definition String</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.02030000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.020c0000</Identification>
+<Symbol>TypeDefinitionStream</Symbol>
+<Description>Type Definition Stream</Description>
+<Name>Type Definition Stream</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.02030000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.020d0000</Identification>
+<Symbol>TypeDefinitionRecord</Symbol>
+<Description>Type Definition Record</Description>
+<Name>Type Definition Record</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.02030000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.020e0000</Identification>
+<Symbol>TypeDefinitionRename</Symbol>
+<Description>Type Definition Rename</Description>
+<Name>Type Definition Rename</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.02030000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.02200000</Identification>
+<Symbol>TypeDefinitionExtendibleEnumeration</Symbol>
+<Description>Type Definition Extendible Enumeration</Description>
+<Name>Type Definition Extendible Enumeration</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.02030000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.02210000</Identification>
+<Symbol>TypeDefinitionIndirect</Symbol>
+<Description>Type Definition Indirect</Description>
+<Name>Type Definition Indirect</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.02030000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.02220000</Identification>
+<Symbol>TypeDefinitionOpaque</Symbol>
+<Description>Type Definition Opaque</Description>
+<Name>Type Definition Opaque</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.02210000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.02230000</Identification>
+<Symbol>TypeDefinitionCharacter</Symbol>
+<Description>Type Definition Character</Description>
+<Name>Type Definition Character</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.02030000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.02240000</Identification>
+<Symbol>MetaDefinition</Symbol>
+<Description>Meta-Definition</Description>
+<Name>Meta-Definition</Name>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.02250000</Identification>
+<Symbol>MetaDictionary</Symbol>
+<Description>Meta-Dictionary</Description>
+<Name>Meta-Dictionary</Name>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.02260000</Identification>
+<Symbol>ExtensionScheme</Symbol>
+<Name>Extension Scheme</Name>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.03000000</Identification>
+<Symbol>Root</Symbol>
+<Description>Root</Description>
+<Name>Root</Name>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010201.01100100</Identification>
+<Symbol>IndexTableSegment</Symbol>
+<Description>IndexTableSegment</Description>
+<Name>IndexTableSegment</Name>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010400.00000000</Identification>
+<Symbol>DescriptiveObject</Symbol>
+<Description>Descriptive Object</Description>
+<Name>Descriptive Object</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.00000000</Identification>
+<Symbol>DescriptiveFramework</Symbol>
+<Description>Descriptive Framework</Description>
+<Name>Descriptive Framework</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.01010100</Identification>
+<Symbol>ProductionFramework</Symbol>
+<Description>Production Framework</Description>
+<Name>Production Framework</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f0200</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.01010200</Identification>
+<Symbol>ClipFramework</Symbol>
+<Description>Clip Framework</Description>
+<Name>Clip Framework</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f0200</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.01010300</Identification>
+<Symbol>SceneFramework</Symbol>
+<Description>Scene Framework</Description>
+<Name>Scene Framework</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f0100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.01100100</Identification>
+<Symbol>Titles</Symbol>
+<Description>Titles Set</Description>
+<Name>Titles Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.01110100</Identification>
+<Symbol>DMS1Identification</Symbol>
+<Description>Identification Set</Description>
+<Name>Identification Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1200</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.01120100</Identification>
+<Symbol>GroupRelationship</Symbol>
+<Description>Episodic Item Set</Description>
+<Name>Episodic Item Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1200</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.01130100</Identification>
+<Symbol>Branding</Symbol>
+<Description>Branding Set</Description>
+<Name>Branding Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.01140100</Identification>
+<Symbol>DMS1Event</Symbol>
+<Description>Event Set</Description>
+<Name>Event Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1200</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.01140200</Identification>
+<Symbol>Publication</Symbol>
+<Description>Publication Set</Description>
+<Name>Publication Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.01150100</Identification>
+<Symbol>Award</Symbol>
+<Description>Award Set</Description>
+<Name>Award Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1200</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.01160100</Identification>
+<Symbol>CaptionsDescription</Symbol>
+<Description>Captions Description Set</Description>
+<Name>Captions Description Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1200</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.01170100</Identification>
+<Symbol>DMS1Annotation</Symbol>
+<Description>Annotation Set</Description>
+<Name>Annotation Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1200</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.01170200</Identification>
+<Symbol>SettingPeriod</Symbol>
+<Description>Setting Period Set</Description>
+<Name>Setting Period Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1200</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.01170300</Identification>
+<Symbol>Scripting</Symbol>
+<Description>Scripting Set</Description>
+<Name>Scripting Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1200</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.01170400</Identification>
+<Symbol>Classification</Symbol>
+<Description>Classification Set</Description>
+<Name>Classification Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1200</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.01170500</Identification>
+<Symbol>Shot</Symbol>
+<Description>Shot Set</Description>
+<Name>Shot Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.01170600</Identification>
+<Symbol>Keypoint</Symbol>
+<Description>Key Point Set</Description>
+<Name>Key Point Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1200</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.01170800</Identification>
+<Symbol>CueWords</Symbol>
+<Description>Cue Words Set</Description>
+<Name>Cue Words Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.01180100</Identification>
+<Symbol>Participant</Symbol>
+<Description>Participant Role Set</Description>
+<Name>Participant Role Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1200</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.01190100</Identification>
+<Symbol>ContactsList</Symbol>
+<Description>Contacts List Set</Description>
+<Name>Contacts List Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.011a0200</Identification>
+<Symbol>Person</Symbol>
+<Description>Person Set</Description>
+<Name>Person Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1a00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.011a0300</Identification>
+<Symbol>Organization</Symbol>
+<Description>Organisation Set</Description>
+<Name>Organisation Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1a00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.011a0400</Identification>
+<Symbol>Location</Symbol>
+<Description>Location Set</Description>
+<Name>Location Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1a00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.011b0100</Identification>
+<Symbol>Address</Symbol>
+<Description>Address Set</Description>
+<Name>Address Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.011b0200</Identification>
+<Symbol>Communications</Symbol>
+<Description>Communications Set</Description>
+<Name>Communications Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.011c0100</Identification>
+<Symbol>Contract</Symbol>
+<Description>Contract Set</Description>
+<Name>Contract Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1200</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.011c0200</Identification>
+<Symbol>Rights</Symbol>
+<Description>Rights Set</Description>
+<Name>Rights Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1200</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.011d0100</Identification>
+<Symbol>PictureFormat</Symbol>
+<Description>Picture Format Set</Description>
+<Name>Picture Format Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.011e0100</Identification>
+<Symbol>DeviceParameters</Symbol>
+<Description>Device Parameters Set</Description>
+<Name>Device Parameters Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1200</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.011f0100</Identification>
+<Symbol>NameValue</Symbol>
+<Description>Name-Value Set</Description>
+<Name>Name-Value Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.01200100</Identification>
+<Symbol>Processing</Symbol>
+<Description>Processing Set</Description>
+<Name>Processing Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.01200200</Identification>
+<Symbol>Project</Symbol>
+<Description>Project Set</Description>
+<Name>Project Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.017f0100</Identification>
+<Symbol>DMS1Framework</Symbol>
+<Description>DMS-1 Framework</Description>
+<Name>DMS-1 Framework</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.00000000</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.017f0200</Identification>
+<Symbol>ProductionClipFramework</Symbol>
+<Description>Production/Clip Framework</Description>
+<Name>Production/Clip Framework</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f0100</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1000</Identification>
+<Symbol>DMS1Object</Symbol>
+<Description>DMS-1 Set</Description>
+<Name>DMS-1 Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010400.00000000</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1100</Identification>
+<Symbol>TextLanguage</Symbol>
+<Description>TextLanguage</Description>
+<Name>TextLanguage</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1000</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1200</Identification>
+<Symbol>Thesaurus</Symbol>
+<Description>Thesaurus</Description>
+<Name>Thesaurus</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1100</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1a00</Identification>
+<Symbol>Contact</Symbol>
+<Description>Contact</Description>
+<Name>Contact</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.017f1200</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.02010000</Identification>
+<Symbol>CryptographicFramework</Symbol>
+<Description>Cryptographic Framework</Description>
+<Name>Cryptographic Framework</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.00000000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.02020000</Identification>
+<Symbol>CryptographicContext</Symbol>
+<Description>Cryptographic Context</Description>
+<Name>Cryptographic Context</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010400.00000000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.03010000</Identification>
+<Symbol>DMS_AS_03_Framework</Symbol>
+<Description>AS_03 Descriptive Metadata</Description>
+<Name>DMS AS-03 Framework</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.00000000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.04010100</Identification>
+<Symbol>TextBasedFramework</Symbol>
+<Description>Text-based Framework</Description>
+<Name>Text-based Framework</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.00000000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.04020100</Identification>
+<Symbol>GenericStreamTextBasedSet</Symbol>
+<Description>Generic Stream Text-based Set</Description>
+<Name>Generic Stream Text-based Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.04030100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.04020200</Identification>
+<Symbol>UTF8TextBasedSet</Symbol>
+<Description>UTF-8 Text-based Set</Description>
+<Name>UTF-8 Text-based Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.04030100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.04020300</Identification>
+<Symbol>UTF16TextBasedSet</Symbol>
+<Description>UTF-16 Text-based Set</Description>
+<Name>UTF-16 Text-based Set</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.04030100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.04030100</Identification>
+<Symbol>TextBasedObject</Symbol>
+<Description>Text-based Object</Description>
+<Name>Text-based Object</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010400.00000000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.05010000</Identification>
+<Symbol>EIDRFramework</Symbol>
+<Description>EIDR Descriptive Metadata Framework</Description>
+<Name>EIDR Framework</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.00000000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.02530105.0e090502.00000000</Identification>
+<Symbol>ISXDDataEssenceDescriptor</Symbol>
+<Description>Identifies an ISXD Data Essence Descriptor</Description>
+<Name>ISXD Data Essence Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01014300</ParentClass>
+<IsConcrete>false</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.02530105.0e090607.01010103</Identification>
+<Symbol>PHDRMetadataTrackSubDescriptor</Symbol>
+<Description>PHDR Metadata Track Sub-Descriptor</Description>
+<Name>PHDR Metadata Track Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+</MetaDefinitions>
+</Extension>

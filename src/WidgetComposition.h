@@ -188,6 +188,8 @@ private:
 	QAction *mpAddSubtitlesTrackAction;
 	QAction *mpAddVisuallyImpairedTextTrackAction;
 	QAction *mpAddMainImageTrackAction;
+	QAction *mpAddIABTrackAction;
+	QAction *mpAddISXDTrackAction;
 
 };
 

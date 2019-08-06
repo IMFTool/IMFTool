@@ -51,6 +51,8 @@ mData(ImfXmlHelper::Convert(QUuid::createUuid()), ImfXmlHelper::Convert(QDateTim
 	cpl_namespace["cc"].name = XML_NAMESPACE_CC;
 	cpl_namespace["ds"].name = XML_NAMESPACE_DS;
 	cpl_namespace["xs"].name = XML_NAMESPACE_XS;
+	cpl_namespace["iab"].name = XML_NAMESPACE_IAB;
+	cpl_namespace["rdd47"].name = XML_NAMESPACE_RDD47;
 
 	mpUndoStack = new QUndoStack(this);
 	InitLayout();
@@ -388,6 +390,12 @@ ImfError WidgetComposition::Write(const QString &rDestination /*= QString()*/) {
 							case VisuallyImpairedTextSequence:
 								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("cc")->second.name).c_str(), (xsd::cxx::xml::string("cc:VisuallyImpairedTextSequence").c_str()));
 								break;
+							case IABSequence:
+								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("iab")->second.name).c_str(), (xsd::cxx::xml::string("iab:IABSequence").c_str()));
+								break;
+							case ISXDSequence:
+								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("rdd47")->second.name).c_str(), (xsd::cxx::xml::string("rdd47:ISXDSequence").c_str()));
+								break;
 							case Unknown:
 								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(p_sequence->property("namespace").toString().toStdString()).c_str(), (xsd::cxx::xml::string(p_sequence->property("localName").toString().toStdString()).c_str()));
 								break;
@@ -565,6 +573,12 @@ ImfError WidgetComposition::WriteNew(const QString &rDestination /*= QString()*/
 								break;
 							case VisuallyImpairedTextSequence:
 								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("cc")->second.name).c_str(), (xsd::cxx::xml::string("cc:VisuallyImpairedTextSequence").c_str()));
+								break;
+							case IABSequence:
+								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("iab")->second.name).c_str(), (xsd::cxx::xml::string("iab:IABSequence").c_str()));
+								break;
+							case ISXDSequence:
+								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("rdd47")->second.name).c_str(), (xsd::cxx::xml::string("rdd47:ISXDSequence").c_str()));
 								break;
 							case Unknown:
 								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(p_sequence->property("namespace").toString().toStdString()).c_str(), (xsd::cxx::xml::string(p_sequence->property("localName").toString().toStdString()).c_str()));
@@ -819,6 +833,14 @@ ImfError WidgetComposition::ParseCpl() {
 					if(p_track_detail == NULL) p_track_detail = new WidgetTrackDetails(ImfXmlHelper::Convert(sequence.getTrackId()), AncillaryDataSequence, mpCompositionTracksWidget);
 					p_graphics_sequence = new GraphicsWidgetSequence(p_graphics_segment, AncillaryDataSequence, ImfXmlHelper::Convert(sequence.getTrackId()), ImfXmlHelper::Convert(sequence.getId()));
 				}
+				else if(name == "IABSequence") {
+					if(p_track_detail == NULL) p_track_detail = new WidgetTrackDetails(ImfXmlHelper::Convert(sequence.getTrackId()), IABSequence, mpCompositionTracksWidget);
+					p_graphics_sequence = new GraphicsWidgetSequence(p_graphics_segment, IABSequence, ImfXmlHelper::Convert(sequence.getTrackId()), ImfXmlHelper::Convert(sequence.getId()));
+				}
+				else if(name == "ISXDSequence") {
+					if(p_track_detail == NULL) p_track_detail = new WidgetTrackDetails(ImfXmlHelper::Convert(sequence.getTrackId()), ISXDSequence, mpCompositionTracksWidget);
+					p_graphics_sequence = new GraphicsWidgetSequence(p_graphics_segment, ISXDSequence, ImfXmlHelper::Convert(sequence.getTrackId()), ImfXmlHelper::Convert(sequence.getId()));
+				}
 				else {
 					if(p_track_detail == NULL) p_track_detail = new WidgetTrackDetails(ImfXmlHelper::Convert(sequence.getTrackId()), Unknown, mpCompositionTracksWidget);
 					p_graphics_sequence = new GraphicsWidgetSequence(p_graphics_segment, Unknown, ImfXmlHelper::Convert(sequence.getTrackId()), ImfXmlHelper::Convert(sequence.getId()));
@@ -857,6 +879,14 @@ ImfError WidgetComposition::ParseCpl() {
 							case AncillaryDataSequence:
 								if(mImp) p_graphics_sequence->AddResource(new GraphicsWidgetAncillaryDataResource(p_graphics_sequence, p_file_resource->_clone(), mImp->GetAsset(ImfXmlHelper::Convert(p_file_resource->getTrackFileId())).objectCast<AssetMxfTrack>(), 0, mImp), p_graphics_sequence->GetResourceCount());
 								else p_graphics_sequence->AddResource(new GraphicsWidgetAncillaryDataResource(p_graphics_sequence, p_file_resource->_clone()), p_graphics_sequence->GetResourceCount());
+								break;
+							case IABSequence:
+								if(mImp) p_graphics_sequence->AddResource(new GraphicsWidgetIABResource(p_graphics_sequence, p_file_resource->_clone(), mImp->GetAsset(ImfXmlHelper::Convert(p_file_resource->getTrackFileId())).objectCast<AssetMxfTrack>(), 0, mImp), p_graphics_sequence->GetResourceCount());
+								else p_graphics_sequence->AddResource(new GraphicsWidgetIABResource(p_graphics_sequence, p_file_resource->_clone()), p_graphics_sequence->GetResourceCount());
+								break;
+							case ISXDSequence:
+								if(mImp) p_graphics_sequence->AddResource(new GraphicsWidgetISXDResource(p_graphics_sequence, p_file_resource->_clone(), mImp->GetAsset(ImfXmlHelper::Convert(p_file_resource->getTrackFileId())).objectCast<AssetMxfTrack>(), 0, mImp), p_graphics_sequence->GetResourceCount());
+								else p_graphics_sequence->AddResource(new GraphicsWidgetISXDResource(p_graphics_sequence, p_file_resource->_clone()), p_graphics_sequence->GetResourceCount());
 								break;
 							case Unknown:
 								qDebug() << "A generic file resource will be added to unknown sequence.";
@@ -1025,6 +1055,8 @@ void WidgetComposition::InitToolbar() {
 	mpAddSubtitlesTrackAction = p_add_track_menu->addAction(QIcon(":/text.png"), tr("subtitles track"));
 	p_add_track_menu->addSeparator();
 	mpAddMarkerTrackAction = p_add_track_menu->addAction(QIcon(":/marker.png"), tr("marker track"));
+	mpAddIABTrackAction = p_add_track_menu->addAction(QIcon(":/sound.png"), tr("Immersive Audio track"));
+	mpAddISXDTrackAction = p_add_track_menu->addAction(QIcon(":/xml-icon.png"), tr("Isochronous stream of XML documents track"));
 	p_button_add_track->setMenu(p_add_track_menu);
 	mpToolBar->addWidget(p_button_add_track);
 	QAction *p_action = mpToolBar->addAction(QIcon(":/cutter.png"), tr("Edit"), mpCompositionScene, SLOT(SetEditRequest()));
@@ -1126,6 +1158,8 @@ void WidgetComposition::rAddTrackMenuActionTriggered(QAction *pAction) {
 	if(pAction == mpAddMarkerTrackAction) AddNewTrackRequest(MarkerSequence);
 	else if(pAction == mpAddMainAudioTrackAction) AddNewTrackRequest(MainAudioSequence);
 	else if(pAction == mpAddSubtitlesTrackAction) AddNewTrackRequest(SubtitlesSequence);
+	else if(pAction == mpAddIABTrackAction) AddNewTrackRequest(IABSequence);
+	else if(pAction == mpAddISXDTrackAction) AddNewTrackRequest(ISXDSequence);
 	else AddNewTrackRequest(Unknown);
 }
 
@@ -1203,6 +1237,8 @@ XmlSerializationError WidgetComposition::WriteMinimal(const QString &rDestinatio
 	cpl_namespace["cc"].name = XML_NAMESPACE_CC;
 	cpl_namespace["ds"].name = XML_NAMESPACE_DS;
 	cpl_namespace["xs"].name = XML_NAMESPACE_XS;
+	cpl_namespace["iab"].name = XML_NAMESPACE_IAB;
+	cpl_namespace["rdd47"].name = XML_NAMESPACE_RDD47;
 
 	cpl2016::CompositionPlaylistType_SegmentListType segment_list;
 	cpl2016::CompositionPlaylistType_SegmentListType::SegmentSequence &segment_sequence = segment_list.getSegment();

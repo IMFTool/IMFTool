@@ -93,6 +93,9 @@ void WizardResourceGenerator::InitLayout() {
 		case Metadata::TimedText:
 			SwitchMode(eMode::TTMLMode);
 			break;
+		case Metadata::ISXD:
+			SwitchMode(eMode::ISXDMode);
+			break;
 		default:
 			break;
 		}
@@ -404,6 +407,10 @@ void WizardResourceGeneratorPage::InitLayout() {
 		p_wrapper_layout_four->addWidget(new QLabel(SMPTE::vColorPrimaries[metadata.colorPrimaries]), i, 1, 1, 1);
 		p_wrapper_layout_four->addWidget(new QLabel(tr("OETF:")), ++i, 0, 1, 1);
 		p_wrapper_layout_four->addWidget(new QLabel(SMPTE::vTransferCharacteristic[metadata.transferCharcteristics]), i, 1, 1, 1);
+		if (metadata.isPHDR) {
+			p_wrapper_layout_four->addWidget(new QLabel(tr("Metadata:")), ++i, 0, 1, 1);
+			p_wrapper_layout_four->addWidget(new QLabel(tr("PHDR data present")), i, 1, 1, 1);
+		}
 
 		QWidget* empty = new QWidget();
 		empty->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
@@ -413,12 +420,39 @@ void WizardResourceGeneratorPage::InitLayout() {
 
 	p_wrapper_widget_four->setLayout(p_wrapper_layout_four);
 
+	QWidget *p_wrapper_widget_five = new QWidget(this);
+	QGridLayout *p_wrapper_layout_five = new QGridLayout();
+	p_wrapper_layout_five->setContentsMargins(0, 0, 0, 0);
+
+	if (mReadOnly && mAsset) {
+		int i = -1;
+		Metadata metadata = mAsset->GetMetadata();
+		QLabel* label = new QLabel();
+		label->setTextInteractionFlags(Qt::TextSelectableByMouse);
+		label->setText(metadata.assetId.toString());
+		p_wrapper_layout_five->addWidget(new QLabel(tr("Track File ID:")), ++i, 0, 1, 1);
+		p_wrapper_layout_five->addWidget(label, i, 1, 1, 1);
+		p_wrapper_layout_five->addWidget(new QLabel(tr("Edit Rate:")), ++i, 0, 1, 1);
+		p_wrapper_layout_five->addWidget(new QLabel(metadata.editRate.GetName()), i, 1, 1, 1);
+		p_wrapper_layout_five->addWidget(new QLabel(tr("Duration:")), ++i, 0, 1, 1);
+		p_wrapper_layout_five->addWidget(new QLabel(metadata.duration.GetAsString(metadata.editRate)), i, 1, 1, 1);
+		p_wrapper_layout_five->addWidget(new QLabel(tr("Namespace URI:")), ++i, 0, 1, 1);
+		p_wrapper_layout_five->addWidget(new QLabel(metadata.namespaceURI), i, 1, 1, 1);
+
+		QWidget* empty = new QWidget();
+		empty->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+		p_wrapper_layout_five->addWidget(empty);
+
+	}
+
+	p_wrapper_widget_five->setLayout(p_wrapper_layout_five);
 
 	mpStackedLayout = new QStackedLayout();
 	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::WavIndex, p_wrapper_widget_two);
 	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::TTMLIndex, p_wrapper_widget_three);
 	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::Jpeg2000Index, p_wrapper_widget_four);
 	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::ExrIndex, p_wrapper_widget_four);
+	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::ISXDIndex, p_wrapper_widget_five);
 	setLayout(mpStackedLayout);
 
 	registerField(FIELD_NAME_SELECTED_FILES"*", this, "FilesSelected", SIGNAL(FilesListChanged()));
@@ -833,6 +867,10 @@ void WizardResourceGeneratorPage::SwitchMode(WizardResourceGenerator::eMode mode
 
 		case WizardResourceGenerator::Jpeg2000Mode:
 			mpStackedLayout->setCurrentIndex(Jpeg2000Index);
+			break;
+
+		case WizardResourceGenerator::ISXDMode:
+			mpStackedLayout->setCurrentIndex(ISXDIndex);
 			break;
 
 		default:

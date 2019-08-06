@@ -83,6 +83,13 @@ Error MetadataExtractor::ReadMetadata(Metadata &rMetadata, const QString &rSourc
 					case ASDCP::ESS_AS02_TIMED_TEXT:
 						error = ReadTimedTextMxfDescriptor(rMetadata, source_file);
 						break;
+					case ASDCP::ESS_AS02_ISXD:
+						error = ReadISXDDescriptor(rMetadata, source_file);
+						break;
+
+					case ASDCP::ESS_AS02_IAB:
+						error = ReadIABDescriptor(rMetadata, source_file);
+						break;
 					default:
 						break;
 				}
@@ -272,6 +279,20 @@ Error MetadataExtractor::ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileI
 				char buf[64];
 				metadata.pictureEssenceCoding = QString(rgba_descriptor->PictureEssenceCoding.EncodeString(buf, 64)); //WR
 			}
+			  Array<Kumu::UUID>::const_iterator sdi = rgba_descriptor->SubDescriptors.begin();
+			  TargetFrameSubDescriptor* DescObject = NULL;
+			  Result_t result = RESULT_OK;
+			  ASDCP::MXF::OP1aHeader& header = reader.OP1aHeader();
+			  const ASDCP::Dictionary*& dict = reader.AS02IndexReader().m_Dict;
+
+			  for(; sdi != rgba_descriptor->SubDescriptors.end() && KM_SUCCESS(result); sdi++)
+			  {
+			    InterchangeObject* tmp_iobj = NULL;
+			    result = header.GetMDObjectByID(*sdi, &tmp_iobj);
+			    if (tmp_iobj->IsA(dict->ul(MDD_PHDRMetadataTrackSubDescriptor))) {
+			        metadata.isPHDR = true;
+			    }
+			  }
 		}
 		else if(cdci_descriptor) {
 			metadata.colorEncoding = Metadata::CDCI;
@@ -524,6 +545,157 @@ Error MetadataExtractor::ReadTimedTextMxfDescriptor(Metadata &rMetadata, const Q
 				metadata.languageTag = QString(tt_descriptor->RFC5646LanguageTagList.get().EncodeString(identbuf, IdentBufferLen));
 			}
 			//WR
+		} else {
+			error = Error(result);
+			return error;
+		}
+	}
+	else {
+		error = Error(result);
+		return error;
+	}
+	rMetadata = metadata;
+	return error;
+}
+
+Error MetadataExtractor::ReadISXDDescriptor(Metadata &rMetadata, const QFileInfo &rSourceFile){
+
+	Error error;
+	Metadata metadata(Metadata::ISXD);
+	metadata.fileName = rSourceFile.fileName();
+	metadata.filePath = rSourceFile.filePath();
+
+	AS_02::ISXD::MXFReader reader;
+	//AS_02::TimedText::TimedTextDescriptor TDesc;
+	//WR: Only ASDCP::MXF::TimedTextDescriptor exposes RFC5646LanguageTagList:
+	ASDCP::MXF::ISXDDataEssenceDescriptor *isxd_descriptor = NULL;
+
+	AS_02::Result_t result = reader.OpenRead(rSourceFile.absoluteFilePath().toStdString());
+	if(ASDCP_SUCCESS(result)) {
+		//WR
+		WriterInfo writerinfo;
+		result = reader.FillWriterInfo(writerinfo);
+		if(KM_SUCCESS(result)) {
+			char str_buf[16], str_buf2[40];
+			metadata.assetId = convert_uuid((unsigned char*)writerinfo.AssetUUID);
+		}
+		ASDCP::MXF::InterchangeObject* tmp_obj = NULL;
+
+		result = reader.OP1aHeader().GetMDObjectByType(DefaultCompositeDict().ul(MDD_ISXDDataEssenceDescriptor), &tmp_obj);
+
+		if(ASDCP_SUCCESS(result)) {
+			isxd_descriptor = dynamic_cast<ASDCP::MXF::ISXDDataEssenceDescriptor*>(tmp_obj);
+			if(isxd_descriptor == NULL) {
+				error = Error(Error::UnsupportedEssence);
+				return error;
+			}
+
+			metadata.editRate = isxd_descriptor->SampleRate;
+			metadata.duration = Duration(isxd_descriptor->ContainerDuration);
+			metadata.namespaceURI = QString(isxd_descriptor->NamespaceURI.c_str());
+		} else {
+			error = Error(result);
+			return error;
+		}
+	}
+	else {
+		error = Error(result);
+		return error;
+	}
+	rMetadata = metadata;
+	return error;
+}
+
+Error MetadataExtractor::ReadIABDescriptor(Metadata &rMetadata, const QFileInfo &rSourceFile){
+
+	Error error;
+	Metadata metadata(Metadata::IAB);
+	metadata.fileName = rSourceFile.fileName();
+	metadata.filePath = rSourceFile.filePath();
+
+	AS_02::IAB::MXFReader reader;
+	ASDCP::MXF::IABEssenceDescriptor *iab_descriptor = NULL;
+
+	AS_02::Result_t result = reader.OpenRead(rSourceFile.absoluteFilePath().toStdString());
+	if(ASDCP_SUCCESS(result)) {
+		//WR
+		WriterInfo writerinfo;
+		result = reader.FillWriterInfo(writerinfo);
+		if(KM_SUCCESS(result)) {
+			char str_buf[16], str_buf2[40];
+			metadata.assetId = convert_uuid((unsigned char*)writerinfo.AssetUUID);
+		}
+		ASDCP::MXF::InterchangeObject* tmp_obj = NULL;
+
+		result = reader.OP1aHeader().GetMDObjectByType(DefaultCompositeDict().ul(MDD_IABEssenceDescriptor), &tmp_obj);
+
+		if(ASDCP_SUCCESS(result)) {
+			iab_descriptor = dynamic_cast<ASDCP::MXF::IABEssenceDescriptor*>(tmp_obj);
+			if(iab_descriptor == NULL) {
+				error = Error(Error::UnsupportedEssence);
+				return error;
+			}
+			iab_descriptor->AudioRefLevel.empty();
+			char buf[64];
+			metadata.essenceContainer = QString(iab_descriptor->EssenceContainer.EncodeString(buf, 64)); // IMF_IABEssenceClipWrappedContainer urn:smpte:ul:060E2B34.0401010D.0D010301.021D0101 per 2067-21
+			metadata.essenceCoding = QString(iab_descriptor->SoundEssenceCoding.EncodeString(buf, 64)); // urn:smpte:ul:060E2B34.04010105.0E090604.00000000 per 2067-21
+			metadata.editRate = iab_descriptor->SampleRate;
+			if (!iab_descriptor->ContainerDuration.empty())
+				metadata.duration = iab_descriptor->ContainerDuration.get();
+			iab_descriptor->ElectroSpatialFormulation.empty();//If present shall be set to a value of 15 (multi-channel mode default).
+			metadata.audioQuantization = iab_descriptor->QuantizationBits;
+			if (!iab_descriptor->ReferenceImageEditRate.empty())
+				metadata.referenceImageEditRate = iab_descriptor->ReferenceImageEditRate.get(); // Should be present
+			iab_descriptor->ReferenceAudioAlignmentLevel.empty(); // Should be present
+			metadata.audioSamplingRate = iab_descriptor->AudioSamplingRate;
+			ASDCP::MXF::InterchangeObject* tmp_obj = NULL;
+			result = reader.OP1aHeader().GetMDObjectByType(DefaultCompositeDict().ul(MDD_IABSoundfieldLabelSubDescriptor), &tmp_obj);
+			if(KM_SUCCESS(result)) {
+				ASDCP::MXF::IABSoundfieldLabelSubDescriptor *p_iab_subdescriptor = NULL;
+				p_iab_subdescriptor = dynamic_cast<ASDCP::MXF::IABSoundfieldLabelSubDescriptor*>(tmp_obj);
+				if(p_iab_subdescriptor) {
+					if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IABSoundfield)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupIAB;
+					else if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_ST)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupST;
+					else if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_DM)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupDM;
+					else if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_30)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup30;
+					else if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_40)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup40;
+					else if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_50)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup50;
+					else if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_60)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup60;
+					else if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_70)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup70;
+					else if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_LtRt)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupLtRt;
+					else if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_51Ex)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup51EX;
+					else if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_HI)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupHA;
+					else if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_VIN)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupVA;
+					else if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_51)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup51;
+					else if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_71)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup71;
+					else if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_SDS)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupSDS;
+					else if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_61)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup61;
+					else if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_M)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupM;
+					else metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupNone;
+					const unsigned short IdentBufferLen = 128;
+					metadata.mcaTagSymbol = QString(p_iab_subdescriptor->MCATagSymbol.EncodeString(buf, 64));
+					char identbuf[IdentBufferLen];
+					if (!p_iab_subdescriptor->MCATagName.empty()) {
+						metadata.mcaTagName = QString(p_iab_subdescriptor->MCATagName.get().EncodeString(identbuf, IdentBufferLen));
+					}
+					if (!p_iab_subdescriptor->RFC5646SpokenLanguage.empty()) {
+						metadata.languageTag = QString(p_iab_subdescriptor->RFC5646SpokenLanguage.get().EncodeString(identbuf, IdentBufferLen));
+					}
+					if (!p_iab_subdescriptor->MCAAudioContentKind.empty()) {
+						metadata.mcaAudioContentKind = QString(p_iab_subdescriptor->MCAAudioContentKind.get().EncodeString(identbuf, IdentBufferLen));
+					}
+					if (!p_iab_subdescriptor->MCAAudioElementKind.empty()) {
+						metadata.mcaAudioElementKind = QString(p_iab_subdescriptor->MCAAudioElementKind.get().EncodeString(identbuf, IdentBufferLen));
+					}
+					if (!p_iab_subdescriptor->MCATitle.empty()) {
+						metadata.mcaTitle = QString(p_iab_subdescriptor->MCATitle.get().EncodeString(identbuf, IdentBufferLen));
+					}
+					if (!p_iab_subdescriptor->MCATitleVersion.empty()) {
+						metadata.mcaTitleVersion = QString(p_iab_subdescriptor->MCATitleVersion.get().EncodeString(identbuf, IdentBufferLen));
+					}
+					//WR
+				}
+			}
 		} else {
 			error = Error(result);
 			return error;

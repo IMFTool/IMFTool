@@ -315,7 +315,7 @@ Error JobExtractEssenceDescriptor::Execute() {
 		<< "www-smpte-ra-org-reg-335-2012-13-12-as11.xml"
 		<< "www-smpte-ra-org-reg-335-2012-13-13.xml"
 		<< "www-smpte-ra-org-reg-395-2014.xml"*/
-		<< "www-smpte-ra-org-reg-395-2014-13-1-aaf.xml"
+		<< "www-smpte-ra-org-reg-395-2014-13-1-aaf-phdr.xml"
 /*		<< "www-smpte-ra-org-reg-395-2014-13-1-amwa-as10.xml"
 		<< "www-smpte-ra-org-reg-395-2014-13-1-amwa-as11.xml"
 		<< "www-smpte-ra-org-reg-395-2014-13-1-amwa-as12.xml"
@@ -331,7 +331,7 @@ Error JobExtractEssenceDescriptor::Execute() {
 		<< "www-ebu-ch-metadata-schemas-ebucore-smpte-class13-element.xml"
 		<< "www-ebu-ch-metadata-schemas-ebucore-smpte-class13-group.xml"
 		<< "www-ebu-ch-metadata-schemas-ebucore-smpte-class13-type.xml" */
-		<< "www-smpte-ra-org-reg-335-2012.xml"
+		<< "www-smpte-ra-org-reg-335-2012-phdr.xml"
 		<< "www-smpte-ra-org-reg-335-2012-13-1-aaf.xml"
 //		<< "www-smpte-ra-org-reg-335-2012-13-1-amwa-as10.xml"
 //		<< "www-smpte-ra-org-reg-335-2012-13-1-amwa-as11.xml"
@@ -436,10 +436,12 @@ Error JobCallPhoton::Execute() {
 #endif
 	arg << "com.netflix.imflibrary.app.IMPAnalyzer";
 	arg << mWorkingDirectory;
+/*
 	if (appString == "app5") {
 		arg << "--application";
 		arg << appString;
 	}
+*/
 	emit Progress(20);
 	myProcess->start(program, arg);
 	emit Progress(40);

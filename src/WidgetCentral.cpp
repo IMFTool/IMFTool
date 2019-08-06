@@ -376,8 +376,8 @@ void WidgetCentral::UninstallImp() {
 	mpLocaleListWidget->setDisabled(true);
 	mpLocaleListWidget->Clear();
 	mpTTMLDetailsWidget->ClearTTML(); // (k) - clear ttml
+	this->mpPreview->Reset();
 
-	
 	for(int i = 0; i < mpTabWidget->count(); i++) {
 		if(QWidget *p_widget = mpTabWidget->widget(i)) {
 			p_widget->deleteLater();

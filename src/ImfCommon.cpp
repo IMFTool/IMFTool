@@ -197,6 +197,9 @@ const SoundfieldGroup SoundfieldGroup::SoundFieldGroup71("71", "7.1DS", 8, Chann
 const SoundfieldGroup SoundfieldGroup::SoundFieldGroupSDS("SDS", "7.1SDS", 8, ChannelL | ChannelLc | ChannelC | ChannelRc | ChannelR | ChannelLs | ChannelRs | ChannelLFE);
 const SoundfieldGroup SoundfieldGroup::SoundFieldGroup61("61", "6.1", 7, ChannelL | ChannelR | ChannelC | ChannelLss | ChannelRss | ChannelCs | ChannelLFE);
 const SoundfieldGroup SoundfieldGroup::SoundFieldGroupM("M", "1.0 Monaural", 1, ChannelC);
+//IAB
+const SoundfieldGroup SoundfieldGroup::SoundFieldGroupIAB("IAB", "Immersive Audio ST2067-201", 1, ChannelUndefined);
+
 
 
 const QList<QPair<QString, QString> > SoundfieldGroup::mChannelNamesSymbolsMap = QList<QPair<QString, QString> >()

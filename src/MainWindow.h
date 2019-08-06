@@ -49,6 +49,7 @@ signals:
 public slots:
 	void ShowWidgetAbout();
 	void ShowWorkspaceLauncher();
+	void ShowWorkspaceLauncherNewImp();
 	void ShowWorkspaceLauncherPartialImp();
 	void ShowCplEditor(const QUuid &rCplAssetId);
 	void CloseImfPackage();
@@ -62,11 +63,13 @@ public slots:
 
 private slots:
 	void rWorkspaceLauncherAccepted();
+	void rWorkspaceLauncherAcceptedNewImp();
 	void rWorkspaceLauncherPartialImpAccepted();
 	void rEnableSaveActions();
 	void rFocusChanged(QWidget *pOld, QWidget *pNow);
 	void rSaveCPLRequest();
 	void rOpenImpRequest();
+	void rNewImpRequest();
 	void rCloseImpRequest();
 	void rReinstallImp();
 	//WR
@@ -90,9 +93,7 @@ private:
 	bool checkUndoStack();
 
 	QMessageBox	*mpMsgBox;
-//#ifdef ARCHIVIST
 	QDockWidget *mpDockWidgetImagePreview;
-//#endif
 	WidgetImpBrowser *mpWidgetImpBrowser;
 	WidgetCentral	*mpCentralWidget;
 	QUndoGroup *mpUndoGroup;

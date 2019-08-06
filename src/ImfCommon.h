@@ -56,8 +56,10 @@ public:
 	static const SoundfieldGroup SoundFieldGroupSDS;
 	static const SoundfieldGroup SoundFieldGroup61;
 	static const SoundfieldGroup SoundFieldGroupM;
+	static const SoundfieldGroup SoundFieldGroupIAB;
 
 	enum eChannel {
+		ChannelUndefined = 0,
 		ChannelM1 = (1u << 0), // 1
 		ChannelM2 = (1u << 1), // 2
 		ChannelLt = (1u << 2), // 4

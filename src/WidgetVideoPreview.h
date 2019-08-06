@@ -45,6 +45,7 @@ public:
 	void InstallImp();
 	void UninstallImp();
 	void setPlaylist(QVector<VideoResource> &rPlayList, QVector<TTMLtimelineResource> &rTTMLs);
+	void setMenuQuality(int rWidth, int rHeight);
 	JP2K_Player *player;
 #ifdef APP5_ACES
 	ACES_Player *mpACESPlayer;
@@ -53,6 +54,7 @@ public:
 	eImfApplications getApplication();
 	~WidgetVideoPreview();
 	void Clear();
+	void Reset();
 	float CPLEditRate;
 signals:
 	void currentPlayerPosition(qint64);
@@ -104,7 +106,7 @@ private:
 	QAction *view_actions[1];
 	QMenu *processing_extract;
 	QStringList *processing_extract_names;
-	QAction *processing_extract_actions[15];
+	QAction *processing_extract_actions[17];
 	int processing_extract_action = 3; // default
 	QPushButton *mpStopButton;
 	QPushButton *mpPlayPauseButton;
@@ -116,7 +118,7 @@ private:
 	QMessageBox *mpMsgBox;
 
 	// player
-	int decode_layer = 3; // default
+	int decode_layer = 2; // default
 	int decode_speed = 5; // default (fps in player)
 	QThread *playerThread;
 #ifdef APP5_ACES
@@ -143,4 +145,8 @@ private:
 	qint64 decodingFrame = 0; // currently decoding frame
 	qint64 xSliderFrame = 0;
 	qint64 xSliderTotal = 0;
+	int mStoredWidth = 0;
+	int mStoredHeight = 0;
+	int mDisplayWidth = 0;
+	int mDisplayHeight = 0;
 };

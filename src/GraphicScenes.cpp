@@ -88,6 +88,16 @@ GraphicsSceneBase::GridInfo GraphicsSceneBase::SnapToGrid(const QPointF &rPoint,
 				use = p_base_graphics_widget->ExtendGrid(proposed_point, DataHorizontal);
 				if(use && snap_rect.contains(proposed_point)) horizontal_sigularities.push_back(QPair<qreal, AbstractGridExtension*>(proposed_point.y(), p_base_graphics_widget));
 			}
+			if(which & ISXDHorizontal) {
+				QPointF proposed_point(rPoint);
+				use = p_base_graphics_widget->ExtendGrid(proposed_point, ISXDHorizontal);
+				if(use && snap_rect.contains(proposed_point)) horizontal_sigularities.push_back(QPair<qreal, AbstractGridExtension*>(proposed_point.y(), p_base_graphics_widget));
+			}
+			if(which & IABHorizontal) {
+				QPointF proposed_point(rPoint);
+				use = p_base_graphics_widget->ExtendGrid(proposed_point, IABHorizontal);
+				if(use && snap_rect.contains(proposed_point)) horizontal_sigularities.push_back(QPair<qreal, AbstractGridExtension*>(proposed_point.y(), p_base_graphics_widget));
+			}
 		}
 	}
 	AbstractGridExtension *p_final_snap_item_vertical = NULL;
@@ -297,6 +307,12 @@ void GraphicsSceneComposition::ProcessDragMove(DragDropInfo &rInfo, const QPoint
 					break;
 				case GraphicsWidgetTimedTextResourceType:
 					grid_type |= TimedTextHorizontal;
+					break;
+				case GraphicsWidgetISXDResourceType:
+					grid_type |= ISXDHorizontal;
+					break;
+				case GraphicsWidgetIABResourceType:
+					grid_type |= IABHorizontal;
 					break;
 			}
 			GraphicsSceneComposition::GridInfo grid_info_left = SnapToGrid(QPointF(scene_pos.x() - offset_left, rScenePos.y()), grid_type, QRectF(), mpGhost);
@@ -544,6 +560,26 @@ void GraphicsSceneComposition::ProcessDragMove(DragDropInfo &rInfo, const QPoint
 					}
 				}
 
+				else if(p_origin_resource->type() == GraphicsWidgetISXDResourceType) {
+					if(p_origin_resource->GetAsset() && p_origin_resource->GetAsset()->GetEditRate() == GetCplEditRate()) {
+						rInfo.isDropable = true;
+					}
+					else {
+						get_main_window()->statusBar()->setStyleSheet("QStatusBar{color:red}");
+						get_main_window()->statusBar()->showMessage(tr("Image edit rate mismatch: %1 expected.").arg(GetCplEditRate().GetQuotient(), 0, 'f', 2), 5000);
+					}
+				}
+
+				else if(p_origin_resource->type() == GraphicsWidgetIABResourceType) {
+					if(p_origin_resource->GetAsset() && p_origin_resource->GetAsset()->GetEditRate() == GetCplEditRate()) {
+						rInfo.isDropable = true;
+					}
+					else {
+						get_main_window()->statusBar()->setStyleSheet("QStatusBar{color:red}");
+						get_main_window()->statusBar()->showMessage(tr("Image edit rate mismatch: %1 expected.").arg(GetCplEditRate().GetQuotient(), 0, 'f', 2), 5000);
+					}
+				}
+
 				if((dummy_right != NULL && dummy_right == dummy_left) || (rInfo.pSegment && dummy_left != NULL && rInfo.pSegment->isAncestorOf(dummy_left))) {
 					if(rInfo.isDropable == true) {
 						get_main_window()->statusBar()->setStyleSheet("QStatusBar{color:red}");
@@ -742,6 +778,8 @@ void GraphicsSceneComposition::keyPressEvent(QKeyEvent *pEvent) {
 				case	GraphicsWidgetAudioResourceType:
 				case	GraphicsWidgetMarkerResourceType:
 				case	GraphicsWidgetTimedTextResourceType:
+				case 	GraphicsWidgetISXDResourceType:
+				case 	GraphicsWidgetIABResourceType:
 					emit PushCommand(new RemoveResourceCommand(static_cast<AbstractGraphicsWidgetResource*>(p_item), static_cast<AbstractGraphicsWidgetResource*>(p_item)->GetSequence()));
 					break;
 				case GraphicsWidgetMarkerType:
@@ -894,6 +932,21 @@ void GraphicsSceneComposition::dragEnterEvent(QGraphicsSceneDragDropEvent *pEven
 						break;
 							/* -----Denis Manthey End----- */
 
+					case Metadata::ISXD:
+						p_resource = new GraphicsWidgetISXDResource(NULL, asset);
+						p_resource->hide();
+						addItem(p_resource);
+						ProcessInitDrag(mDropInfo, p_resource, pEvent->scenePos().toPoint(), QPoint(p_resource->boundingRect().center().toPoint()));
+						accept = true;
+						break;
+
+					case Metadata::IAB:
+						p_resource = new GraphicsWidgetIABResource(NULL, asset);
+						p_resource->hide();
+						addItem(p_resource);
+						ProcessInitDrag(mDropInfo, p_resource, pEvent->scenePos().toPoint(), QPoint(p_resource->boundingRect().center().toPoint()));
+						accept = true;
+						break;
 
 					default:
 						get_main_window()->statusBar()->setStyleSheet("QStatusBar{color:red}");

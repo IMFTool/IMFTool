@@ -52,6 +52,7 @@ WidgetVideoPreview::WidgetVideoPreview(QWidget *pParent) : QWidget(pParent) {
 	// ############## - create 2 single frame extractors - ###################
 	for (int i = 0; i <= 1; i++) {
 		mpACESDecoders[i] = new ACES_Preview();
+		mpACESDecoders[i]->setLayer(2);
 		mpACESDecodingThreads[i] = new QThread();
 		mpACESDecoders[i]->moveToThread(mpACESDecodingThreads[i]);
 
@@ -173,41 +174,64 @@ void WidgetVideoPreview::InitLayout() {
 	menuProcessing = new QMenu(tr("Processing"));
 	menuBar->addMenu(menuProcessing);
 	connect(menuProcessing, SIGNAL(triggered(QAction*)), this, SLOT(rChangeProcessing(QAction*)));
+	quint8 action_count = 0;
 
-	processing_extract_actions[0] = new QAction(tr("Smooth"));
-	processing_extract_actions[0]->setCheckable(true);
-	processing_extract_actions[0]->setChecked(true); // default
-	processing_extract_actions[0]->setData(0);
-	menuProcessing->addAction(processing_extract_actions[0]);
+	processing_extract_actions[action_count] = new QAction(tr("Smooth"));
+	processing_extract_actions[action_count]->setCheckable(true);
+	processing_extract_actions[action_count]->setChecked(true); // default
+	processing_extract_actions[action_count]->setData(action_count);
+	menuProcessing->addAction(processing_extract_actions[action_count]);
+	action_count++;
 
-	processing_extract_actions[1] = new QAction(tr("Scaling"));
-	processing_extract_actions[1]->setCheckable(true);
-	processing_extract_actions[1]->setChecked(true); // default
-	processing_extract_actions[1]->setData(1);
-	menuProcessing->addAction(processing_extract_actions[1]);
+	processing_extract_actions[action_count] = new QAction(tr("Scaling"));
+	processing_extract_actions[action_count]->setCheckable(true);
+	processing_extract_actions[action_count]->setChecked(true); // default
+	processing_extract_actions[action_count]->setData(action_count);
+	menuProcessing->addAction(processing_extract_actions[action_count]);
+	action_count++;
 
-	processing_extract_actions[2] = new QAction(tr("Show subtitles"));
-	processing_extract_actions[2]->setCheckable(true);
-	processing_extract_actions[2]->setChecked(true); // default
-	processing_extract_actions[2]->setData(2);
-	menuProcessing->addAction(processing_extract_actions[2]);
+	menuProcessing->addSeparator();
+	processing_extract_actions[action_count] = new QAction(tr("Show Native Resolution"));
+	processing_extract_actions[action_count]->setCheckable(true);
+	processing_extract_actions[action_count]->setChecked(true); // default
+	processing_extract_actions[action_count]->setData(action_count);
+	menuProcessing->addAction(processing_extract_actions[action_count]);
+	action_count++;
 
-	processing_extract_actions[3] = new QAction(tr("real-speed"));
-	processing_extract_actions[3]->setCheckable(true);
-	processing_extract_actions[3]->setChecked(false); // default
-	processing_extract_actions[3]->setData(3);
-	menuProcessing->addAction(processing_extract_actions[3]);
+	processing_extract_actions[action_count] = new QAction(tr("Show Active Area"));
+	processing_extract_actions[action_count]->setCheckable(true);
+	processing_extract_actions[action_count]->setChecked(false); // default
+	processing_extract_actions[action_count]->setData(action_count);
+	menuProcessing->addAction(processing_extract_actions[action_count]);
+	menuProcessing->addSeparator();
+	action_count++;
 
-	processing_extract_actions[4] = new QAction(tr("convert to REC.709"));
-	processing_extract_actions[4]->setCheckable(true);
-	processing_extract_actions[4]->setChecked(true); // default
-	processing_extract_actions[4]->setData(4);
-	menuProcessing->addAction(processing_extract_actions[4]);
+	processing_extract_actions[action_count] = new QAction(tr("Show subtitles"));
+	processing_extract_actions[action_count]->setCheckable(true);
+	processing_extract_actions[action_count]->setChecked(true); // default
+	processing_extract_actions[action_count]->setData(action_count);
+	menuProcessing->addAction(processing_extract_actions[action_count]);
+	action_count++;
+
+	processing_extract_actions[action_count] = new QAction(tr("real-speed"));
+	processing_extract_actions[action_count]->setCheckable(true);
+	processing_extract_actions[action_count]->setChecked(false); // default
+	processing_extract_actions[action_count]->setData(action_count);
+	menuProcessing->addAction(processing_extract_actions[action_count]);
+	action_count++;
+
+	processing_extract_actions[action_count] = new QAction(tr("convert to REC.709"));
+	processing_extract_actions[action_count]->setCheckable(true);
+	processing_extract_actions[action_count]->setChecked(true); // default
+	processing_extract_actions[action_count]->setData(action_count);
+	menuProcessing->addAction(processing_extract_actions[action_count]);
+	action_count++;
 
 	// save image
-	processing_extract_actions[5] = new QAction(tr("save image"));
-	processing_extract_actions[5]->setData(5);
-	menuProcessing->addAction(processing_extract_actions[5]);
+	processing_extract_actions[action_count] = new QAction(tr("save image"));
+	processing_extract_actions[action_count]->setData(action_count);
+	menuProcessing->addAction(processing_extract_actions[action_count]);
+	action_count++;
 
 	// extract
 	processing_extract = menuProcessing->addMenu("extract");
@@ -225,12 +249,12 @@ void WidgetVideoPreview::InitLayout() {
 	processing_extract_names->append("bottom right");
 
 	// add actions
-	for (int i = 6; i < (processing_extract_names->length() + 6); i++) {
-		processing_extract_actions[i] = new QAction(processing_extract_names->at((i - 6)));
-		processing_extract_actions[i]->setCheckable(true);
-		processing_extract_actions[i]->setData(i); // set index
-		if (i == 0) processing_extract_actions[i]->setChecked(true); // default
-		processing_extract->addAction(processing_extract_actions[i]); // add action to menu
+	for (int i = 0; i < processing_extract_names->length(); i++) {
+		processing_extract_actions[action_count] = new QAction(processing_extract_names->at(i));
+		processing_extract_actions[action_count]->setCheckable(true);
+		processing_extract_actions[action_count]->setData(action_count); // set index
+		processing_extract->addAction(processing_extract_actions[action_count]); // add action to menu
+		action_count++;
 	}
 
 	// play button
@@ -606,11 +630,24 @@ void WidgetVideoPreview::keyPressEvent(QKeyEvent *pEvent) {
 	}
 }
 
-
 void WidgetVideoPreview::Clear() {
 	decoding_time->setText("");
 	mpImagePreview->Clear();
 	emit stopPlayback(true); // stop playback
+}
+
+void WidgetVideoPreview::Reset() {
+	Clear();
+	decode_layer = 2;
+	processing_extract_actions[2]->setChecked(true); // Data Window is on
+	processing_extract_actions[3]->setChecked(false); // Display Window is off
+	for (int i = 0; i <= 1; i++) {
+		decoders[i]->setLayer(decode_layer);
+#ifdef APP5_ACES
+		mpACESDecoders[i]->setLayer(decode_layer);
+		mpACESDecoders[i]->showActiveArea(false);
+#endif
+	}
 }
 
 void WidgetVideoPreview::InstallImp() {
@@ -632,7 +669,6 @@ void WidgetVideoPreview::setPlaylist(QVector<VideoResource> &rPlayList, QVector<
 	else
 		mpACESPlayer->setPlaylist(rPlayList); // set playlist in player
 #endif
-	menuQuality->clear(); // clear prev. resolutions from menu
 	current_playlist_index = 0; // set to first item in playlist 
 
 	// create array of TTMLtracks
@@ -646,7 +682,7 @@ void WidgetVideoPreview::setPlaylist(QVector<VideoResource> &rPlayList, QVector<
 	if (rPlayList.length() > 0) {
 		
 		// loop playlist & set resolutions
-		int width = 0, height = 0, count = -1;
+		int count = -1;
 		bool found = false;
 
 		// look for first valid asset
@@ -660,30 +696,18 @@ void WidgetVideoPreview::setPlaylist(QVector<VideoResource> &rPlayList, QVector<
 		if (found == false) return; // no valid asset found in timeline
 
 		// use first valid asset to get resolution
-		if (rPlayList.at(count).asset->GetMetadata().displayWidth > 0) { // check for displayWidth
-			width = rPlayList.at(count).asset->GetMetadata().displayWidth;
-			height = rPlayList.at(count).asset->GetMetadata().displayHeight;
+
+		if (rPlayList.at(count).asset->GetMetadata().storedWidth > 0) { // check for storedWidth
+			mStoredWidth = rPlayList.at(count).asset->GetMetadata().storedWidth;
+			mStoredHeight = rPlayList.at(count).asset->GetMetadata().storedHeight;
 		}
-		else if (rPlayList.at(count).asset->GetMetadata().storedWidth > 0) { // check for storedWidth
-			width = rPlayList.at(count).asset->GetMetadata().storedWidth;
-			height = rPlayList.at(count).asset->GetMetadata().storedHeight;
+		if (rPlayList.at(count).asset->GetMetadata().displayWidth > 0) { // check for displayWidth
+			mDisplayWidth = rPlayList.at(count).asset->GetMetadata().displayWidth;
+			mDisplayHeight = rPlayList.at(count).asset->GetMetadata().displayHeight;
 		}
 
-		if (mImfApplication != ::App5) {
-			for (int i = 0; i <= 5; i++) {
-				int w = width / pow(2, i);
-				int h = height / pow(2, i);
-				qualities[i] = new QAction(QString("%1 x %2").arg(w).arg(h)); // create new action
-				qualities[i]->setData(i);
-				qualities[i]->setCheckable(true);
-				if (i == decode_layer) qualities[i]->setChecked(true); // default
-				menuQuality->addAction(qualities[i]);
-			}
-		} else {
-			qualities[0] = new QAction(QString("%1 x %2").arg(width).arg(height));
-			qualities[0]->setData(0);
-			menuQuality->addAction(qualities[0]);
-		}
+		setMenuQuality(mStoredWidth, mStoredHeight);
+
 		// load first picture in preview
 		decoding_time->setText("loading...");
 		currentAsset = rPlayList[0].asset;
@@ -720,6 +744,19 @@ void WidgetVideoPreview::setPlaylist(QVector<VideoResource> &rPlayList, QVector<
 		decodingFrame = 0;
 		decoding_time->setText("No/empty playlist!");
 		Clear(); // stop player & clear preview
+	}
+}
+
+void WidgetVideoPreview::setMenuQuality(int rWidth, int rHeight) {
+	menuQuality->clear(); // clear prev. resolutions from menu
+	for (int i = 0; i <= 5; i++) {
+		int w = rWidth / (1 << i);
+		int h = rHeight / (1 << i);
+		qualities[i] = new QAction(QString("%1 x %2").arg(w).arg(h)); // create new action
+		qualities[i]->setData(i);
+		qualities[i]->setCheckable(true);
+		if (i == decode_layer) qualities[i]->setChecked(true); // default
+		menuQuality->addAction(qualities[i]);
 	}
 }
 
@@ -768,11 +805,11 @@ void WidgetVideoPreview::rChangeSpeed(QAction *action) {
 
 void WidgetVideoPreview::rChangeQuality(QAction *action) {
 
-	if (mImfApplication != ::App5) {
-		if (decode_layer != action->data().value<int>()) {
-			qualities[decode_layer]->setChecked(false); // uncheck 'old' layer
+	if (decode_layer != action->data().value<int>()) {
+		qualities[decode_layer]->setChecked(false); // uncheck 'old' layer
 
-			decode_layer = action->data().value<int>();
+		decode_layer = action->data().value<int>();
+		if (mImfApplication != ::App5) {
 			player->setLayer(decode_layer);
 			decoders[0]->setLayer(decode_layer);
 			decoders[1]->setLayer(decode_layer);
@@ -784,10 +821,21 @@ void WidgetVideoPreview::rChangeQuality(QAction *action) {
 				decoding_time->setText("loading...");
 			}
 		}
+#ifdef APP5_ACES
 		else {
-			qualities[decode_layer]->setChecked(true); // check again!
+			mpACESPlayer->setLayer(decode_layer);
+			mpACESDecoders[0]->setLayer(decode_layer);
+			mpACESDecoders[1]->setLayer(decode_layer);
+
+			// reload the same frame again (if player is not playing)
+			if (!mpACESPlayer->playing) {
+				now_running = !now_running; // use same decoder (relevant frame is still set)
+				mpACESDecodingThreads[(int)now_running]->start(QThread::HighestPriority); // start decoder (again)
+				decoding_time->setText("loading...");
+			}
 		}
 	}
+#endif
 }
 
 void WidgetVideoPreview::rChangeProcessing(QAction *action) {
@@ -822,7 +870,43 @@ void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 			mpImagePreview->setExtract(4);
 		}
 		break;
-	case 2:
+	case 2: // Data Window, default
+		processing_extract_actions[nr]->setChecked(true); // Data Window is on
+		processing_extract_actions[nr+1]->setChecked(false); // Display Window is off
+		this->setMenuQuality(mStoredWidth, mStoredHeight);
+		if (mImfApplication == ::App5) {
+#ifdef APP5_ACES
+			mpACESPlayer->showActiveArea(false);
+			mpACESDecoders[0]->showActiveArea(false);
+			mpACESDecoders[1]->showActiveArea(false);
+			// reload the same frame again (if player is not playing)
+			if (!mpACESPlayer->playing) {
+				now_running = !now_running; // use same decoder (relevant frame is still set)
+				mpACESDecodingThreads[(int)now_running]->start(QThread::HighestPriority); // start decoder (again)
+				decoding_time->setText("loading...");
+			}
+#endif
+		}
+		break;
+	case 3:
+		processing_extract_actions[nr]->setChecked(true); // Display Window is on
+		processing_extract_actions[nr-1]->setChecked(false); // Data Window is off
+		this->setMenuQuality(mDisplayWidth, mDisplayHeight);
+		if (mImfApplication == ::App5) {
+#ifdef APP5_ACES
+			mpACESPlayer->showActiveArea(true);
+			mpACESDecoders[0]->showActiveArea(true);
+			mpACESDecoders[1]->showActiveArea(true);
+			// reload the same frame again (if player is not playing)
+			if (!mpACESPlayer->playing) {
+				now_running = !now_running; // use same decoder (relevant frame is still set)
+				mpACESDecodingThreads[(int)now_running]->start(QThread::HighestPriority); // start decoder (again)
+				decoding_time->setText("loading...");
+			}
+#endif
+		}
+		break;
+	case 4:
 		if (mImfApplication != ::App5) {
 			player->show_subtitles = action->isChecked();
 			if (!player->show_subtitles) {
@@ -838,7 +922,7 @@ void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 		}
 #endif
 		break;
-	case 3: // real speed
+	case 5: // real speed
 
 		if (mImfApplication != ::App5) {
 			if(playerThread->isRunning()) playerThread->quit();
@@ -863,7 +947,7 @@ void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 		}
 #endif
 		break;
-	case 4: // color space conversion
+	case 6: // color space conversion
 		if (mImfApplication != ::App5) {
 			decoders[0]->convert_to_709 = action->isChecked(); // set in decoder 0
 			decoders[1]->convert_to_709 = action->isChecked(); // set in decoder 1
@@ -883,12 +967,12 @@ void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 #endif
 
 		break;
-	case 5: // save image
+	case 7: // save image
 		mpImagePreview->saveImage();
 		break;
 	}
 
-	if (nr >= 6) {
+	if (nr >= 8) {
 		if (action->isChecked()) {
 			processing_extract_actions[1]->setChecked(false); // scaling is off
 			mpImagePreview->setScaling(false); // scaling is off
@@ -901,7 +985,7 @@ void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 		// extract action!
 		if(processing_extract_action != nr) processing_extract_actions[processing_extract_action]->setChecked(false); // uncheck 'old' option
 		processing_extract_action = nr;
-		mpImagePreview->setExtract((nr - 6));
+		mpImagePreview->setExtract((nr - 8));
 	}
 }
 

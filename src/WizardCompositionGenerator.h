@@ -53,6 +53,9 @@ public:
 	QString GetApp() const;
 	void SetApp(const QString &rApplicationIdentification);
 
+public slots:
+	virtual bool isComplete() const;
+
 signals:
 	void EditRateChanged();
 	void AppChanged();
@@ -70,4 +73,7 @@ private:
 			{"http://www.smpte-ra.org/schemas/2067-21/2014", "App #2E 2014"},
 			{"http://www.smpte-ra.org/ns/2067-50/2017", "App 5 ACES"},
 	};
+	QString mAppString;
+private slots:
+	void AppTextChanged(const QString);
 };

@@ -62,6 +62,9 @@
         <file>inbox_upload_plus.png</file>
 		<file>ttml_bg_not_found.png</file>
 		<file>qc.png</file>
+		<file>xml-icon.png</file>
+		<file>proxy_xml.png</file>
+		<file>proxy_iab_sound.png</file>
     </qresource>
     <qresource prefix="/other">
         <file alias="license">../LICENSE</file>

@@ -44,7 +44,7 @@ void JP2K_Preview::setUp() {
 
 	mDecode_time.start();
 
-	params.cp_reduce = 3; // (default)
+	params.cp_reduce = 2; // (default)
 	mCpus = opj_get_num_cpus();
 
 	pDecompressor = OPENJPEG_H::opj_create_decompress(OPJ_CODEC_J2K);

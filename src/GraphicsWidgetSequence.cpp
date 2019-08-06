@@ -204,6 +204,18 @@ bool GraphicsWidgetSequence::ExtendGrid(QPointF &rPoint, eGridPosition which) co
 			}
 			else return false;
 			break;
+		case ISXDSequence:
+			if(which == ISXDHorizontal) {
+				ret.setY(boundingRect().center().y());
+			}
+			else return false;
+			break;
+		case IABSequence:
+			if(which == IABHorizontal) {
+				ret.setY(boundingRect().center().y());
+			}
+			else return false;
+			break;
 		case MarkerSequence:
 			if(which == MarkerHorizontal) {
 				ret.setY(boundingRect().center().y());
