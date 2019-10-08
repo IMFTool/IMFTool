@@ -36,6 +36,7 @@
 #include <fstream>
 #include <QPropertyAnimation>
 #include <QTemporaryFile>
+#include <QMap>
 
 
 
@@ -361,6 +362,31 @@ ImfError WidgetComposition::Write(const QString &rDestination /*= QString()*/) {
 					}
 					if(p_sequence->GetType() == MarkerSequence) {
 						cpl2016::SequenceType sequence(ImfXmlHelper::Convert(p_sequence->GetId()), ImfXmlHelper::Convert(p_sequence->GetTrackId()), resource_list);
+						//Sort Marker elements by Offset:
+						for(cpl2016::SequenceType_ResourceListType::ResourceIterator resource_iter(sequence.getResourceList().getResource().begin()); resource_iter != sequence.getResourceList().getResource().end(); ++resource_iter) {
+							cpl2016::MarkerResourceType *p_marker_resource = dynamic_cast<cpl2016::MarkerResourceType*>(&(*resource_iter));
+							if(p_marker_resource) {
+								cpl2016::MarkerResourceType::MarkerSequence& marker_sequence = p_marker_resource->getMarker();
+								cpl2016::MarkerResourceType::MarkerSequence sorted_marker_sequence = cpl2016::MarkerResourceType::MarkerSequence();
+								cpl2016::MarkerResourceType::MarkerIterator sorted_iterator;
+								int size = sorted_marker_sequence.size();
+								QList<QPair<int, quint64> > sorted_marker_list; // int: Index in Original MarkerSequence, quint64: Associated Offset
+								for (cpl2016::MarkerResourceType::MarkerIterator marker_iterator(p_marker_resource->getMarker().begin()); marker_iterator != p_marker_resource->getMarker().end(); ++marker_iterator) {
+									// QPair of current index and Offset
+									QPair<int, quint64> marker_index_offset = QPair<int, quint64>((int)sorted_marker_list.size(), (quint64)marker_iterator->getOffset());
+									int sortindex = 0;
+									while ((sortindex < sorted_marker_list.size()) && (sorted_marker_list.at(sortindex).second < marker_index_offset.second)) {
+										sortindex++;
+									}
+									sorted_marker_list.insert(sortindex, marker_index_offset);
+								}
+								for (int iii = 0; iii <  sorted_marker_list.size(); iii++) {
+									sorted_marker_sequence.push_back(p_marker_resource->getMarker().at(sorted_marker_list.at(iii).first));
+								}
+								p_marker_resource->setMarker(sorted_marker_sequence);
+							}
+						}
+						// Replace MarkerSequence by sorted MarkerSequence
 						sequence_list.setMarkerSequence(sequence);
 					}
 					else {

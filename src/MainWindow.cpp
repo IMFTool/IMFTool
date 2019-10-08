@@ -358,17 +358,22 @@ bool MainWindow::checkUndoStack() {
 	if(changes == true) {
 		mpMsgBox->setText(tr("There are unsaved changes in the current IMP!"));
 		mpMsgBox->setInformativeText(tr("Do you want to proceed?"));
+/* TODO - does not work properly
 		mpMsgBox->setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel | QMessageBox::SaveAll);
+*/
+		mpMsgBox->setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
 		mpMsgBox->setDefaultButton(QMessageBox::Cancel);
 		mpMsgBox->setIcon(QMessageBox::Warning);
 		int ret = mpMsgBox->exec();
 
 		if(ret == QMessageBox::Cancel)
 			return 1;
+/* TODO - does not work properly
 		else if(ret == QMessageBox::SaveAll) {
 			WritePackage();
 			return 0;
 		}
+*/
 		else {
 			for(int i=0; i<mpUnwrittenCPLs.size(); i++){
 				QFile::remove(mpUnwrittenCPLs.at(i));

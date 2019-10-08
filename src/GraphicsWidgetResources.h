@@ -387,7 +387,7 @@ private:
 	class GraphicsWidgetMarker : public GraphicsObjectVerticalIndicator {
 
 	public:
-		GraphicsWidgetMarker(GraphicsWidgetMarkerResource *pParent, qreal width, qreal height, const MarkerLabel &rLabel, const QColor &rColor);
+		GraphicsWidgetMarker(GraphicsWidgetMarkerResource *pParent, qreal width, qreal height, const MarkerLabel &rLabel, const QColor &rColor, const UserText &rAnnotation = UserText());
 		virtual ~GraphicsWidgetMarker() {}
 		virtual int type() const { return GraphicsWidgetMarkerType; }
 		UserText GetAnnotation() const { return mAnnotation; }
@@ -420,6 +420,7 @@ public:
 	virtual std::auto_ptr<cpl2016::BaseResourceType> Write() const;
 	void SetIntrinsicDuaration(const Duration &rIntrinsicDuration);
 	virtual void RemoveIrrelevantMarkers();
+	void SetAnnotation(QPointF &rPos, int &rIndex, UserText &rAnnotation);
 
 protected:
 	virtual double ResourceErPerCompositionEr(const EditRate &rCompositionEditRate) const;

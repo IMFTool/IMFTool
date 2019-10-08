@@ -23,6 +23,7 @@
 #include <QStyleOptionGraphicsItem>
 #include <QMenu>
 #include <QToolTip>
+#include <QInputDialog>
 #include "JP2K_Preview.h"
 
 AbstractGraphicsWidgetResource::AbstractGraphicsWidgetResource(GraphicsWidgetSequence *pParent, cpl2016::BaseResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/, const QColor &rColor /*= QColor(Qt::white)*/) :
@@ -1586,7 +1587,10 @@ void GraphicsWidgetMarkerResource::InitMarker() {
 	for(unsigned int i = 0; i < r_marker_sequence.size(); i++) {
 		// Create GraphicsWidgetMarker only when marker is on the visible timeline
 		if ((r_marker_sequence.at(i).getOffset() >= entry_point) && (r_marker_sequence.at(i).getOffset() < entry_point+source_duration)) {
-			GraphicsWidgetMarker *p_marker = new GraphicsWidgetMarker(this, 1, boundingRect().height(), ImfXmlHelper::Convert(r_marker_sequence.at(i).getLabel()), QColor(CPL_COLOR_DEFAULT_MARKER));
+			GraphicsWidgetMarker *p_marker = new GraphicsWidgetMarker(this, 1, boundingRect().height(),
+					ImfXmlHelper::Convert(r_marker_sequence.at(i).getLabel()),
+					QColor(CPL_COLOR_DEFAULT_MARKER),
+					r_marker_sequence.at(i).getAnnotation().present() ? ImfXmlHelper::Convert(r_marker_sequence.at(i).getAnnotation().get()) : UserText() );
 			p_marker->setPos((qint64)((r_marker_sequence.at(i).getOffset() - entry_point)/ ResourceErPerCompositionEr(GetCplEditRate())), 1);
 		}
 	}
@@ -1612,12 +1616,37 @@ void GraphicsWidgetMarkerResource::contextMenuEvent(QGraphicsSceneContextMenuEve
 	}
 	QAction *p_delete_marker_action = NULL;
 	if(p_marker != NULL) p_delete_marker_action = menu.addAction(QIcon(":/delete.png"), tr("&Remove Marker"));
+	QAction *p_marker_annotation_action = NULL;
+	if(p_marker != NULL) p_marker_annotation_action = menu.addAction(QIcon(":/edit.png"), tr("&Edit Annotation"));
 	QAction *p_selected_action = menu.exec(pEvent->screenPos());
 
 	if(p_selected_action) {
 		if(p_delete_marker_action && p_selected_action == p_delete_marker_action) {
 			if(GraphicsSceneComposition* p_scene = qobject_cast<GraphicsSceneComposition*>(scene())) p_scene->DelegateCommand(new RemoveMarkerCommand(p_marker, this));
 			else qWarning() << "Couldn't delegate remove marker command.";
+		}
+		else if(p_marker_annotation_action && p_selected_action == p_marker_annotation_action) {
+			if(GraphicsSceneComposition* p_scene = qobject_cast<GraphicsSceneComposition*>(scene())) {
+				GraphicsWidgetMarkerResource::GraphicsWidgetMarker *p_widget_marker = NULL;
+				QPointF position = pEvent->scenePos();
+				int index;
+				QList<QGraphicsItem*> items = scene()->items(pEvent->scenePos());
+				for(int i = 0; i < items.size(); i++) {
+					p_widget_marker = dynamic_cast<GraphicsWidgetMarkerResource::GraphicsWidgetMarker*>(items.at(i));
+					if(p_widget_marker != NULL) {
+				    	index = i;
+						bool ok;
+						QString text = QInputDialog::getText(0, p_widget_marker->GetMarkerLabel().GetLabel(),
+								tr("Edit Annotation:"), QLineEdit::Normal,
+								p_widget_marker->GetAnnotation().first, &ok);
+						if (ok && (p_widget_marker->GetAnnotation() != UserText(text))) {
+					    	p_scene->DelegateCommand(new EditMarkerAnnotationCommand(this, position, index, p_widget_marker->GetAnnotation(), UserText(text)));
+						}
+						break;
+					}
+				}
+			}
+			else qWarning() << "Couldn't delegate edit marker annotation command.";
 		}
 		else {
 			MarkerLabel label = MarkerLabel::GetMarker(p_selected_action->text());
@@ -1736,8 +1765,22 @@ void GraphicsWidgetMarkerResource::RemoveIrrelevantMarkers() {
 	}
 }
 
-GraphicsWidgetMarkerResource::GraphicsWidgetMarker::GraphicsWidgetMarker(GraphicsWidgetMarkerResource *pParent, qreal width, qreal height, const MarkerLabel &rLabel, const QColor &rColor) :
-GraphicsObjectVerticalIndicator(width, height, rColor, pParent), mAnnotation(), mLabel(rLabel) {
+
+void GraphicsWidgetMarkerResource::SetAnnotation(QPointF &rPos, int &rIndex, UserText &rAnnotation) {
+
+	GraphicsWidgetMarkerResource::GraphicsWidgetMarker *p_widget_marker = NULL;
+
+	QList<QGraphicsItem*> items = scene()->items(rPos);
+	if (items.size() > rIndex) {
+		p_widget_marker = dynamic_cast<GraphicsWidgetMarkerResource::GraphicsWidgetMarker*>(items.at(rIndex));
+		if (p_widget_marker) {
+			p_widget_marker->SetAnnotation(rAnnotation);
+		}
+	}
+}
+
+GraphicsWidgetMarkerResource::GraphicsWidgetMarker::GraphicsWidgetMarker(GraphicsWidgetMarkerResource *pParent, qreal width, qreal height, const MarkerLabel &rLabel, const QColor &rColor, const UserText &rAnnotation /*= UserText()*/) :
+GraphicsObjectVerticalIndicator(width, height, rColor, pParent), mAnnotation(rAnnotation), mLabel(rLabel) {
 
 	ShowHead();
 	HideLine();
@@ -1787,6 +1830,7 @@ void GraphicsWidgetMarkerResource::GraphicsWidgetMarker::hoverEnterEvent(QGraphi
 	update();
 	QString tool_tip(QString("[%1]").arg(mLabel.GetLabel()));
 	if(mLabel.IsWellKnown()) tool_tip.append(QString("\n%1").arg(mLabel.GetDescription()));
+	if(!mAnnotation.IsEmpty()) tool_tip.append(QString("\n%1").arg(mAnnotation.first));
 	QToolTip::showText(pEvent->screenPos(), tool_tip);
 }
 

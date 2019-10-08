@@ -34,6 +34,7 @@ Introductory videos are available on YouTube [[2]](#imf-video), [[3]](#imf-video
 -	Ingest of IMF 1.0 (PKL ST 429-8 and CPL ST 2067-3:2013) and IMF 1.1 (PKL ST 2067-2:2016 and CPL ST 2067-3:2016)
 -	Outgest will be IMF 1.1 only
 -	Editing of the ContentVersionList element
+-	Edit Marker Annotations
 
 ## CREDITS
 The development of this tool has kindly been sponsored by Netflix Inc.
@@ -55,7 +56,7 @@ IMF Tool is multi-platform and has been successfully built under Mac OS X 10.10 
 The build system is based on CMake. Please use CMake to create make files and project files for eclipse or Visual Studio. Installation instructions including CMake screenshots are provided as pdf file here.
 Prerequisites:
 -	Qt Version 5.7.0, more recent versions may work
--	NEW: For IAB support, a patched version of asdcplib is required: https://github.com/wruppelx/asdcplib 
+-	NEW: For IAB support, a patched version of asdcplib is required: https://github.com/wruppelx/asdcplib/tree/feature.IAB_ED_Reader
 -	libxsd
 -	Xerces 3.1
 -	Requires OpenJPEG 2.2 (with multi-threading support), available at https://github.com/uclouvain/openjpeg

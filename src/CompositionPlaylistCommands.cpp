@@ -377,6 +377,26 @@ void RemoveMarkerCommand::redo() {
 	mpMarker->setParentItem(NULL); // Gets top level item. Deleted by scene.
 	mIsRedone = true;
 }
+EditMarkerAnnotationCommand::EditMarkerAnnotationCommand(GraphicsWidgetMarkerResource *pResource, QPointF &rPos, int &rIndex, UserText rOldAnnotation, UserText rNewAnnotation, QUndoCommand *pParent /*= NULL*/) :
+		QUndoCommand(pParent), mpResource(pResource), mPos(rPos), mIndex(rIndex), mNewAnnotation(rNewAnnotation), mOldAnnotation(rOldAnnotation), mIsRedone(false) {
+}
+
+EditMarkerAnnotationCommand::~EditMarkerAnnotationCommand() {
+
+}
+
+void EditMarkerAnnotationCommand::undo() {
+
+	mpResource->SetAnnotation(mPos, mIndex, mOldAnnotation);
+	mIsRedone = false;
+}
+
+void EditMarkerAnnotationCommand::redo() {
+
+	mpResource->SetAnnotation(mPos, mIndex, mNewAnnotation);
+	mIsRedone = true;
+}
+
 
 AddTrackDetailsCommand::AddTrackDetailsCommand(AbstractWidgetTrackDetails *pTrackDetails, WidgetComposition *pComposition, int trackIndex, QUndoCommand *pParent /*= NULL*/) :
 QUndoCommand(pParent), mpTrackDetails(pTrackDetails), mpComposition(pComposition), mIndex(trackIndex), mIsRedone(false) {

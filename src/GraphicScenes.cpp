@@ -556,7 +556,7 @@ void GraphicsSceneComposition::ProcessDragMove(DragDropInfo &rInfo, const QPoint
 					}
 					else {
 						get_main_window()->statusBar()->setStyleSheet("QStatusBar{color:red}");
-						get_main_window()->statusBar()->showMessage(tr("Image edit rate mismatch: %1 expected.").arg(GetCplEditRate().GetQuotient(), 0, 'f', 2), 5000);
+						get_main_window()->statusBar()->showMessage(tr("Timed Text sample rate mismatch: %1 expected.").arg(GetCplEditRate().GetQuotient(), 0, 'f', 2), 5000);
 					}
 				}
 
@@ -566,17 +566,18 @@ void GraphicsSceneComposition::ProcessDragMove(DragDropInfo &rInfo, const QPoint
 					}
 					else {
 						get_main_window()->statusBar()->setStyleSheet("QStatusBar{color:red}");
-						get_main_window()->statusBar()->showMessage(tr("Image edit rate mismatch: %1 expected.").arg(GetCplEditRate().GetQuotient(), 0, 'f', 2), 5000);
+						get_main_window()->statusBar()->showMessage(tr("ISXD sample rate mismatch: %1 expected.").arg(GetCplEditRate().GetQuotient(), 0, 'f', 2), 5000);
 					}
 				}
 
 				else if(p_origin_resource->type() == GraphicsWidgetIABResourceType) {
+					// TODO Per 2067-201, the IAB Edit Rate shall be an Integer multiple of the image Edit Rate
 					if(p_origin_resource->GetAsset() && p_origin_resource->GetAsset()->GetEditRate() == GetCplEditRate()) {
 						rInfo.isDropable = true;
 					}
 					else {
 						get_main_window()->statusBar()->setStyleSheet("QStatusBar{color:red}");
-						get_main_window()->statusBar()->showMessage(tr("Image edit rate mismatch: %1 expected.").arg(GetCplEditRate().GetQuotient(), 0, 'f', 2), 5000);
+						get_main_window()->statusBar()->showMessage(tr("IAB sample rate mismatch: %1 expected.").arg(GetCplEditRate().GetQuotient(), 0, 'f', 2), 5000);
 					}
 				}
 

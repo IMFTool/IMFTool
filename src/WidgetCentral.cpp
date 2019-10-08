@@ -283,7 +283,7 @@ void WidgetCentral::rTabCloseRequested(int index) {
 
 	WidgetComposition *p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->widget(index));
 	if(p_composition) {
-		if(p_composition->GetUndoStack() && p_composition->GetUndoStack()->count() > 0) {
+		if(p_composition->GetUndoStack() && !p_composition->GetUndoStack()->isClean()) {
 			mpMsgBox->setText(tr("Save changes?"));
 			mpMsgBox->setInformativeText(tr("The composition has unsaved changes!"));
 			mpMsgBox->setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);

@@ -15,6 +15,7 @@
  */
 #pragma once
 #include "ImfCommon.h"
+#include "ImfPackageCommon.h"
 #include <QUndoCommand>
 
 
@@ -286,6 +287,26 @@ private:
 	GraphicsObjectVerticalIndicator *mpMarker;
 	GraphicsWidgetMarkerResource *mpResource;
 	QPointF mPosition;
+	bool mIsRedone;
+};
+
+
+class EditMarkerAnnotationCommand : public QUndoCommand {
+
+public:
+	EditMarkerAnnotationCommand(GraphicsWidgetMarkerResource *pResource, QPointF &rPos, int &rIndex, UserText rOldAnnotation, UserText rNewAnnotation, QUndoCommand *pParent = NULL);
+	virtual ~EditMarkerAnnotationCommand();
+	virtual void undo();
+	//! Called once when pushed on Undo Stack.
+	virtual void redo();
+
+private:
+	Q_DISABLE_COPY(EditMarkerAnnotationCommand);
+	GraphicsWidgetMarkerResource *mpResource;
+	QPointF mPos;
+	int mIndex;
+	UserText mOldAnnotation;
+	UserText mNewAnnotation;
 	bool mIsRedone;
 };
 
