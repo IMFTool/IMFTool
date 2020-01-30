@@ -90,6 +90,9 @@ Error MetadataExtractor::ReadMetadata(Metadata &rMetadata, const QString &rSourc
 					case ASDCP::ESS_AS02_IAB:
 						error = ReadIABDescriptor(rMetadata, source_file);
 						break;
+					case ASDCP::ESS_AS02_ProRes:
+						error = ReadProResMxfDescriptor(rMetadata, source_file);
+						break;
 					default:
 						break;
 				}
@@ -280,7 +283,6 @@ Error MetadataExtractor::ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileI
 				metadata.pictureEssenceCoding = QString(rgba_descriptor->PictureEssenceCoding.EncodeString(buf, 64)); //WR
 			}
 			  Array<Kumu::UUID>::const_iterator sdi = rgba_descriptor->SubDescriptors.begin();
-			  TargetFrameSubDescriptor* DescObject = NULL;
 			  Result_t result = RESULT_OK;
 			  ASDCP::MXF::OP1aHeader& header = reader.OP1aHeader();
 			  const ASDCP::Dictionary*& dict = reader.AS02IndexReader().m_Dict;
@@ -700,6 +702,142 @@ Error MetadataExtractor::ReadIABDescriptor(Metadata &rMetadata, const QFileInfo 
 			error = Error(result);
 			return error;
 		}
+	}
+	else {
+		error = Error(result);
+		return error;
+	}
+	rMetadata = metadata;
+	return error;
+}
+
+Error MetadataExtractor::ReadProResMxfDescriptor(Metadata &rMetadata, const QFileInfo &rSourceFile) {
+
+	Error error;
+	Metadata metadata(Metadata::ProRes);
+	metadata.fileName = rSourceFile.fileName();
+	metadata.filePath = rSourceFile.filePath();
+	AESDecContext*     p_context = NULL;
+	HMACContext*       p_hmac = NULL;
+	AS_02::ProRes::MXFReader    reader;
+	//JP2K::FrameBuffer  frame_buffer;
+	ui32_t             frame_count = 0;
+
+	Result_t result = reader.OpenRead(rSourceFile.absoluteFilePath().toStdString());
+
+	if(ASDCP_SUCCESS(result)) {
+		WriterInfo writerinfo;
+		result = reader.FillWriterInfo(writerinfo);
+		if(KM_SUCCESS(result)) {
+			char str_buf[16], str_buf2[40];
+			metadata.assetId = convert_uuid((unsigned char*)writerinfo.AssetUUID);
+		}
+
+		ASDCP::MXF::RGBAEssenceDescriptor *rgba_descriptor = NULL;
+		ASDCP::MXF::CDCIEssenceDescriptor *cdci_descriptor = NULL;
+
+		result = reader.OP1aHeader().GetMDObjectByType(DefaultCompositeDict().ul(MDD_RGBAEssenceDescriptor), reinterpret_cast<MXF::InterchangeObject**>(&rgba_descriptor));
+		if(KM_SUCCESS(result) && rgba_descriptor) {
+			if(rgba_descriptor->ContainerDuration.empty() == false) frame_count = rgba_descriptor->ContainerDuration.get();
+			else frame_count = reader.AS02IndexReader().GetDuration();
+		}
+		else {
+			result = reader.OP1aHeader().GetMDObjectByType(DefaultCompositeDict().ul(MDD_CDCIEssenceDescriptor), reinterpret_cast<MXF::InterchangeObject**>(&cdci_descriptor));
+			if(KM_SUCCESS(result) && cdci_descriptor) {
+				if(cdci_descriptor->ContainerDuration.empty() == false) frame_count = cdci_descriptor->ContainerDuration.get();
+				else frame_count = reader.AS02IndexReader().GetDuration();
+			}
+		}
+		if(frame_count == 0) {
+			error = Error(Error::UnknownDuration, QString(), true);
+		}
+		metadata.duration = Duration(frame_count);
+		ASDCP::UL TransferCharacteristic; // (k)
+		ASDCP::UL ColorPrimaries; // (k)
+
+		if(rgba_descriptor) {
+			metadata.colorEncoding = Metadata::RGBA;
+			metadata.editRate = EditRate(rgba_descriptor->SampleRate.Numerator, rgba_descriptor->SampleRate.Denominator);
+			metadata.aspectRatio = rgba_descriptor->AspectRatio;
+			if(rgba_descriptor->DisplayHeight.empty() == false) metadata.displayHeight = rgba_descriptor->DisplayHeight;
+			else if(rgba_descriptor->SampledHeight.empty() == false) metadata.displayHeight = rgba_descriptor->SampledHeight;
+			else metadata.displayHeight = rgba_descriptor->StoredHeight;
+			if(rgba_descriptor->DisplayWidth.empty() == false) metadata.displayWidth = rgba_descriptor->DisplayWidth;
+			else if(rgba_descriptor->SampledWidth.empty() == false) metadata.displayWidth = rgba_descriptor->SampledWidth;
+			else metadata.displayWidth = rgba_descriptor->StoredWidth;
+			metadata.storedHeight = rgba_descriptor->StoredHeight;
+			metadata.storedWidth = rgba_descriptor->StoredWidth;
+			metadata.horizontalSubsampling = 1;
+			metadata.componentDepth = 0;
+			if (rgba_descriptor->PixelLayout.HasValue()) {
+				char buf[64];
+				QString pixel_layout;
+				pixel_layout = QString(rgba_descriptor->PixelLayout.EncodeString(buf, 64)); //WR
+				if (pixel_layout.contains(QRegExp("\\([0-9]*\\)"))) {
+					metadata.componentDepth = pixel_layout.split('(')[1].split(')').first().toInt();
+				}
+			}
+			if (metadata.componentDepth == 0) {
+				// Try deriving from ComponentMaxRef, if present.
+				if(rgba_descriptor->ComponentMaxRef.empty() == false) {
+					metadata.componentDepth = round (log10(rgba_descriptor->ComponentMaxRef.get() + 1) / log10(2.));
+				} else {
+					qDebug() << "WARNING: Pixel Layout and ComponentMaxRef do not contain proper values!";
+				}
+
+			}
+			TransferCharacteristic = rgba_descriptor->TransferCharacteristic; // (k)
+			ColorPrimaries = rgba_descriptor->ColorPrimaries; // (k)
+			if(rgba_descriptor->ComponentMinRef.empty() == false) metadata.componentMinRef = rgba_descriptor->ComponentMinRef;
+			if(rgba_descriptor->ComponentMaxRef.empty() == false) metadata.componentMaxRef = rgba_descriptor->ComponentMaxRef;
+			if (rgba_descriptor->PictureEssenceCoding.HasValue()) {
+				char buf[64];
+				metadata.pictureEssenceCoding = QString(rgba_descriptor->PictureEssenceCoding.EncodeString(buf, 64)); //WR
+			}
+		}
+		else if(cdci_descriptor) {
+			metadata.colorEncoding = Metadata::CDCI;
+			metadata.editRate = EditRate(cdci_descriptor->SampleRate.Numerator, cdci_descriptor->SampleRate.Denominator);
+			metadata.aspectRatio = cdci_descriptor->AspectRatio;
+			if(cdci_descriptor->DisplayHeight.empty() == false) metadata.displayHeight = cdci_descriptor->DisplayHeight;
+			else if(cdci_descriptor->SampledHeight.empty() == false) metadata.displayHeight = cdci_descriptor->SampledHeight;
+			else metadata.displayHeight = cdci_descriptor->StoredHeight;
+			if(cdci_descriptor->DisplayWidth.empty() == false) metadata.displayWidth = cdci_descriptor->DisplayWidth;
+			else if(cdci_descriptor->SampledWidth.empty() == false) metadata.displayWidth = cdci_descriptor->SampledWidth;
+			else metadata.displayWidth = cdci_descriptor->StoredWidth;
+			metadata.storedHeight = cdci_descriptor->StoredHeight;
+			metadata.storedWidth = cdci_descriptor->StoredWidth;
+			metadata.horizontalSubsampling = cdci_descriptor->HorizontalSubsampling;
+			metadata.componentDepth = cdci_descriptor->ComponentDepth;
+			if (cdci_descriptor->PictureEssenceCoding.HasValue()) {
+				char buf[64];
+				metadata.pictureEssenceCoding = QString(cdci_descriptor->PictureEssenceCoding.EncodeString(buf, 64)); //WR
+			}
+			TransferCharacteristic = cdci_descriptor->TransferCharacteristic; // (k)
+			ColorPrimaries = cdci_descriptor->ColorPrimaries; // (k)
+		}
+
+		// (k) - start
+		char buf[64];
+
+		// get ColorPrimaries
+		QString CP;
+		if (ColorPrimaries.HasValue()) {
+
+			CP = ColorPrimaries.EncodeString(buf, 64);
+			CP = CP.toLower(); //.replace(".", "");
+			metadata.colorPrimaries = SMPTE::ColorPrimariesMap[CP];
+		}
+
+		// get TransferCharacteristic
+		QString TC;
+		if (TransferCharacteristic.HasValue()){
+			TC = TransferCharacteristic.EncodeString(buf, 64);
+			TC = TC.toLower(); //.replace(".", "");
+			metadata.transferCharcteristics = SMPTE::TransferCharacteristicMap[TC];
+
+		}
+		// (k) - end
 	}
 	else {
 		error = Error(result);

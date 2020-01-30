@@ -80,6 +80,7 @@ void WizardResourceGenerator::InitLayout() {
 	if (mReadOnly && (mAsset != NULL)) { //Display metadata of existing asset
 		switch(mAsset->GetEssenceType()) {
 		case Metadata::Jpeg2000:
+		case Metadata::ProRes:
 			SwitchMode(eMode::Jpeg2000Mode);
 			break;
 #ifdef APP5_ACES
@@ -370,6 +371,8 @@ void WizardResourceGeneratorPage::InitLayout() {
 			p_wrapper_layout_four->addWidget(new QLabel(SMPTE::vJ2K_Profiles[SMPTE::J2K_ProfilesMap[metadata.pictureEssenceCoding]]), i, 1, 1, 1);
 		else if (SMPTE::ACES_ProfilesMap.contains(metadata.pictureEssenceCoding))
 			p_wrapper_layout_four->addWidget(new QLabel(SMPTE::vACES_Profiles[SMPTE::ACES_ProfilesMap[metadata.pictureEssenceCoding]]), i, 1, 1, 1);
+		else if (SMPTE::ProRes_ProfilesMap.contains(metadata.pictureEssenceCoding))
+			p_wrapper_layout_four->addWidget(new QLabel(SMPTE::vProRes_Profiles[SMPTE::ProRes_ProfilesMap[metadata.pictureEssenceCoding]]), i, 1, 1, 1);
 		else
 			p_wrapper_layout_four->addWidget(new QLabel("Unknown"), ++i, 1, 1, 1);
 		p_wrapper_layout_four->addWidget(new QLabel(tr("Duration:")), ++i, 0, 1, 1);

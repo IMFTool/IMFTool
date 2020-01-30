@@ -834,8 +834,8 @@ void WidgetVideoPreview::rChangeQuality(QAction *action) {
 				decoding_time->setText("loading...");
 			}
 		}
-	}
 #endif
+	}
 }
 
 void WidgetVideoPreview::rChangeProcessing(QAction *action) {
@@ -906,11 +906,18 @@ void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 #endif
 		}
 		break;
-	case 4:
+	case 4: // Show subtitles
 		if (mImfApplication != ::App5) {
 			player->show_subtitles = action->isChecked();
+			this->showTTML = action->isChecked();
 			if (!player->show_subtitles) {
 				emit ttmlChanged(QVector<visibleTTtrack>(), ttml_search_time.elapsed()); // clear subtitle preview
+				mpImagePreview->ttml_regions.clear();
+				mpImagePreview->paintGL();
+			} else {
+				emit ttmlChanged(current_tt, ttml_search_time.elapsed());
+				getTTML();
+				mpImagePreview->paintGL();
 			}
 		}
 #ifdef APP5_ACES

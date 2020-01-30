@@ -131,7 +131,10 @@ static void dbug_msg_handler(QtMsgType type, const QMessageLogContext &rContext,
 }
 
 int main(int argc, char *argv[]) {
-
+#ifdef Q_OS_WIN
+	// Reference: https://doc.qt.io/qt-5/highdpi.html
+	qputenv("QT_AUTO_SCREEN_SCALE_FACTOR", "1");
+#endif
 	QApplication a(argc, argv);
 	a.setApplicationName(PROJECT_NAME);
 	a.setOrganizationName("hsrm");

@@ -56,7 +56,7 @@ IMF Tool is multi-platform and has been successfully built under Mac OS X 10.10 
 The build system is based on CMake. Please use CMake to create make files and project files for eclipse or Visual Studio. Installation instructions including CMake screenshots are provided as pdf file here.
 Prerequisites:
 -	Qt Version 5.7.0, more recent versions may work
--	NEW: For IAB support, a patched version of asdcplib is required: https://github.com/wruppelx/asdcplib/tree/feature.IAB_ED_Reader
+-	NEW: For IAB and ProRes support, a patched version of asdcplib is required: https://github.com/wruppelx/asdcplib/tree/features.IAB.ProRes
 -	libxsd
 -	Xerces 3.1
 -	Requires OpenJPEG 2.2 (with multi-threading support), available at https://github.com/uclouvain/openjpeg

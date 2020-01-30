@@ -905,6 +905,7 @@ void GraphicsSceneComposition::dragEnterEvent(QGraphicsSceneDragDropEvent *pEven
 				AbstractGraphicsWidgetResource *p_resource = NULL;
 				switch(asset->GetEssenceType()) {
 					case Metadata::Jpeg2000:
+					case Metadata::ProRes:
 #ifdef APP5_ACES
 					case Metadata::Aces:
 #endif

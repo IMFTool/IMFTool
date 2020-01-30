@@ -49,6 +49,7 @@ private:
     Error ReadTimedTextMxfDescriptor(Metadata &rMetadata, const QFileInfo &rSourceFile);
     Error ReadIABDescriptor(Metadata &rMetadata, const QFileInfo &rSourceFile);
     Error ReadISXDDescriptor(Metadata &rMetadata, const QFileInfo &rSourceFile);
+    Error ReadProResMxfDescriptor(Metadata &rMetadata, const QFileInfo &rSourceFile);
 	float DurationExtractor(xercesc::DOMDocument *dom_doc, float fr, int tr);
 	float GetElementDuration(xercesc::DOMElement* eleDom, float fr, int tr);
 	float ConvertTimingQStringtoDouble(QString string_time, float fr, int tr);

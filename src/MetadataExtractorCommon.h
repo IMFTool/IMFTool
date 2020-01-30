@@ -42,7 +42,8 @@ public:
 		Pcm,
 		TimedText,
 		IAB,
-		ISXD
+		ISXD,
+		ProRes,
 	};
 
 	enum eColorEncoding {

@@ -56,12 +56,14 @@ QString Metadata::GetAsString() {
 		case Metadata::Aces:
 #endif
 		case Metadata::Jpeg2000:
+		case Metadata::ProRes:
 #ifdef APP5_ACES
 			if(type == Metadata::Aces)										ret.append(QObject::tr("%1").arg("ACES\n"));
 			else if(type == Metadata::Jpeg2000)						ret.append(QObject::tr("%1").arg("JPEG2000\n"));
 #else
 			if(type == Metadata::Jpeg2000)						ret.append(QObject::tr("%1").arg("JPEG2000\n"));
 #endif
+			else if(type == Metadata::ProRes)						ret.append(QObject::tr("%1").arg("ProRes\n"));
 			if(duration.IsValid() && editRate.IsValid())	ret.append(QObject::tr("Duration: %1\n").arg(duration.GetAsString(editRate)));
 			if(editRate.IsValid() == true)								ret.append(QObject::tr("Frame Rate: %1\n").arg(editRate.GetQuotient()));
 			if(storedHeight != 0 || storedWidth != 0)			ret.append(QObject::tr("Stored Resolution: %1 x %2\n").arg(storedWidth).arg(storedHeight));
@@ -141,9 +143,9 @@ void Metadata::GetAsTextDocument(QTextDocument &rDoc) {
 	QFontMetrics font_metrics(rDoc.defaultFont());
 
 #ifdef APP5_ACES
-	if(type == Metadata::Jpeg2000 || type == Metadata::Aces) {
+	if(type == Metadata::Jpeg2000 || type == Metadata::Aces || type == Metadata::ProRes) {
 #else
-	if(type == Metadata::Jpeg2000) {
+	if(type == Metadata::Jpeg2000 || type == Metadata::ProRes) {
 #endif
 
 		QTextTable *table = cursor.insertTable(5, 2, tableFormat);
@@ -152,6 +154,7 @@ void Metadata::GetAsTextDocument(QTextDocument &rDoc) {
 			case Metadata::Aces:																						table->cellAt(0, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Essence Type: %1").arg("ACES"), Qt::ElideRight, column_text_width)); break;
 #endif
 			case Metadata::Jpeg2000:																				table->cellAt(0, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Essence Type: %1").arg("JPEG2000"), Qt::ElideRight, column_text_width)); break;
+			case Metadata::ProRes:																				table->cellAt(0, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Essence Type: %1").arg("ProRes"), Qt::ElideRight, column_text_width)); break;
 			default:																												table->cellAt(0, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Essence Type: Unknown"), Qt::ElideRight, column_text_width)); break;
 		}
 		if(duration.IsValid() && editRate.IsValid())											table->cellAt(0, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Duration: %1").arg(duration.GetAsString(editRate)), Qt::ElideRight, column_text_width));

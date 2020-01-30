@@ -100,6 +100,8 @@ void WidgetImpBrowser::InitLayout() {
 	mpViewImp->setFrameShape(QFrame::NoFrame);
 	mpViewImp->setDragEnabled(true);
 	mpViewImp->setDragDropMode(QAbstractItemView::DragOnly);
+	mpViewImp->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+
 
 	mpViewAssets = new CustomTableView(this);												//Asset Metadata View
 	mpViewAssets->setShowGrid(false);
@@ -1182,6 +1184,7 @@ void WidgetImpBrowser::SetMxfFile(const QStringList &rFiles) {
 					case ASDCP::ESS_AS02_PCM_24b_96k:
 					case ASDCP::ESS_AS02_ISXD:
 					case ASDCP::ESS_AS02_IAB:
+					case ASDCP::ESS_AS02_ProRes:
 						break;
 
 					case ASDCP::ESS_AS02_TIMED_TEXT:

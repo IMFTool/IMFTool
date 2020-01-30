@@ -257,6 +257,11 @@ QToolBar {
     spacing: 3px; /* spacing between items in the tool bar */
 }
 
+QToolBar::separator {
+    background:#2D2D30;
+    border: 0px solid #2D2D30;
+}
+
 QMenuBar {
 	font: 10pt;
 	background-color: #2D2D30;
@@ -383,7 +388,7 @@ QPushButton:default:disabled {
 
 QComboBox:editable {
 	background-color: #333337;
-	padding-left: 2px /*damit text bei einer enitierbaren und nicht editierbaren Combobox übereinander steht*/
+	padding-left: 2px /*damit text bei einer enitierbaren und nicht editierbaren Combobox uebereinander steht*/
 }
 /*
 QComboBox::on {
