@@ -55,7 +55,7 @@ to download the latest binary installers.
 IMF Tool is multi-platform and has been successfully built under Mac OS X 10.10 and 10.11, Windows 7/10 and Linux 64 bit.
 The build system is based on CMake. Please use CMake to create make files and project files for eclipse or Visual Studio. Installation instructions including CMake screenshots are provided as pdf file here.
 Prerequisites:
--	Qt Version 5.7.0, more recent versions may work
+-	Qt Version 5.12, more recent versions may work
 -	NEW: For IAB and ProRes support, a patched version of asdcplib is required: https://github.com/wruppelx/asdcplib/tree/features.IAB.ProRes
 -	libxsd
 -	Xerces 3.1
