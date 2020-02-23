@@ -54,7 +54,8 @@ void WidgetTrackDetailsTimeline::InitLayout() {
 
 	mpTimecodeLabel = new QLabel(this);
 	mpTimecodeLabel->setText(Timecode().GetAsString());
-	QFont font("Monospace");
+	QFont font("Arial");
+	font.setFixedPitch(true);
 	if(font.pointSize() <= -1) font.setPixelSize(font.pixelSize() * 2);
 	else font.setPointSize(font.pointSize() * 2);
 	mpTimecodeLabel->setFont(font);

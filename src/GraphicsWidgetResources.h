@@ -98,7 +98,7 @@ public:
 	void SetEntryPoint(const Duration &rEntryPoint);
 	void SetSourceDuration(const Duration &rSourceDuration);
 	void SetID (QUuid id);
-	virtual std::auto_ptr<cpl2016::BaseResourceType> Write() const = 0;
+	virtual std::unique_ptr<cpl2016::BaseResourceType> Write() const = 0;
 	GraphicsWidgetSequence* GetSequence() const;
 	QColor GetColor() const { return mColor; }
 	//! Should return a copy of this but with different Ids and no parent assigned. The object is not owned by this.
@@ -192,7 +192,7 @@ public:
 	virtual int type() const { return GraphicsWidgetFileResourceType; }
 	QUuid GetTrackFileId() const { return ImfXmlHelper::Convert(static_cast<cpl2016::TrackFileResourceType*>(mpData)->getTrackFileId()); }
 	virtual GraphicsWidgetFileResource* Clone() const;
-	virtual std::auto_ptr<cpl2016::BaseResourceType> Write() const;
+	virtual std::unique_ptr<cpl2016::BaseResourceType> Write() const;
 
 private:
 	Q_DISABLE_COPY(GraphicsWidgetFileResource);
@@ -417,7 +417,7 @@ public:
 	virtual ~GraphicsWidgetMarkerResource() {}
 	virtual int type() const { return GraphicsWidgetMarkerResourceType; }
 	virtual GraphicsWidgetMarkerResource* Clone() const;
-	virtual std::auto_ptr<cpl2016::BaseResourceType> Write() const;
+	virtual std::unique_ptr<cpl2016::BaseResourceType> Write() const;
 	void SetIntrinsicDuaration(const Duration &rIntrinsicDuration);
 	virtual void RemoveIrrelevantMarkers();
 	void SetAnnotation(QPointF &rPos, int &rIndex, UserText &rAnnotation);

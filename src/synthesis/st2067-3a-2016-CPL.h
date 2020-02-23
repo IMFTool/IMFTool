@@ -34,6 +34,10 @@
 #ifndef ST2067_3A_2016_CPL_H
 #define ST2067_3A_2016_CPL_H
 
+#ifndef XSD_CXX11
+#define XSD_CXX11
+#endif
+
 #ifndef XSD_USE_CHAR
 #define XSD_USE_CHAR
 #endif
@@ -239,7 +243,7 @@ namespace xml_schema
   {
     // Automatic pointer for DOMDocument.
     //
-    using ::xsd::cxx::xml::dom::auto_ptr;
+    using ::xsd::cxx::xml::dom::unique_ptr;
 
 #ifndef XSD_CXX_TREE_TREE_NODE_KEY__XML_SCHEMA
 #define XSD_CXX_TREE_TREE_NODE_KEY__XML_SCHEMA
@@ -284,9 +288,10 @@ namespace cpl2016
 }
 
 
-#include <memory>    // ::std::auto_ptr
+#include <memory>    // ::std::unique_ptr
 #include <limits>    // std::numeric_limits
 #include <algorithm> // std::binary_search
+#include <utility>   // std::move
 
 #include <xsd/cxx/xml/char-utf8.hxx>
 
@@ -299,7 +304,7 @@ namespace cpl2016
 
 #include <xsd/cxx/tree/containers-wildcard.hxx>
 
-#include "dcmlTypes.h"
+#include "st0433-dcmlTypes.h"
 
 #include "xmldsig-core-schema.h"
 
@@ -323,7 +328,7 @@ namespace cpl2016
     setId (const IdType& x);
 
     void
-    setId (::std::auto_ptr< IdType > p);
+    setId (::std::unique_ptr< IdType > p);
 
     // Annotation
     //
@@ -344,7 +349,7 @@ namespace cpl2016
     setAnnotation (const AnnotationOptional& x);
 
     void
-    setAnnotation (::std::auto_ptr< AnnotationType > p);
+    setAnnotation (::std::unique_ptr< AnnotationType > p);
 
     // IssueDate
     //
@@ -361,7 +366,7 @@ namespace cpl2016
     setIssueDate (const IssueDateType& x);
 
     void
-    setIssueDate (::std::auto_ptr< IssueDateType > p);
+    setIssueDate (::std::unique_ptr< IssueDateType > p);
 
     // Issuer
     //
@@ -382,7 +387,7 @@ namespace cpl2016
     setIssuer (const IssuerOptional& x);
 
     void
-    setIssuer (::std::auto_ptr< IssuerType > p);
+    setIssuer (::std::unique_ptr< IssuerType > p);
 
     // Creator
     //
@@ -403,7 +408,7 @@ namespace cpl2016
     setCreator (const CreatorOptional& x);
 
     void
-    setCreator (::std::auto_ptr< CreatorType > p);
+    setCreator (::std::unique_ptr< CreatorType > p);
 
     // ContentOriginator
     //
@@ -424,7 +429,7 @@ namespace cpl2016
     setContentOriginator (const ContentOriginatorOptional& x);
 
     void
-    setContentOriginator (::std::auto_ptr< ContentOriginatorType > p);
+    setContentOriginator (::std::unique_ptr< ContentOriginatorType > p);
 
     // ContentTitle
     //
@@ -441,7 +446,7 @@ namespace cpl2016
     setContentTitle (const ContentTitleType& x);
 
     void
-    setContentTitle (::std::auto_ptr< ContentTitleType > p);
+    setContentTitle (::std::unique_ptr< ContentTitleType > p);
 
     // ContentKind
     //
@@ -462,7 +467,7 @@ namespace cpl2016
     setContentKind (const ContentKindOptional& x);
 
     void
-    setContentKind (::std::auto_ptr< ContentKindType > p);
+    setContentKind (::std::unique_ptr< ContentKindType > p);
 
     // ContentVersionList
     //
@@ -483,7 +488,7 @@ namespace cpl2016
     setContentVersionList (const ContentVersionListOptional& x);
 
     void
-    setContentVersionList (::std::auto_ptr< ContentVersionListType > p);
+    setContentVersionList (::std::unique_ptr< ContentVersionListType > p);
 
     // EssenceDescriptorList
     //
@@ -504,7 +509,7 @@ namespace cpl2016
     setEssenceDescriptorList (const EssenceDescriptorListOptional& x);
 
     void
-    setEssenceDescriptorList (::std::auto_ptr< EssenceDescriptorListType > p);
+    setEssenceDescriptorList (::std::unique_ptr< EssenceDescriptorListType > p);
 
     // CompositionTimecode
     //
@@ -525,7 +530,7 @@ namespace cpl2016
     setCompositionTimecode (const CompositionTimecodeOptional& x);
 
     void
-    setCompositionTimecode (::std::auto_ptr< CompositionTimecodeType > p);
+    setCompositionTimecode (::std::unique_ptr< CompositionTimecodeType > p);
 
     // EditRate
     //
@@ -542,7 +547,7 @@ namespace cpl2016
     setEditRate (const EditRateType& x);
 
     void
-    setEditRate (::std::auto_ptr< EditRateType > p);
+    setEditRate (::std::unique_ptr< EditRateType > p);
 
     // TotalRunningTime
     //
@@ -563,7 +568,7 @@ namespace cpl2016
     setTotalRunningTime (const TotalRunningTimeOptional& x);
 
     void
-    setTotalRunningTime (::std::auto_ptr< TotalRunningTimeType > p);
+    setTotalRunningTime (::std::unique_ptr< TotalRunningTimeType > p);
 
     // LocaleList
     //
@@ -584,7 +589,7 @@ namespace cpl2016
     setLocaleList (const LocaleListOptional& x);
 
     void
-    setLocaleList (::std::auto_ptr< LocaleListType > p);
+    setLocaleList (::std::unique_ptr< LocaleListType > p);
 
     // ExtensionProperties
     //
@@ -605,7 +610,7 @@ namespace cpl2016
     setExtensionProperties (const ExtensionPropertiesOptional& x);
 
     void
-    setExtensionProperties (::std::auto_ptr< ExtensionPropertiesType > p);
+    setExtensionProperties (::std::unique_ptr< ExtensionPropertiesType > p);
 
     // SegmentList
     //
@@ -622,7 +627,7 @@ namespace cpl2016
     setSegmentList (const SegmentListType& x);
 
     void
-    setSegmentList (::std::auto_ptr< SegmentListType > p);
+    setSegmentList (::std::unique_ptr< SegmentListType > p);
 
     // Signer
     //
@@ -643,7 +648,7 @@ namespace cpl2016
     setSigner (const SignerOptional& x);
 
     void
-    setSigner (::std::auto_ptr< SignerType > p);
+    setSigner (::std::unique_ptr< SignerType > p);
 
     // Signature
     //
@@ -664,7 +669,7 @@ namespace cpl2016
     setSignature (const SignatureOptional& x);
 
     void
-    setSignature (::std::auto_ptr< SignatureType > p);
+    setSignature (::std::unique_ptr< SignatureType > p);
 
     // Constructors.
     //
@@ -676,9 +681,9 @@ namespace cpl2016
 
     CompositionPlaylistType (const IdType&,
                              const IssueDateType&,
-                             ::std::auto_ptr< ContentTitleType >,
+                             ::std::unique_ptr< ContentTitleType >,
                              const EditRateType&,
-                             ::std::auto_ptr< SegmentListType >);
+                             ::std::unique_ptr< SegmentListType >);
 
     CompositionPlaylistType (const ::xercesc::DOMElement& e,
                              ::xml_schema::Flags f = 0,
@@ -772,7 +777,7 @@ namespace cpl2016
     setTimecodeStartAddress (const TimecodeStartAddressType& x);
 
     void
-    setTimecodeStartAddress (::std::auto_ptr< TimecodeStartAddressType > p);
+    setTimecodeStartAddress (::std::unique_ptr< TimecodeStartAddressType > p);
 
     // Constructors.
     //
@@ -867,7 +872,7 @@ namespace cpl2016
     setScope (const ScopeType& x);
 
     void
-    setScope (::std::auto_ptr< ScopeType > p);
+    setScope (::std::unique_ptr< ScopeType > p);
 
     static const ScopeType&
     getScopeDefaultValue ();
@@ -934,7 +939,7 @@ namespace cpl2016
     setAnnotation (const AnnotationOptional& x);
 
     void
-    setAnnotation (::std::auto_ptr< AnnotationType > p);
+    setAnnotation (::std::unique_ptr< AnnotationType > p);
 
     // LanguageList
     //
@@ -955,7 +960,7 @@ namespace cpl2016
     setLanguageList (const LanguageListOptional& x);
 
     void
-    setLanguageList (::std::auto_ptr< LanguageListType > p);
+    setLanguageList (::std::unique_ptr< LanguageListType > p);
 
     // RegionList
     //
@@ -976,7 +981,7 @@ namespace cpl2016
     setRegionList (const RegionListOptional& x);
 
     void
-    setRegionList (::std::auto_ptr< RegionListType > p);
+    setRegionList (::std::unique_ptr< RegionListType > p);
 
     // ContentMaturityRatingList
     //
@@ -997,7 +1002,7 @@ namespace cpl2016
     setContentMaturityRatingList (const ContentMaturityRatingListOptional& x);
 
     void
-    setContentMaturityRatingList (::std::auto_ptr< ContentMaturityRatingListType > p);
+    setContentMaturityRatingList (::std::unique_ptr< ContentMaturityRatingListType > p);
 
     // Constructors.
     //
@@ -1053,7 +1058,7 @@ namespace cpl2016
     setAgency (const AgencyType& x);
 
     void
-    setAgency (::std::auto_ptr< AgencyType > p);
+    setAgency (::std::unique_ptr< AgencyType > p);
 
     // Rating
     //
@@ -1070,7 +1075,7 @@ namespace cpl2016
     setRating (const RatingType& x);
 
     void
-    setRating (::std::auto_ptr< RatingType > p);
+    setRating (::std::unique_ptr< RatingType > p);
 
     // Audience
     //
@@ -1091,7 +1096,7 @@ namespace cpl2016
     setAudience (const AudienceOptional& x);
 
     void
-    setAudience (::std::auto_ptr< AudienceType > p);
+    setAudience (::std::unique_ptr< AudienceType > p);
 
     // any
     //
@@ -1147,7 +1152,7 @@ namespace cpl2016
            ::xml_schema::Flags);
 
     protected:
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > dom_document_;
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > dom_document_;
 
     ::xsd::cxx::tree::one< AgencyType > Agency_;
     ::xsd::cxx::tree::one< RatingType > Rating_;
@@ -1173,7 +1178,7 @@ namespace cpl2016
     setId (const IdType& x);
 
     void
-    setId (::std::auto_ptr< IdType > p);
+    setId (::std::unique_ptr< IdType > p);
 
     // any
     //
@@ -1228,7 +1233,7 @@ namespace cpl2016
            ::xml_schema::Flags);
 
     protected:
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > dom_document_;
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > dom_document_;
 
     ::xsd::cxx::tree::one< IdType > Id_;
     AnySequence any_;
@@ -1252,7 +1257,7 @@ namespace cpl2016
     setId (const IdType& x);
 
     void
-    setId (::std::auto_ptr< IdType > p);
+    setId (::std::unique_ptr< IdType > p);
 
     // LabelText
     //
@@ -1269,7 +1274,7 @@ namespace cpl2016
     setLabelText (const LabelTextType& x);
 
     void
-    setLabelText (::std::auto_ptr< LabelTextType > p);
+    setLabelText (::std::unique_ptr< LabelTextType > p);
 
     // any
     //
@@ -1300,7 +1305,7 @@ namespace cpl2016
                         const LabelTextType&);
 
     ContentVersionType (const IdType&,
-                        ::std::auto_ptr< LabelTextType >);
+                        ::std::unique_ptr< LabelTextType >);
 
     ContentVersionType (const ::xercesc::DOMElement& e,
                         ::xml_schema::Flags f = 0,
@@ -1328,7 +1333,7 @@ namespace cpl2016
            ::xml_schema::Flags);
 
     protected:
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > dom_document_;
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > dom_document_;
 
     ::xsd::cxx::tree::one< IdType > Id_;
     ::xsd::cxx::tree::one< LabelTextType > LabelText_;
@@ -1353,7 +1358,7 @@ namespace cpl2016
     setId (const IdType& x);
 
     void
-    setId (::std::auto_ptr< IdType > p);
+    setId (::std::unique_ptr< IdType > p);
 
     // Annotation
     //
@@ -1374,7 +1379,7 @@ namespace cpl2016
     setAnnotation (const AnnotationOptional& x);
 
     void
-    setAnnotation (::std::auto_ptr< AnnotationType > p);
+    setAnnotation (::std::unique_ptr< AnnotationType > p);
 
     // SequenceList
     //
@@ -1391,7 +1396,7 @@ namespace cpl2016
     setSequenceList (const SequenceListType& x);
 
     void
-    setSequenceList (::std::auto_ptr< SequenceListType > p);
+    setSequenceList (::std::unique_ptr< SequenceListType > p);
 
     // Constructors.
     //
@@ -1399,7 +1404,7 @@ namespace cpl2016
                  const SequenceListType&);
 
     SegmentType (const IdType&,
-                 ::std::auto_ptr< SequenceListType >);
+                 ::std::unique_ptr< SequenceListType >);
 
     SegmentType (const ::xercesc::DOMElement& e,
                  ::xml_schema::Flags f = 0,
@@ -1450,7 +1455,7 @@ namespace cpl2016
     setId (const IdType& x);
 
     void
-    setId (::std::auto_ptr< IdType > p);
+    setId (::std::unique_ptr< IdType > p);
 
     // TrackId
     //
@@ -1467,7 +1472,7 @@ namespace cpl2016
     setTrackId (const TrackIdType& x);
 
     void
-    setTrackId (::std::auto_ptr< TrackIdType > p);
+    setTrackId (::std::unique_ptr< TrackIdType > p);
 
     // ResourceList
     //
@@ -1484,7 +1489,7 @@ namespace cpl2016
     setResourceList (const ResourceListType& x);
 
     void
-    setResourceList (::std::auto_ptr< ResourceListType > p);
+    setResourceList (::std::unique_ptr< ResourceListType > p);
 
     // Constructors.
     //
@@ -1494,7 +1499,7 @@ namespace cpl2016
 
     SequenceType (const IdType&,
                   const TrackIdType&,
-                  ::std::auto_ptr< ResourceListType >);
+                  ::std::unique_ptr< ResourceListType >);
 
     SequenceType (const ::xercesc::DOMElement& e,
                   ::xml_schema::Flags f = 0,
@@ -1545,7 +1550,7 @@ namespace cpl2016
     setId (const IdType& x);
 
     void
-    setId (::std::auto_ptr< IdType > p);
+    setId (::std::unique_ptr< IdType > p);
 
     // Annotation
     //
@@ -1566,7 +1571,7 @@ namespace cpl2016
     setAnnotation (const AnnotationOptional& x);
 
     void
-    setAnnotation (::std::auto_ptr< AnnotationType > p);
+    setAnnotation (::std::unique_ptr< AnnotationType > p);
 
     // EditRate
     //
@@ -1587,7 +1592,7 @@ namespace cpl2016
     setEditRate (const EditRateOptional& x);
 
     void
-    setEditRate (::std::auto_ptr< EditRateType > p);
+    setEditRate (::std::unique_ptr< EditRateType > p);
 
     // IntrinsicDuration
     //
@@ -1715,7 +1720,7 @@ namespace cpl2016
     setSourceEncoding (const SourceEncodingType& x);
 
     void
-    setSourceEncoding (::std::auto_ptr< SourceEncodingType > p);
+    setSourceEncoding (::std::unique_ptr< SourceEncodingType > p);
 
     // TrackFileId
     //
@@ -1732,7 +1737,7 @@ namespace cpl2016
     setTrackFileId (const TrackFileIdType& x);
 
     void
-    setTrackFileId (::std::auto_ptr< TrackFileIdType > p);
+    setTrackFileId (::std::unique_ptr< TrackFileIdType > p);
 
     // KeyId
     //
@@ -1753,7 +1758,7 @@ namespace cpl2016
     setKeyId (const KeyIdOptional& x);
 
     void
-    setKeyId (::std::auto_ptr< KeyIdType > p);
+    setKeyId (::std::unique_ptr< KeyIdType > p);
 
     // Hash
     //
@@ -1774,7 +1779,7 @@ namespace cpl2016
     setHash (const HashOptional& x);
 
     void
-    setHash (::std::auto_ptr< HashType > p);
+    setHash (::std::unique_ptr< HashType > p);
 
     // HashAlgorithm
     //
@@ -1795,7 +1800,7 @@ namespace cpl2016
     setHashAlgorithm (const HashAlgorithmOptional& x);
 
     void
-    setHashAlgorithm (::std::auto_ptr< HashAlgorithmType > p);
+    setHashAlgorithm (::std::unique_ptr< HashAlgorithmType > p);
 
     // Constructors.
     //
@@ -1913,7 +1918,7 @@ namespace cpl2016
     setAnnotation (const AnnotationOptional& x);
 
     void
-    setAnnotation (::std::auto_ptr< AnnotationType > p);
+    setAnnotation (::std::unique_ptr< AnnotationType > p);
 
     // Label
     //
@@ -1930,7 +1935,7 @@ namespace cpl2016
     setLabel (const LabelType& x);
 
     void
-    setLabel (::std::auto_ptr< LabelType > p);
+    setLabel (::std::unique_ptr< LabelType > p);
 
     // Offset
     //
@@ -1951,7 +1956,7 @@ namespace cpl2016
     MarkerType (const LabelType&,
                 const OffsetType&);
 
-    MarkerType (::std::auto_ptr< LabelType >,
+    MarkerType (::std::unique_ptr< LabelType >,
                 const OffsetType&);
 
     MarkerType (const ::xercesc::DOMElement& e,
@@ -2238,7 +2243,7 @@ namespace cpl2016
            ::xml_schema::Flags);
 
     protected:
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > dom_document_;
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > dom_document_;
 
     AnySequence any_;
   };
@@ -2473,7 +2478,7 @@ namespace cpl2016
     setScope (const ScopeType& x);
 
     void
-    setScope (::std::auto_ptr< ScopeType > p);
+    setScope (::std::unique_ptr< ScopeType > p);
 
     // Constructors.
     //
@@ -2539,7 +2544,7 @@ namespace cpl2016
     setMarkerSequence (const MarkerSequenceOptional& x);
 
     void
-    setMarkerSequence (::std::auto_ptr< MarkerSequenceType > p);
+    setMarkerSequence (::std::unique_ptr< MarkerSequenceType > p);
 
     // any
     //
@@ -2594,7 +2599,7 @@ namespace cpl2016
            ::xml_schema::Flags);
 
     protected:
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > dom_document_;
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > dom_document_;
 
     MarkerSequenceOptional MarkerSequence_;
     AnySequence any_;
@@ -2671,7 +2676,7 @@ namespace cpl2016
     setScope (const ScopeType& x);
 
     void
-    setScope (::std::auto_ptr< ScopeType > p);
+    setScope (::std::unique_ptr< ScopeType > p);
 
     static const ScopeType&
     getScopeDefaultValue ();
@@ -2814,18 +2819,18 @@ namespace cpl2016
   // Parse a URI or a local file.
   //
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (const ::std::string& uri,
                             ::xml_schema::Flags f = 0,
                             const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (const ::std::string& uri,
                             ::xml_schema::ErrorHandler& eh,
                             ::xml_schema::Flags f = 0,
                             const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (const ::std::string& uri,
                             ::xercesc::DOMErrorHandler& eh,
                             ::xml_schema::Flags f = 0,
@@ -2834,37 +2839,37 @@ namespace cpl2016
   // Parse std::istream.
   //
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (::std::istream& is,
                             ::xml_schema::Flags f = 0,
                             const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (::std::istream& is,
                             ::xml_schema::ErrorHandler& eh,
                             ::xml_schema::Flags f = 0,
                             const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (::std::istream& is,
                             ::xercesc::DOMErrorHandler& eh,
                             ::xml_schema::Flags f = 0,
                             const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (::std::istream& is,
                             const ::std::string& id,
                             ::xml_schema::Flags f = 0,
                             const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (::std::istream& is,
                             const ::std::string& id,
                             ::xml_schema::ErrorHandler& eh,
                             ::xml_schema::Flags f = 0,
                             const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (::std::istream& is,
                             const ::std::string& id,
                             ::xercesc::DOMErrorHandler& eh,
@@ -2874,18 +2879,18 @@ namespace cpl2016
   // Parse xercesc::InputSource.
   //
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (::xercesc::InputSource& is,
                             ::xml_schema::Flags f = 0,
                             const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (::xercesc::InputSource& is,
                             ::xml_schema::ErrorHandler& eh,
                             ::xml_schema::Flags f = 0,
                             const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (::xercesc::InputSource& is,
                             ::xercesc::DOMErrorHandler& eh,
                             ::xml_schema::Flags f = 0,
@@ -2894,13 +2899,13 @@ namespace cpl2016
   // Parse xercesc::DOMDocument.
   //
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (const ::xercesc::DOMDocument& d,
                             ::xml_schema::Flags f = 0,
                             const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
-  parseCompositionPlaylist (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d,
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
+  parseCompositionPlaylist (::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d,
                             ::xml_schema::Flags f = 0,
                             const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 }
@@ -2978,7 +2983,7 @@ namespace cpl2016
   // Serialize to a new xercesc::DOMDocument.
   //
 
-  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >
+  ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument >
   serializeCompositionPlaylist (const ::cpl2016::CompositionPlaylistType& x, 
                                 const ::xml_schema::NamespaceInfomap& m = ::xml_schema::NamespaceInfomap (),
                                 ::xml_schema::Flags f = 0);

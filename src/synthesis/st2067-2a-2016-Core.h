@@ -34,6 +34,10 @@
 #ifndef ST2067_2A_2016_CORE_H
 #define ST2067_2A_2016_CORE_H
 
+#ifndef XSD_CXX11
+#define XSD_CXX11
+#endif
+
 #ifndef XSD_USE_CHAR
 #define XSD_USE_CHAR
 #endif
@@ -239,7 +243,7 @@ namespace xml_schema
   {
     // Automatic pointer for DOMDocument.
     //
-    using ::xsd::cxx::xml::dom::auto_ptr;
+    using ::xsd::cxx::xml::dom::unique_ptr;
 
 #ifndef XSD_CXX_TREE_TREE_NODE_KEY__XML_SCHEMA
 #define XSD_CXX_TREE_TREE_NODE_KEY__XML_SCHEMA
@@ -261,9 +265,10 @@ namespace cc2016
 }
 
 
-#include <memory>    // ::std::auto_ptr
+#include <memory>    // ::std::unique_ptr
 #include <limits>    // std::numeric_limits
 #include <algorithm> // std::binary_search
+#include <utility>   // std::move
 
 #include <xsd/cxx/xml/char-utf8.hxx>
 
@@ -278,7 +283,7 @@ namespace cc2016
 
 #include "st2067-3a-2016-CPL.h"
 
-#include "dcmlTypes.h"
+#include "st0433-dcmlTypes.h"
 
 namespace cc2016
 {
@@ -300,7 +305,7 @@ namespace cc2016
     setLeftEye (const LeftEyeType& x);
 
     void
-    setLeftEye (::std::auto_ptr< LeftEyeType > p);
+    setLeftEye (::std::unique_ptr< LeftEyeType > p);
 
     // RightEye
     //
@@ -317,7 +322,7 @@ namespace cc2016
     setRightEye (const RightEyeType& x);
 
     void
-    setRightEye (::std::auto_ptr< RightEyeType > p);
+    setRightEye (::std::unique_ptr< RightEyeType > p);
 
     // Constructors.
     //
@@ -328,8 +333,8 @@ namespace cc2016
 
     StereoImageTrackFileResourceType (const IdType&,
                                       const IntrinsicDurationType&,
-                                      ::std::auto_ptr< LeftEyeType >,
-                                      ::std::auto_ptr< RightEyeType >);
+                                      ::std::unique_ptr< LeftEyeType >,
+                                      ::std::unique_ptr< RightEyeType >);
 
     StereoImageTrackFileResourceType (const ::xercesc::DOMElement& e,
                                       ::xml_schema::Flags f = 0,
@@ -452,7 +457,7 @@ namespace cc2016
     setParentTrackID (const ParentTrackIDType& x);
 
     void
-    setParentTrackID (::std::auto_ptr< ParentTrackIDType > p);
+    setParentTrackID (::std::unique_ptr< ParentTrackIDType > p);
 
     // Constructors.
     //
@@ -463,7 +468,7 @@ namespace cc2016
 
     CDPSequence (const IdType&,
                  const TrackIdType&,
-                 ::std::auto_ptr< ResourceListType >,
+                 ::std::unique_ptr< ResourceListType >,
                  const ParentTrackIDType&);
 
     CDPSequence (const ::xercesc::DOMElement& e,

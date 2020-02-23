@@ -34,6 +34,10 @@
 #ifndef LABELS_REGISTER_H
 #define LABELS_REGISTER_H
 
+#ifndef XSD_CXX11
+#define XSD_CXX11
+#endif
+
 #ifndef XSD_USE_CHAR
 #define XSD_USE_CHAR
 #endif
@@ -239,7 +243,7 @@ namespace xml_schema
   {
     // Automatic pointer for DOMDocument.
     //
-    using ::xsd::cxx::xml::dom::auto_ptr;
+    using ::xsd::cxx::xml::dom::unique_ptr;
 
 #ifndef XSD_CXX_TREE_TREE_NODE_KEY__XML_SCHEMA
 #define XSD_CXX_TREE_TREE_NODE_KEY__XML_SCHEMA
@@ -261,9 +265,10 @@ namespace lr
 }
 
 
-#include <memory>    // ::std::auto_ptr
+#include <memory>    // ::std::unique_ptr
 #include <limits>    // std::numeric_limits
 #include <algorithm> // std::binary_search
+#include <utility>   // std::move
 
 #include <xsd/cxx/xml/char-utf8.hxx>
 
@@ -300,7 +305,7 @@ namespace lr
     setRegister (const RegisterOptional& x);
 
     void
-    setRegister (::std::auto_ptr< RegisterType > p);
+    setRegister (::std::unique_ptr< RegisterType > p);
 
     // NamespaceName
     //
@@ -317,7 +322,7 @@ namespace lr
     setNamespaceName (const NamespaceNameType& x);
 
     void
-    setNamespaceName (::std::auto_ptr< NamespaceNameType > p);
+    setNamespaceName (::std::unique_ptr< NamespaceNameType > p);
 
     // Symbol
     //
@@ -334,7 +339,7 @@ namespace lr
     setSymbol (const SymbolType& x);
 
     void
-    setSymbol (::std::auto_ptr< SymbolType > p);
+    setSymbol (::std::unique_ptr< SymbolType > p);
 
     // UL
     //
@@ -351,7 +356,7 @@ namespace lr
     setUL (const ULType& x);
 
     void
-    setUL (::std::auto_ptr< ULType > p);
+    setUL (::std::unique_ptr< ULType > p);
 
     // Kind
     //
@@ -372,7 +377,7 @@ namespace lr
     setKind (const KindOptional& x);
 
     void
-    setKind (::std::auto_ptr< KindType > p);
+    setKind (::std::unique_ptr< KindType > p);
 
     // Name
     //
@@ -393,7 +398,7 @@ namespace lr
     setName (const NameOptional& x);
 
     void
-    setName (::std::auto_ptr< NameType > p);
+    setName (::std::unique_ptr< NameType > p);
 
     // Definition
     //
@@ -414,7 +419,7 @@ namespace lr
     setDefinition (const DefinitionOptional& x);
 
     void
-    setDefinition (::std::auto_ptr< DefinitionType > p);
+    setDefinition (::std::unique_ptr< DefinitionType > p);
 
     // Applications
     //
@@ -435,7 +440,7 @@ namespace lr
     setApplications (const ApplicationsOptional& x);
 
     void
-    setApplications (::std::auto_ptr< ApplicationsType > p);
+    setApplications (::std::unique_ptr< ApplicationsType > p);
 
     // Notes
     //
@@ -456,7 +461,7 @@ namespace lr
     setNotes (const NotesOptional& x);
 
     void
-    setNotes (::std::auto_ptr< NotesType > p);
+    setNotes (::std::unique_ptr< NotesType > p);
 
     // DefiningDocument
     //
@@ -477,7 +482,7 @@ namespace lr
     setDefiningDocument (const DefiningDocumentOptional& x);
 
     void
-    setDefiningDocument (::std::auto_ptr< DefiningDocumentType > p);
+    setDefiningDocument (::std::unique_ptr< DefiningDocumentType > p);
 
     // IsDeprecated
     //
@@ -561,7 +566,7 @@ namespace lr
     setEntries (const EntriesOptional& x);
 
     void
-    setEntries (::std::auto_ptr< EntriesType > p);
+    setEntries (::std::unique_ptr< EntriesType > p);
 
     // Constructors.
     //
@@ -737,18 +742,18 @@ namespace lr
   // Parse a URI or a local file.
   //
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (const ::std::string& uri,
                        ::xml_schema::Flags f = 0,
                        const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (const ::std::string& uri,
                        ::xml_schema::ErrorHandler& eh,
                        ::xml_schema::Flags f = 0,
                        const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (const ::std::string& uri,
                        ::xercesc::DOMErrorHandler& eh,
                        ::xml_schema::Flags f = 0,
@@ -757,37 +762,37 @@ namespace lr
   // Parse std::istream.
   //
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (::std::istream& is,
                        ::xml_schema::Flags f = 0,
                        const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (::std::istream& is,
                        ::xml_schema::ErrorHandler& eh,
                        ::xml_schema::Flags f = 0,
                        const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (::std::istream& is,
                        ::xercesc::DOMErrorHandler& eh,
                        ::xml_schema::Flags f = 0,
                        const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (::std::istream& is,
                        const ::std::string& id,
                        ::xml_schema::Flags f = 0,
                        const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (::std::istream& is,
                        const ::std::string& id,
                        ::xml_schema::ErrorHandler& eh,
                        ::xml_schema::Flags f = 0,
                        const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (::std::istream& is,
                        const ::std::string& id,
                        ::xercesc::DOMErrorHandler& eh,
@@ -797,18 +802,18 @@ namespace lr
   // Parse xercesc::InputSource.
   //
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (::xercesc::InputSource& is,
                        ::xml_schema::Flags f = 0,
                        const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (::xercesc::InputSource& is,
                        ::xml_schema::ErrorHandler& eh,
                        ::xml_schema::Flags f = 0,
                        const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (::xercesc::InputSource& is,
                        ::xercesc::DOMErrorHandler& eh,
                        ::xml_schema::Flags f = 0,
@@ -817,13 +822,13 @@ namespace lr
   // Parse xercesc::DOMDocument.
   //
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (const ::xercesc::DOMDocument& d,
                        ::xml_schema::Flags f = 0,
                        const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
-  parseLabelsRegister (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d,
+  ::std::unique_ptr< ::lr::LabelsRegister >
+  parseLabelsRegister (::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d,
                        ::xml_schema::Flags f = 0,
                        const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 }
@@ -901,7 +906,7 @@ namespace lr
   // Serialize to a new xercesc::DOMDocument.
   //
 
-  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >
+  ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument >
   serializeLabelsRegister (const ::lr::LabelsRegister& x, 
                            const ::xml_schema::NamespaceInfomap& m = ::xml_schema::NamespaceInfomap (),
                            ::xml_schema::Flags f = 0);

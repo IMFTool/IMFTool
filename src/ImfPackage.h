@@ -15,7 +15,7 @@
  */
 #pragma once
 #include "ImfPackageCommon.h"
-#include "SMPTE-429-8-2014-AM.h"
+#include "SMPTE-429-9-2007-AM.h"
 #include "SMPTE-429-8-2006-PKL.h"
 #include "SMPTE-2067-9a-2018-Sidecar.h"
 #include "MetadataExtractor.h"
@@ -236,7 +236,7 @@ public:
 		unknown
 	};
 	//! Import existing Asset
-	Asset(eAssetType type, const QFileInfo &rFilePath, const am::AssetType &rAsset, std::auto_ptr<pkl2016::AssetType> assetType = std::auto_ptr<pkl2016::AssetType>(NULL));
+	Asset(eAssetType type, const QFileInfo &rFilePath, const am::AssetType &rAsset, std::unique_ptr<pkl2016::AssetType> assetType = nullptr); //std::unique_ptr<pkl2016::AssetType>(NULL));
 	//! Creates new Asset. rFilePath must be the PROSPECTIVE path of the asset (collisions must be avoided). If the asset doesn't exist on the file system when ImfPackage::Outgest() is invoked the asset will be ignored.
 	Asset(eAssetType type, const QFileInfo &rFilePath, const QUuid &rId, const UserText &rAnnotationText = UserText());
 	virtual ~Asset() {}
@@ -251,7 +251,7 @@ public:
 	//! Call this function to receive the Dom Tree for serialization.
 	const am::AssetType& WriteAm();
 	//! Call this function to receive the Dom Tree for serialization.
-	const std::auto_ptr<pkl2016::AssetType>& WritePkl();
+	const std::unique_ptr<pkl2016::AssetType>& WritePkl();
 	QFileInfo GetPath() { return mFilePath; }
 
 	QUuid GetId() const { return ImfXmlHelper::Convert(mAmData.getId()); }
@@ -310,7 +310,7 @@ private:
 	eAssetType										mType;
 	QFileInfo											mFilePath;
 	am::AssetType									mAmData;
-	std::auto_ptr<pkl2016::AssetType>	mpPklData;
+	std::unique_ptr<pkl2016::AssetType>	mpPklData;
 	bool mFileNeedsNewHash;
 	bool mIsOutsidePackage;
 	QColor mColor = QColor(Qt::black); // Font color for IMP browser and timeline view

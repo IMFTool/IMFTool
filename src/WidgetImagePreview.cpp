@@ -18,15 +18,18 @@
 #include <QOpenGLContext>
 #include <QOpenGLFunctions>
 #include <QApplication>
-#include <QDesktopWidget>
+//#include <QDesktopWidget>
+#include <QScreen>
+#include <QGuiApplication>
 #include "openjpeg.h"
 #include <QOpenGLTexture>
 #include <QFileDialog>
 #include <QKeyEvent>
 #include <QWindow>
+#include <QHBoxLayout>
 
 
-WidgetImagePreview::WidgetImagePreview() {
+WidgetImagePreview::WidgetImagePreview(QWidget *pParent /* = nullptr */) : QOpenGLWidget(pParent) {
 
 	InitLayout();
 	Clear();
@@ -49,7 +52,12 @@ void WidgetImagePreview::InitLayout() {
 
 QSize WidgetImagePreview::sizeHint() const {
 
-	QRect size = QApplication::desktop()->availableGeometry();
+	//QScreen *pScreen = this->window()->windowHandle()->screen();
+	//QRect size = pScreen->availableGeometry();
+	QScreen* screen = QGuiApplication::primaryScreen();
+	QRect  size = screen->geometry();
+
+	//QRect size = QApplication::desktop()->availableGeometry();
 	return QSize(size.width() * 0.10, size.width()* 0.10 * 9. / 16.);
 }
 
@@ -74,7 +82,9 @@ bool WidgetImagePreview::hasHeightForWidth() const {
 
 void WidgetImagePreview::resizeGL(int w, int h) {
 
-	px_ratio = QApplication::desktop()->devicePixelRatio();
+	QScreen *pScreen = this->window()->windowHandle()->screen();
+	px_ratio = pScreen->devicePixelRatio();
+	//px_ratio = QApplication::desktop()->devicePixelRatio();
 
 	f = QOpenGLContext::currentContext()->functions();
 	f->glViewport(0, 0, (GLint)w, (GLint)h);
@@ -86,7 +96,9 @@ void WidgetImagePreview::paintGL() {
 	f = QOpenGLContext::currentContext()->functions();
 	f->glClear(GL_COLOR_BUFFER_BIT);
 
-	
+	QScreen *pScreen = this->window()->windowHandle()->screen();
+	px_ratio = pScreen->devicePixelRatio();
+
 	painter.begin(this);
 
 	if(smooth) painter.setRenderHint(QPainter::SmoothPixmapTransform);
@@ -172,10 +184,19 @@ void WidgetImagePreview::paintRegions(QPainter &painter, const QRect rect_viewpo
 	}
 }
 
-void WidgetImagePreview::toggleFullScreen() {
+/*void WidgetImagePreview::toggleFullScreen() {
 
 	if (isFullScreen() == false) {
-		setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
+//		setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
+		setWindowFlags(Qt::FramelessWindowHint
+				| Qt::Tool
+				| Qt::CustomizeWindowHint
+				| Qt::WindowStaysOnTopHint
+//		        | Qt::BypassWindowManagerHint
+		        | Qt::NoDropShadowWindowHint
+//		        | Qt::ToolTip
+				| Qt::Popup
+				);
 		auto const desktop(QApplication::desktop());
 		setGeometry(desktop->screenGeometry(desktop->numScreens() - 1));
 		windowHandle()->setScreen(qApp->screens()[desktop->numScreens() - 1]);
@@ -185,7 +206,31 @@ void WidgetImagePreview::toggleFullScreen() {
 		setWindowFlags(Qt::Widget);
 		showNormal();
 	}
+}*/
+
+void WidgetImagePreview::toggleFullScreen() {
+
+	if (isMaximized() == false) {
+		auto const desktop(QGuiApplication::primaryScreen());
+		setGeometry(desktop->geometry());
+
+		setWindowFlags(Qt::FramelessWindowHint
+				| Qt::Tool
+				| Qt::CustomizeWindowHint
+		        | Qt::BypassWindowManagerHint
+		        | Qt::NoDropShadowWindowHint
+				| Qt::Window
+);
+		windowHandle()->setScreen(desktop);
+		this->showMaximized();
+	}
+	else {
+		setWindowFlags(Qt::Widget
+				);
+		showNormal();
+	}
 }
+
 
 void WidgetImagePreview::initializeGL() {
 
@@ -215,7 +260,8 @@ void WidgetImagePreview::Clear() {
 void WidgetImagePreview::keyPressEvent(QKeyEvent *pEvent) {
 
 	if (pEvent->key() == Qt::Key_Escape) {
-		if (isFullScreen() == true) {
+		//if (isFullScreen() == true) {
+		if (isMaximized() == true) {
 			setWindowFlags(Qt::Widget);
 			showNormal();
 		}

@@ -193,7 +193,7 @@ ImfError ImfPackage::Outgest() {
 					pkl_asset->FileModified();
 				}
 				if (ImfXmlHelper::RemoveWhiteSpaces(mPackingLists.at(i)->GetFilePath().absoluteFilePath()))
-					qDebug() << "Error removong XML whitespaces from " << mPackingLists.at(i)->GetFilePath().absoluteFilePath();
+					qDebug() << "Error removing XML whitespaces from " << mPackingLists.at(i)->GetFilePath().absoluteFilePath();
 			}
 			else break;
 		}
@@ -276,9 +276,9 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 	ImfError error;
 	XmlParsingError parse_error;
 	// ---Parse Asset Map---
-	std::auto_ptr<am::AssetMapType> asset_map;
+	std::unique_ptr<am::AssetMapType> p_asset_map;
 	try {
-		asset_map = am::parseAssetMap(rAssetMapFilePath.absoluteFilePath().toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize);
+		p_asset_map = am::parseAssetMap(rAssetMapFilePath.absoluteFilePath().toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize);
 	}
 	catch(const xml_schema::Parsing &e) { parse_error = XmlParsingError(e); }
 	catch(const xml_schema::ExpectedElement &e) { parse_error = XmlParsingError(e); }
@@ -296,32 +296,31 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 		//WR
 		mpJobQueue->FlushQueue();
 		//WR
-		if(asset_map->getVolumeCount() == 1) {
-			mpAssetMap = new AssetMap(this, rAssetMapFilePath, *asset_map.get()); // add new Asset Map
+		if(p_asset_map->getVolumeCount() == 1) {
+			mpAssetMap = new AssetMap(this, rAssetMapFilePath, *p_asset_map.get()); // add new Asset Map
 			// We must find all Packing Lists.
-			for(unsigned int i = 0; i < asset_map->getAssetList().getAsset().size(); i++) {
-				am::AssetType asset = asset_map->getAssetList().getAsset().at(i);
+			for(unsigned int i = 0; i < p_asset_map->getAssetList().getAsset().size(); i++) {
+				am::AssetType asset = p_asset_map->getAssetList().getAsset().at(i);
 				if(asset.getPackingList().present() && asset.getPackingList().get() == xml_schema::Boolean(true)) {
 					// We found a Packing List.
 					if(asset.getChunkList().getChunk().size() == 1) {
 						QFileInfo packing_list_path = QFileInfo(mRootDir.absolutePath().append("/").append(asset.getChunkList().getChunk().back().getPath().c_str()));
-						qDebug() << QDir::toNativeSeparators(packing_list_path.absoluteFilePath());
 						if(packing_list_path.exists() == true) {
 							// ---Parse Packing List---
-							std::auto_ptr<pkl::PackingListType> packing_list2013;
-							std::auto_ptr<pkl2016::PackingListType> packing_list;
+							std::unique_ptr<pkl::PackingListType> p_packing_list2013;
+							std::unique_ptr<pkl2016::PackingListType> p_packing_list;
 							try {
-								packing_list2013 = (pkl::parsePackingList(QDir::toNativeSeparators(packing_list_path.absoluteFilePath()).toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize));
+								p_packing_list2013 = (pkl::parsePackingList(QDir::toNativeSeparators(packing_list_path.absoluteFilePath()).toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize));
 								qDebug() << "Parsing 2013 PKL";
 							}
 							catch(...) { parse_error = XmlParsingError(XmlParsingError::Unknown); }
 							if(parse_error.IsError() == false) {
-								packing_list = ImfXmlHelper::Convert(packing_list2013);
+								p_packing_list = ImfXmlHelper::Convert(p_packing_list2013);
 								qDebug() << "Success: Parsing 2013 PKL";
 							} else {
 								parse_error = XmlParsingError();
 								try {
-									packing_list = (pkl2016::parsePackingList(QDir::toNativeSeparators(packing_list_path.absoluteFilePath()).toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize));
+									p_packing_list = (pkl2016::parsePackingList(QDir::toNativeSeparators(packing_list_path.absoluteFilePath()).toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize));
 								}
 								catch(const xml_schema::Parsing &e) { parse_error = XmlParsingError(e); }
 								catch(const xml_schema::ExpectedElement &e) { parse_error = XmlParsingError(e); }
@@ -336,23 +335,23 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 							}
 							if(parse_error.IsError() == false) {
 								// XML parsing succeeds
-								PackingList *p_new_packing_list = new PackingList(this, packing_list_path, *packing_list.get()); // add new Packing list
+								PackingList *p_new_packing_list = new PackingList(this, packing_list_path, *p_packing_list.get()); // add new Packing list
 								mPackingLists.push_back(p_new_packing_list);
 								// First add Packing List Asset itself.		
 								AddAsset(QSharedPointer<AssetPkl>(new AssetPkl(packing_list_path, asset)), QUuid()); // PKL Id doesn't matter. It's a new Packing List which cannot be added to an existing PKL.
 								// Add all Assets found in Packing List
-								for(unsigned int i = 0; i < packing_list->getAssetList().getAsset().size(); i++) {
-									pkl2016::AssetType pkl_asset = packing_list->getAssetList().getAsset().at(i);
+								for(unsigned int i = 0; i < p_packing_list->getAssetList().getAsset().size(); i++) {
+									pkl2016::AssetType pkl_asset = p_packing_list->getAssetList().getAsset().at(i);
 									// Find equivalent Asset in Asset Map
-									for(unsigned int ii = 0; ii < asset_map->getAssetList().getAsset().size(); ii++) {
-										am::AssetType am_asset = asset_map->getAssetList().getAsset().at(ii);
+									for(unsigned int ii = 0; ii < p_asset_map->getAssetList().getAsset().size(); ii++) {
+										am::AssetType am_asset = p_asset_map->getAssetList().getAsset().at(ii);
 										if(pkl_asset.getId() == am_asset.getId()) {
 											if(am_asset.getChunkList().getChunk().size() == 1) {
 												QFileInfo new_asset_path = QFileInfo(mRootDir.absolutePath().append("/").append(am_asset.getChunkList().getChunk().back().getPath().c_str()));
 												if(pkl_asset.getType().compare(MIME_TYPE_MXF) == 0) {
 													// Add Asset MXF Track
 													QSharedPointer<AssetMxfTrack> mxf_track(new AssetMxfTrack(new_asset_path, am_asset, pkl_asset));
-													AddAsset(mxf_track, ImfXmlHelper::Convert(packing_list->getId()));
+													AddAsset(mxf_track, ImfXmlHelper::Convert(p_packing_list->getId()));
 													//WR
 													JobExtractEssenceDescriptor *p_ed_job_c = new JobExtractEssenceDescriptor(mxf_track->GetPath().absoluteFilePath());
 													connect(p_ed_job_c, SIGNAL(Result(const DOMDocument*, const QVariant&)), mxf_track.data(), SLOT(SetEssenceDescriptor(const DOMDocument*)));
@@ -366,8 +365,8 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 													bool is_opl = true;
 													bool is_cpl = true;
 													bool is_cpl2013 = true;
-													std::auto_ptr< cpl2016::CompositionPlaylistType> cpl_data;
-													std::auto_ptr< cpl::CompositionPlaylistType> cpl2013_data;
+													std::unique_ptr< cpl2016::CompositionPlaylistType> cpl_data;
+													std::unique_ptr< cpl::CompositionPlaylistType> cpl2013_data;
 													try { cpl_data = cpl2016::parseCompositionPlaylist(new_asset_path.absoluteFilePath().toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize); }
 													catch(...) { is_cpl = false; }
 													try { cpl2013_data = cpl::parseCompositionPlaylist(new_asset_path.absoluteFilePath().toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize); }
@@ -426,15 +425,15 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 													}
 													try { opl::parseOutputProfileList(new_asset_path.absoluteFilePath().toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize); }
 													catch(...) { is_opl = false; }
-													::std::auto_ptr< ::scm::SidecarCompositionMapType> scm;
-													try { scm = scm::parseSidecarCompositionMap(new_asset_path.absoluteFilePath().toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize); }
+													::std::unique_ptr< ::scm::SidecarCompositionMapType> p_scm;
+													try { p_scm = scm::parseSidecarCompositionMap(new_asset_path.absoluteFilePath().toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize); }
 													catch(...) { is_scm = false; }
 													if(is_cpl && !is_opl && !is_scm) {
 														// Add CPL
 														QSharedPointer<AssetCpl> cpl(new AssetCpl(new_asset_path, am_asset, pkl_asset));
-														AddAsset(cpl, ImfXmlHelper::Convert(packing_list->getId()));
+														AddAsset(cpl, ImfXmlHelper::Convert(p_packing_list->getId()));
 														//WR
-														mCplList << *cpl_data;
+														mCplList << *cpl_data.get();
 														mImpEditRates.push_back(ImfXmlHelper::Convert(cpl_data->getEditRate()));
 														qDebug() << "CPL Edit Rate: " << mImpEditRates.last().GetNumerator()  << mImpEditRates.last().GetDenominator();
 														//WR
@@ -442,24 +441,24 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 													else if(is_opl && !is_cpl && !is_scm) {
 														// Add Opl
 														QSharedPointer<AssetOpl> opl(new AssetOpl(new_asset_path, am_asset, pkl_asset));
-														AddAsset(opl, ImfXmlHelper::Convert(packing_list->getId()));
+														AddAsset(opl, ImfXmlHelper::Convert(p_packing_list->getId()));
 													}
 													else if(is_scm && !is_cpl && !is_opl) {
 														// Add Scm
-														QSharedPointer<AssetScm> scm_asset(new AssetScm(new_asset_path, am_asset, pkl_asset, *scm.get()));
-														AddAsset(scm_asset, ImfXmlHelper::Convert(packing_list->getId()));
+														QSharedPointer<AssetScm> scm_asset(new AssetScm(new_asset_path, am_asset, pkl_asset, *std::move(p_scm).get()));
+														AddAsset(scm_asset, ImfXmlHelper::Convert(p_packing_list->getId()));
 														mScmList << scm_asset;
 													}
 													else {
 														// It will be checked below if the unknown asset is a sidecar asset
-														QSharedPointer<Asset> unknown(new Asset(Asset::unknown, new_asset_path, am_asset, std::auto_ptr<pkl2016::AssetType>(new pkl2016::AssetType(pkl_asset))));
-														AddAsset(unknown, ImfXmlHelper::Convert(packing_list->getId()));
+														QSharedPointer<Asset> unknown(new Asset(Asset::unknown, new_asset_path, am_asset, std::unique_ptr<pkl2016::AssetType>(new pkl2016::AssetType(pkl_asset))));
+														AddAsset(unknown, ImfXmlHelper::Convert(p_packing_list->getId()));
 													}
 												}
 												else { // MIME Type neither XML nor MXF
 													// It will be checked below if the unknown asset is a sidecar asset
-													QSharedPointer<Asset> unknown(new Asset(Asset::unknown, new_asset_path, am_asset, std::auto_ptr<pkl2016::AssetType>(new pkl2016::AssetType(pkl_asset))));
-													AddAsset(unknown, ImfXmlHelper::Convert(packing_list->getId()));
+													QSharedPointer<Asset> unknown(new Asset(Asset::unknown, new_asset_path, am_asset, std::unique_ptr<pkl2016::AssetType>(new pkl2016::AssetType(pkl_asset))));
+													AddAsset(unknown, ImfXmlHelper::Convert(p_packing_list->getId()));
 												}
 											}
 											else {
@@ -512,7 +511,6 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 									if (!assetMxfTrack.isNull() && !mImpEditRates.isEmpty()){
 										if (assetMxfTrack->GetEssenceType() == Metadata::TimedText) {
 											if (!assetMxfTrack->GetTimedTextFrameRate().IsValid()) break;  //CPLs arbitrarily expose EssenceType == Metadata::TimedText
-											qDebug() << "Metadata::TimedText" << assetMxfTrack->GetId();
 											assetMxfTrack->SetCplEditRate(mImpEditRates.first());
 											assetMxfTrack->SetEditRate(mImpEditRates.first());
 											if (assetMxfTrack->GetTimedTextFrameRate() != assetMxfTrack->GetEditRate()) {
@@ -1149,8 +1147,8 @@ const pkl2016::PackingListType& PackingList::Write() {
 	mData.setCreator(ImfXmlHelper::Convert(UserText(CREATOR_STRING)));
 	mData.setIssueDate(ImfXmlHelper::Convert(QDateTime::currentDateTimeUtc()));
 	// Remove Signature and Signer. We don't support this.
-	mData.setSignature(std::auto_ptr<ds::SignatureType>(NULL));
-	mData.setSigner(std::auto_ptr<ds::KeyInfoType>(NULL));
+	mData.setSignature(nullptr);
+	mData.setSigner(nullptr);
 	return mData;
 }
 
@@ -1158,10 +1156,10 @@ const pkl2016::PackingListType& PackingList::Write() {
 Asset::Asset(eAssetType type, const QFileInfo &rFilePath, const QUuid &rId, const UserText &rAnnotationText /*= QString()*/) :
 QObject(NULL), mpAssetMap(NULL), mpPackageList(NULL), mType(type), mFilePath(rFilePath),
 mAmData(ImfXmlHelper::Convert(QUuid() /*empty*/), am::AssetType_ChunkListType() /*empty*/),
-mpPklData(NULL), mFileNeedsNewHash(true), mIsOutsidePackage(false) {
+mpPklData(nullptr), mFileNeedsNewHash(true), mIsOutsidePackage(false) {
 
 	if(mType != pkl) {
-		mpPklData = std::auto_ptr<pkl2016::AssetType>(new pkl2016::AssetType(
+		mpPklData = std::unique_ptr<pkl2016::AssetType>(new pkl2016::AssetType(
 			ImfXmlHelper::Convert(QUuid() /*empty*/),
 			ImfXmlHelper::Convert(QByteArray() /*empty*/),
 			xml_schema::PositiveInteger(0) /*empty*/,
@@ -1194,8 +1192,8 @@ mpPklData(NULL), mFileNeedsNewHash(true), mIsOutsidePackage(false) {
 }
 
 // Import existing Asset
-Asset::Asset(eAssetType type, const QFileInfo &rFilePath, const am::AssetType &rAsset, std::auto_ptr<pkl2016::AssetType> assetType /*= std::auto_ptr<pkl2016::AssetType>(NULL)*/) :
-QObject(NULL), mpAssetMap(NULL), mpPackageList(NULL), mType(type), mFilePath(rFilePath), mAmData(rAsset), mpPklData(assetType), mFileNeedsNewHash(false), mIsOutsidePackage(false) {
+Asset::Asset(eAssetType type, const QFileInfo &rFilePath, const am::AssetType &rAsset, std::unique_ptr<pkl2016::AssetType> assetType /* =nullptr */) :
+QObject(NULL), mpAssetMap(NULL), mpPackageList(NULL), mType(type), mFilePath(rFilePath), mAmData(rAsset), mpPklData(std::move(assetType)), mFileNeedsNewHash(false), mIsOutsidePackage(false) {
 
 	connect(this, SIGNAL(AssetModified(Asset*)), this, SLOT(rAssetModified(Asset*)));
 }
@@ -1218,7 +1216,7 @@ const am::AssetType& Asset::WriteAm() {
 	return mAmData;
 }
 
-const std::auto_ptr<pkl2016::AssetType>& Asset::WritePkl() {
+const std::unique_ptr<pkl2016::AssetType>& Asset::WritePkl() {
 
 	return mpPklData;
 }
@@ -1325,7 +1323,7 @@ Asset(Asset::pkl, rFilePath, rId, rAnnotationText) {
 }
 
 AssetCpl::AssetCpl(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl2016::AssetType &rPklAsset) :
-Asset(Asset::cpl, rFilePath, rAmAsset, std::auto_ptr<pkl2016::AssetType>(new pkl2016::AssetType(rPklAsset))) {
+Asset(Asset::cpl, rFilePath, rAmAsset, std::unique_ptr<pkl2016::AssetType>(new pkl2016::AssetType(rPklAsset))) {
 //WR begin
 	mIsNewOrModified = false;
 //WR end
@@ -1341,7 +1339,7 @@ Asset(Asset::cpl, rFilePath, rId, rAnnotationText) {
 }
 
 AssetOpl::AssetOpl(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl2016::AssetType &rPklAsset) :
-Asset(Asset::opl, rFilePath, rAmAsset, std::auto_ptr<pkl2016::AssetType>(new pkl2016::AssetType(rPklAsset))) {
+Asset(Asset::opl, rFilePath, rAmAsset, std::unique_ptr<pkl2016::AssetType>(new pkl2016::AssetType(rPklAsset))) {
 
 }
 
@@ -1351,7 +1349,7 @@ Asset(Asset::opl, rFilePath, rId, rAnnotationText) {
 }
 
 AssetMxfTrack::AssetMxfTrack(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl2016::AssetType &rPklAsset) :
-Asset(Asset::mxf, rFilePath, rAmAsset, std::auto_ptr<pkl2016::AssetType>(new pkl2016::AssetType(rPklAsset))), mMetadata(), mSourceFiles(), mFirstProxyImage(), mMetadataExtr() {
+Asset(Asset::mxf, rFilePath, rAmAsset, std::unique_ptr<pkl2016::AssetType>(new pkl2016::AssetType(rPklAsset))), mMetadata(), mSourceFiles(), mFirstProxyImage(), mMetadataExtr() {
 	mMetadataExtr.ReadMetadata(mMetadata, rFilePath.absoluteFilePath());
 	SetDefaultProxyImages();
 	//WR begin
@@ -1695,7 +1693,7 @@ void AssetMxfTrack::SetEssenceDescriptor(const DOMDocument* dom_result) {
 }
 //! Import SCM.
 AssetScm::AssetScm(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl2016::AssetType &rPklAsset, const scm::SidecarCompositionMapType &rSidecarCompositionMap) :
-Asset(Asset::scm, rFilePath, rAmAsset, std::auto_ptr<pkl2016::AssetType>(new pkl2016::AssetType(rPklAsset))), mIsNew(false), mData(rSidecarCompositionMap) {
+Asset(Asset::scm, rFilePath, rAmAsset, std::unique_ptr<pkl2016::AssetType>(new pkl2016::AssetType(rPklAsset))), mIsNew(false), mData(rSidecarCompositionMap) {
 
 		//mData.setProperties(scm::SidecarCompositionMapType_PropertiesType());
 		if(mData.getSigner().present() == true) qWarning() << "Signer is in Packing List not supported.";
@@ -1741,8 +1739,8 @@ const scm::SidecarCompositionMapType& AssetScm::WriteScm() {
 	// Update values before serialization.
 	mData.getProperties().setIssueDate(ImfXmlHelper::Convert(QDateTime::currentDateTimeUtc()));
 	// Remove Signature and Signer. We don't support this.
-	mData.setSignature(std::auto_ptr<ds::SignatureType>(NULL));
-	mData.setSigner(std::auto_ptr<ds::KeyInfoType>(NULL));
+	mData.setSignature(nullptr);
+	mData.setSigner(nullptr);
 	return mData;
 }
 
@@ -1760,12 +1758,12 @@ bool AssetScm::AddSidecarCompositionMapEntry(const SidecarCompositionMapEntry &r
 
 
 AssetSidecar::AssetSidecar(const QFileInfo &rFilePath, const am::AssetType &rAmAsset, const pkl2016::AssetType &rPklAsset) :
-Asset(Asset::sidecar, rFilePath, rAmAsset, std::auto_ptr<pkl2016::AssetType>(new pkl2016::AssetType(rPklAsset))) {
+Asset(Asset::sidecar, rFilePath, rAmAsset, std::unique_ptr<pkl2016::AssetType>(new pkl2016::AssetType(rPklAsset))), mIsNew(false) {
 
 }
 
 AssetSidecar::AssetSidecar(const QFileInfo &rFilePath, const QUuid &rId, const UserText &rAnnotationText /*= QString()*/) :
-Asset(Asset::sidecar, rFilePath, rId, rAnnotationText) {
+Asset(Asset::sidecar, rFilePath, rId, rAnnotationText), mIsNew(false) {
 
 }
 

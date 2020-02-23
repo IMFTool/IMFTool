@@ -64,9 +64,9 @@ namespace cpl2016
   }
 
   void CompositionPlaylistType::
-  setId (::std::auto_ptr< IdType > x)
+  setId (::std::unique_ptr< IdType > x)
   {
-    this->Id_.set (x);
+    this->Id_.set (std::move (x));
   }
 
   const CompositionPlaylistType::AnnotationOptional& CompositionPlaylistType::
@@ -94,9 +94,9 @@ namespace cpl2016
   }
 
   void CompositionPlaylistType::
-  setAnnotation (::std::auto_ptr< AnnotationType > x)
+  setAnnotation (::std::unique_ptr< AnnotationType > x)
   {
-    this->Annotation_.set (x);
+    this->Annotation_.set (std::move (x));
   }
 
   const CompositionPlaylistType::IssueDateType& CompositionPlaylistType::
@@ -118,9 +118,9 @@ namespace cpl2016
   }
 
   void CompositionPlaylistType::
-  setIssueDate (::std::auto_ptr< IssueDateType > x)
+  setIssueDate (::std::unique_ptr< IssueDateType > x)
   {
-    this->IssueDate_.set (x);
+    this->IssueDate_.set (std::move (x));
   }
 
   const CompositionPlaylistType::IssuerOptional& CompositionPlaylistType::
@@ -148,9 +148,9 @@ namespace cpl2016
   }
 
   void CompositionPlaylistType::
-  setIssuer (::std::auto_ptr< IssuerType > x)
+  setIssuer (::std::unique_ptr< IssuerType > x)
   {
-    this->Issuer_.set (x);
+    this->Issuer_.set (std::move (x));
   }
 
   const CompositionPlaylistType::CreatorOptional& CompositionPlaylistType::
@@ -178,9 +178,9 @@ namespace cpl2016
   }
 
   void CompositionPlaylistType::
-  setCreator (::std::auto_ptr< CreatorType > x)
+  setCreator (::std::unique_ptr< CreatorType > x)
   {
-    this->Creator_.set (x);
+    this->Creator_.set (std::move (x));
   }
 
   const CompositionPlaylistType::ContentOriginatorOptional& CompositionPlaylistType::
@@ -208,9 +208,9 @@ namespace cpl2016
   }
 
   void CompositionPlaylistType::
-  setContentOriginator (::std::auto_ptr< ContentOriginatorType > x)
+  setContentOriginator (::std::unique_ptr< ContentOriginatorType > x)
   {
-    this->ContentOriginator_.set (x);
+    this->ContentOriginator_.set (std::move (x));
   }
 
   const CompositionPlaylistType::ContentTitleType& CompositionPlaylistType::
@@ -232,9 +232,9 @@ namespace cpl2016
   }
 
   void CompositionPlaylistType::
-  setContentTitle (::std::auto_ptr< ContentTitleType > x)
+  setContentTitle (::std::unique_ptr< ContentTitleType > x)
   {
-    this->ContentTitle_.set (x);
+    this->ContentTitle_.set (std::move (x));
   }
 
   const CompositionPlaylistType::ContentKindOptional& CompositionPlaylistType::
@@ -262,9 +262,9 @@ namespace cpl2016
   }
 
   void CompositionPlaylistType::
-  setContentKind (::std::auto_ptr< ContentKindType > x)
+  setContentKind (::std::unique_ptr< ContentKindType > x)
   {
-    this->ContentKind_.set (x);
+    this->ContentKind_.set (std::move (x));
   }
 
   const CompositionPlaylistType::ContentVersionListOptional& CompositionPlaylistType::
@@ -292,9 +292,9 @@ namespace cpl2016
   }
 
   void CompositionPlaylistType::
-  setContentVersionList (::std::auto_ptr< ContentVersionListType > x)
+  setContentVersionList (::std::unique_ptr< ContentVersionListType > x)
   {
-    this->ContentVersionList_.set (x);
+    this->ContentVersionList_.set (std::move (x));
   }
 
   const CompositionPlaylistType::EssenceDescriptorListOptional& CompositionPlaylistType::
@@ -322,9 +322,9 @@ namespace cpl2016
   }
 
   void CompositionPlaylistType::
-  setEssenceDescriptorList (::std::auto_ptr< EssenceDescriptorListType > x)
+  setEssenceDescriptorList (::std::unique_ptr< EssenceDescriptorListType > x)
   {
-    this->EssenceDescriptorList_.set (x);
+    this->EssenceDescriptorList_.set (std::move (x));
   }
 
   const CompositionPlaylistType::CompositionTimecodeOptional& CompositionPlaylistType::
@@ -352,9 +352,9 @@ namespace cpl2016
   }
 
   void CompositionPlaylistType::
-  setCompositionTimecode (::std::auto_ptr< CompositionTimecodeType > x)
+  setCompositionTimecode (::std::unique_ptr< CompositionTimecodeType > x)
   {
-    this->CompositionTimecode_.set (x);
+    this->CompositionTimecode_.set (std::move (x));
   }
 
   const CompositionPlaylistType::EditRateType& CompositionPlaylistType::
@@ -376,9 +376,9 @@ namespace cpl2016
   }
 
   void CompositionPlaylistType::
-  setEditRate (::std::auto_ptr< EditRateType > x)
+  setEditRate (::std::unique_ptr< EditRateType > x)
   {
-    this->EditRate_.set (x);
+    this->EditRate_.set (std::move (x));
   }
 
   const CompositionPlaylistType::TotalRunningTimeOptional& CompositionPlaylistType::
@@ -406,9 +406,9 @@ namespace cpl2016
   }
 
   void CompositionPlaylistType::
-  setTotalRunningTime (::std::auto_ptr< TotalRunningTimeType > x)
+  setTotalRunningTime (::std::unique_ptr< TotalRunningTimeType > x)
   {
-    this->TotalRunningTime_.set (x);
+    this->TotalRunningTime_.set (std::move (x));
   }
 
   const CompositionPlaylistType::LocaleListOptional& CompositionPlaylistType::
@@ -436,9 +436,9 @@ namespace cpl2016
   }
 
   void CompositionPlaylistType::
-  setLocaleList (::std::auto_ptr< LocaleListType > x)
+  setLocaleList (::std::unique_ptr< LocaleListType > x)
   {
-    this->LocaleList_.set (x);
+    this->LocaleList_.set (std::move (x));
   }
 
   const CompositionPlaylistType::ExtensionPropertiesOptional& CompositionPlaylistType::
@@ -466,9 +466,9 @@ namespace cpl2016
   }
 
   void CompositionPlaylistType::
-  setExtensionProperties (::std::auto_ptr< ExtensionPropertiesType > x)
+  setExtensionProperties (::std::unique_ptr< ExtensionPropertiesType > x)
   {
-    this->ExtensionProperties_.set (x);
+    this->ExtensionProperties_.set (std::move (x));
   }
 
   const CompositionPlaylistType::SegmentListType& CompositionPlaylistType::
@@ -490,9 +490,9 @@ namespace cpl2016
   }
 
   void CompositionPlaylistType::
-  setSegmentList (::std::auto_ptr< SegmentListType > x)
+  setSegmentList (::std::unique_ptr< SegmentListType > x)
   {
-    this->SegmentList_.set (x);
+    this->SegmentList_.set (std::move (x));
   }
 
   const CompositionPlaylistType::SignerOptional& CompositionPlaylistType::
@@ -520,9 +520,9 @@ namespace cpl2016
   }
 
   void CompositionPlaylistType::
-  setSigner (::std::auto_ptr< SignerType > x)
+  setSigner (::std::unique_ptr< SignerType > x)
   {
-    this->Signer_.set (x);
+    this->Signer_.set (std::move (x));
   }
 
   const CompositionPlaylistType::SignatureOptional& CompositionPlaylistType::
@@ -550,9 +550,9 @@ namespace cpl2016
   }
 
   void CompositionPlaylistType::
-  setSignature (::std::auto_ptr< SignatureType > x)
+  setSignature (::std::unique_ptr< SignatureType > x)
   {
-    this->Signature_.set (x);
+    this->Signature_.set (std::move (x));
   }
 
 
@@ -614,9 +614,9 @@ namespace cpl2016
   }
 
   void CompositionTimecodeType::
-  setTimecodeStartAddress (::std::auto_ptr< TimecodeStartAddressType > x)
+  setTimecodeStartAddress (::std::unique_ptr< TimecodeStartAddressType > x)
   {
-    this->TimecodeStartAddress_.set (x);
+    this->TimecodeStartAddress_.set (std::move (x));
   }
 
 
@@ -646,9 +646,9 @@ namespace cpl2016
   }
 
   void ContentKindType::
-  setScope (::std::auto_ptr< ScopeType > x)
+  setScope (::std::unique_ptr< ScopeType > x)
   {
-    this->scope_.set (x);
+    this->scope_.set (std::move (x));
   }
 
   const ContentKindType::ScopeType& ContentKindType::
@@ -686,9 +686,9 @@ namespace cpl2016
   }
 
   void LocaleType::
-  setAnnotation (::std::auto_ptr< AnnotationType > x)
+  setAnnotation (::std::unique_ptr< AnnotationType > x)
   {
-    this->Annotation_.set (x);
+    this->Annotation_.set (std::move (x));
   }
 
   const LocaleType::LanguageListOptional& LocaleType::
@@ -716,9 +716,9 @@ namespace cpl2016
   }
 
   void LocaleType::
-  setLanguageList (::std::auto_ptr< LanguageListType > x)
+  setLanguageList (::std::unique_ptr< LanguageListType > x)
   {
-    this->LanguageList_.set (x);
+    this->LanguageList_.set (std::move (x));
   }
 
   const LocaleType::RegionListOptional& LocaleType::
@@ -746,9 +746,9 @@ namespace cpl2016
   }
 
   void LocaleType::
-  setRegionList (::std::auto_ptr< RegionListType > x)
+  setRegionList (::std::unique_ptr< RegionListType > x)
   {
-    this->RegionList_.set (x);
+    this->RegionList_.set (std::move (x));
   }
 
   const LocaleType::ContentMaturityRatingListOptional& LocaleType::
@@ -776,9 +776,9 @@ namespace cpl2016
   }
 
   void LocaleType::
-  setContentMaturityRatingList (::std::auto_ptr< ContentMaturityRatingListType > x)
+  setContentMaturityRatingList (::std::unique_ptr< ContentMaturityRatingListType > x)
   {
-    this->ContentMaturityRatingList_.set (x);
+    this->ContentMaturityRatingList_.set (std::move (x));
   }
 
 
@@ -804,9 +804,9 @@ namespace cpl2016
   }
 
   void ContentMaturityRatingType::
-  setAgency (::std::auto_ptr< AgencyType > x)
+  setAgency (::std::unique_ptr< AgencyType > x)
   {
-    this->Agency_.set (x);
+    this->Agency_.set (std::move (x));
   }
 
   const ContentMaturityRatingType::RatingType& ContentMaturityRatingType::
@@ -828,9 +828,9 @@ namespace cpl2016
   }
 
   void ContentMaturityRatingType::
-  setRating (::std::auto_ptr< RatingType > x)
+  setRating (::std::unique_ptr< RatingType > x)
   {
-    this->Rating_.set (x);
+    this->Rating_.set (std::move (x));
   }
 
   const ContentMaturityRatingType::AudienceOptional& ContentMaturityRatingType::
@@ -858,9 +858,9 @@ namespace cpl2016
   }
 
   void ContentMaturityRatingType::
-  setAudience (::std::auto_ptr< AudienceType > x)
+  setAudience (::std::unique_ptr< AudienceType > x)
   {
-    this->Audience_.set (x);
+    this->Audience_.set (std::move (x));
   }
 
   const ContentMaturityRatingType::AnySequence& ContentMaturityRatingType::
@@ -916,9 +916,9 @@ namespace cpl2016
   }
 
   void EssenceDescriptorBaseType::
-  setId (::std::auto_ptr< IdType > x)
+  setId (::std::unique_ptr< IdType > x)
   {
-    this->Id_.set (x);
+    this->Id_.set (std::move (x));
   }
 
   const EssenceDescriptorBaseType::AnySequence& EssenceDescriptorBaseType::
@@ -974,9 +974,9 @@ namespace cpl2016
   }
 
   void ContentVersionType::
-  setId (::std::auto_ptr< IdType > x)
+  setId (::std::unique_ptr< IdType > x)
   {
-    this->Id_.set (x);
+    this->Id_.set (std::move (x));
   }
 
   const ContentVersionType::LabelTextType& ContentVersionType::
@@ -998,9 +998,9 @@ namespace cpl2016
   }
 
   void ContentVersionType::
-  setLabelText (::std::auto_ptr< LabelTextType > x)
+  setLabelText (::std::unique_ptr< LabelTextType > x)
   {
-    this->LabelText_.set (x);
+    this->LabelText_.set (std::move (x));
   }
 
   const ContentVersionType::AnySequence& ContentVersionType::
@@ -1056,9 +1056,9 @@ namespace cpl2016
   }
 
   void SegmentType::
-  setId (::std::auto_ptr< IdType > x)
+  setId (::std::unique_ptr< IdType > x)
   {
-    this->Id_.set (x);
+    this->Id_.set (std::move (x));
   }
 
   const SegmentType::AnnotationOptional& SegmentType::
@@ -1086,9 +1086,9 @@ namespace cpl2016
   }
 
   void SegmentType::
-  setAnnotation (::std::auto_ptr< AnnotationType > x)
+  setAnnotation (::std::unique_ptr< AnnotationType > x)
   {
-    this->Annotation_.set (x);
+    this->Annotation_.set (std::move (x));
   }
 
   const SegmentType::SequenceListType& SegmentType::
@@ -1110,9 +1110,9 @@ namespace cpl2016
   }
 
   void SegmentType::
-  setSequenceList (::std::auto_ptr< SequenceListType > x)
+  setSequenceList (::std::unique_ptr< SequenceListType > x)
   {
-    this->SequenceList_.set (x);
+    this->SequenceList_.set (std::move (x));
   }
 
 
@@ -1138,9 +1138,9 @@ namespace cpl2016
   }
 
   void SequenceType::
-  setId (::std::auto_ptr< IdType > x)
+  setId (::std::unique_ptr< IdType > x)
   {
-    this->Id_.set (x);
+    this->Id_.set (std::move (x));
   }
 
   const SequenceType::TrackIdType& SequenceType::
@@ -1162,9 +1162,9 @@ namespace cpl2016
   }
 
   void SequenceType::
-  setTrackId (::std::auto_ptr< TrackIdType > x)
+  setTrackId (::std::unique_ptr< TrackIdType > x)
   {
-    this->TrackId_.set (x);
+    this->TrackId_.set (std::move (x));
   }
 
   const SequenceType::ResourceListType& SequenceType::
@@ -1186,9 +1186,9 @@ namespace cpl2016
   }
 
   void SequenceType::
-  setResourceList (::std::auto_ptr< ResourceListType > x)
+  setResourceList (::std::unique_ptr< ResourceListType > x)
   {
-    this->ResourceList_.set (x);
+    this->ResourceList_.set (std::move (x));
   }
 
 
@@ -1214,9 +1214,9 @@ namespace cpl2016
   }
 
   void BaseResourceType::
-  setId (::std::auto_ptr< IdType > x)
+  setId (::std::unique_ptr< IdType > x)
   {
-    this->Id_.set (x);
+    this->Id_.set (std::move (x));
   }
 
   const BaseResourceType::AnnotationOptional& BaseResourceType::
@@ -1244,9 +1244,9 @@ namespace cpl2016
   }
 
   void BaseResourceType::
-  setAnnotation (::std::auto_ptr< AnnotationType > x)
+  setAnnotation (::std::unique_ptr< AnnotationType > x)
   {
-    this->Annotation_.set (x);
+    this->Annotation_.set (std::move (x));
   }
 
   const BaseResourceType::EditRateOptional& BaseResourceType::
@@ -1274,9 +1274,9 @@ namespace cpl2016
   }
 
   void BaseResourceType::
-  setEditRate (::std::auto_ptr< EditRateType > x)
+  setEditRate (::std::unique_ptr< EditRateType > x)
   {
-    this->EditRate_.set (x);
+    this->EditRate_.set (std::move (x));
   }
 
   const BaseResourceType::IntrinsicDurationType& BaseResourceType::
@@ -1392,9 +1392,9 @@ namespace cpl2016
   }
 
   void TrackFileResourceType::
-  setSourceEncoding (::std::auto_ptr< SourceEncodingType > x)
+  setSourceEncoding (::std::unique_ptr< SourceEncodingType > x)
   {
-    this->SourceEncoding_.set (x);
+    this->SourceEncoding_.set (std::move (x));
   }
 
   const TrackFileResourceType::TrackFileIdType& TrackFileResourceType::
@@ -1416,9 +1416,9 @@ namespace cpl2016
   }
 
   void TrackFileResourceType::
-  setTrackFileId (::std::auto_ptr< TrackFileIdType > x)
+  setTrackFileId (::std::unique_ptr< TrackFileIdType > x)
   {
-    this->TrackFileId_.set (x);
+    this->TrackFileId_.set (std::move (x));
   }
 
   const TrackFileResourceType::KeyIdOptional& TrackFileResourceType::
@@ -1446,9 +1446,9 @@ namespace cpl2016
   }
 
   void TrackFileResourceType::
-  setKeyId (::std::auto_ptr< KeyIdType > x)
+  setKeyId (::std::unique_ptr< KeyIdType > x)
   {
-    this->KeyId_.set (x);
+    this->KeyId_.set (std::move (x));
   }
 
   const TrackFileResourceType::HashOptional& TrackFileResourceType::
@@ -1476,9 +1476,9 @@ namespace cpl2016
   }
 
   void TrackFileResourceType::
-  setHash (::std::auto_ptr< HashType > x)
+  setHash (::std::unique_ptr< HashType > x)
   {
-    this->Hash_.set (x);
+    this->Hash_.set (std::move (x));
   }
 
   const TrackFileResourceType::HashAlgorithmOptional& TrackFileResourceType::
@@ -1506,9 +1506,9 @@ namespace cpl2016
   }
 
   void TrackFileResourceType::
-  setHashAlgorithm (::std::auto_ptr< HashAlgorithmType > x)
+  setHashAlgorithm (::std::unique_ptr< HashAlgorithmType > x)
   {
-    this->HashAlgorithm_.set (x);
+    this->HashAlgorithm_.set (std::move (x));
   }
 
 
@@ -1562,9 +1562,9 @@ namespace cpl2016
   }
 
   void MarkerType::
-  setAnnotation (::std::auto_ptr< AnnotationType > x)
+  setAnnotation (::std::unique_ptr< AnnotationType > x)
   {
-    this->Annotation_.set (x);
+    this->Annotation_.set (std::move (x));
   }
 
   const MarkerType::LabelType& MarkerType::
@@ -1586,9 +1586,9 @@ namespace cpl2016
   }
 
   void MarkerType::
-  setLabel (::std::auto_ptr< LabelType > x)
+  setLabel (::std::unique_ptr< LabelType > x)
   {
-    this->Label_.set (x);
+    this->Label_.set (std::move (x));
   }
 
   const MarkerType::OffsetType& MarkerType::
@@ -1824,9 +1824,9 @@ namespace cpl2016
   }
 
   void ContentMaturityRatingType_AudienceType::
-  setScope (::std::auto_ptr< ScopeType > x)
+  setScope (::std::unique_ptr< ScopeType > x)
   {
-    this->scope_.set (x);
+    this->scope_.set (std::move (x));
   }
 
 
@@ -1858,9 +1858,9 @@ namespace cpl2016
   }
 
   void SegmentType_SequenceListType::
-  setMarkerSequence (::std::auto_ptr< MarkerSequenceType > x)
+  setMarkerSequence (::std::unique_ptr< MarkerSequenceType > x)
   {
-    this->MarkerSequence_.set (x);
+    this->MarkerSequence_.set (std::move (x));
   }
 
   const SegmentType_SequenceListType::AnySequence& SegmentType_SequenceListType::
@@ -1938,9 +1938,9 @@ namespace cpl2016
   }
 
   void MarkerType_LabelType::
-  setScope (::std::auto_ptr< ScopeType > x)
+  setScope (::std::unique_ptr< ScopeType > x)
   {
-    this->scope_.set (x);
+    this->scope_.set (std::move (x));
   }
 
   const MarkerType_LabelType::ScopeType& MarkerType_LabelType::
@@ -1999,9 +1999,9 @@ namespace cpl2016
   CompositionPlaylistType::
   CompositionPlaylistType (const IdType& Id,
                            const IssueDateType& IssueDate,
-                           ::std::auto_ptr< ContentTitleType > ContentTitle,
+                           ::std::unique_ptr< ContentTitleType > ContentTitle,
                            const EditRateType& EditRate,
-                           ::std::auto_ptr< SegmentListType > SegmentList)
+                           ::std::unique_ptr< SegmentListType > SegmentList)
   : ::xml_schema::Type (),
     Id_ (Id, this),
     Annotation_ (this),
@@ -2009,7 +2009,7 @@ namespace cpl2016
     Issuer_ (this),
     Creator_ (this),
     ContentOriginator_ (this),
-    ContentTitle_ (ContentTitle, this),
+    ContentTitle_ (std::move (ContentTitle), this),
     ContentKind_ (this),
     ContentVersionList_ (this),
     EssenceDescriptorList_ (this),
@@ -2018,7 +2018,7 @@ namespace cpl2016
     TotalRunningTime_ (this),
     LocaleList_ (this),
     ExtensionProperties_ (this),
-    SegmentList_ (SegmentList, this),
+    SegmentList_ (std::move (SegmentList), this),
     Signer_ (this),
     Signature_ (this)
   {
@@ -2095,12 +2095,12 @@ namespace cpl2016
       //
       if (n.name () == "Id" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< IdType > r (
+        ::std::unique_ptr< IdType > r (
           IdTraits::create (i, f, this));
 
         if (!Id_.present ())
         {
-          this->Id_.set (r);
+          this->Id_.set (::std::move (r));
           continue;
         }
       }
@@ -2109,12 +2109,12 @@ namespace cpl2016
       //
       if (n.name () == "Annotation" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< AnnotationType > r (
+        ::std::unique_ptr< AnnotationType > r (
           AnnotationTraits::create (i, f, this));
 
         if (!this->Annotation_)
         {
-          this->Annotation_.set (r);
+          this->Annotation_.set (::std::move (r));
           continue;
         }
       }
@@ -2123,12 +2123,12 @@ namespace cpl2016
       //
       if (n.name () == "IssueDate" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< IssueDateType > r (
+        ::std::unique_ptr< IssueDateType > r (
           IssueDateTraits::create (i, f, this));
 
         if (!IssueDate_.present ())
         {
-          this->IssueDate_.set (r);
+          this->IssueDate_.set (::std::move (r));
           continue;
         }
       }
@@ -2137,12 +2137,12 @@ namespace cpl2016
       //
       if (n.name () == "Issuer" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< IssuerType > r (
+        ::std::unique_ptr< IssuerType > r (
           IssuerTraits::create (i, f, this));
 
         if (!this->Issuer_)
         {
-          this->Issuer_.set (r);
+          this->Issuer_.set (::std::move (r));
           continue;
         }
       }
@@ -2151,12 +2151,12 @@ namespace cpl2016
       //
       if (n.name () == "Creator" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< CreatorType > r (
+        ::std::unique_ptr< CreatorType > r (
           CreatorTraits::create (i, f, this));
 
         if (!this->Creator_)
         {
-          this->Creator_.set (r);
+          this->Creator_.set (::std::move (r));
           continue;
         }
       }
@@ -2165,12 +2165,12 @@ namespace cpl2016
       //
       if (n.name () == "ContentOriginator" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< ContentOriginatorType > r (
+        ::std::unique_ptr< ContentOriginatorType > r (
           ContentOriginatorTraits::create (i, f, this));
 
         if (!this->ContentOriginator_)
         {
-          this->ContentOriginator_.set (r);
+          this->ContentOriginator_.set (::std::move (r));
           continue;
         }
       }
@@ -2179,12 +2179,12 @@ namespace cpl2016
       //
       if (n.name () == "ContentTitle" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< ContentTitleType > r (
+        ::std::unique_ptr< ContentTitleType > r (
           ContentTitleTraits::create (i, f, this));
 
         if (!ContentTitle_.present ())
         {
-          this->ContentTitle_.set (r);
+          this->ContentTitle_.set (::std::move (r));
           continue;
         }
       }
@@ -2193,12 +2193,12 @@ namespace cpl2016
       //
       if (n.name () == "ContentKind" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< ContentKindType > r (
+        ::std::unique_ptr< ContentKindType > r (
           ContentKindTraits::create (i, f, this));
 
         if (!this->ContentKind_)
         {
-          this->ContentKind_.set (r);
+          this->ContentKind_.set (::std::move (r));
           continue;
         }
       }
@@ -2207,12 +2207,12 @@ namespace cpl2016
       //
       if (n.name () == "ContentVersionList" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< ContentVersionListType > r (
+        ::std::unique_ptr< ContentVersionListType > r (
           ContentVersionListTraits::create (i, f, this));
 
         if (!this->ContentVersionList_)
         {
-          this->ContentVersionList_.set (r);
+          this->ContentVersionList_.set (::std::move (r));
           continue;
         }
       }
@@ -2221,12 +2221,12 @@ namespace cpl2016
       //
       if (n.name () == "EssenceDescriptorList" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< EssenceDescriptorListType > r (
+        ::std::unique_ptr< EssenceDescriptorListType > r (
           EssenceDescriptorListTraits::create (i, f, this));
 
         if (!this->EssenceDescriptorList_)
         {
-          this->EssenceDescriptorList_.set (r);
+          this->EssenceDescriptorList_.set (::std::move (r));
           continue;
         }
       }
@@ -2235,12 +2235,12 @@ namespace cpl2016
       //
       if (n.name () == "CompositionTimecode" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< CompositionTimecodeType > r (
+        ::std::unique_ptr< CompositionTimecodeType > r (
           CompositionTimecodeTraits::create (i, f, this));
 
         if (!this->CompositionTimecode_)
         {
-          this->CompositionTimecode_.set (r);
+          this->CompositionTimecode_.set (::std::move (r));
           continue;
         }
       }
@@ -2249,12 +2249,12 @@ namespace cpl2016
       //
       if (n.name () == "EditRate" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< EditRateType > r (
+        ::std::unique_ptr< EditRateType > r (
           EditRateTraits::create (i, f, this));
 
         if (!EditRate_.present ())
         {
-          this->EditRate_.set (r);
+          this->EditRate_.set (::std::move (r));
           continue;
         }
       }
@@ -2263,12 +2263,12 @@ namespace cpl2016
       //
       if (n.name () == "TotalRunningTime" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< TotalRunningTimeType > r (
+        ::std::unique_ptr< TotalRunningTimeType > r (
           TotalRunningTimeTraits::create (i, f, this));
 
         if (!this->TotalRunningTime_)
         {
-          this->TotalRunningTime_.set (r);
+          this->TotalRunningTime_.set (::std::move (r));
           continue;
         }
       }
@@ -2277,12 +2277,12 @@ namespace cpl2016
       //
       if (n.name () == "LocaleList" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< LocaleListType > r (
+        ::std::unique_ptr< LocaleListType > r (
           LocaleListTraits::create (i, f, this));
 
         if (!this->LocaleList_)
         {
-          this->LocaleList_.set (r);
+          this->LocaleList_.set (::std::move (r));
           continue;
         }
       }
@@ -2291,12 +2291,12 @@ namespace cpl2016
       //
       if (n.name () == "ExtensionProperties" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< ExtensionPropertiesType > r (
+        ::std::unique_ptr< ExtensionPropertiesType > r (
           ExtensionPropertiesTraits::create (i, f, this));
 
         if (!this->ExtensionProperties_)
         {
-          this->ExtensionProperties_.set (r);
+          this->ExtensionProperties_.set (::std::move (r));
           continue;
         }
       }
@@ -2305,12 +2305,12 @@ namespace cpl2016
       //
       if (n.name () == "SegmentList" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< SegmentListType > r (
+        ::std::unique_ptr< SegmentListType > r (
           SegmentListTraits::create (i, f, this));
 
         if (!SegmentList_.present ())
         {
-          this->SegmentList_.set (r);
+          this->SegmentList_.set (::std::move (r));
           continue;
         }
       }
@@ -2319,12 +2319,12 @@ namespace cpl2016
       //
       if (n.name () == "Signer" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< SignerType > r (
+        ::std::unique_ptr< SignerType > r (
           SignerTraits::create (i, f, this));
 
         if (!this->Signer_)
         {
-          this->Signer_.set (r);
+          this->Signer_.set (::std::move (r));
           continue;
         }
       }
@@ -2333,12 +2333,12 @@ namespace cpl2016
       //
       if (n.name () == "Signature" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< SignatureType > r (
+        ::std::unique_ptr< SignatureType > r (
           SignatureTraits::create (i, f, this));
 
         if (!this->Signature_)
         {
-          this->Signature_.set (r);
+          this->Signature_.set (::std::move (r));
           continue;
         }
       }
@@ -2500,12 +2500,12 @@ namespace cpl2016
       //
       if (n.name () == "TimecodeStartAddress" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< TimecodeStartAddressType > r (
+        ::std::unique_ptr< TimecodeStartAddressType > r (
           TimecodeStartAddressTraits::create (i, f, this));
 
         if (!TimecodeStartAddress_.present ())
         {
-          this->TimecodeStartAddress_.set (r);
+          this->TimecodeStartAddress_.set (::std::move (r));
           continue;
         }
       }
@@ -2793,12 +2793,12 @@ namespace cpl2016
       //
       if (n.name () == "Annotation" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< AnnotationType > r (
+        ::std::unique_ptr< AnnotationType > r (
           AnnotationTraits::create (i, f, this));
 
         if (!this->Annotation_)
         {
-          this->Annotation_.set (r);
+          this->Annotation_.set (::std::move (r));
           continue;
         }
       }
@@ -2807,12 +2807,12 @@ namespace cpl2016
       //
       if (n.name () == "LanguageList" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< LanguageListType > r (
+        ::std::unique_ptr< LanguageListType > r (
           LanguageListTraits::create (i, f, this));
 
         if (!this->LanguageList_)
         {
-          this->LanguageList_.set (r);
+          this->LanguageList_.set (::std::move (r));
           continue;
         }
       }
@@ -2821,12 +2821,12 @@ namespace cpl2016
       //
       if (n.name () == "RegionList" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< RegionListType > r (
+        ::std::unique_ptr< RegionListType > r (
           RegionListTraits::create (i, f, this));
 
         if (!this->RegionList_)
         {
-          this->RegionList_.set (r);
+          this->RegionList_.set (::std::move (r));
           continue;
         }
       }
@@ -2835,12 +2835,12 @@ namespace cpl2016
       //
       if (n.name () == "ContentMaturityRatingList" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< ContentMaturityRatingListType > r (
+        ::std::unique_ptr< ContentMaturityRatingListType > r (
           ContentMaturityRatingListTraits::create (i, f, this));
 
         if (!this->ContentMaturityRatingList_)
         {
-          this->ContentMaturityRatingList_.set (r);
+          this->ContentMaturityRatingList_.set (::std::move (r));
           continue;
         }
       }
@@ -2936,12 +2936,12 @@ namespace cpl2016
       //
       if (n.name () == "Agency" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< AgencyType > r (
+        ::std::unique_ptr< AgencyType > r (
           AgencyTraits::create (i, f, this));
 
         if (!Agency_.present ())
         {
-          this->Agency_.set (r);
+          this->Agency_.set (::std::move (r));
           continue;
         }
       }
@@ -2950,12 +2950,12 @@ namespace cpl2016
       //
       if (n.name () == "Rating" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< RatingType > r (
+        ::std::unique_ptr< RatingType > r (
           RatingTraits::create (i, f, this));
 
         if (!Rating_.present ())
         {
-          this->Rating_.set (r);
+          this->Rating_.set (::std::move (r));
           continue;
         }
       }
@@ -2964,12 +2964,12 @@ namespace cpl2016
       //
       if (n.name () == "Audience" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< AudienceType > r (
+        ::std::unique_ptr< AudienceType > r (
           AudienceTraits::create (i, f, this));
 
         if (!this->Audience_)
         {
-          this->Audience_.set (r);
+          this->Audience_.set (::std::move (r));
           continue;
         }
       }
@@ -3084,12 +3084,12 @@ namespace cpl2016
       //
       if (n.name () == "Id" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< IdType > r (
+        ::std::unique_ptr< IdType > r (
           IdTraits::create (i, f, this));
 
         if (!Id_.present ())
         {
-          this->Id_.set (r);
+          this->Id_.set (::std::move (r));
           continue;
         }
       }
@@ -3158,11 +3158,11 @@ namespace cpl2016
 
   ContentVersionType::
   ContentVersionType (const IdType& Id,
-                      ::std::auto_ptr< LabelTextType > LabelText)
+                      ::std::unique_ptr< LabelTextType > LabelText)
   : ::xml_schema::Type (),
     dom_document_ (::xsd::cxx::xml::dom::create_document< char > ()),
     Id_ (Id, this),
-    LabelText_ (LabelText, this),
+    LabelText_ (std::move (LabelText), this),
     any_ (this->getDomDocument ())
   {
   }
@@ -3210,12 +3210,12 @@ namespace cpl2016
       //
       if (n.name () == "Id" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< IdType > r (
+        ::std::unique_ptr< IdType > r (
           IdTraits::create (i, f, this));
 
         if (!Id_.present ())
         {
-          this->Id_.set (r);
+          this->Id_.set (::std::move (r));
           continue;
         }
       }
@@ -3224,12 +3224,12 @@ namespace cpl2016
       //
       if (n.name () == "LabelText" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< LabelTextType > r (
+        ::std::unique_ptr< LabelTextType > r (
           LabelTextTraits::create (i, f, this));
 
         if (!LabelText_.present ())
         {
-          this->LabelText_.set (r);
+          this->LabelText_.set (::std::move (r));
           continue;
         }
       }
@@ -3305,11 +3305,11 @@ namespace cpl2016
 
   SegmentType::
   SegmentType (const IdType& Id,
-               ::std::auto_ptr< SequenceListType > SequenceList)
+               ::std::unique_ptr< SequenceListType > SequenceList)
   : ::xml_schema::Type (),
     Id_ (Id, this),
     Annotation_ (this),
-    SequenceList_ (SequenceList, this)
+    SequenceList_ (std::move (SequenceList), this)
   {
   }
 
@@ -3354,12 +3354,12 @@ namespace cpl2016
       //
       if (n.name () == "Id" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< IdType > r (
+        ::std::unique_ptr< IdType > r (
           IdTraits::create (i, f, this));
 
         if (!Id_.present ())
         {
-          this->Id_.set (r);
+          this->Id_.set (::std::move (r));
           continue;
         }
       }
@@ -3368,12 +3368,12 @@ namespace cpl2016
       //
       if (n.name () == "Annotation" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< AnnotationType > r (
+        ::std::unique_ptr< AnnotationType > r (
           AnnotationTraits::create (i, f, this));
 
         if (!this->Annotation_)
         {
-          this->Annotation_.set (r);
+          this->Annotation_.set (::std::move (r));
           continue;
         }
       }
@@ -3382,12 +3382,12 @@ namespace cpl2016
       //
       if (n.name () == "SequenceList" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< SequenceListType > r (
+        ::std::unique_ptr< SequenceListType > r (
           SequenceListTraits::create (i, f, this));
 
         if (!SequenceList_.present ())
         {
-          this->SequenceList_.set (r);
+          this->SequenceList_.set (::std::move (r));
           continue;
         }
       }
@@ -3453,11 +3453,11 @@ namespace cpl2016
   SequenceType::
   SequenceType (const IdType& Id,
                 const TrackIdType& TrackId,
-                ::std::auto_ptr< ResourceListType > ResourceList)
+                ::std::unique_ptr< ResourceListType > ResourceList)
   : ::xml_schema::Type (),
     Id_ (Id, this),
     TrackId_ (TrackId, this),
-    ResourceList_ (ResourceList, this)
+    ResourceList_ (std::move (ResourceList), this)
   {
   }
 
@@ -3502,12 +3502,12 @@ namespace cpl2016
       //
       if (n.name () == "Id" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< IdType > r (
+        ::std::unique_ptr< IdType > r (
           IdTraits::create (i, f, this));
 
         if (!Id_.present ())
         {
-          this->Id_.set (r);
+          this->Id_.set (::std::move (r));
           continue;
         }
       }
@@ -3516,12 +3516,12 @@ namespace cpl2016
       //
       if (n.name () == "TrackId" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< TrackIdType > r (
+        ::std::unique_ptr< TrackIdType > r (
           TrackIdTraits::create (i, f, this));
 
         if (!TrackId_.present ())
         {
-          this->TrackId_.set (r);
+          this->TrackId_.set (::std::move (r));
           continue;
         }
       }
@@ -3530,12 +3530,12 @@ namespace cpl2016
       //
       if (n.name () == "ResourceList" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< ResourceListType > r (
+        ::std::unique_ptr< ResourceListType > r (
           ResourceListTraits::create (i, f, this));
 
         if (!ResourceList_.present ())
         {
-          this->ResourceList_.set (r);
+          this->ResourceList_.set (::std::move (r));
           continue;
         }
       }
@@ -3657,12 +3657,12 @@ namespace cpl2016
       //
       if (n.name () == "Id" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< IdType > r (
+        ::std::unique_ptr< IdType > r (
           IdTraits::create (i, f, this));
 
         if (!Id_.present ())
         {
-          this->Id_.set (r);
+          this->Id_.set (::std::move (r));
           continue;
         }
       }
@@ -3671,12 +3671,12 @@ namespace cpl2016
       //
       if (n.name () == "Annotation" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< AnnotationType > r (
+        ::std::unique_ptr< AnnotationType > r (
           AnnotationTraits::create (i, f, this));
 
         if (!this->Annotation_)
         {
-          this->Annotation_.set (r);
+          this->Annotation_.set (::std::move (r));
           continue;
         }
       }
@@ -3685,12 +3685,12 @@ namespace cpl2016
       //
       if (n.name () == "EditRate" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< EditRateType > r (
+        ::std::unique_ptr< EditRateType > r (
           EditRateTraits::create (i, f, this));
 
         if (!this->EditRate_)
         {
-          this->EditRate_.set (r);
+          this->EditRate_.set (::std::move (r));
           continue;
         }
       }
@@ -3858,12 +3858,12 @@ namespace cpl2016
       //
       if (n.name () == "SourceEncoding" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< SourceEncodingType > r (
+        ::std::unique_ptr< SourceEncodingType > r (
           SourceEncodingTraits::create (i, f, this));
 
         if (!SourceEncoding_.present ())
         {
-          this->SourceEncoding_.set (r);
+          this->SourceEncoding_.set (::std::move (r));
           continue;
         }
       }
@@ -3872,12 +3872,12 @@ namespace cpl2016
       //
       if (n.name () == "TrackFileId" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< TrackFileIdType > r (
+        ::std::unique_ptr< TrackFileIdType > r (
           TrackFileIdTraits::create (i, f, this));
 
         if (!TrackFileId_.present ())
         {
-          this->TrackFileId_.set (r);
+          this->TrackFileId_.set (::std::move (r));
           continue;
         }
       }
@@ -3886,12 +3886,12 @@ namespace cpl2016
       //
       if (n.name () == "KeyId" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< KeyIdType > r (
+        ::std::unique_ptr< KeyIdType > r (
           KeyIdTraits::create (i, f, this));
 
         if (!this->KeyId_)
         {
-          this->KeyId_.set (r);
+          this->KeyId_.set (::std::move (r));
           continue;
         }
       }
@@ -3900,12 +3900,12 @@ namespace cpl2016
       //
       if (n.name () == "Hash" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< HashType > r (
+        ::std::unique_ptr< HashType > r (
           HashTraits::create (i, f, this));
 
         if (!this->Hash_)
         {
-          this->Hash_.set (r);
+          this->Hash_.set (::std::move (r));
           continue;
         }
       }
@@ -3914,12 +3914,12 @@ namespace cpl2016
       //
       if (n.name () == "HashAlgorithm" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< HashAlgorithmType > r (
+        ::std::unique_ptr< HashAlgorithmType > r (
           HashAlgorithmTraits::create (i, f, this));
 
         if (!this->HashAlgorithm_)
         {
-          this->HashAlgorithm_.set (r);
+          this->HashAlgorithm_.set (::std::move (r));
           continue;
         }
       }
@@ -4027,10 +4027,10 @@ namespace cpl2016
       //
       if (n.name () == "Marker" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< MarkerType > r (
+        ::std::unique_ptr< MarkerType > r (
           MarkerTraits::create (i, f, this));
 
-        this->Marker_.push_back (r);
+        this->Marker_.push_back (::std::move (r));
         continue;
       }
 
@@ -4082,11 +4082,11 @@ namespace cpl2016
   }
 
   MarkerType::
-  MarkerType (::std::auto_ptr< LabelType > Label,
+  MarkerType (::std::unique_ptr< LabelType > Label,
               const OffsetType& Offset)
   : ::xml_schema::Type (),
     Annotation_ (this),
-    Label_ (Label, this),
+    Label_ (std::move (Label), this),
     Offset_ (Offset, this)
   {
   }
@@ -4132,12 +4132,12 @@ namespace cpl2016
       //
       if (n.name () == "Annotation" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< AnnotationType > r (
+        ::std::unique_ptr< AnnotationType > r (
           AnnotationTraits::create (i, f, this));
 
         if (!this->Annotation_)
         {
-          this->Annotation_.set (r);
+          this->Annotation_.set (::std::move (r));
           continue;
         }
       }
@@ -4146,12 +4146,12 @@ namespace cpl2016
       //
       if (n.name () == "Label" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< LabelType > r (
+        ::std::unique_ptr< LabelType > r (
           LabelTraits::create (i, f, this));
 
         if (!Label_.present ())
         {
-          this->Label_.set (r);
+          this->Label_.set (::std::move (r));
           continue;
         }
       }
@@ -4258,10 +4258,10 @@ namespace cpl2016
       //
       if (n.name () == "ContentVersion" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< ContentVersionType > r (
+        ::std::unique_ptr< ContentVersionType > r (
           ContentVersionTraits::create (i, f, this));
 
-        this->ContentVersion_.push_back (r);
+        this->ContentVersion_.push_back (::std::move (r));
         continue;
       }
 
@@ -4340,10 +4340,10 @@ namespace cpl2016
       //
       if (n.name () == "EssenceDescriptor" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< EssenceDescriptorType > r (
+        ::std::unique_ptr< EssenceDescriptorType > r (
           EssenceDescriptorTraits::create (i, f, this));
 
-        this->EssenceDescriptor_.push_back (r);
+        this->EssenceDescriptor_.push_back (::std::move (r));
         continue;
       }
 
@@ -4494,10 +4494,10 @@ namespace cpl2016
       //
       if (n.name () == "Locale" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< LocaleType > r (
+        ::std::unique_ptr< LocaleType > r (
           LocaleTraits::create (i, f, this));
 
-        this->Locale_.push_back (r);
+        this->Locale_.push_back (::std::move (r));
         continue;
       }
 
@@ -4662,10 +4662,10 @@ namespace cpl2016
       //
       if (n.name () == "Segment" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< SegmentType > r (
+        ::std::unique_ptr< SegmentType > r (
           SegmentTraits::create (i, f, this));
 
-        this->Segment_.push_back (r);
+        this->Segment_.push_back (::std::move (r));
         continue;
       }
 
@@ -4744,10 +4744,10 @@ namespace cpl2016
       //
       if (n.name () == "Language" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< LanguageType > r (
+        ::std::unique_ptr< LanguageType > r (
           LanguageTraits::create (i, f, this));
 
-        this->Language_.push_back (r);
+        this->Language_.push_back (::std::move (r));
         continue;
       }
 
@@ -4826,10 +4826,10 @@ namespace cpl2016
       //
       if (n.name () == "Region" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< RegionType > r (
+        ::std::unique_ptr< RegionType > r (
           RegionTraits::create (i, f, this));
 
-        this->Region_.push_back (r);
+        this->Region_.push_back (::std::move (r));
         continue;
       }
 
@@ -4908,10 +4908,10 @@ namespace cpl2016
       //
       if (n.name () == "ContentMaturityRating" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< ContentMaturityRatingType > r (
+        ::std::unique_ptr< ContentMaturityRatingType > r (
           ContentMaturityRatingTraits::create (i, f, this));
 
-        this->ContentMaturityRating_.push_back (r);
+        this->ContentMaturityRating_.push_back (::std::move (r));
         continue;
       }
 
@@ -5102,12 +5102,12 @@ namespace cpl2016
       //
       if (n.name () == "MarkerSequence" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
       {
-        ::std::auto_ptr< MarkerSequenceType > r (
+        ::std::unique_ptr< MarkerSequenceType > r (
           MarkerSequenceTraits::create (i, f, this));
 
         if (!this->MarkerSequence_)
         {
-          this->MarkerSequence_.set (r);
+          this->MarkerSequence_.set (::std::move (r));
           continue;
         }
       }
@@ -5199,7 +5199,7 @@ namespace cpl2016
       // Resource
       //
       {
-        ::std::auto_ptr< ::xsd::cxx::tree::type > tmp (
+        ::std::unique_ptr< ::xsd::cxx::tree::type > tmp (
           ::xsd::cxx::tree::type_factory_map_instance< 0, char > ().create (
             "Resource",
             "http://www.smpte-ra.org/schemas/2067-3/2016",
@@ -5208,7 +5208,7 @@ namespace cpl2016
 
         if (tmp.get () != 0)
         {
-          ::std::auto_ptr< ResourceType > r (
+          ::std::unique_ptr< ResourceType > r (
             dynamic_cast< ResourceType* > (tmp.get ()));
 
           if (r.get ())
@@ -5216,7 +5216,7 @@ namespace cpl2016
           else
             throw ::xsd::cxx::tree::not_derived< char > ();
 
-          this->Resource_.push_back (r);
+          this->Resource_.push_back (::std::move (r));
           continue;
         }
       }
@@ -5803,7 +5803,7 @@ namespace cpl2016
 
 namespace cpl2016
 {
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (const ::std::string& u,
                             ::xml_schema::Flags f,
                             const ::xml_schema::Properties& p)
@@ -5814,18 +5814,18 @@ namespace cpl2016
 
     ::xsd::cxx::tree::error_handler< char > h;
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         u, h, p, f));
 
     h.throw_if_failed< ::xsd::cxx::tree::parsing< char > > ();
 
-    return ::std::auto_ptr< ::cpl2016::CompositionPlaylistType > (
+    return ::std::unique_ptr< ::cpl2016::CompositionPlaylistType > (
       ::cpl2016::parseCompositionPlaylist (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (const ::std::string& u,
                             ::xml_schema::ErrorHandler& h,
                             ::xml_schema::Flags f,
@@ -5835,37 +5835,37 @@ namespace cpl2016
       (f & ::xml_schema::Flags::dont_initialize) == 0,
       (f & ::xml_schema::Flags::keep_dom) == 0);
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         u, h, p, f));
 
     if (!d.get ())
       throw ::xsd::cxx::tree::parsing< char > ();
 
-    return ::std::auto_ptr< ::cpl2016::CompositionPlaylistType > (
+    return ::std::unique_ptr< ::cpl2016::CompositionPlaylistType > (
       ::cpl2016::parseCompositionPlaylist (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (const ::std::string& u,
                             ::xercesc::DOMErrorHandler& h,
                             ::xml_schema::Flags f,
                             const ::xml_schema::Properties& p)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         u, h, p, f));
 
     if (!d.get ())
       throw ::xsd::cxx::tree::parsing< char > ();
 
-    return ::std::auto_ptr< ::cpl2016::CompositionPlaylistType > (
+    return ::std::unique_ptr< ::cpl2016::CompositionPlaylistType > (
       ::cpl2016::parseCompositionPlaylist (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (::std::istream& is,
                             ::xml_schema::Flags f,
                             const ::xml_schema::Properties& p)
@@ -5878,7 +5878,7 @@ namespace cpl2016
     return ::cpl2016::parseCompositionPlaylist (isrc, f, p);
   }
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (::std::istream& is,
                             ::xml_schema::ErrorHandler& h,
                             ::xml_schema::Flags f,
@@ -5892,7 +5892,7 @@ namespace cpl2016
     return ::cpl2016::parseCompositionPlaylist (isrc, h, f, p);
   }
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (::std::istream& is,
                             ::xercesc::DOMErrorHandler& h,
                             ::xml_schema::Flags f,
@@ -5902,7 +5902,7 @@ namespace cpl2016
     return ::cpl2016::parseCompositionPlaylist (isrc, h, f, p);
   }
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (::std::istream& is,
                             const ::std::string& sid,
                             ::xml_schema::Flags f,
@@ -5916,7 +5916,7 @@ namespace cpl2016
     return ::cpl2016::parseCompositionPlaylist (isrc, f, p);
   }
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (::std::istream& is,
                             const ::std::string& sid,
                             ::xml_schema::ErrorHandler& h,
@@ -5931,7 +5931,7 @@ namespace cpl2016
     return ::cpl2016::parseCompositionPlaylist (isrc, h, f, p);
   }
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (::std::istream& is,
                             const ::std::string& sid,
                             ::xercesc::DOMErrorHandler& h,
@@ -5942,73 +5942,73 @@ namespace cpl2016
     return ::cpl2016::parseCompositionPlaylist (isrc, h, f, p);
   }
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (::xercesc::InputSource& i,
                             ::xml_schema::Flags f,
                             const ::xml_schema::Properties& p)
   {
     ::xsd::cxx::tree::error_handler< char > h;
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         i, h, p, f));
 
     h.throw_if_failed< ::xsd::cxx::tree::parsing< char > > ();
 
-    return ::std::auto_ptr< ::cpl2016::CompositionPlaylistType > (
+    return ::std::unique_ptr< ::cpl2016::CompositionPlaylistType > (
       ::cpl2016::parseCompositionPlaylist (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (::xercesc::InputSource& i,
                             ::xml_schema::ErrorHandler& h,
                             ::xml_schema::Flags f,
                             const ::xml_schema::Properties& p)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         i, h, p, f));
 
     if (!d.get ())
       throw ::xsd::cxx::tree::parsing< char > ();
 
-    return ::std::auto_ptr< ::cpl2016::CompositionPlaylistType > (
+    return ::std::unique_ptr< ::cpl2016::CompositionPlaylistType > (
       ::cpl2016::parseCompositionPlaylist (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (::xercesc::InputSource& i,
                             ::xercesc::DOMErrorHandler& h,
                             ::xml_schema::Flags f,
                             const ::xml_schema::Properties& p)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         i, h, p, f));
 
     if (!d.get ())
       throw ::xsd::cxx::tree::parsing< char > ();
 
-    return ::std::auto_ptr< ::cpl2016::CompositionPlaylistType > (
+    return ::std::unique_ptr< ::cpl2016::CompositionPlaylistType > (
       ::cpl2016::parseCompositionPlaylist (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
   parseCompositionPlaylist (const ::xercesc::DOMDocument& doc,
                             ::xml_schema::Flags f,
                             const ::xml_schema::Properties& p)
   {
     if (f & ::xml_schema::Flags::keep_dom)
     {
-      ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+      ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
         static_cast< ::xercesc::DOMDocument* > (doc.cloneNode (true)));
 
-      return ::std::auto_ptr< ::cpl2016::CompositionPlaylistType > (
+      return ::std::unique_ptr< ::cpl2016::CompositionPlaylistType > (
         ::cpl2016::parseCompositionPlaylist (
-          d, f | ::xml_schema::Flags::own_dom, p));
+          std::move (d), f | ::xml_schema::Flags::own_dom, p));
     }
 
     const ::xercesc::DOMElement& e (*doc.getDocumentElement ());
@@ -6018,7 +6018,7 @@ namespace cpl2016
     if (n.name () == "CompositionPlaylist" &&
         n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
     {
-      ::std::auto_ptr< ::cpl2016::CompositionPlaylistType > r (
+      ::std::unique_ptr< ::cpl2016::CompositionPlaylistType > r (
         ::xsd::cxx::tree::traits< ::cpl2016::CompositionPlaylistType, char >::create (
           e, f, 0));
       return r;
@@ -6031,12 +6031,12 @@ namespace cpl2016
       "http://www.smpte-ra.org/schemas/2067-3/2016");
   }
 
-  ::std::auto_ptr< ::cpl2016::CompositionPlaylistType >
-  parseCompositionPlaylist (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d,
+  ::std::unique_ptr< ::cpl2016::CompositionPlaylistType >
+  parseCompositionPlaylist (::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d,
                             ::xml_schema::Flags f,
                             const ::xml_schema::Properties&)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > c (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > c (
       ((f & ::xml_schema::Flags::keep_dom) &&
        !(f & ::xml_schema::Flags::own_dom))
       ? static_cast< ::xercesc::DOMDocument* > (d->cloneNode (true))
@@ -6056,7 +6056,7 @@ namespace cpl2016
     if (n.name () == "CompositionPlaylist" &&
         n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-3/2016")
     {
-      ::std::auto_ptr< ::cpl2016::CompositionPlaylistType > r (
+      ::std::unique_ptr< ::cpl2016::CompositionPlaylistType > r (
         ::xsd::cxx::tree::traits< ::cpl2016::CompositionPlaylistType, char >::create (
           e, f, 0));
       return r;
@@ -6095,7 +6095,7 @@ namespace cpl2016
     ::xsd::cxx::xml::auto_initializer i (
       (f & ::xml_schema::Flags::dont_initialize) == 0);
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::cpl2016::serializeCompositionPlaylist (s, m, f));
 
     ::xsd::cxx::tree::error_handler< char > h;
@@ -6118,7 +6118,7 @@ namespace cpl2016
     ::xsd::cxx::xml::auto_initializer i (
       (f & ::xml_schema::Flags::dont_initialize) == 0);
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::cpl2016::serializeCompositionPlaylist (s, m, f));
     ::xsd::cxx::xml::dom::ostream_format_target t (o);
     if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
@@ -6135,7 +6135,7 @@ namespace cpl2016
                                 const ::std::string& e,
                                 ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::cpl2016::serializeCompositionPlaylist (s, m, f));
     ::xsd::cxx::xml::dom::ostream_format_target t (o);
     if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
@@ -6151,7 +6151,7 @@ namespace cpl2016
                                 const ::std::string& e,
                                 ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::cpl2016::serializeCompositionPlaylist (s, m, f));
 
     ::xsd::cxx::tree::error_handler< char > h;
@@ -6170,7 +6170,7 @@ namespace cpl2016
                                 const ::std::string& e,
                                 ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::cpl2016::serializeCompositionPlaylist (s, m, f));
     if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
     {
@@ -6186,7 +6186,7 @@ namespace cpl2016
                                 const ::std::string& e,
                                 ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::cpl2016::serializeCompositionPlaylist (s, m, f));
     if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
     {
@@ -6218,12 +6218,12 @@ namespace cpl2016
     }
   }
 
-  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >
+  ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument >
   serializeCompositionPlaylist (const ::cpl2016::CompositionPlaylistType& s,
                                 const ::xml_schema::NamespaceInfomap& m,
                                 ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::serialize< char > (
         "CompositionPlaylist",
         "http://www.smpte-ra.org/schemas/2067-3/2016",

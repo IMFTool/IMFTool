@@ -70,9 +70,9 @@ namespace lr
   }
 
   void LabelEntry::
-  setRegister (::std::auto_ptr< RegisterType > x)
+  setRegister (::std::unique_ptr< RegisterType > x)
   {
-    this->Register_.set (x);
+    this->Register_.set (std::move (x));
   }
 
   const LabelEntry::NamespaceNameType& LabelEntry::
@@ -94,9 +94,9 @@ namespace lr
   }
 
   void LabelEntry::
-  setNamespaceName (::std::auto_ptr< NamespaceNameType > x)
+  setNamespaceName (::std::unique_ptr< NamespaceNameType > x)
   {
-    this->NamespaceName_.set (x);
+    this->NamespaceName_.set (std::move (x));
   }
 
   const LabelEntry::SymbolType& LabelEntry::
@@ -118,9 +118,9 @@ namespace lr
   }
 
   void LabelEntry::
-  setSymbol (::std::auto_ptr< SymbolType > x)
+  setSymbol (::std::unique_ptr< SymbolType > x)
   {
-    this->Symbol_.set (x);
+    this->Symbol_.set (std::move (x));
   }
 
   const LabelEntry::ULType& LabelEntry::
@@ -142,9 +142,9 @@ namespace lr
   }
 
   void LabelEntry::
-  setUL (::std::auto_ptr< ULType > x)
+  setUL (::std::unique_ptr< ULType > x)
   {
-    this->UL_.set (x);
+    this->UL_.set (std::move (x));
   }
 
   const LabelEntry::KindOptional& LabelEntry::
@@ -172,9 +172,9 @@ namespace lr
   }
 
   void LabelEntry::
-  setKind (::std::auto_ptr< KindType > x)
+  setKind (::std::unique_ptr< KindType > x)
   {
-    this->Kind_.set (x);
+    this->Kind_.set (std::move (x));
   }
 
   const LabelEntry::NameOptional& LabelEntry::
@@ -202,9 +202,9 @@ namespace lr
   }
 
   void LabelEntry::
-  setName (::std::auto_ptr< NameType > x)
+  setName (::std::unique_ptr< NameType > x)
   {
-    this->Name_.set (x);
+    this->Name_.set (std::move (x));
   }
 
   const LabelEntry::DefinitionOptional& LabelEntry::
@@ -232,9 +232,9 @@ namespace lr
   }
 
   void LabelEntry::
-  setDefinition (::std::auto_ptr< DefinitionType > x)
+  setDefinition (::std::unique_ptr< DefinitionType > x)
   {
-    this->Definition_.set (x);
+    this->Definition_.set (std::move (x));
   }
 
   const LabelEntry::ApplicationsOptional& LabelEntry::
@@ -262,9 +262,9 @@ namespace lr
   }
 
   void LabelEntry::
-  setApplications (::std::auto_ptr< ApplicationsType > x)
+  setApplications (::std::unique_ptr< ApplicationsType > x)
   {
-    this->Applications_.set (x);
+    this->Applications_.set (std::move (x));
   }
 
   const LabelEntry::NotesOptional& LabelEntry::
@@ -292,9 +292,9 @@ namespace lr
   }
 
   void LabelEntry::
-  setNotes (::std::auto_ptr< NotesType > x)
+  setNotes (::std::unique_ptr< NotesType > x)
   {
-    this->Notes_.set (x);
+    this->Notes_.set (std::move (x));
   }
 
   const LabelEntry::DefiningDocumentOptional& LabelEntry::
@@ -322,9 +322,9 @@ namespace lr
   }
 
   void LabelEntry::
-  setDefiningDocument (::std::auto_ptr< DefiningDocumentType > x)
+  setDefiningDocument (::std::unique_ptr< DefiningDocumentType > x)
   {
-    this->DefiningDocument_.set (x);
+    this->DefiningDocument_.set (std::move (x));
   }
 
   const LabelEntry::IsDeprecatedType& LabelEntry::
@@ -374,9 +374,9 @@ namespace lr
   }
 
   void LabelsRegister::
-  setEntries (::std::auto_ptr< EntriesType > x)
+  setEntries (::std::unique_ptr< EntriesType > x)
   {
-    this->Entries_.set (x);
+    this->Entries_.set (std::move (x));
   }
 
 
@@ -542,12 +542,12 @@ namespace lr
       //
       if (n.name () == "Register" && n.namespace_ () == "http://www.smpte-ra.org/schemas/400/2012")
       {
-        ::std::auto_ptr< RegisterType > r (
+        ::std::unique_ptr< RegisterType > r (
           RegisterTraits::create (i, f, this));
 
         if (!this->Register_)
         {
-          this->Register_.set (r);
+          this->Register_.set (::std::move (r));
           continue;
         }
       }
@@ -556,12 +556,12 @@ namespace lr
       //
       if (n.name () == "NamespaceName" && n.namespace_ () == "http://www.smpte-ra.org/schemas/400/2012")
       {
-        ::std::auto_ptr< NamespaceNameType > r (
+        ::std::unique_ptr< NamespaceNameType > r (
           NamespaceNameTraits::create (i, f, this));
 
         if (!NamespaceName_.present ())
         {
-          this->NamespaceName_.set (r);
+          this->NamespaceName_.set (::std::move (r));
           continue;
         }
       }
@@ -570,12 +570,12 @@ namespace lr
       //
       if (n.name () == "Symbol" && n.namespace_ () == "http://www.smpte-ra.org/schemas/400/2012")
       {
-        ::std::auto_ptr< SymbolType > r (
+        ::std::unique_ptr< SymbolType > r (
           SymbolTraits::create (i, f, this));
 
         if (!Symbol_.present ())
         {
-          this->Symbol_.set (r);
+          this->Symbol_.set (::std::move (r));
           continue;
         }
       }
@@ -584,12 +584,12 @@ namespace lr
       //
       if (n.name () == "UL" && n.namespace_ () == "http://www.smpte-ra.org/schemas/400/2012")
       {
-        ::std::auto_ptr< ULType > r (
+        ::std::unique_ptr< ULType > r (
           ULTraits::create (i, f, this));
 
         if (!UL_.present ())
         {
-          this->UL_.set (r);
+          this->UL_.set (::std::move (r));
           continue;
         }
       }
@@ -598,12 +598,12 @@ namespace lr
       //
       if (n.name () == "Kind" && n.namespace_ () == "http://www.smpte-ra.org/schemas/400/2012")
       {
-        ::std::auto_ptr< KindType > r (
+        ::std::unique_ptr< KindType > r (
           KindTraits::create (i, f, this));
 
         if (!this->Kind_)
         {
-          this->Kind_.set (r);
+          this->Kind_.set (::std::move (r));
           continue;
         }
       }
@@ -612,12 +612,12 @@ namespace lr
       //
       if (n.name () == "Name" && n.namespace_ () == "http://www.smpte-ra.org/schemas/400/2012")
       {
-        ::std::auto_ptr< NameType > r (
+        ::std::unique_ptr< NameType > r (
           NameTraits::create (i, f, this));
 
         if (!this->Name_)
         {
-          this->Name_.set (r);
+          this->Name_.set (::std::move (r));
           continue;
         }
       }
@@ -626,12 +626,12 @@ namespace lr
       //
       if (n.name () == "Definition" && n.namespace_ () == "http://www.smpte-ra.org/schemas/400/2012")
       {
-        ::std::auto_ptr< DefinitionType > r (
+        ::std::unique_ptr< DefinitionType > r (
           DefinitionTraits::create (i, f, this));
 
         if (!this->Definition_)
         {
-          this->Definition_.set (r);
+          this->Definition_.set (::std::move (r));
           continue;
         }
       }
@@ -640,12 +640,12 @@ namespace lr
       //
       if (n.name () == "Applications" && n.namespace_ () == "http://www.smpte-ra.org/schemas/400/2012")
       {
-        ::std::auto_ptr< ApplicationsType > r (
+        ::std::unique_ptr< ApplicationsType > r (
           ApplicationsTraits::create (i, f, this));
 
         if (!this->Applications_)
         {
-          this->Applications_.set (r);
+          this->Applications_.set (::std::move (r));
           continue;
         }
       }
@@ -654,12 +654,12 @@ namespace lr
       //
       if (n.name () == "Notes" && n.namespace_ () == "http://www.smpte-ra.org/schemas/400/2012")
       {
-        ::std::auto_ptr< NotesType > r (
+        ::std::unique_ptr< NotesType > r (
           NotesTraits::create (i, f, this));
 
         if (!this->Notes_)
         {
-          this->Notes_.set (r);
+          this->Notes_.set (::std::move (r));
           continue;
         }
       }
@@ -668,12 +668,12 @@ namespace lr
       //
       if (n.name () == "DefiningDocument" && n.namespace_ () == "http://www.smpte-ra.org/schemas/400/2012")
       {
-        ::std::auto_ptr< DefiningDocumentType > r (
+        ::std::unique_ptr< DefiningDocumentType > r (
           DefiningDocumentTraits::create (i, f, this));
 
         if (!this->DefiningDocument_)
         {
-          this->DefiningDocument_.set (r);
+          this->DefiningDocument_.set (::std::move (r));
           continue;
         }
       }
@@ -802,12 +802,12 @@ namespace lr
       //
       if (n.name () == "Entries" && n.namespace_ () == "http://www.smpte-ra.org/schemas/400/2012")
       {
-        ::std::auto_ptr< EntriesType > r (
+        ::std::unique_ptr< EntriesType > r (
           EntriesTraits::create (i, f, this));
 
         if (!this->Entries_)
         {
-          this->Entries_.set (r);
+          this->Entries_.set (::std::move (r));
           continue;
         }
       }
@@ -957,10 +957,10 @@ namespace lr
       //
       if (n.name () == "Entry" && n.namespace_ () == "http://www.smpte-ra.org/schemas/400/2012")
       {
-        ::std::auto_ptr< EntryType > r (
+        ::std::unique_ptr< EntryType > r (
           EntryTraits::create (i, f, this));
 
-        this->Entry_.push_back (r);
+        this->Entry_.push_back (::std::move (r));
         continue;
       }
 
@@ -1094,7 +1094,7 @@ namespace lr
 
 namespace lr
 {
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (const ::std::string& u,
                        ::xml_schema::Flags f,
                        const ::xml_schema::Properties& p)
@@ -1105,18 +1105,18 @@ namespace lr
 
     ::xsd::cxx::tree::error_handler< char > h;
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         u, h, p, f));
 
     h.throw_if_failed< ::xsd::cxx::tree::parsing< char > > ();
 
-    return ::std::auto_ptr< ::lr::LabelsRegister > (
+    return ::std::unique_ptr< ::lr::LabelsRegister > (
       ::lr::parseLabelsRegister (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (const ::std::string& u,
                        ::xml_schema::ErrorHandler& h,
                        ::xml_schema::Flags f,
@@ -1126,37 +1126,37 @@ namespace lr
       (f & ::xml_schema::Flags::dont_initialize) == 0,
       (f & ::xml_schema::Flags::keep_dom) == 0);
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         u, h, p, f));
 
     if (!d.get ())
       throw ::xsd::cxx::tree::parsing< char > ();
 
-    return ::std::auto_ptr< ::lr::LabelsRegister > (
+    return ::std::unique_ptr< ::lr::LabelsRegister > (
       ::lr::parseLabelsRegister (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (const ::std::string& u,
                        ::xercesc::DOMErrorHandler& h,
                        ::xml_schema::Flags f,
                        const ::xml_schema::Properties& p)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         u, h, p, f));
 
     if (!d.get ())
       throw ::xsd::cxx::tree::parsing< char > ();
 
-    return ::std::auto_ptr< ::lr::LabelsRegister > (
+    return ::std::unique_ptr< ::lr::LabelsRegister > (
       ::lr::parseLabelsRegister (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (::std::istream& is,
                        ::xml_schema::Flags f,
                        const ::xml_schema::Properties& p)
@@ -1169,7 +1169,7 @@ namespace lr
     return ::lr::parseLabelsRegister (isrc, f, p);
   }
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (::std::istream& is,
                        ::xml_schema::ErrorHandler& h,
                        ::xml_schema::Flags f,
@@ -1183,7 +1183,7 @@ namespace lr
     return ::lr::parseLabelsRegister (isrc, h, f, p);
   }
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (::std::istream& is,
                        ::xercesc::DOMErrorHandler& h,
                        ::xml_schema::Flags f,
@@ -1193,7 +1193,7 @@ namespace lr
     return ::lr::parseLabelsRegister (isrc, h, f, p);
   }
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (::std::istream& is,
                        const ::std::string& sid,
                        ::xml_schema::Flags f,
@@ -1207,7 +1207,7 @@ namespace lr
     return ::lr::parseLabelsRegister (isrc, f, p);
   }
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (::std::istream& is,
                        const ::std::string& sid,
                        ::xml_schema::ErrorHandler& h,
@@ -1222,7 +1222,7 @@ namespace lr
     return ::lr::parseLabelsRegister (isrc, h, f, p);
   }
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (::std::istream& is,
                        const ::std::string& sid,
                        ::xercesc::DOMErrorHandler& h,
@@ -1233,73 +1233,73 @@ namespace lr
     return ::lr::parseLabelsRegister (isrc, h, f, p);
   }
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (::xercesc::InputSource& i,
                        ::xml_schema::Flags f,
                        const ::xml_schema::Properties& p)
   {
     ::xsd::cxx::tree::error_handler< char > h;
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         i, h, p, f));
 
     h.throw_if_failed< ::xsd::cxx::tree::parsing< char > > ();
 
-    return ::std::auto_ptr< ::lr::LabelsRegister > (
+    return ::std::unique_ptr< ::lr::LabelsRegister > (
       ::lr::parseLabelsRegister (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (::xercesc::InputSource& i,
                        ::xml_schema::ErrorHandler& h,
                        ::xml_schema::Flags f,
                        const ::xml_schema::Properties& p)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         i, h, p, f));
 
     if (!d.get ())
       throw ::xsd::cxx::tree::parsing< char > ();
 
-    return ::std::auto_ptr< ::lr::LabelsRegister > (
+    return ::std::unique_ptr< ::lr::LabelsRegister > (
       ::lr::parseLabelsRegister (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (::xercesc::InputSource& i,
                        ::xercesc::DOMErrorHandler& h,
                        ::xml_schema::Flags f,
                        const ::xml_schema::Properties& p)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         i, h, p, f));
 
     if (!d.get ())
       throw ::xsd::cxx::tree::parsing< char > ();
 
-    return ::std::auto_ptr< ::lr::LabelsRegister > (
+    return ::std::unique_ptr< ::lr::LabelsRegister > (
       ::lr::parseLabelsRegister (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
+  ::std::unique_ptr< ::lr::LabelsRegister >
   parseLabelsRegister (const ::xercesc::DOMDocument& doc,
                        ::xml_schema::Flags f,
                        const ::xml_schema::Properties& p)
   {
     if (f & ::xml_schema::Flags::keep_dom)
     {
-      ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+      ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
         static_cast< ::xercesc::DOMDocument* > (doc.cloneNode (true)));
 
-      return ::std::auto_ptr< ::lr::LabelsRegister > (
+      return ::std::unique_ptr< ::lr::LabelsRegister > (
         ::lr::parseLabelsRegister (
-          d, f | ::xml_schema::Flags::own_dom, p));
+          std::move (d), f | ::xml_schema::Flags::own_dom, p));
     }
 
     const ::xercesc::DOMElement& e (*doc.getDocumentElement ());
@@ -1309,7 +1309,7 @@ namespace lr
     if (n.name () == "LabelsRegister" &&
         n.namespace_ () == "http://www.smpte-ra.org/schemas/400/2012")
     {
-      ::std::auto_ptr< ::lr::LabelsRegister > r (
+      ::std::unique_ptr< ::lr::LabelsRegister > r (
         ::xsd::cxx::tree::traits< ::lr::LabelsRegister, char >::create (
           e, f, 0));
       return r;
@@ -1322,12 +1322,12 @@ namespace lr
       "http://www.smpte-ra.org/schemas/400/2012");
   }
 
-  ::std::auto_ptr< ::lr::LabelsRegister >
-  parseLabelsRegister (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d,
+  ::std::unique_ptr< ::lr::LabelsRegister >
+  parseLabelsRegister (::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d,
                        ::xml_schema::Flags f,
                        const ::xml_schema::Properties&)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > c (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > c (
       ((f & ::xml_schema::Flags::keep_dom) &&
        !(f & ::xml_schema::Flags::own_dom))
       ? static_cast< ::xercesc::DOMDocument* > (d->cloneNode (true))
@@ -1347,7 +1347,7 @@ namespace lr
     if (n.name () == "LabelsRegister" &&
         n.namespace_ () == "http://www.smpte-ra.org/schemas/400/2012")
     {
-      ::std::auto_ptr< ::lr::LabelsRegister > r (
+      ::std::unique_ptr< ::lr::LabelsRegister > r (
         ::xsd::cxx::tree::traits< ::lr::LabelsRegister, char >::create (
           e, f, 0));
       return r;
@@ -1386,7 +1386,7 @@ namespace lr
     ::xsd::cxx::xml::auto_initializer i (
       (f & ::xml_schema::Flags::dont_initialize) == 0);
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::lr::serializeLabelsRegister (s, m, f));
 
     ::xsd::cxx::tree::error_handler< char > h;
@@ -1409,7 +1409,7 @@ namespace lr
     ::xsd::cxx::xml::auto_initializer i (
       (f & ::xml_schema::Flags::dont_initialize) == 0);
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::lr::serializeLabelsRegister (s, m, f));
     ::xsd::cxx::xml::dom::ostream_format_target t (o);
     if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
@@ -1426,7 +1426,7 @@ namespace lr
                            const ::std::string& e,
                            ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::lr::serializeLabelsRegister (s, m, f));
     ::xsd::cxx::xml::dom::ostream_format_target t (o);
     if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
@@ -1442,7 +1442,7 @@ namespace lr
                            const ::std::string& e,
                            ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::lr::serializeLabelsRegister (s, m, f));
 
     ::xsd::cxx::tree::error_handler< char > h;
@@ -1461,7 +1461,7 @@ namespace lr
                            const ::std::string& e,
                            ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::lr::serializeLabelsRegister (s, m, f));
     if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
     {
@@ -1477,7 +1477,7 @@ namespace lr
                            const ::std::string& e,
                            ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::lr::serializeLabelsRegister (s, m, f));
     if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
     {
@@ -1509,12 +1509,12 @@ namespace lr
     }
   }
 
-  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >
+  ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument >
   serializeLabelsRegister (const ::lr::LabelsRegister& s,
                            const ::xml_schema::NamespaceInfomap& m,
                            ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::serialize< char > (
         "LabelsRegister",
         "http://www.smpte-ra.org/schemas/400/2012",

@@ -64,9 +64,9 @@ namespace cc
   }
 
   void StereoImageTrackFileResourceType::
-  setLeftEye (::std::auto_ptr< LeftEyeType > x)
+  setLeftEye (::std::unique_ptr< LeftEyeType > x)
   {
-    this->LeftEye_.set (x);
+    this->LeftEye_.set (std::move (x));
   }
 
   const StereoImageTrackFileResourceType::RightEyeType& StereoImageTrackFileResourceType::
@@ -88,9 +88,9 @@ namespace cc
   }
 
   void StereoImageTrackFileResourceType::
-  setRightEye (::std::auto_ptr< RightEyeType > x)
+  setRightEye (::std::unique_ptr< RightEyeType > x)
   {
-    this->RightEye_.set (x);
+    this->RightEye_.set (std::move (x));
   }
 
 
@@ -155,12 +155,12 @@ namespace cc
   StereoImageTrackFileResourceType::
   StereoImageTrackFileResourceType (const IdType& Id,
                                     const IntrinsicDurationType& IntrinsicDuration,
-                                    ::std::auto_ptr< LeftEyeType > LeftEye,
-                                    ::std::auto_ptr< RightEyeType > RightEye)
+                                    ::std::unique_ptr< LeftEyeType > LeftEye,
+                                    ::std::unique_ptr< RightEyeType > RightEye)
   : ::cpl::BaseResourceType (Id,
                              IntrinsicDuration),
-    LeftEye_ (LeftEye, this),
-    RightEye_ (RightEye, this)
+    LeftEye_ (std::move (LeftEye), this),
+    RightEye_ (std::move (RightEye), this)
   {
   }
 
@@ -204,7 +204,7 @@ namespace cc
       // LeftEye
       //
       {
-        ::std::auto_ptr< ::xsd::cxx::tree::type > tmp (
+        ::std::unique_ptr< ::xsd::cxx::tree::type > tmp (
           ::xsd::cxx::tree::type_factory_map_instance< 0, char > ().create (
             "LeftEye",
             "http://www.smpte-ra.org/schemas/2067-2/2013",
@@ -215,7 +215,7 @@ namespace cc
         {
           if (!LeftEye_.present ())
           {
-            ::std::auto_ptr< LeftEyeType > r (
+            ::std::unique_ptr< LeftEyeType > r (
               dynamic_cast< LeftEyeType* > (tmp.get ()));
 
             if (r.get ())
@@ -223,7 +223,7 @@ namespace cc
             else
               throw ::xsd::cxx::tree::not_derived< char > ();
 
-            this->LeftEye_.set (r);
+            this->LeftEye_.set (::std::move (r));
             continue;
           }
         }
@@ -232,7 +232,7 @@ namespace cc
       // RightEye
       //
       {
-        ::std::auto_ptr< ::xsd::cxx::tree::type > tmp (
+        ::std::unique_ptr< ::xsd::cxx::tree::type > tmp (
           ::xsd::cxx::tree::type_factory_map_instance< 0, char > ().create (
             "RightEye",
             "http://www.smpte-ra.org/schemas/2067-2/2013",
@@ -243,7 +243,7 @@ namespace cc
         {
           if (!RightEye_.present ())
           {
-            ::std::auto_ptr< RightEyeType > r (
+            ::std::unique_ptr< RightEyeType > r (
               dynamic_cast< RightEyeType* > (tmp.get ()));
 
             if (r.get ())
@@ -251,7 +251,7 @@ namespace cc
             else
               throw ::xsd::cxx::tree::not_derived< char > ();
 
-            this->RightEye_.set (r);
+            this->RightEye_.set (::std::move (r));
             continue;
           }
         }

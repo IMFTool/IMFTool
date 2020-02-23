@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema targetNamespace="http://www.smpte-ra.org/schemas/433/2008/dcmlTypes" version="1.0"
-        xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
-        xmlns:dcml="http://www.smpte-ra.org/schemas/433/2008/dcmlTypes"
-        elementFormDefault="qualified" attributeFormDefault="unqualified">
-<xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
+<xs:schema
+   targetNamespace="http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/"   version="1.0"
+   xmlns:dcml="http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/"
+   xmlns:ds="http://www.w3.org/2000/09/xmldsig#"
+   xmlns:xs="http://www.w3.org/2001/XMLSchema"
+   elementFormDefault="qualified" attributeFormDefault="unqualified">
+
 <xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
 
 <!-- UUID Type -->
@@ -124,7 +124,7 @@
 <xs:complexType name="rateType">
    <xs:simpleContent>
       <xs:extension base="dcml:RationalType">
-         <xs:attribute name="eventscope" type="xs:anyURI" use="optional" default="http://www.smpte-ra.org/schemas/433/2008/dcmlTypes#rate-scope-tokens"/>
+         <xs:attribute name="eventscope" type="xs:anyURI" use="optional" default="http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/#rate-scope-tokens"/>
          <xs:attribute name="event" type="xs:token" use="optional"/>
          <xs:attribute name="period" type="dcml:timeUnitToken" use="required"/>
       </xs:extension>

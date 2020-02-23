@@ -482,9 +482,6 @@ Error JobCreateScm::Execute() {
 	scm_namespace["xs"].name = XML_NAMESPACE_XS;
 
 	scm::SidecarCompositionMapType scm = mAssetScm->WriteScm();
-	// Create a scm::SidecarCompositionMapType instance
-	std::auto_ptr< scm::SidecarCompositionMapType> scm_data;
-	std::auto_ptr< scm::SidecarCompositionMapType_PropertiesType> scm_properties;
 
 	QString destination(mAssetScm->GetPath().absoluteFilePath());
 	if(destination.isEmpty() == false) {

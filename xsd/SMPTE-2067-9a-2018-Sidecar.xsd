@@ -6,8 +6,8 @@
 	xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	elementFormDefault="qualified"
 	attributeFormDefault="unqualified">
-	<xs:import namespace="http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/" />
-	<xs:import namespace="http://www.w3.org/2000/09/xmldsig#" />
+	<xs:import namespace="http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/" schemaLocation="st0433-dcmlTypes.xsd"/>
+	<xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
 	<xs:element name="SidecarCompositionMap" type="scm:SidecarCompositionMapType" />
 	<xs:complexType name="SidecarCompositionMapType">
 		<xs:sequence>

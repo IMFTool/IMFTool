@@ -45,7 +45,7 @@ QVariant GraphicsWidgetBase::itemChange(GraphicsItemChange change, const QVarian
 
 void GraphicsWidgetBase::customEvent(QEvent *pEvent) {
 
-	if(pEvent && pEvent->type() == UserEventCplEditRateChange) {
+	if(pEvent && pEvent->type() == (QEvent::Type)UserEventCplEditRateChange) {
 		CplEditRateChanged();
 	}
 }
@@ -72,7 +72,7 @@ QVariant GraphicsObjectBase::itemChange(GraphicsItemChange change, const QVarian
 
 void GraphicsObjectBase::customEvent(QEvent *pEvent) {
 
-	if(pEvent && pEvent->type() == UserEventCplEditRateChange) {
+	if(pEvent && pEvent->type() == (QEvent::Type)UserEventCplEditRateChange) {
 		CplEditRateChanged();
 	}
 }
@@ -119,7 +119,7 @@ void GraphicsObjectVerticalIndicator::paint(QPainter *pPainter, const QStyleOpti
 
 	pPainter->save();
 	if(visible_rect.isEmpty() == false) {
-		if(acceptHoverEvents() == true && pOption->state & QStyle::State_MouseOver) {
+		if(acceptHoverEvents() == true && (pOption->state & QStyle::State_MouseOver)) {
 			if(pOption->state & QStyle::State_Selected) {
 				pen.setColor(dark_color);
 				brush.setColor(dark_color);
@@ -376,7 +376,7 @@ QWidget* GraphicsWidgetHollowProxyWidget::GetWidget() const {
 }
 
 GraphicsWidgetHollowProxyWidget::GraphicsItemHover::GraphicsItemHover(QGraphicsItem *pParent) :
-QGraphicsItem(pParent) {
+QGraphicsItem(pParent), mHeight(0) {
 
 	setCursor(Qt::UpArrowCursor);
 	setFlags(QGraphicsItem::ItemHasNoContents);
@@ -417,7 +417,7 @@ void GraphicsWidgetHollowProxyWidget::GraphicsItemHover::paint(QPainter *pPainte
 	QRectF visible_rect(hover_rect.intersected(exposed_rect));
 	visible_rect.translate(-.5, -.5);
 	if(visible_rect.isEmpty() == false) {
-		if(acceptHoverEvents() == true && pOption->state & QStyle::State_MouseOver) {
+		if(acceptHoverEvents() == true && (pOption->state & QStyle::State_MouseOver)) {
 			pPainter->fillRect(visible_rect, dark);
 		}
 	}

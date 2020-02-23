@@ -34,6 +34,10 @@
 #ifndef SMPTE_2067_9A_2018_SIDECAR_H
 #define SMPTE_2067_9A_2018_SIDECAR_H
 
+#ifndef XSD_CXX11
+#define XSD_CXX11
+#endif
+
 #ifndef XSD_USE_CHAR
 #define XSD_USE_CHAR
 #endif
@@ -225,6 +229,8 @@ namespace xml_schema
   typedef ::xsd::cxx::tree::unexpected_enumerator< char > UnexpectedEnumerator;
   typedef ::xsd::cxx::tree::expected_text_content< char > ExpectedTextContent;
   typedef ::xsd::cxx::tree::no_prefix_mapping< char > NoPrefixMapping;
+  typedef ::xsd::cxx::tree::no_type_info< char > NoTypeInfo;
+  typedef ::xsd::cxx::tree::not_derived< char > NotDerived;
   typedef ::xsd::cxx::tree::serialization< char > Serialization;
 
   // Error handler callback interface.
@@ -237,7 +243,7 @@ namespace xml_schema
   {
     // Automatic pointer for DOMDocument.
     //
-    using ::xsd::cxx::xml::dom::auto_ptr;
+    using ::xsd::cxx::xml::dom::unique_ptr;
 
 #ifndef XSD_CXX_TREE_TREE_NODE_KEY__XML_SCHEMA
 #define XSD_CXX_TREE_TREE_NODE_KEY__XML_SCHEMA
@@ -260,9 +266,10 @@ namespace scm
 }
 
 
-#include <memory>    // ::std::auto_ptr
+#include <memory>    // ::std::unique_ptr
 #include <limits>    // std::numeric_limits
 #include <algorithm> // std::binary_search
+#include <utility>   // std::move
 
 #include <xsd/cxx/xml/char-utf8.hxx>
 
@@ -275,7 +282,7 @@ namespace scm
 
 #include <xsd/cxx/tree/containers-wildcard.hxx>
 
-#include "dcmlTypes.h"
+#include "st0433-dcmlTypes.h"
 
 #include "xmldsig-core-schema.h"
 
@@ -299,7 +306,7 @@ namespace scm
     setId (const IdType& x);
 
     void
-    setId (::std::auto_ptr< IdType > p);
+    setId (::std::unique_ptr< IdType > p);
 
     // Properties
     //
@@ -316,7 +323,7 @@ namespace scm
     setProperties (const PropertiesType& x);
 
     void
-    setProperties (::std::auto_ptr< PropertiesType > p);
+    setProperties (::std::unique_ptr< PropertiesType > p);
 
     // SidecarAssetList
     //
@@ -333,7 +340,7 @@ namespace scm
     setSidecarAssetList (const SidecarAssetListType& x);
 
     void
-    setSidecarAssetList (::std::auto_ptr< SidecarAssetListType > p);
+    setSidecarAssetList (::std::unique_ptr< SidecarAssetListType > p);
 
     // Signer
     //
@@ -354,7 +361,7 @@ namespace scm
     setSigner (const SignerOptional& x);
 
     void
-    setSigner (::std::auto_ptr< SignerType > p);
+    setSigner (::std::unique_ptr< SignerType > p);
 
     // Signature
     //
@@ -375,7 +382,7 @@ namespace scm
     setSignature (const SignatureOptional& x);
 
     void
-    setSignature (::std::auto_ptr< SignatureType > p);
+    setSignature (::std::unique_ptr< SignatureType > p);
 
     // Constructors.
     //
@@ -384,8 +391,8 @@ namespace scm
                                const SidecarAssetListType&);
 
     SidecarCompositionMapType (const IdType&,
-                               ::std::auto_ptr< PropertiesType >,
-                               ::std::auto_ptr< SidecarAssetListType >);
+                               ::std::unique_ptr< PropertiesType >,
+                               ::std::unique_ptr< SidecarAssetListType >);
 
     SidecarCompositionMapType (const ::xercesc::DOMElement& e,
                                ::xml_schema::Flags f = 0,
@@ -438,7 +445,7 @@ namespace scm
     setId (const IdType& x);
 
     void
-    setId (::std::auto_ptr< IdType > p);
+    setId (::std::unique_ptr< IdType > p);
 
     // AssociatedCPLList
     //
@@ -455,7 +462,7 @@ namespace scm
     setAssociatedCPLList (const AssociatedCPLListType& x);
 
     void
-    setAssociatedCPLList (::std::auto_ptr< AssociatedCPLListType > p);
+    setAssociatedCPLList (::std::unique_ptr< AssociatedCPLListType > p);
 
     // Constructors.
     //
@@ -463,7 +470,7 @@ namespace scm
                       const AssociatedCPLListType&);
 
     SidecarAssetType (const IdType&,
-                      ::std::auto_ptr< AssociatedCPLListType >);
+                      ::std::unique_ptr< AssociatedCPLListType >);
 
     SidecarAssetType (const ::xercesc::DOMElement& e,
                       ::xml_schema::Flags f = 0,
@@ -517,7 +524,7 @@ namespace scm
     setAnnotation (const AnnotationOptional& x);
 
     void
-    setAnnotation (::std::auto_ptr< AnnotationType > p);
+    setAnnotation (::std::unique_ptr< AnnotationType > p);
 
     // IssueDate
     //
@@ -534,7 +541,7 @@ namespace scm
     setIssueDate (const IssueDateType& x);
 
     void
-    setIssueDate (::std::auto_ptr< IssueDateType > p);
+    setIssueDate (::std::unique_ptr< IssueDateType > p);
 
     // Issuer
     //
@@ -555,7 +562,7 @@ namespace scm
     setIssuer (const IssuerOptional& x);
 
     void
-    setIssuer (::std::auto_ptr< IssuerType > p);
+    setIssuer (::std::unique_ptr< IssuerType > p);
 
     // any
     //
@@ -610,7 +617,7 @@ namespace scm
            ::xml_schema::Flags);
 
     protected:
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > dom_document_;
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > dom_document_;
 
     AnnotationOptional Annotation_;
     ::xsd::cxx::tree::one< IssueDateType > IssueDate_;
@@ -756,18 +763,18 @@ namespace scm
   // Parse a URI or a local file.
   //
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (const ::std::string& uri,
                               ::xml_schema::Flags f = 0,
                               const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (const ::std::string& uri,
                               ::xml_schema::ErrorHandler& eh,
                               ::xml_schema::Flags f = 0,
                               const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (const ::std::string& uri,
                               ::xercesc::DOMErrorHandler& eh,
                               ::xml_schema::Flags f = 0,
@@ -776,37 +783,37 @@ namespace scm
   // Parse std::istream.
   //
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (::std::istream& is,
                               ::xml_schema::Flags f = 0,
                               const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (::std::istream& is,
                               ::xml_schema::ErrorHandler& eh,
                               ::xml_schema::Flags f = 0,
                               const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (::std::istream& is,
                               ::xercesc::DOMErrorHandler& eh,
                               ::xml_schema::Flags f = 0,
                               const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (::std::istream& is,
                               const ::std::string& id,
                               ::xml_schema::Flags f = 0,
                               const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (::std::istream& is,
                               const ::std::string& id,
                               ::xml_schema::ErrorHandler& eh,
                               ::xml_schema::Flags f = 0,
                               const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (::std::istream& is,
                               const ::std::string& id,
                               ::xercesc::DOMErrorHandler& eh,
@@ -816,18 +823,18 @@ namespace scm
   // Parse xercesc::InputSource.
   //
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (::xercesc::InputSource& is,
                               ::xml_schema::Flags f = 0,
                               const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (::xercesc::InputSource& is,
                               ::xml_schema::ErrorHandler& eh,
                               ::xml_schema::Flags f = 0,
                               const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (::xercesc::InputSource& is,
                               ::xercesc::DOMErrorHandler& eh,
                               ::xml_schema::Flags f = 0,
@@ -836,13 +843,13 @@ namespace scm
   // Parse xercesc::DOMDocument.
   //
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (const ::xercesc::DOMDocument& d,
                               ::xml_schema::Flags f = 0,
                               const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
-  parseSidecarCompositionMap (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d,
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
+  parseSidecarCompositionMap (::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d,
                               ::xml_schema::Flags f = 0,
                               const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 }
@@ -920,7 +927,7 @@ namespace scm
   // Serialize to a new xercesc::DOMDocument.
   //
 
-  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >
+  ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument >
   serializeSidecarCompositionMap (const ::scm::SidecarCompositionMapType& x, 
                                   const ::xml_schema::NamespaceInfomap& m = ::xml_schema::NamespaceInfomap (),
                                   ::xml_schema::Flags f = 0);

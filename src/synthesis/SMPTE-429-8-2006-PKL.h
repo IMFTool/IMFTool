@@ -34,6 +34,10 @@
 #ifndef SMPTE_429_8_2006_PKL_H
 #define SMPTE_429_8_2006_PKL_H
 
+#ifndef XSD_CXX11
+#define XSD_CXX11
+#endif
+
 #ifndef XSD_USE_CHAR
 #define XSD_USE_CHAR
 #endif
@@ -239,7 +243,7 @@ namespace xml_schema
   {
     // Automatic pointer for DOMDocument.
     //
-    using ::xsd::cxx::xml::dom::auto_ptr;
+    using ::xsd::cxx::xml::dom::unique_ptr;
 
 #ifndef XSD_CXX_TREE_TREE_NODE_KEY__XML_SCHEMA
 #define XSD_CXX_TREE_TREE_NODE_KEY__XML_SCHEMA
@@ -262,9 +266,10 @@ namespace pkl
 }
 
 
-#include <memory>    // ::std::auto_ptr
+#include <memory>    // ::std::unique_ptr
 #include <limits>    // std::numeric_limits
 #include <algorithm> // std::binary_search
+#include <utility>   // std::move
 
 #include <xsd/cxx/xml/char-utf8.hxx>
 
@@ -299,7 +304,7 @@ namespace pkl
     setId (const IdType& x);
 
     void
-    setId (::std::auto_ptr< IdType > p);
+    setId (::std::unique_ptr< IdType > p);
 
     // AnnotationText
     //
@@ -320,7 +325,7 @@ namespace pkl
     setAnnotationText (const AnnotationTextOptional& x);
 
     void
-    setAnnotationText (::std::auto_ptr< AnnotationTextType > p);
+    setAnnotationText (::std::unique_ptr< AnnotationTextType > p);
 
     // IconId
     //
@@ -341,7 +346,7 @@ namespace pkl
     setIconId (const IconIdOptional& x);
 
     void
-    setIconId (::std::auto_ptr< IconIdType > p);
+    setIconId (::std::unique_ptr< IconIdType > p);
 
     // IssueDate
     //
@@ -358,7 +363,7 @@ namespace pkl
     setIssueDate (const IssueDateType& x);
 
     void
-    setIssueDate (::std::auto_ptr< IssueDateType > p);
+    setIssueDate (::std::unique_ptr< IssueDateType > p);
 
     // Issuer
     //
@@ -375,7 +380,7 @@ namespace pkl
     setIssuer (const IssuerType& x);
 
     void
-    setIssuer (::std::auto_ptr< IssuerType > p);
+    setIssuer (::std::unique_ptr< IssuerType > p);
 
     // Creator
     //
@@ -392,7 +397,7 @@ namespace pkl
     setCreator (const CreatorType& x);
 
     void
-    setCreator (::std::auto_ptr< CreatorType > p);
+    setCreator (::std::unique_ptr< CreatorType > p);
 
     // GroupId
     //
@@ -413,7 +418,7 @@ namespace pkl
     setGroupId (const GroupIdOptional& x);
 
     void
-    setGroupId (::std::auto_ptr< GroupIdType > p);
+    setGroupId (::std::unique_ptr< GroupIdType > p);
 
     // AssetList
     //
@@ -430,7 +435,7 @@ namespace pkl
     setAssetList (const AssetListType& x);
 
     void
-    setAssetList (::std::auto_ptr< AssetListType > p);
+    setAssetList (::std::unique_ptr< AssetListType > p);
 
     // Signer
     //
@@ -451,7 +456,7 @@ namespace pkl
     setSigner (const SignerOptional& x);
 
     void
-    setSigner (::std::auto_ptr< SignerType > p);
+    setSigner (::std::unique_ptr< SignerType > p);
 
     // Signature
     //
@@ -472,7 +477,7 @@ namespace pkl
     setSignature (const SignatureOptional& x);
 
     void
-    setSignature (::std::auto_ptr< SignatureType > p);
+    setSignature (::std::unique_ptr< SignatureType > p);
 
     // Constructors.
     //
@@ -484,9 +489,9 @@ namespace pkl
 
     PackingListType (const IdType&,
                      const IssueDateType&,
-                     ::std::auto_ptr< IssuerType >,
-                     ::std::auto_ptr< CreatorType >,
-                     ::std::auto_ptr< AssetListType >);
+                     ::std::unique_ptr< IssuerType >,
+                     ::std::unique_ptr< CreatorType >,
+                     ::std::unique_ptr< AssetListType >);
 
     PackingListType (const ::xercesc::DOMElement& e,
                      ::xml_schema::Flags f = 0,
@@ -544,7 +549,7 @@ namespace pkl
     setId (const IdType& x);
 
     void
-    setId (::std::auto_ptr< IdType > p);
+    setId (::std::unique_ptr< IdType > p);
 
     // AnnotationText
     //
@@ -565,7 +570,7 @@ namespace pkl
     setAnnotationText (const AnnotationTextOptional& x);
 
     void
-    setAnnotationText (::std::auto_ptr< AnnotationTextType > p);
+    setAnnotationText (::std::unique_ptr< AnnotationTextType > p);
 
     // Hash
     //
@@ -582,7 +587,7 @@ namespace pkl
     setHash (const HashType& x);
 
     void
-    setHash (::std::auto_ptr< HashType > p);
+    setHash (::std::unique_ptr< HashType > p);
 
     // Size
     //
@@ -613,7 +618,7 @@ namespace pkl
     setType (const TypeType& x);
 
     void
-    setType (::std::auto_ptr< TypeType > p);
+    setType (::std::unique_ptr< TypeType > p);
 
     // OriginalFileName
     //
@@ -634,7 +639,7 @@ namespace pkl
     setOriginalFileName (const OriginalFileNameOptional& x);
 
     void
-    setOriginalFileName (::std::auto_ptr< OriginalFileNameType > p);
+    setOriginalFileName (::std::unique_ptr< OriginalFileNameType > p);
 
     // Constructors.
     //
@@ -727,7 +732,7 @@ namespace pkl
     setLanguage (const LanguageType& x);
 
     void
-    setLanguage (::std::auto_ptr< LanguageType > p);
+    setLanguage (::std::unique_ptr< LanguageType > p);
 
     static const LanguageType&
     getLanguageDefaultValue ();
@@ -857,18 +862,18 @@ namespace pkl
   // Parse a URI or a local file.
   //
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (const ::std::string& uri,
                     ::xml_schema::Flags f = 0,
                     const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (const ::std::string& uri,
                     ::xml_schema::ErrorHandler& eh,
                     ::xml_schema::Flags f = 0,
                     const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (const ::std::string& uri,
                     ::xercesc::DOMErrorHandler& eh,
                     ::xml_schema::Flags f = 0,
@@ -877,37 +882,37 @@ namespace pkl
   // Parse std::istream.
   //
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (::std::istream& is,
                     ::xml_schema::Flags f = 0,
                     const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (::std::istream& is,
                     ::xml_schema::ErrorHandler& eh,
                     ::xml_schema::Flags f = 0,
                     const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (::std::istream& is,
                     ::xercesc::DOMErrorHandler& eh,
                     ::xml_schema::Flags f = 0,
                     const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (::std::istream& is,
                     const ::std::string& id,
                     ::xml_schema::Flags f = 0,
                     const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (::std::istream& is,
                     const ::std::string& id,
                     ::xml_schema::ErrorHandler& eh,
                     ::xml_schema::Flags f = 0,
                     const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (::std::istream& is,
                     const ::std::string& id,
                     ::xercesc::DOMErrorHandler& eh,
@@ -917,18 +922,18 @@ namespace pkl
   // Parse xercesc::InputSource.
   //
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (::xercesc::InputSource& is,
                     ::xml_schema::Flags f = 0,
                     const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (::xercesc::InputSource& is,
                     ::xml_schema::ErrorHandler& eh,
                     ::xml_schema::Flags f = 0,
                     const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (::xercesc::InputSource& is,
                     ::xercesc::DOMErrorHandler& eh,
                     ::xml_schema::Flags f = 0,
@@ -937,13 +942,13 @@ namespace pkl
   // Parse xercesc::DOMDocument.
   //
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (const ::xercesc::DOMDocument& d,
                     ::xml_schema::Flags f = 0,
                     const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::pkl::PackingListType >
-  parsePackingList (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d,
+  ::std::unique_ptr< ::pkl::PackingListType >
+  parsePackingList (::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d,
                     ::xml_schema::Flags f = 0,
                     const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 }
@@ -1021,7 +1026,7 @@ namespace pkl
   // Serialize to a new xercesc::DOMDocument.
   //
 
-  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >
+  ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument >
   serializePackingList (const ::pkl::PackingListType& x, 
                         const ::xml_schema::NamespaceInfomap& m = ::xml_schema::NamespaceInfomap (),
                         ::xml_schema::Flags f = 0);

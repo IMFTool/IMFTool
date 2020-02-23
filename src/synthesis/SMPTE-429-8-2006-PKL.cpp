@@ -64,9 +64,9 @@ namespace pkl
   }
 
   void PackingListType::
-  setId (::std::auto_ptr< IdType > x)
+  setId (::std::unique_ptr< IdType > x)
   {
-    this->Id_.set (x);
+    this->Id_.set (std::move (x));
   }
 
   const PackingListType::AnnotationTextOptional& PackingListType::
@@ -94,9 +94,9 @@ namespace pkl
   }
 
   void PackingListType::
-  setAnnotationText (::std::auto_ptr< AnnotationTextType > x)
+  setAnnotationText (::std::unique_ptr< AnnotationTextType > x)
   {
-    this->AnnotationText_.set (x);
+    this->AnnotationText_.set (std::move (x));
   }
 
   const PackingListType::IconIdOptional& PackingListType::
@@ -124,9 +124,9 @@ namespace pkl
   }
 
   void PackingListType::
-  setIconId (::std::auto_ptr< IconIdType > x)
+  setIconId (::std::unique_ptr< IconIdType > x)
   {
-    this->IconId_.set (x);
+    this->IconId_.set (std::move (x));
   }
 
   const PackingListType::IssueDateType& PackingListType::
@@ -148,9 +148,9 @@ namespace pkl
   }
 
   void PackingListType::
-  setIssueDate (::std::auto_ptr< IssueDateType > x)
+  setIssueDate (::std::unique_ptr< IssueDateType > x)
   {
-    this->IssueDate_.set (x);
+    this->IssueDate_.set (std::move (x));
   }
 
   const PackingListType::IssuerType& PackingListType::
@@ -172,9 +172,9 @@ namespace pkl
   }
 
   void PackingListType::
-  setIssuer (::std::auto_ptr< IssuerType > x)
+  setIssuer (::std::unique_ptr< IssuerType > x)
   {
-    this->Issuer_.set (x);
+    this->Issuer_.set (std::move (x));
   }
 
   const PackingListType::CreatorType& PackingListType::
@@ -196,9 +196,9 @@ namespace pkl
   }
 
   void PackingListType::
-  setCreator (::std::auto_ptr< CreatorType > x)
+  setCreator (::std::unique_ptr< CreatorType > x)
   {
-    this->Creator_.set (x);
+    this->Creator_.set (std::move (x));
   }
 
   const PackingListType::GroupIdOptional& PackingListType::
@@ -226,9 +226,9 @@ namespace pkl
   }
 
   void PackingListType::
-  setGroupId (::std::auto_ptr< GroupIdType > x)
+  setGroupId (::std::unique_ptr< GroupIdType > x)
   {
-    this->GroupId_.set (x);
+    this->GroupId_.set (std::move (x));
   }
 
   const PackingListType::AssetListType& PackingListType::
@@ -250,9 +250,9 @@ namespace pkl
   }
 
   void PackingListType::
-  setAssetList (::std::auto_ptr< AssetListType > x)
+  setAssetList (::std::unique_ptr< AssetListType > x)
   {
-    this->AssetList_.set (x);
+    this->AssetList_.set (std::move (x));
   }
 
   const PackingListType::SignerOptional& PackingListType::
@@ -280,9 +280,9 @@ namespace pkl
   }
 
   void PackingListType::
-  setSigner (::std::auto_ptr< SignerType > x)
+  setSigner (::std::unique_ptr< SignerType > x)
   {
-    this->Signer_.set (x);
+    this->Signer_.set (std::move (x));
   }
 
   const PackingListType::SignatureOptional& PackingListType::
@@ -310,9 +310,9 @@ namespace pkl
   }
 
   void PackingListType::
-  setSignature (::std::auto_ptr< SignatureType > x)
+  setSignature (::std::unique_ptr< SignatureType > x)
   {
-    this->Signature_.set (x);
+    this->Signature_.set (std::move (x));
   }
 
 
@@ -338,9 +338,9 @@ namespace pkl
   }
 
   void AssetType::
-  setId (::std::auto_ptr< IdType > x)
+  setId (::std::unique_ptr< IdType > x)
   {
-    this->Id_.set (x);
+    this->Id_.set (std::move (x));
   }
 
   const AssetType::AnnotationTextOptional& AssetType::
@@ -368,9 +368,9 @@ namespace pkl
   }
 
   void AssetType::
-  setAnnotationText (::std::auto_ptr< AnnotationTextType > x)
+  setAnnotationText (::std::unique_ptr< AnnotationTextType > x)
   {
-    this->AnnotationText_.set (x);
+    this->AnnotationText_.set (std::move (x));
   }
 
   const AssetType::HashType& AssetType::
@@ -392,9 +392,9 @@ namespace pkl
   }
 
   void AssetType::
-  setHash (::std::auto_ptr< HashType > x)
+  setHash (::std::unique_ptr< HashType > x)
   {
-    this->Hash_.set (x);
+    this->Hash_.set (std::move (x));
   }
 
   const AssetType::SizeType& AssetType::
@@ -434,9 +434,9 @@ namespace pkl
   }
 
   void AssetType::
-  setType (::std::auto_ptr< TypeType > x)
+  setType (::std::unique_ptr< TypeType > x)
   {
-    this->Type_.set (x);
+    this->Type_.set (std::move (x));
   }
 
   const AssetType::OriginalFileNameOptional& AssetType::
@@ -464,9 +464,9 @@ namespace pkl
   }
 
   void AssetType::
-  setOriginalFileName (::std::auto_ptr< OriginalFileNameType > x)
+  setOriginalFileName (::std::unique_ptr< OriginalFileNameType > x)
   {
-    this->OriginalFileName_.set (x);
+    this->OriginalFileName_.set (std::move (x));
   }
 
 
@@ -496,9 +496,9 @@ namespace pkl
   }
 
   void UserText::
-  setLanguage (::std::auto_ptr< LanguageType > x)
+  setLanguage (::std::unique_ptr< LanguageType > x)
   {
-    this->language_.set (x);
+    this->language_.set (std::move (x));
   }
 
   const UserText::LanguageType& UserText::
@@ -571,18 +571,18 @@ namespace pkl
   PackingListType::
   PackingListType (const IdType& Id,
                    const IssueDateType& IssueDate,
-                   ::std::auto_ptr< IssuerType > Issuer,
-                   ::std::auto_ptr< CreatorType > Creator,
-                   ::std::auto_ptr< AssetListType > AssetList)
+                   ::std::unique_ptr< IssuerType > Issuer,
+                   ::std::unique_ptr< CreatorType > Creator,
+                   ::std::unique_ptr< AssetListType > AssetList)
   : ::xml_schema::Type (),
     Id_ (Id, this),
     AnnotationText_ (this),
     IconId_ (this),
     IssueDate_ (IssueDate, this),
-    Issuer_ (Issuer, this),
-    Creator_ (Creator, this),
+    Issuer_ (std::move (Issuer), this),
+    Creator_ (std::move (Creator), this),
     GroupId_ (this),
-    AssetList_ (AssetList, this),
+    AssetList_ (std::move (AssetList), this),
     Signer_ (this),
     Signature_ (this)
   {
@@ -643,12 +643,12 @@ namespace pkl
       //
       if (n.name () == "Id" && n.namespace_ () == "http://www.smpte-ra.org/schemas/429-8/2007/PKL")
       {
-        ::std::auto_ptr< IdType > r (
+        ::std::unique_ptr< IdType > r (
           IdTraits::create (i, f, this));
 
         if (!Id_.present ())
         {
-          this->Id_.set (r);
+          this->Id_.set (::std::move (r));
           continue;
         }
       }
@@ -657,12 +657,12 @@ namespace pkl
       //
       if (n.name () == "AnnotationText" && n.namespace_ () == "http://www.smpte-ra.org/schemas/429-8/2007/PKL")
       {
-        ::std::auto_ptr< AnnotationTextType > r (
+        ::std::unique_ptr< AnnotationTextType > r (
           AnnotationTextTraits::create (i, f, this));
 
         if (!this->AnnotationText_)
         {
-          this->AnnotationText_.set (r);
+          this->AnnotationText_.set (::std::move (r));
           continue;
         }
       }
@@ -671,12 +671,12 @@ namespace pkl
       //
       if (n.name () == "IconId" && n.namespace_ () == "http://www.smpte-ra.org/schemas/429-8/2007/PKL")
       {
-        ::std::auto_ptr< IconIdType > r (
+        ::std::unique_ptr< IconIdType > r (
           IconIdTraits::create (i, f, this));
 
         if (!this->IconId_)
         {
-          this->IconId_.set (r);
+          this->IconId_.set (::std::move (r));
           continue;
         }
       }
@@ -685,12 +685,12 @@ namespace pkl
       //
       if (n.name () == "IssueDate" && n.namespace_ () == "http://www.smpte-ra.org/schemas/429-8/2007/PKL")
       {
-        ::std::auto_ptr< IssueDateType > r (
+        ::std::unique_ptr< IssueDateType > r (
           IssueDateTraits::create (i, f, this));
 
         if (!IssueDate_.present ())
         {
-          this->IssueDate_.set (r);
+          this->IssueDate_.set (::std::move (r));
           continue;
         }
       }
@@ -699,12 +699,12 @@ namespace pkl
       //
       if (n.name () == "Issuer" && n.namespace_ () == "http://www.smpte-ra.org/schemas/429-8/2007/PKL")
       {
-        ::std::auto_ptr< IssuerType > r (
+        ::std::unique_ptr< IssuerType > r (
           IssuerTraits::create (i, f, this));
 
         if (!Issuer_.present ())
         {
-          this->Issuer_.set (r);
+          this->Issuer_.set (::std::move (r));
           continue;
         }
       }
@@ -713,12 +713,12 @@ namespace pkl
       //
       if (n.name () == "Creator" && n.namespace_ () == "http://www.smpte-ra.org/schemas/429-8/2007/PKL")
       {
-        ::std::auto_ptr< CreatorType > r (
+        ::std::unique_ptr< CreatorType > r (
           CreatorTraits::create (i, f, this));
 
         if (!Creator_.present ())
         {
-          this->Creator_.set (r);
+          this->Creator_.set (::std::move (r));
           continue;
         }
       }
@@ -727,12 +727,12 @@ namespace pkl
       //
       if (n.name () == "GroupId" && n.namespace_ () == "http://www.smpte-ra.org/schemas/429-8/2007/PKL")
       {
-        ::std::auto_ptr< GroupIdType > r (
+        ::std::unique_ptr< GroupIdType > r (
           GroupIdTraits::create (i, f, this));
 
         if (!this->GroupId_)
         {
-          this->GroupId_.set (r);
+          this->GroupId_.set (::std::move (r));
           continue;
         }
       }
@@ -741,12 +741,12 @@ namespace pkl
       //
       if (n.name () == "AssetList" && n.namespace_ () == "http://www.smpte-ra.org/schemas/429-8/2007/PKL")
       {
-        ::std::auto_ptr< AssetListType > r (
+        ::std::unique_ptr< AssetListType > r (
           AssetListTraits::create (i, f, this));
 
         if (!AssetList_.present ())
         {
-          this->AssetList_.set (r);
+          this->AssetList_.set (::std::move (r));
           continue;
         }
       }
@@ -755,12 +755,12 @@ namespace pkl
       //
       if (n.name () == "Signer" && n.namespace_ () == "http://www.smpte-ra.org/schemas/429-8/2007/PKL")
       {
-        ::std::auto_ptr< SignerType > r (
+        ::std::unique_ptr< SignerType > r (
           SignerTraits::create (i, f, this));
 
         if (!this->Signer_)
         {
-          this->Signer_.set (r);
+          this->Signer_.set (::std::move (r));
           continue;
         }
       }
@@ -769,12 +769,12 @@ namespace pkl
       //
       if (n.name () == "Signature" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< SignatureType > r (
+        ::std::unique_ptr< SignatureType > r (
           SignatureTraits::create (i, f, this));
 
         if (!this->Signature_)
         {
-          this->Signature_.set (r);
+          this->Signature_.set (::std::move (r));
           continue;
         }
       }
@@ -916,12 +916,12 @@ namespace pkl
       //
       if (n.name () == "Id" && n.namespace_ () == "http://www.smpte-ra.org/schemas/429-8/2007/PKL")
       {
-        ::std::auto_ptr< IdType > r (
+        ::std::unique_ptr< IdType > r (
           IdTraits::create (i, f, this));
 
         if (!Id_.present ())
         {
-          this->Id_.set (r);
+          this->Id_.set (::std::move (r));
           continue;
         }
       }
@@ -930,12 +930,12 @@ namespace pkl
       //
       if (n.name () == "AnnotationText" && n.namespace_ () == "http://www.smpte-ra.org/schemas/429-8/2007/PKL")
       {
-        ::std::auto_ptr< AnnotationTextType > r (
+        ::std::unique_ptr< AnnotationTextType > r (
           AnnotationTextTraits::create (i, f, this));
 
         if (!this->AnnotationText_)
         {
-          this->AnnotationText_.set (r);
+          this->AnnotationText_.set (::std::move (r));
           continue;
         }
       }
@@ -944,12 +944,12 @@ namespace pkl
       //
       if (n.name () == "Hash" && n.namespace_ () == "http://www.smpte-ra.org/schemas/429-8/2007/PKL")
       {
-        ::std::auto_ptr< HashType > r (
+        ::std::unique_ptr< HashType > r (
           HashTraits::create (i, f, this));
 
         if (!Hash_.present ())
         {
-          this->Hash_.set (r);
+          this->Hash_.set (::std::move (r));
           continue;
         }
       }
@@ -969,12 +969,12 @@ namespace pkl
       //
       if (n.name () == "Type" && n.namespace_ () == "http://www.smpte-ra.org/schemas/429-8/2007/PKL")
       {
-        ::std::auto_ptr< TypeType > r (
+        ::std::unique_ptr< TypeType > r (
           TypeTraits::create (i, f, this));
 
         if (!Type_.present ())
         {
-          this->Type_.set (r);
+          this->Type_.set (::std::move (r));
           continue;
         }
       }
@@ -983,12 +983,12 @@ namespace pkl
       //
       if (n.name () == "OriginalFileName" && n.namespace_ () == "http://www.smpte-ra.org/schemas/429-8/2007/PKL")
       {
-        ::std::auto_ptr< OriginalFileNameType > r (
+        ::std::unique_ptr< OriginalFileNameType > r (
           OriginalFileNameTraits::create (i, f, this));
 
         if (!this->OriginalFileName_)
         {
-          this->OriginalFileName_.set (r);
+          this->OriginalFileName_.set (::std::move (r));
           continue;
         }
       }
@@ -1259,10 +1259,10 @@ namespace pkl
       //
       if (n.name () == "Asset" && n.namespace_ () == "http://www.smpte-ra.org/schemas/429-8/2007/PKL")
       {
-        ::std::auto_ptr< AssetType > r (
+        ::std::unique_ptr< AssetType > r (
           AssetTraits::create (i, f, this));
 
-        this->Asset_.push_back (r);
+        this->Asset_.push_back (::std::move (r));
         continue;
       }
 
@@ -1401,7 +1401,7 @@ namespace pkl
 
 namespace pkl
 {
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (const ::std::string& u,
                     ::xml_schema::Flags f,
                     const ::xml_schema::Properties& p)
@@ -1412,18 +1412,18 @@ namespace pkl
 
     ::xsd::cxx::tree::error_handler< char > h;
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         u, h, p, f));
 
     h.throw_if_failed< ::xsd::cxx::tree::parsing< char > > ();
 
-    return ::std::auto_ptr< ::pkl::PackingListType > (
+    return ::std::unique_ptr< ::pkl::PackingListType > (
       ::pkl::parsePackingList (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (const ::std::string& u,
                     ::xml_schema::ErrorHandler& h,
                     ::xml_schema::Flags f,
@@ -1433,37 +1433,37 @@ namespace pkl
       (f & ::xml_schema::Flags::dont_initialize) == 0,
       (f & ::xml_schema::Flags::keep_dom) == 0);
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         u, h, p, f));
 
     if (!d.get ())
       throw ::xsd::cxx::tree::parsing< char > ();
 
-    return ::std::auto_ptr< ::pkl::PackingListType > (
+    return ::std::unique_ptr< ::pkl::PackingListType > (
       ::pkl::parsePackingList (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (const ::std::string& u,
                     ::xercesc::DOMErrorHandler& h,
                     ::xml_schema::Flags f,
                     const ::xml_schema::Properties& p)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         u, h, p, f));
 
     if (!d.get ())
       throw ::xsd::cxx::tree::parsing< char > ();
 
-    return ::std::auto_ptr< ::pkl::PackingListType > (
+    return ::std::unique_ptr< ::pkl::PackingListType > (
       ::pkl::parsePackingList (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (::std::istream& is,
                     ::xml_schema::Flags f,
                     const ::xml_schema::Properties& p)
@@ -1476,7 +1476,7 @@ namespace pkl
     return ::pkl::parsePackingList (isrc, f, p);
   }
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (::std::istream& is,
                     ::xml_schema::ErrorHandler& h,
                     ::xml_schema::Flags f,
@@ -1490,7 +1490,7 @@ namespace pkl
     return ::pkl::parsePackingList (isrc, h, f, p);
   }
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (::std::istream& is,
                     ::xercesc::DOMErrorHandler& h,
                     ::xml_schema::Flags f,
@@ -1500,7 +1500,7 @@ namespace pkl
     return ::pkl::parsePackingList (isrc, h, f, p);
   }
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (::std::istream& is,
                     const ::std::string& sid,
                     ::xml_schema::Flags f,
@@ -1514,7 +1514,7 @@ namespace pkl
     return ::pkl::parsePackingList (isrc, f, p);
   }
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (::std::istream& is,
                     const ::std::string& sid,
                     ::xml_schema::ErrorHandler& h,
@@ -1529,7 +1529,7 @@ namespace pkl
     return ::pkl::parsePackingList (isrc, h, f, p);
   }
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (::std::istream& is,
                     const ::std::string& sid,
                     ::xercesc::DOMErrorHandler& h,
@@ -1540,73 +1540,73 @@ namespace pkl
     return ::pkl::parsePackingList (isrc, h, f, p);
   }
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (::xercesc::InputSource& i,
                     ::xml_schema::Flags f,
                     const ::xml_schema::Properties& p)
   {
     ::xsd::cxx::tree::error_handler< char > h;
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         i, h, p, f));
 
     h.throw_if_failed< ::xsd::cxx::tree::parsing< char > > ();
 
-    return ::std::auto_ptr< ::pkl::PackingListType > (
+    return ::std::unique_ptr< ::pkl::PackingListType > (
       ::pkl::parsePackingList (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (::xercesc::InputSource& i,
                     ::xml_schema::ErrorHandler& h,
                     ::xml_schema::Flags f,
                     const ::xml_schema::Properties& p)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         i, h, p, f));
 
     if (!d.get ())
       throw ::xsd::cxx::tree::parsing< char > ();
 
-    return ::std::auto_ptr< ::pkl::PackingListType > (
+    return ::std::unique_ptr< ::pkl::PackingListType > (
       ::pkl::parsePackingList (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (::xercesc::InputSource& i,
                     ::xercesc::DOMErrorHandler& h,
                     ::xml_schema::Flags f,
                     const ::xml_schema::Properties& p)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         i, h, p, f));
 
     if (!d.get ())
       throw ::xsd::cxx::tree::parsing< char > ();
 
-    return ::std::auto_ptr< ::pkl::PackingListType > (
+    return ::std::unique_ptr< ::pkl::PackingListType > (
       ::pkl::parsePackingList (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::pkl::PackingListType >
+  ::std::unique_ptr< ::pkl::PackingListType >
   parsePackingList (const ::xercesc::DOMDocument& doc,
                     ::xml_schema::Flags f,
                     const ::xml_schema::Properties& p)
   {
     if (f & ::xml_schema::Flags::keep_dom)
     {
-      ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+      ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
         static_cast< ::xercesc::DOMDocument* > (doc.cloneNode (true)));
 
-      return ::std::auto_ptr< ::pkl::PackingListType > (
+      return ::std::unique_ptr< ::pkl::PackingListType > (
         ::pkl::parsePackingList (
-          d, f | ::xml_schema::Flags::own_dom, p));
+          std::move (d), f | ::xml_schema::Flags::own_dom, p));
     }
 
     const ::xercesc::DOMElement& e (*doc.getDocumentElement ());
@@ -1616,7 +1616,7 @@ namespace pkl
     if (n.name () == "PackingList" &&
         n.namespace_ () == "http://www.smpte-ra.org/schemas/429-8/2007/PKL")
     {
-      ::std::auto_ptr< ::pkl::PackingListType > r (
+      ::std::unique_ptr< ::pkl::PackingListType > r (
         ::xsd::cxx::tree::traits< ::pkl::PackingListType, char >::create (
           e, f, 0));
       return r;
@@ -1629,12 +1629,12 @@ namespace pkl
       "http://www.smpte-ra.org/schemas/429-8/2007/PKL");
   }
 
-  ::std::auto_ptr< ::pkl::PackingListType >
-  parsePackingList (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d,
+  ::std::unique_ptr< ::pkl::PackingListType >
+  parsePackingList (::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d,
                     ::xml_schema::Flags f,
                     const ::xml_schema::Properties&)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > c (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > c (
       ((f & ::xml_schema::Flags::keep_dom) &&
        !(f & ::xml_schema::Flags::own_dom))
       ? static_cast< ::xercesc::DOMDocument* > (d->cloneNode (true))
@@ -1654,7 +1654,7 @@ namespace pkl
     if (n.name () == "PackingList" &&
         n.namespace_ () == "http://www.smpte-ra.org/schemas/429-8/2007/PKL")
     {
-      ::std::auto_ptr< ::pkl::PackingListType > r (
+      ::std::unique_ptr< ::pkl::PackingListType > r (
         ::xsd::cxx::tree::traits< ::pkl::PackingListType, char >::create (
           e, f, 0));
       return r;
@@ -1693,7 +1693,7 @@ namespace pkl
     ::xsd::cxx::xml::auto_initializer i (
       (f & ::xml_schema::Flags::dont_initialize) == 0);
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::pkl::serializePackingList (s, m, f));
 
     ::xsd::cxx::tree::error_handler< char > h;
@@ -1716,7 +1716,7 @@ namespace pkl
     ::xsd::cxx::xml::auto_initializer i (
       (f & ::xml_schema::Flags::dont_initialize) == 0);
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::pkl::serializePackingList (s, m, f));
     ::xsd::cxx::xml::dom::ostream_format_target t (o);
     if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
@@ -1733,7 +1733,7 @@ namespace pkl
                         const ::std::string& e,
                         ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::pkl::serializePackingList (s, m, f));
     ::xsd::cxx::xml::dom::ostream_format_target t (o);
     if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
@@ -1749,7 +1749,7 @@ namespace pkl
                         const ::std::string& e,
                         ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::pkl::serializePackingList (s, m, f));
 
     ::xsd::cxx::tree::error_handler< char > h;
@@ -1768,7 +1768,7 @@ namespace pkl
                         const ::std::string& e,
                         ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::pkl::serializePackingList (s, m, f));
     if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
     {
@@ -1784,7 +1784,7 @@ namespace pkl
                         const ::std::string& e,
                         ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::pkl::serializePackingList (s, m, f));
     if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
     {
@@ -1816,12 +1816,12 @@ namespace pkl
     }
   }
 
-  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >
+  ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument >
   serializePackingList (const ::pkl::PackingListType& s,
                         const ::xml_schema::NamespaceInfomap& m,
                         ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::serialize< char > (
         "PackingList",
         "http://www.smpte-ra.org/schemas/429-8/2007/PKL",

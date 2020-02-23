@@ -28,7 +28,7 @@ class JP2K_Decoder : public QObject, public QRunnable, public JP2 {
 	Q_OBJECT
 
 public:
-	JP2K_Decoder(QSharedPointer<DecodedFrames>&, QSharedPointer<FrameRequest>&, float*&, float*&, float*&);
+	JP2K_Decoder(QSharedPointer<DecodedFrames>&, QSharedPointer<FrameRequest>&);
 private:
 
 	QSharedPointer<DecodedFrames> decoded_shared;

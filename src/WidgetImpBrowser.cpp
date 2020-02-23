@@ -28,7 +28,7 @@
 #include <QStringList>
 #include <QVBoxLayout>
 #include <QHeaderView>
-#include <QDesktopWidget>
+//#include <QDesktopWidget>
 #include <QMenu>
 #include <QMessageBox>
 #include <QSortFilterProxyModel>
@@ -46,6 +46,7 @@
 #include <QFile>
 #include <QPushButton>
 #include <QDesktopServices>
+#include <QScreen>
 #include "WizardEssenceDescriptor.h"
 #include "SMPTE-2067-9a-2018-Sidecar.h"
 
@@ -274,8 +275,8 @@ void WidgetImpBrowser::UninstallImp() {
 }
 
 QSize WidgetImpBrowser::sizeHint() const {
-
-	QRect size = QApplication::desktop()->availableGeometry();
+	//QRect size = QApplication::desktop()->availableGeometry(); (deprecated)
+	QRect size = QGuiApplication::primaryScreen()->availableGeometry();
 	return QSize(size.width() * 0.20, 200);
 }
 
@@ -514,8 +515,8 @@ void WidgetImpBrowser::ShowCompositionGenerator() {
 				if (asset_cpl) {
 					QString file_path = asset_cpl->GetPath().absoluteFilePath();
 					if(QFile::exists(file_path)) {
-						std::auto_ptr< cpl2016::CompositionPlaylistType> cpl_data;
-						std::auto_ptr< cpl::CompositionPlaylistType> cpl2013_data;
+						std::unique_ptr< cpl2016::CompositionPlaylistType> cpl_data;
+						std::unique_ptr< cpl::CompositionPlaylistType> cpl2013_data;
 						try { cpl_data = cpl2016::parseCompositionPlaylist(file_path.toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize); }
 						catch(...) {  }
 						try { cpl2013_data = cpl::parseCompositionPlaylist(file_path.toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize); }
@@ -1174,10 +1175,6 @@ void WidgetImpBrowser::SetMxfFile(const QStringList &rFiles) {
 					qDebug() << "ASDCP_FAILURE";
 
 				switch(EssenceType) {
-				#ifdef ARCHIVIST
-					case  ASDCP::ESS_ACES:
-						break;
-				#endif
 					case ASDCP::ESS_AS02_JPEG_2000:
 					case ASDCP::ESS_AS02_ACES:
 					case ASDCP::ESS_AS02_PCM_24b_48k:
@@ -1500,9 +1497,11 @@ QTableView(pParent) {
 }
 
 void CustomTableView::startDrag(Qt::DropActions supportedActions) {
-
 	QModelIndexList indexes = selectedIndexes();
 	for(int i = 0; i < indexes.size(); i++) if(indexes.at(i).flags() != Qt::ItemIsDragEnabled) indexes.removeAt(i);
+	//The following line is a workaround for a bug in macOS Catalina, that persists to exist in 10.15.2
+	//Reference: https://bugreports.qt.io/plugins/servlet/mobile#issue/QTBUG-71939
+	while (indexes.size() > 1) indexes.removeLast();
 	if(indexes.count() > 0) {
 		QMimeData *data = model()->mimeData(indexes);
 		if(!data) return;
@@ -1514,7 +1513,7 @@ void CustomTableView::startDrag(Qt::DropActions supportedActions) {
 		Qt::DropAction default_drop_action = Qt::IgnoreAction;
 		if(defaultDropAction() != Qt::IgnoreAction && (supportedActions & defaultDropAction()))
 			default_drop_action = defaultDropAction();
-		else if(supportedActions & Qt::CopyAction && dragDropMode() != QAbstractItemView::InternalMove)
+		else if((supportedActions & Qt::CopyAction) && dragDropMode() != QAbstractItemView::InternalMove)
 			default_drop_action = Qt::CopyAction;
 		if(drag->exec(supportedActions, default_drop_action) == Qt::MoveAction) {
 			qWarning() << "Not implemented";

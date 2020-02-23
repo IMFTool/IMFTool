@@ -2,16 +2,23 @@
 --location-map "http://www.w3.org/TR/2002/REC-xmldsig-core-20020212/xmldsig-core-schema.xsd=xmldsig-core-schema.xsd" 
 --location-map "http://www.w3.org/2001/XMLSchema.dtd=xmldsig-core-schema.dtd"
 
---namespace-map "http://www.smpte-ra.org/schemas/2067-3/2013=cpl"
+
+--namespace-map "http://www.smpte-ra.org/schemas/2067-3/2016=cpl2016"
 --namespace-map "http://www.w3.org/2000/09/xmldsig#=ds"
---namespace-map "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes=dcml"
---namespace-map "http://www.smpte-ra.org/schemas/2067-2/2013=cc"
+--namespace-map "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/=dcml"
+--namespace-map "http://www.smpte-ra.org/schemas/2067-2/2016=cc2016"
 --namespace-map "http://www.smpte-ra.org/schemas/2067-100/2014=opl"
 --namespace-map "http://www.smpte-ra.org/schemas/429-9/2007/AM=am"
+--namespace-map "http://www.smpte-ra.org/schemas/2067-2/2016/PKL=pkl2016"
+--namespace-map "http://www.smpte-ra.org/schemas/2067-3/2013=cpl"
+--namespace-map "http://www.smpte-ra.org/schemas/2067-2/2013=cc"
 --namespace-map "http://www.smpte-ra.org/schemas/429-8/2007/PKL=pkl"
 --namespace-map "http://www.smpte-ra.org/schemas/434/2006/types/S377M/2004=s377mTypes"
 --namespace-map "http://www.smpte-ra.org/schemas/434/2006/groups/S377M/2004=s377mGroups"
 --namespace-map "http://www.smpte-ra.org/schemas/434/2006/properties/S335M=s335mElements"
+--namespace-map "http://www.smpte-ra.org/schemas/400/2012=lr"
+--namespace-map "http://www.smpte-ra.org/ns/2067-9/2018=scm"
+
 
 --anonymous-regex %.* .* (.+)/(.+)%$1_$2Type%
 --anonymous-regex-trace
@@ -35,3 +42,8 @@
 --root-element AssetMap
 --root-element VolumeIndex
 --root-element PackingList
+--root-element SidecarCompositionMap
+--root-element LabelsRegister
+
+
+--std c++11

@@ -36,7 +36,7 @@ void DelegateMetadata::paint(QPainter *pPainter, const QStyleOptionViewItem &rOp
 
 	if(rIndex.data(UserRoleMetadata).canConvert<Metadata>()) {
 		Metadata metadata = qvariant_cast<Metadata>(rIndex.data(UserRoleMetadata));
-		QStyleOptionViewItemV4 options = rOption;
+		QStyleOptionViewItem options = rOption;
 		initStyleOption(&options, rIndex);
 		const QWidget *widget = options.widget;
 		QStyle *style = widget ? widget->style() : QApplication::style();

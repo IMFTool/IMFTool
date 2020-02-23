@@ -104,7 +104,7 @@ QDebug operator<<(QDebug dbg, const XmlSerializationError &rError) {
 	return dbg.space();
 }
 //WR
-std::auto_ptr<pkl2016::PackingListType> ImfXmlHelper::Convert(std::auto_ptr<pkl::PackingListType> rPackingList2013) {
+std::unique_ptr<pkl2016::PackingListType> ImfXmlHelper::Convert(std::unique_ptr<pkl::PackingListType> &rPackingList2013) {
 
 	pkl2016::PackingListType::AssetListType rAssetList;
 	pkl2016::PackingListType_AssetListType::AssetSequence seq;
@@ -120,7 +120,7 @@ std::auto_ptr<pkl2016::PackingListType> ImfXmlHelper::Convert(std::auto_ptr<pkl:
 	//const pkl2016::PackingListType::IdType uuid = ImfXmlHelper::Convert(QUuid::createUuid());
 	const pkl2016::PackingListType::IdType uuid = rPackingList2013->getId();
 	const pkl2016::PackingListType::IssueDateType date(0,0,0,0,0,0);
-	std::auto_ptr<pkl2016::PackingListType> rPackingList2016(new pkl2016::PackingListType(rPackingList2013->getId(), date,
+	std::unique_ptr<pkl2016::PackingListType> rPackingList2016(new pkl2016::PackingListType(rPackingList2013->getId(), date,
 			(const pkl2016::PackingListType::IssuerType&)"Issuer", (const pkl2016::PackingListType::CreatorType&)"Creator",
 			(const pkl2016::PackingListType::AssetListType&)rAssetList
 			));
@@ -140,8 +140,8 @@ std::auto_ptr<pkl2016::PackingListType> ImfXmlHelper::Convert(std::auto_ptr<pkl:
 	return content_version_list;
 
 }
-std::auto_ptr<cpl2016::CompositionPlaylistType_ContentVersionListType> ImfXmlHelper::Convert(const ::ContentVersionList &rContentVersionList) {
-	std::auto_ptr<cpl2016::CompositionPlaylistType_ContentVersionListType> content_version_list(new cpl2016::CompositionPlaylistType_ContentVersionListType());
+std::unique_ptr<cpl2016::CompositionPlaylistType_ContentVersionListType> ImfXmlHelper::Convert(const ::ContentVersionList &rContentVersionList) {
+	std::unique_ptr<cpl2016::CompositionPlaylistType_ContentVersionListType> content_version_list(new cpl2016::CompositionPlaylistType_ContentVersionListType());
 	cpl2016::CompositionPlaylistType_ContentVersionListType::ContentVersionSequence &content_version_sequence = content_version_list->getContentVersion();
 	content_version_sequence.clear();
 	for (int i = 0; i < rContentVersionList.count(); i++) {
@@ -166,8 +166,8 @@ std::auto_ptr<cpl2016::CompositionPlaylistType_ContentVersionListType> ImfXmlHel
 }
 
 
-std::auto_ptr<cpl2016::CompositionPlaylistType_LocaleListType> ImfXmlHelper::Convert(const ::LocaleList &rLocaleList) {
-	std::auto_ptr<cpl2016::CompositionPlaylistType_LocaleListType> locale_list(new cpl2016::CompositionPlaylistType_LocaleListType());
+std::unique_ptr<cpl2016::CompositionPlaylistType_LocaleListType> ImfXmlHelper::Convert(const ::LocaleList &rLocaleList) {
+	std::unique_ptr<cpl2016::CompositionPlaylistType_LocaleListType> locale_list(new cpl2016::CompositionPlaylistType_LocaleListType());
 	cpl2016::CompositionPlaylistType_LocaleListType::LocaleSequence &locale_sequence = locale_list->getLocale();
 	locale_sequence.clear();
 	for (int i = 0; i < rLocaleList.count(); i++) {

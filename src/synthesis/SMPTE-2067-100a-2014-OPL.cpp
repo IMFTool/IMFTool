@@ -64,9 +64,9 @@ namespace opl
   }
 
   void OutputProfileListType::
-  setId (::std::auto_ptr< IdType > x)
+  setId (::std::unique_ptr< IdType > x)
   {
-    this->Id_.set (x);
+    this->Id_.set (std::move (x));
   }
 
   const OutputProfileListType::AnnotationOptional& OutputProfileListType::
@@ -94,9 +94,9 @@ namespace opl
   }
 
   void OutputProfileListType::
-  setAnnotation (::std::auto_ptr< AnnotationType > x)
+  setAnnotation (::std::unique_ptr< AnnotationType > x)
   {
-    this->Annotation_.set (x);
+    this->Annotation_.set (std::move (x));
   }
 
   const OutputProfileListType::IssueDateType& OutputProfileListType::
@@ -118,9 +118,9 @@ namespace opl
   }
 
   void OutputProfileListType::
-  setIssueDate (::std::auto_ptr< IssueDateType > x)
+  setIssueDate (::std::unique_ptr< IssueDateType > x)
   {
-    this->IssueDate_.set (x);
+    this->IssueDate_.set (std::move (x));
   }
 
   const OutputProfileListType::IssuerOptional& OutputProfileListType::
@@ -148,9 +148,9 @@ namespace opl
   }
 
   void OutputProfileListType::
-  setIssuer (::std::auto_ptr< IssuerType > x)
+  setIssuer (::std::unique_ptr< IssuerType > x)
   {
-    this->Issuer_.set (x);
+    this->Issuer_.set (std::move (x));
   }
 
   const OutputProfileListType::CreatorOptional& OutputProfileListType::
@@ -178,9 +178,9 @@ namespace opl
   }
 
   void OutputProfileListType::
-  setCreator (::std::auto_ptr< CreatorType > x)
+  setCreator (::std::unique_ptr< CreatorType > x)
   {
-    this->Creator_.set (x);
+    this->Creator_.set (std::move (x));
   }
 
   const OutputProfileListType::CompositionPlaylistIdType& OutputProfileListType::
@@ -202,9 +202,9 @@ namespace opl
   }
 
   void OutputProfileListType::
-  setCompositionPlaylistId (::std::auto_ptr< CompositionPlaylistIdType > x)
+  setCompositionPlaylistId (::std::unique_ptr< CompositionPlaylistIdType > x)
   {
-    this->CompositionPlaylistId_.set (x);
+    this->CompositionPlaylistId_.set (std::move (x));
   }
 
   const OutputProfileListType::ExtensionPropertiesOptional& OutputProfileListType::
@@ -232,9 +232,9 @@ namespace opl
   }
 
   void OutputProfileListType::
-  setExtensionProperties (::std::auto_ptr< ExtensionPropertiesType > x)
+  setExtensionProperties (::std::unique_ptr< ExtensionPropertiesType > x)
   {
-    this->ExtensionProperties_.set (x);
+    this->ExtensionProperties_.set (std::move (x));
   }
 
   const OutputProfileListType::AliasListType& OutputProfileListType::
@@ -256,9 +256,9 @@ namespace opl
   }
 
   void OutputProfileListType::
-  setAliasList (::std::auto_ptr< AliasListType > x)
+  setAliasList (::std::unique_ptr< AliasListType > x)
   {
-    this->AliasList_.set (x);
+    this->AliasList_.set (std::move (x));
   }
 
   const OutputProfileListType::MacroListType& OutputProfileListType::
@@ -280,9 +280,9 @@ namespace opl
   }
 
   void OutputProfileListType::
-  setMacroList (::std::auto_ptr< MacroListType > x)
+  setMacroList (::std::unique_ptr< MacroListType > x)
   {
-    this->MacroList_.set (x);
+    this->MacroList_.set (std::move (x));
   }
 
   const OutputProfileListType::SignerOptional& OutputProfileListType::
@@ -310,9 +310,9 @@ namespace opl
   }
 
   void OutputProfileListType::
-  setSigner (::std::auto_ptr< SignerType > x)
+  setSigner (::std::unique_ptr< SignerType > x)
   {
-    this->Signer_.set (x);
+    this->Signer_.set (std::move (x));
   }
 
   const OutputProfileListType::SignatureOptional& OutputProfileListType::
@@ -340,9 +340,9 @@ namespace opl
   }
 
   void OutputProfileListType::
-  setSignature (::std::auto_ptr< SignatureType > x)
+  setSignature (::std::unique_ptr< SignatureType > x)
   {
-    this->Signature_.set (x);
+    this->Signature_.set (std::move (x));
   }
 
 
@@ -368,9 +368,9 @@ namespace opl
   }
 
   void MacroType::
-  setName (::std::auto_ptr< NameType > x)
+  setName (::std::unique_ptr< NameType > x)
   {
-    this->Name_.set (x);
+    this->Name_.set (std::move (x));
   }
 
   const MacroType::AnnotationOptional& MacroType::
@@ -398,9 +398,9 @@ namespace opl
   }
 
   void MacroType::
-  setAnnotation (::std::auto_ptr< AnnotationType > x)
+  setAnnotation (::std::unique_ptr< AnnotationType > x)
   {
-    this->Annotation_.set (x);
+    this->Annotation_.set (std::move (x));
   }
 
 
@@ -426,9 +426,9 @@ namespace opl
   }
 
   void PresetMacroType::
-  setPreset (::std::auto_ptr< PresetType > x)
+  setPreset (::std::unique_ptr< PresetType > x)
   {
-    this->Preset_.set (x);
+    this->Preset_.set (std::move (x));
   }
 
 
@@ -540,9 +540,9 @@ namespace opl
   }
 
   void OutputProfileListType_AliasListType_AliasType::
-  setHandle (::std::auto_ptr< HandleType1 > x)
+  setHandle (::std::unique_ptr< HandleType1 > x)
   {
-    this->handle_.set (x);
+    this->handle_.set (std::move (x));
   }
 }
 
@@ -589,8 +589,8 @@ namespace opl
   OutputProfileListType (const IdType& Id,
                          const IssueDateType& IssueDate,
                          const CompositionPlaylistIdType& CompositionPlaylistId,
-                         ::std::auto_ptr< AliasListType > AliasList,
-                         ::std::auto_ptr< MacroListType > MacroList)
+                         ::std::unique_ptr< AliasListType > AliasList,
+                         ::std::unique_ptr< MacroListType > MacroList)
   : ::xml_schema::Type (),
     Id_ (Id, this),
     Annotation_ (this),
@@ -599,8 +599,8 @@ namespace opl
     Creator_ (this),
     CompositionPlaylistId_ (CompositionPlaylistId, this),
     ExtensionProperties_ (this),
-    AliasList_ (AliasList, this),
-    MacroList_ (MacroList, this),
+    AliasList_ (std::move (AliasList), this),
+    MacroList_ (std::move (MacroList), this),
     Signer_ (this),
     Signature_ (this)
   {
@@ -663,12 +663,12 @@ namespace opl
       //
       if (n.name () == "Id" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-100/2014")
       {
-        ::std::auto_ptr< IdType > r (
+        ::std::unique_ptr< IdType > r (
           IdTraits::create (i, f, this));
 
         if (!Id_.present ())
         {
-          this->Id_.set (r);
+          this->Id_.set (::std::move (r));
           continue;
         }
       }
@@ -677,12 +677,12 @@ namespace opl
       //
       if (n.name () == "Annotation" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-100/2014")
       {
-        ::std::auto_ptr< AnnotationType > r (
+        ::std::unique_ptr< AnnotationType > r (
           AnnotationTraits::create (i, f, this));
 
         if (!this->Annotation_)
         {
-          this->Annotation_.set (r);
+          this->Annotation_.set (::std::move (r));
           continue;
         }
       }
@@ -691,12 +691,12 @@ namespace opl
       //
       if (n.name () == "IssueDate" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-100/2014")
       {
-        ::std::auto_ptr< IssueDateType > r (
+        ::std::unique_ptr< IssueDateType > r (
           IssueDateTraits::create (i, f, this));
 
         if (!IssueDate_.present ())
         {
-          this->IssueDate_.set (r);
+          this->IssueDate_.set (::std::move (r));
           continue;
         }
       }
@@ -705,12 +705,12 @@ namespace opl
       //
       if (n.name () == "Issuer" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-100/2014")
       {
-        ::std::auto_ptr< IssuerType > r (
+        ::std::unique_ptr< IssuerType > r (
           IssuerTraits::create (i, f, this));
 
         if (!this->Issuer_)
         {
-          this->Issuer_.set (r);
+          this->Issuer_.set (::std::move (r));
           continue;
         }
       }
@@ -719,12 +719,12 @@ namespace opl
       //
       if (n.name () == "Creator" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-100/2014")
       {
-        ::std::auto_ptr< CreatorType > r (
+        ::std::unique_ptr< CreatorType > r (
           CreatorTraits::create (i, f, this));
 
         if (!this->Creator_)
         {
-          this->Creator_.set (r);
+          this->Creator_.set (::std::move (r));
           continue;
         }
       }
@@ -733,12 +733,12 @@ namespace opl
       //
       if (n.name () == "CompositionPlaylistId" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-100/2014")
       {
-        ::std::auto_ptr< CompositionPlaylistIdType > r (
+        ::std::unique_ptr< CompositionPlaylistIdType > r (
           CompositionPlaylistIdTraits::create (i, f, this));
 
         if (!CompositionPlaylistId_.present ())
         {
-          this->CompositionPlaylistId_.set (r);
+          this->CompositionPlaylistId_.set (::std::move (r));
           continue;
         }
       }
@@ -747,12 +747,12 @@ namespace opl
       //
       if (n.name () == "ExtensionProperties" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-100/2014")
       {
-        ::std::auto_ptr< ExtensionPropertiesType > r (
+        ::std::unique_ptr< ExtensionPropertiesType > r (
           ExtensionPropertiesTraits::create (i, f, this));
 
         if (!this->ExtensionProperties_)
         {
-          this->ExtensionProperties_.set (r);
+          this->ExtensionProperties_.set (::std::move (r));
           continue;
         }
       }
@@ -761,12 +761,12 @@ namespace opl
       //
       if (n.name () == "AliasList" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-100/2014")
       {
-        ::std::auto_ptr< AliasListType > r (
+        ::std::unique_ptr< AliasListType > r (
           AliasListTraits::create (i, f, this));
 
         if (!AliasList_.present ())
         {
-          this->AliasList_.set (r);
+          this->AliasList_.set (::std::move (r));
           continue;
         }
       }
@@ -775,12 +775,12 @@ namespace opl
       //
       if (n.name () == "MacroList" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-100/2014")
       {
-        ::std::auto_ptr< MacroListType > r (
+        ::std::unique_ptr< MacroListType > r (
           MacroListTraits::create (i, f, this));
 
         if (!MacroList_.present ())
         {
-          this->MacroList_.set (r);
+          this->MacroList_.set (::std::move (r));
           continue;
         }
       }
@@ -789,12 +789,12 @@ namespace opl
       //
       if (n.name () == "Signer" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-100/2014")
       {
-        ::std::auto_ptr< SignerType > r (
+        ::std::unique_ptr< SignerType > r (
           SignerTraits::create (i, f, this));
 
         if (!this->Signer_)
         {
-          this->Signer_.set (r);
+          this->Signer_.set (::std::move (r));
           continue;
         }
       }
@@ -803,12 +803,12 @@ namespace opl
       //
       if (n.name () == "Signature" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< SignatureType > r (
+        ::std::unique_ptr< SignatureType > r (
           SignatureTraits::create (i, f, this));
 
         if (!this->Signature_)
         {
-          this->Signature_.set (r);
+          this->Signature_.set (::std::move (r));
           continue;
         }
       }
@@ -936,12 +936,12 @@ namespace opl
       //
       if (n.name () == "Name" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-100/2014")
       {
-        ::std::auto_ptr< NameType > r (
+        ::std::unique_ptr< NameType > r (
           NameTraits::create (i, f, this));
 
         if (!Name_.present ())
         {
-          this->Name_.set (r);
+          this->Name_.set (::std::move (r));
           continue;
         }
       }
@@ -950,12 +950,12 @@ namespace opl
       //
       if (n.name () == "Annotation" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-100/2014")
       {
-        ::std::auto_ptr< AnnotationType > r (
+        ::std::unique_ptr< AnnotationType > r (
           AnnotationTraits::create (i, f, this));
 
         if (!this->Annotation_)
         {
-          this->Annotation_.set (r);
+          this->Annotation_.set (::std::move (r));
           continue;
         }
       }
@@ -1052,12 +1052,12 @@ namespace opl
       //
       if (n.name () == "Preset" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-100/2014")
       {
-        ::std::auto_ptr< PresetType > r (
+        ::std::unique_ptr< PresetType > r (
           PresetTraits::create (i, f, this));
 
         if (!Preset_.present ())
         {
-          this->Preset_.set (r);
+          this->Preset_.set (::std::move (r));
           continue;
         }
       }
@@ -1362,10 +1362,10 @@ namespace opl
       //
       if (n.name () == "Alias" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-100/2014")
       {
-        ::std::auto_ptr< AliasType > r (
+        ::std::unique_ptr< AliasType > r (
           AliasTraits::create (i, f, this));
 
-        this->Alias_.push_back (r);
+        this->Alias_.push_back (::std::move (r));
         continue;
       }
 
@@ -1443,7 +1443,7 @@ namespace opl
       // Macro
       //
       {
-        ::std::auto_ptr< ::xsd::cxx::tree::type > tmp (
+        ::std::unique_ptr< ::xsd::cxx::tree::type > tmp (
           ::xsd::cxx::tree::type_factory_map_instance< 0, char > ().create (
             "Macro",
             "http://www.smpte-ra.org/schemas/2067-100/2014",
@@ -1452,7 +1452,7 @@ namespace opl
 
         if (tmp.get () != 0)
         {
-          ::std::auto_ptr< MacroType > r (
+          ::std::unique_ptr< MacroType > r (
             dynamic_cast< MacroType* > (tmp.get ()));
 
           if (r.get ())
@@ -1460,7 +1460,7 @@ namespace opl
           else
             throw ::xsd::cxx::tree::not_derived< char > ();
 
-          this->Macro_.push_back (r);
+          this->Macro_.push_back (::std::move (r));
           continue;
         }
       }
@@ -1730,7 +1730,7 @@ namespace opl
 
 namespace opl
 {
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (const ::std::string& u,
                           ::xml_schema::Flags f,
                           const ::xml_schema::Properties& p)
@@ -1741,18 +1741,18 @@ namespace opl
 
     ::xsd::cxx::tree::error_handler< char > h;
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         u, h, p, f));
 
     h.throw_if_failed< ::xsd::cxx::tree::parsing< char > > ();
 
-    return ::std::auto_ptr< ::opl::OutputProfileListType > (
+    return ::std::unique_ptr< ::opl::OutputProfileListType > (
       ::opl::parseOutputProfileList (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (const ::std::string& u,
                           ::xml_schema::ErrorHandler& h,
                           ::xml_schema::Flags f,
@@ -1762,37 +1762,37 @@ namespace opl
       (f & ::xml_schema::Flags::dont_initialize) == 0,
       (f & ::xml_schema::Flags::keep_dom) == 0);
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         u, h, p, f));
 
     if (!d.get ())
       throw ::xsd::cxx::tree::parsing< char > ();
 
-    return ::std::auto_ptr< ::opl::OutputProfileListType > (
+    return ::std::unique_ptr< ::opl::OutputProfileListType > (
       ::opl::parseOutputProfileList (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (const ::std::string& u,
                           ::xercesc::DOMErrorHandler& h,
                           ::xml_schema::Flags f,
                           const ::xml_schema::Properties& p)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         u, h, p, f));
 
     if (!d.get ())
       throw ::xsd::cxx::tree::parsing< char > ();
 
-    return ::std::auto_ptr< ::opl::OutputProfileListType > (
+    return ::std::unique_ptr< ::opl::OutputProfileListType > (
       ::opl::parseOutputProfileList (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (::std::istream& is,
                           ::xml_schema::Flags f,
                           const ::xml_schema::Properties& p)
@@ -1805,7 +1805,7 @@ namespace opl
     return ::opl::parseOutputProfileList (isrc, f, p);
   }
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (::std::istream& is,
                           ::xml_schema::ErrorHandler& h,
                           ::xml_schema::Flags f,
@@ -1819,7 +1819,7 @@ namespace opl
     return ::opl::parseOutputProfileList (isrc, h, f, p);
   }
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (::std::istream& is,
                           ::xercesc::DOMErrorHandler& h,
                           ::xml_schema::Flags f,
@@ -1829,7 +1829,7 @@ namespace opl
     return ::opl::parseOutputProfileList (isrc, h, f, p);
   }
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (::std::istream& is,
                           const ::std::string& sid,
                           ::xml_schema::Flags f,
@@ -1843,7 +1843,7 @@ namespace opl
     return ::opl::parseOutputProfileList (isrc, f, p);
   }
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (::std::istream& is,
                           const ::std::string& sid,
                           ::xml_schema::ErrorHandler& h,
@@ -1858,7 +1858,7 @@ namespace opl
     return ::opl::parseOutputProfileList (isrc, h, f, p);
   }
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (::std::istream& is,
                           const ::std::string& sid,
                           ::xercesc::DOMErrorHandler& h,
@@ -1869,73 +1869,73 @@ namespace opl
     return ::opl::parseOutputProfileList (isrc, h, f, p);
   }
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (::xercesc::InputSource& i,
                           ::xml_schema::Flags f,
                           const ::xml_schema::Properties& p)
   {
     ::xsd::cxx::tree::error_handler< char > h;
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         i, h, p, f));
 
     h.throw_if_failed< ::xsd::cxx::tree::parsing< char > > ();
 
-    return ::std::auto_ptr< ::opl::OutputProfileListType > (
+    return ::std::unique_ptr< ::opl::OutputProfileListType > (
       ::opl::parseOutputProfileList (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (::xercesc::InputSource& i,
                           ::xml_schema::ErrorHandler& h,
                           ::xml_schema::Flags f,
                           const ::xml_schema::Properties& p)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         i, h, p, f));
 
     if (!d.get ())
       throw ::xsd::cxx::tree::parsing< char > ();
 
-    return ::std::auto_ptr< ::opl::OutputProfileListType > (
+    return ::std::unique_ptr< ::opl::OutputProfileListType > (
       ::opl::parseOutputProfileList (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (::xercesc::InputSource& i,
                           ::xercesc::DOMErrorHandler& h,
                           ::xml_schema::Flags f,
                           const ::xml_schema::Properties& p)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         i, h, p, f));
 
     if (!d.get ())
       throw ::xsd::cxx::tree::parsing< char > ();
 
-    return ::std::auto_ptr< ::opl::OutputProfileListType > (
+    return ::std::unique_ptr< ::opl::OutputProfileListType > (
       ::opl::parseOutputProfileList (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (const ::xercesc::DOMDocument& doc,
                           ::xml_schema::Flags f,
                           const ::xml_schema::Properties& p)
   {
     if (f & ::xml_schema::Flags::keep_dom)
     {
-      ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+      ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
         static_cast< ::xercesc::DOMDocument* > (doc.cloneNode (true)));
 
-      return ::std::auto_ptr< ::opl::OutputProfileListType > (
+      return ::std::unique_ptr< ::opl::OutputProfileListType > (
         ::opl::parseOutputProfileList (
-          d, f | ::xml_schema::Flags::own_dom, p));
+          std::move (d), f | ::xml_schema::Flags::own_dom, p));
     }
 
     const ::xercesc::DOMElement& e (*doc.getDocumentElement ());
@@ -1945,7 +1945,7 @@ namespace opl
     if (n.name () == "OutputProfileList" &&
         n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-100/2014")
     {
-      ::std::auto_ptr< ::opl::OutputProfileListType > r (
+      ::std::unique_ptr< ::opl::OutputProfileListType > r (
         ::xsd::cxx::tree::traits< ::opl::OutputProfileListType, char >::create (
           e, f, 0));
       return r;
@@ -1958,12 +1958,12 @@ namespace opl
       "http://www.smpte-ra.org/schemas/2067-100/2014");
   }
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
-  parseOutputProfileList (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d,
+  ::std::unique_ptr< ::opl::OutputProfileListType >
+  parseOutputProfileList (::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d,
                           ::xml_schema::Flags f,
                           const ::xml_schema::Properties&)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > c (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > c (
       ((f & ::xml_schema::Flags::keep_dom) &&
        !(f & ::xml_schema::Flags::own_dom))
       ? static_cast< ::xercesc::DOMDocument* > (d->cloneNode (true))
@@ -1983,7 +1983,7 @@ namespace opl
     if (n.name () == "OutputProfileList" &&
         n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-100/2014")
     {
-      ::std::auto_ptr< ::opl::OutputProfileListType > r (
+      ::std::unique_ptr< ::opl::OutputProfileListType > r (
         ::xsd::cxx::tree::traits< ::opl::OutputProfileListType, char >::create (
           e, f, 0));
       return r;
@@ -2022,7 +2022,7 @@ namespace opl
     ::xsd::cxx::xml::auto_initializer i (
       (f & ::xml_schema::Flags::dont_initialize) == 0);
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::opl::serializeOutputProfileList (s, m, f));
 
     ::xsd::cxx::tree::error_handler< char > h;
@@ -2045,7 +2045,7 @@ namespace opl
     ::xsd::cxx::xml::auto_initializer i (
       (f & ::xml_schema::Flags::dont_initialize) == 0);
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::opl::serializeOutputProfileList (s, m, f));
     ::xsd::cxx::xml::dom::ostream_format_target t (o);
     if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
@@ -2062,7 +2062,7 @@ namespace opl
                               const ::std::string& e,
                               ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::opl::serializeOutputProfileList (s, m, f));
     ::xsd::cxx::xml::dom::ostream_format_target t (o);
     if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
@@ -2078,7 +2078,7 @@ namespace opl
                               const ::std::string& e,
                               ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::opl::serializeOutputProfileList (s, m, f));
 
     ::xsd::cxx::tree::error_handler< char > h;
@@ -2097,7 +2097,7 @@ namespace opl
                               const ::std::string& e,
                               ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::opl::serializeOutputProfileList (s, m, f));
     if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
     {
@@ -2113,7 +2113,7 @@ namespace opl
                               const ::std::string& e,
                               ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::opl::serializeOutputProfileList (s, m, f));
     if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
     {
@@ -2145,12 +2145,12 @@ namespace opl
     }
   }
 
-  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >
+  ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument >
   serializeOutputProfileList (const ::opl::OutputProfileListType& s,
                               const ::xml_schema::NamespaceInfomap& m,
                               ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::serialize< char > (
         "OutputProfileList",
         "http://www.smpte-ra.org/schemas/2067-100/2014",

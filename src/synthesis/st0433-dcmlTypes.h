@@ -31,8 +31,12 @@
 // in the accompanying FLOSSE file.
 //
 
-#ifndef DCML_TYPES_H
-#define DCML_TYPES_H
+#ifndef ST0433_DCML_TYPES_H
+#define ST0433_DCML_TYPES_H
+
+#ifndef XSD_CXX11
+#define XSD_CXX11
+#endif
 
 #ifndef XSD_USE_CHAR
 #define XSD_USE_CHAR
@@ -239,7 +243,7 @@ namespace xml_schema
   {
     // Automatic pointer for DOMDocument.
     //
-    using ::xsd::cxx::xml::dom::auto_ptr;
+    using ::xsd::cxx::xml::dom::unique_ptr;
 
 #ifndef XSD_CXX_TREE_TREE_NODE_KEY__XML_SCHEMA
 #define XSD_CXX_TREE_TREE_NODE_KEY__XML_SCHEMA
@@ -281,9 +285,10 @@ namespace dcml
 }
 
 
-#include <memory>    // ::std::auto_ptr
+#include <memory>    // ::std::unique_ptr
 #include <limits>    // std::numeric_limits
 #include <algorithm> // std::binary_search
+#include <utility>   // std::move
 
 #include <xsd/cxx/xml/char-utf8.hxx>
 
@@ -295,8 +300,6 @@ namespace dcml
 #include <xsd/cxx/xml/dom/parsing-header.hxx>
 
 #include <xsd/cxx/tree/containers-wildcard.hxx>
-
-#include "xml.h"
 
 #include "xmldsig-core-schema.h"
 
@@ -352,7 +355,7 @@ namespace dcml
     setLanguage (const LanguageType& x);
 
     void
-    setLanguage (::std::auto_ptr< LanguageType > p);
+    setLanguage (::std::unique_ptr< LanguageType > p);
 
     static const LanguageType&
     getLanguageDefaultValue ();
@@ -775,7 +778,7 @@ namespace dcml
     setUnits (const UnitsType& x);
 
     void
-    setUnits (::std::auto_ptr< UnitsType > p);
+    setUnits (::std::unique_ptr< UnitsType > p);
 
     // Constructors.
     //
@@ -829,7 +832,7 @@ namespace dcml
     setUnits (const UnitsType& x);
 
     void
-    setUnits (::std::auto_ptr< UnitsType > p);
+    setUnits (::std::unique_ptr< UnitsType > p);
 
     // mode
     //
@@ -846,7 +849,7 @@ namespace dcml
     setMode (const ModeType& x);
 
     void
-    setMode (::std::auto_ptr< ModeType > p);
+    setMode (::std::unique_ptr< ModeType > p);
 
     // Constructors.
     //
@@ -902,7 +905,7 @@ namespace dcml
     setUnits (const UnitsType& x);
 
     void
-    setUnits (::std::auto_ptr< UnitsType > p);
+    setUnits (::std::unique_ptr< UnitsType > p);
 
     // mode
     //
@@ -919,7 +922,7 @@ namespace dcml
     setMode (const ModeType& x);
 
     void
-    setMode (::std::auto_ptr< ModeType > p);
+    setMode (::std::unique_ptr< ModeType > p);
 
     // Constructors.
     //
@@ -975,7 +978,7 @@ namespace dcml
     setUnits (const UnitsType& x);
 
     void
-    setUnits (::std::auto_ptr< UnitsType > p);
+    setUnits (::std::unique_ptr< UnitsType > p);
 
     // Constructors.
     //
@@ -1029,7 +1032,7 @@ namespace dcml
     setEventscope (const EventscopeType& x);
 
     void
-    setEventscope (::std::auto_ptr< EventscopeType > p);
+    setEventscope (::std::unique_ptr< EventscopeType > p);
 
     static const EventscopeType&
     getEventscopeDefaultValue ();
@@ -1053,7 +1056,7 @@ namespace dcml
     setEvent (const EventOptional& x);
 
     void
-    setEvent (::std::auto_ptr< EventType > p);
+    setEvent (::std::unique_ptr< EventType > p);
 
     // period
     //
@@ -1070,7 +1073,7 @@ namespace dcml
     setPeriod (const PeriodType& x);
 
     void
-    setPeriod (::std::auto_ptr< PeriodType > p);
+    setPeriod (::std::unique_ptr< PeriodType > p);
 
     // Constructors.
     //
@@ -1159,7 +1162,7 @@ namespace dcml
     setIdtype (const IdtypeType& x);
 
     void
-    setIdtype (::std::auto_ptr< IdtypeType > p);
+    setIdtype (::std::unique_ptr< IdtypeType > p);
 
     // Constructors.
     //
@@ -1219,7 +1222,7 @@ namespace dcml
     setPrimaryID (const PrimaryIDType& x);
 
     void
-    setPrimaryID (::std::auto_ptr< PrimaryIDType > p);
+    setPrimaryID (::std::unique_ptr< PrimaryIDType > p);
 
     // SecondaryID
     //
@@ -1240,13 +1243,13 @@ namespace dcml
     setSecondaryID (const SecondaryIDOptional& x);
 
     void
-    setSecondaryID (::std::auto_ptr< SecondaryIDType > p);
+    setSecondaryID (::std::unique_ptr< SecondaryIDType > p);
 
     // Constructors.
     //
     DeviceIdentifierListType (const PrimaryIDType&);
 
-    DeviceIdentifierListType (::std::auto_ptr< PrimaryIDType >);
+    DeviceIdentifierListType (::std::unique_ptr< PrimaryIDType >);
 
     DeviceIdentifierListType (const ::xercesc::DOMElement& e,
                               ::xml_schema::Flags f = 0,
@@ -1296,7 +1299,7 @@ namespace dcml
     setScope (const ScopeType& x);
 
     void
-    setScope (::std::auto_ptr< ScopeType > p);
+    setScope (::std::unique_ptr< ScopeType > p);
 
     static const ScopeType&
     getScopeDefaultValue ();
@@ -1363,7 +1366,7 @@ namespace dcml
     setScope (const ScopeOptional& x);
 
     void
-    setScope (::std::auto_ptr< ScopeType > p);
+    setScope (::std::unique_ptr< ScopeType > p);
 
     // Constructors.
     //
@@ -1422,7 +1425,7 @@ namespace dcml
     setName (const NameType& x);
 
     void
-    setName (::std::auto_ptr< NameType > p);
+    setName (::std::unique_ptr< NameType > p);
 
     // Value
     //
@@ -1439,14 +1442,14 @@ namespace dcml
     setValue (const ValueType& x);
 
     void
-    setValue (::std::auto_ptr< ValueType > p);
+    setValue (::std::unique_ptr< ValueType > p);
 
     // Constructors.
     //
     NamedParmType (const NameType&,
                    const ValueType&);
 
-    NamedParmType (::std::auto_ptr< NameType >,
+    NamedParmType (::std::unique_ptr< NameType >,
                    const ValueType&);
 
     NamedParmType (const ::xercesc::DOMElement& e,
@@ -1621,7 +1624,7 @@ namespace dcml
     setDeviceIdentifier (const DeviceIdentifierType& x);
 
     void
-    setDeviceIdentifier (::std::auto_ptr< DeviceIdentifierType > p);
+    setDeviceIdentifier (::std::unique_ptr< DeviceIdentifierType > p);
 
     // DeviceTypeID
     //
@@ -1638,7 +1641,7 @@ namespace dcml
     setDeviceTypeID (const DeviceTypeIDType& x);
 
     void
-    setDeviceTypeID (::std::auto_ptr< DeviceTypeIDType > p);
+    setDeviceTypeID (::std::unique_ptr< DeviceTypeIDType > p);
 
     // DeviceSubsystemTypeID
     //
@@ -1659,7 +1662,7 @@ namespace dcml
     setDeviceSubsystemTypeID (const DeviceSubsystemTypeIDOptional& x);
 
     void
-    setDeviceSubsystemTypeID (::std::auto_ptr< DeviceSubsystemTypeIDType > p);
+    setDeviceSubsystemTypeID (::std::unique_ptr< DeviceSubsystemTypeIDType > p);
 
     // AdditionalID
     //
@@ -1680,7 +1683,7 @@ namespace dcml
     setAdditionalID (const AdditionalIDOptional& x);
 
     void
-    setAdditionalID (::std::auto_ptr< AdditionalIDType > p);
+    setAdditionalID (::std::unique_ptr< AdditionalIDType > p);
 
     // DeviceSerial
     //
@@ -1697,7 +1700,7 @@ namespace dcml
     setDeviceSerial (const DeviceSerialType& x);
 
     void
-    setDeviceSerial (::std::auto_ptr< DeviceSerialType > p);
+    setDeviceSerial (::std::unique_ptr< DeviceSerialType > p);
 
     // ManufacturerID
     //
@@ -1718,7 +1721,7 @@ namespace dcml
     setManufacturerID (const ManufacturerIDOptional& x);
 
     void
-    setManufacturerID (::std::auto_ptr< ManufacturerIDType > p);
+    setManufacturerID (::std::unique_ptr< ManufacturerIDType > p);
 
     // ManufacturerCertID
     //
@@ -1739,7 +1742,7 @@ namespace dcml
     setManufacturerCertID (const ManufacturerCertIDOptional& x);
 
     void
-    setManufacturerCertID (::std::auto_ptr< ManufacturerCertIDType > p);
+    setManufacturerCertID (::std::unique_ptr< ManufacturerCertIDType > p);
 
     // DeviceCertID
     //
@@ -1760,7 +1763,7 @@ namespace dcml
     setDeviceCertID (const DeviceCertIDOptional& x);
 
     void
-    setDeviceCertID (::std::auto_ptr< DeviceCertIDType > p);
+    setDeviceCertID (::std::unique_ptr< DeviceCertIDType > p);
 
     // ManufacturerName
     //
@@ -1781,7 +1784,7 @@ namespace dcml
     setManufacturerName (const ManufacturerNameOptional& x);
 
     void
-    setManufacturerName (::std::auto_ptr< ManufacturerNameType > p);
+    setManufacturerName (::std::unique_ptr< ManufacturerNameType > p);
 
     // DeviceName
     //
@@ -1802,7 +1805,7 @@ namespace dcml
     setDeviceName (const DeviceNameOptional& x);
 
     void
-    setDeviceName (::std::auto_ptr< DeviceNameType > p);
+    setDeviceName (::std::unique_ptr< DeviceNameType > p);
 
     // ModelNumber
     //
@@ -1823,7 +1826,7 @@ namespace dcml
     setModelNumber (const ModelNumberOptional& x);
 
     void
-    setModelNumber (::std::auto_ptr< ModelNumberType > p);
+    setModelNumber (::std::unique_ptr< ModelNumberType > p);
 
     // VersionInfo
     //
@@ -1840,7 +1843,7 @@ namespace dcml
     setVersionInfo (const VersionInfoType& x);
 
     void
-    setVersionInfo (::std::auto_ptr< VersionInfoType > p);
+    setVersionInfo (::std::unique_ptr< VersionInfoType > p);
 
     // DeviceComment
     //
@@ -1861,7 +1864,7 @@ namespace dcml
     setDeviceComment (const DeviceCommentOptional& x);
 
     void
-    setDeviceComment (::std::auto_ptr< DeviceCommentType > p);
+    setDeviceComment (::std::unique_ptr< DeviceCommentType > p);
 
     // Constructors.
     //
@@ -1870,10 +1873,10 @@ namespace dcml
                            const DeviceSerialType&,
                            const VersionInfoType&);
 
-    DeviceDescriptionType (::std::auto_ptr< DeviceIdentifierType >,
-                           ::std::auto_ptr< DeviceTypeIDType >,
+    DeviceDescriptionType (::std::unique_ptr< DeviceIdentifierType >,
+                           ::std::unique_ptr< DeviceTypeIDType >,
                            const DeviceSerialType&,
-                           ::std::auto_ptr< VersionInfoType >);
+                           ::std::unique_ptr< VersionInfoType >);
 
     DeviceDescriptionType (const ::xercesc::DOMElement& e,
                            ::xml_schema::Flags f = 0,
@@ -2238,4 +2241,4 @@ namespace dcml
 //
 // End epilogue.
 
-#endif // DCML_TYPES_H
+#endif // ST0433_DCML_TYPES_H

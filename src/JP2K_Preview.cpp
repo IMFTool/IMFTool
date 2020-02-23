@@ -34,10 +34,6 @@ JP2K_Preview::~JP2K_Preview()
 	{
 		qDebug() << "no reader found!";
 	}
-	
-	delete oetf_709;
-	delete eotf_2020;
-	delete eotf_PQ;
 }
 
 void JP2K_Preview::setUp() {
@@ -56,47 +52,6 @@ void JP2K_Preview::setUp() {
 		mMsg = "Error setting up decoder!"; // ERROR
 		opj_destroy_codec(pDecompressor);
 	}
-
-	// create lookup tables
-	max_f = 1 << bitdepth;
-	max_f_ = (float)(max_f)-1.0;
-
-	oetf_709 = new float[max_f];
-
-	float alpha = 1.09929682680944;
-	float beta = 0.018053968510807;
-	eotf_2020 = new float[max_f];
-
-	float m1 = 0.1593017578125;
-	float m2 = 78.84375;
-	float c1 = 0.8359375;
-	float c2 = 18.8515625;
-	float c3 = 18.6875;
-	eotf_PQ = new float[max_f];
-
-	for (int i = 0; i < max_f; i++) {
-
-		float input = (float)(i / max_f_); // convert input to value between 0...1
-
-		// BT.709 - OETF
-		oetf_709[i] = pow(input, 1.0f / 2.4f);
-
-
-		// BT.2020 - EOTF
-		if (input < (4.5 * beta)) {
-			eotf_2020[i] = input / 4.5;
-		}
-		else {
-			eotf_2020[i] = pow(((input + (alpha - 1)) / alpha), 1.0 / 0.45);
-		}
-
-		// SMPTE ST 2084 (PQ)
-		eotf_PQ[i] = pow(((pow(input, (1.0 / m2)) - c1)) / (c2 - c3 *pow(input, (1.0 / m2))), 1.0 / m1) * 10000;
-
-	}
-
-	eotf_PQ[0] = 0;
-
 }
 
 void JP2K_Preview::getProxy() {
@@ -160,7 +115,7 @@ void JP2K_Preview::setAsset() {
 
 		// get color space
 		colorPrimaries = asset->GetMetadata().colorPrimaries;
-		transferCharactersitics = asset->GetMetadata().transferCharcteristics;
+		transferCharacteristics = asset->GetMetadata().transferCharcteristics;
 		ColorEncoding = asset->GetMetadata().colorEncoding;
 		src_bitdepth = asset->GetMetadata().componentDepth;
 		//WR
@@ -428,7 +383,6 @@ QImage JP2::DataToQImage()
 					Y = (float)psImage->comps[0].data[(int)(y*w + x)];
 					Cb = (float)psImage->comps[1].data[xpos];
 					Cr = (float)psImage->comps[2].data[xpos];
-
 					// convert to rgb
 					r = (Y - offset)*maxcv / range_y + 2 * (1 - Kr)*(Cr - maxcv_plus_1 / 2)*maxcv / range_c;
 					g = (Y - offset)*maxcv / range_y - 2 * Kb*(1 - Kb) / Kg*(Cb - maxcv_plus_1 / 2)*maxcv / range_c - 2 * Kr*(1 - Kr) / Kg*(Cr - maxcv_plus_1 / 2)*maxcv / range_c;
@@ -446,7 +400,7 @@ QImage JP2::DataToQImage()
 				}
 
 				// now we have rgb data -> linearize the data!
-				switch (transferCharactersitics) {
+				switch (transferCharacteristics) {
 				case SMPTE::TransferCharacteristic_ITU709:
 
 					// convert to 8 bit
@@ -506,6 +460,13 @@ QImage JP2::DataToQImage()
 					continue; // jump to next pixel
 
 					break;
+				case SMPTE::TransferCharacteristic_HLG_OETF:
+					r = eoft_HLG[(int)((r / max) * max_f_)]; // 0...1
+					g = eoft_HLG[(int)((g / max) * max_f_)]; // 0...1
+					b = eoft_HLG[(int)((b / max) * max_f_)]; // 0...1
+
+					break;
+
 				default: return QImage(":/frame_error.png"); break; // abort!
 				}
 
@@ -737,5 +698,4 @@ void JP2::warning_callback(const char *mMsg, void *client_data) {
 void JP2::error_callback(const char *mMsg, void *client_data) {
 	qDebug() << "ERROR" << mMsg;
 }
-
 

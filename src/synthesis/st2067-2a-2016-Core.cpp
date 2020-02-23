@@ -64,9 +64,9 @@ namespace cc2016
   }
 
   void StereoImageTrackFileResourceType::
-  setLeftEye (::std::auto_ptr< LeftEyeType > x)
+  setLeftEye (::std::unique_ptr< LeftEyeType > x)
   {
-    this->LeftEye_.set (x);
+    this->LeftEye_.set (std::move (x));
   }
 
   const StereoImageTrackFileResourceType::RightEyeType& StereoImageTrackFileResourceType::
@@ -88,9 +88,9 @@ namespace cc2016
   }
 
   void StereoImageTrackFileResourceType::
-  setRightEye (::std::auto_ptr< RightEyeType > x)
+  setRightEye (::std::unique_ptr< RightEyeType > x)
   {
-    this->RightEye_.set (x);
+    this->RightEye_.set (std::move (x));
   }
 
 
@@ -144,9 +144,9 @@ namespace cc2016
   }
 
   void CDPSequence::
-  setParentTrackID (::std::auto_ptr< ParentTrackIDType > x)
+  setParentTrackID (::std::unique_ptr< ParentTrackIDType > x)
   {
-    this->ParentTrackID_.set (x);
+    this->ParentTrackID_.set (std::move (x));
   }
 }
 
@@ -183,12 +183,12 @@ namespace cc2016
   StereoImageTrackFileResourceType::
   StereoImageTrackFileResourceType (const IdType& Id,
                                     const IntrinsicDurationType& IntrinsicDuration,
-                                    ::std::auto_ptr< LeftEyeType > LeftEye,
-                                    ::std::auto_ptr< RightEyeType > RightEye)
+                                    ::std::unique_ptr< LeftEyeType > LeftEye,
+                                    ::std::unique_ptr< RightEyeType > RightEye)
   : ::cpl2016::BaseResourceType (Id,
                                  IntrinsicDuration),
-    LeftEye_ (LeftEye, this),
-    RightEye_ (RightEye, this)
+    LeftEye_ (std::move (LeftEye), this),
+    RightEye_ (std::move (RightEye), this)
   {
   }
 
@@ -232,7 +232,7 @@ namespace cc2016
       // LeftEye
       //
       {
-        ::std::auto_ptr< ::xsd::cxx::tree::type > tmp (
+        ::std::unique_ptr< ::xsd::cxx::tree::type > tmp (
           ::xsd::cxx::tree::type_factory_map_instance< 0, char > ().create (
             "LeftEye",
             "http://www.smpte-ra.org/schemas/2067-2/2016",
@@ -243,7 +243,7 @@ namespace cc2016
         {
           if (!LeftEye_.present ())
           {
-            ::std::auto_ptr< LeftEyeType > r (
+            ::std::unique_ptr< LeftEyeType > r (
               dynamic_cast< LeftEyeType* > (tmp.get ()));
 
             if (r.get ())
@@ -251,7 +251,7 @@ namespace cc2016
             else
               throw ::xsd::cxx::tree::not_derived< char > ();
 
-            this->LeftEye_.set (r);
+            this->LeftEye_.set (::std::move (r));
             continue;
           }
         }
@@ -260,7 +260,7 @@ namespace cc2016
       // RightEye
       //
       {
-        ::std::auto_ptr< ::xsd::cxx::tree::type > tmp (
+        ::std::unique_ptr< ::xsd::cxx::tree::type > tmp (
           ::xsd::cxx::tree::type_factory_map_instance< 0, char > ().create (
             "RightEye",
             "http://www.smpte-ra.org/schemas/2067-2/2016",
@@ -271,7 +271,7 @@ namespace cc2016
         {
           if (!RightEye_.present ())
           {
-            ::std::auto_ptr< RightEyeType > r (
+            ::std::unique_ptr< RightEyeType > r (
               dynamic_cast< RightEyeType* > (tmp.get ()));
 
             if (r.get ())
@@ -279,7 +279,7 @@ namespace cc2016
             else
               throw ::xsd::cxx::tree::not_derived< char > ();
 
-            this->RightEye_.set (r);
+            this->RightEye_.set (::std::move (r));
             continue;
           }
         }
@@ -455,11 +455,11 @@ namespace cc2016
   CDPSequence::
   CDPSequence (const IdType& Id,
                const TrackIdType& TrackId,
-               ::std::auto_ptr< ResourceListType > ResourceList,
+               ::std::unique_ptr< ResourceListType > ResourceList,
                const ParentTrackIDType& ParentTrackID)
   : ::cpl2016::SequenceType (Id,
                              TrackId,
-                             ResourceList),
+                             std::move (ResourceList)),
     ParentTrackID_ (ParentTrackID, this)
   {
   }
@@ -503,12 +503,12 @@ namespace cc2016
       //
       if (n.name () == "ParentTrackID" && n.namespace_ () == "http://www.smpte-ra.org/schemas/2067-2/2016")
       {
-        ::std::auto_ptr< ParentTrackIDType > r (
+        ::std::unique_ptr< ParentTrackIDType > r (
           ParentTrackIDTraits::create (i, f, this));
 
         if (!ParentTrackID_.present ())
         {
-          this->ParentTrackID_.set (r);
+          this->ParentTrackID_.set (::std::move (r));
           continue;
         }
       }

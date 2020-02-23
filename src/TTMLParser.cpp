@@ -458,7 +458,7 @@ QString elem::serializeTT(DOMElement *rEl) {
 
 // --------------------------------------------------------------------------------------------
 
-TTMLParser::TTMLParser() {}
+TTMLParser::TTMLParser() : framerate(0.0), is_wrapped(false), tickrate(0), timeline_in(0.0), timeline_out(0.0), mpTTMLtimelineResource(NULL) {}
 
 Error TTMLParser::open(const QString &rSourceFile, TTMLtimelineResource &ttml_segment, bool rIsWrapped) {
 
@@ -505,6 +505,7 @@ void TTMLParser::readAncilleryData() {
 	AS_02::Result_t result = reader.FillTimedTextDescriptor(TDesc);
 	TimedText::FrameBuffer buffer;
 	buffer.Capacity(2 * Kumu::Megabyte);
+	max = 255;
 	
 	if (ASDCP_SUCCESS(result)) {
 		AS_02::TimedText::ResourceList_t::const_iterator ri;
@@ -522,7 +523,27 @@ void TTMLParser::readAncilleryData() {
 #endif
 				QPixmap pix;
 				pix.loadFromData(buffer.RoData(), buffer.Size(), "png");
-				anc_resources[id] = pix.toImage();
+				QImage img = pix.toImage();
+
+				for (int x = 0; x < img.width(); x++) {
+					for (int y = 0; y < img.height(); y++) {
+						double r, g, b, a;
+						QColor pixelColor = img.pixelColor(x,y); // sRGB: 255 = 80cd/m2
+						pixelColor.getRgbF(&r, &g, &b, &a);
+						r = eoft_sRGB[(int)(r * max_f_)]; // 0...1
+						r = oetf_709[(int)(r * max_f_)] * max;
+						g = eoft_sRGB[(int)(g * max_f_)]; // 0...1
+						g = oetf_709[(int)(g * max_f_)] * max;
+						b = eoft_sRGB[(int)(b * max_f_ )]; // 0...1
+						b = oetf_709[(int)(b * max_f_)] * max;
+
+						pixelColor.setRgb((int)r, (int)g, (int)b, (int)(a*255));
+						img.setPixelColor(x, y, pixelColor);
+					}
+				}
+
+
+				anc_resources[id] = img; //pix.toImage();
 			}
 			else {
 #ifdef DEBUG_TTML
@@ -870,7 +891,7 @@ void TTMLParser::print2Console(const QVector<TTMLelem> &ttmls) {
 			qDebug() << ttmls[i].beg << " -> " << ttmls[i].end << "TEXT:" << ttmls[i].text;
 		}
 		else if(ttmls[i].type == 1){ // image
-			qDebug() << ttmls[i].beg << " -> " << ttmls[i].end << "IMAGE:" << ttmls[i].bgImage.byteCount();
+			qDebug() << ttmls[i].beg << " -> " << ttmls[i].end << "IMAGE:" << ttmls[i].bgImage.sizeInBytes();
 		}
 		else { // unknown
 			qDebug() << "ERROR: unknown type";

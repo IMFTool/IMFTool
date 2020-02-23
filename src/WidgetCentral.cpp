@@ -15,12 +15,10 @@
  */
 #include "WidgetCentral.h"
 #include "WidgetComposition.h"
-//#ifdef ARCHIVIST
 #include "WidgetVideoPreview.h" // (k)
 #include "WidgetTimedTextPreview.h" // (k)
 #include "TimelineParser.h" // (k)
 #include "SMPTE_Labels.h" // (k)
-//#endif
 #include "WidgetCompositionInfo.h"
 #include "ImfPackage.h"
 #include "ImfCommon.h"

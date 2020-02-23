@@ -34,6 +34,10 @@
 #ifndef XMLDSIG_CORE_SCHEMA_H
 #define XMLDSIG_CORE_SCHEMA_H
 
+#ifndef XSD_CXX11
+#define XSD_CXX11
+#endif
+
 #ifndef XSD_USE_CHAR
 #define XSD_USE_CHAR
 #endif
@@ -239,7 +243,7 @@ namespace xml_schema
   {
     // Automatic pointer for DOMDocument.
     //
-    using ::xsd::cxx::xml::dom::auto_ptr;
+    using ::xsd::cxx::xml::dom::unique_ptr;
 
 #ifndef XSD_CXX_TREE_TREE_NODE_KEY__XML_SCHEMA
 #define XSD_CXX_TREE_TREE_NODE_KEY__XML_SCHEMA
@@ -282,9 +286,10 @@ namespace ds
 }
 
 
-#include <memory>    // ::std::auto_ptr
+#include <memory>    // ::std::unique_ptr
 #include <limits>    // std::numeric_limits
 #include <algorithm> // std::binary_search
+#include <utility>   // std::move
 
 #include <xsd/cxx/xml/char-utf8.hxx>
 
@@ -351,7 +356,7 @@ namespace ds
     setSignedInfo (const SignedInfoType& x);
 
     void
-    setSignedInfo (::std::auto_ptr< SignedInfoType > p);
+    setSignedInfo (::std::unique_ptr< SignedInfoType > p);
 
     // SignatureValue
     //
@@ -368,7 +373,7 @@ namespace ds
     setSignatureValue (const SignatureValueType& x);
 
     void
-    setSignatureValue (::std::auto_ptr< SignatureValueType > p);
+    setSignatureValue (::std::unique_ptr< SignatureValueType > p);
 
     // KeyInfo
     //
@@ -389,7 +394,7 @@ namespace ds
     setKeyInfo (const KeyInfoOptional& x);
 
     void
-    setKeyInfo (::std::auto_ptr< KeyInfoType > p);
+    setKeyInfo (::std::unique_ptr< KeyInfoType > p);
 
     // Object
     //
@@ -427,15 +432,15 @@ namespace ds
     setId (const IdOptional& x);
 
     void
-    setId (::std::auto_ptr< IdType > p);
+    setId (::std::unique_ptr< IdType > p);
 
     // Constructors.
     //
     SignatureType (const SignedInfoType&,
                    const SignatureValueType&);
 
-    SignatureType (::std::auto_ptr< SignedInfoType >,
-                   ::std::auto_ptr< SignatureValueType >);
+    SignatureType (::std::unique_ptr< SignedInfoType >,
+                   ::std::unique_ptr< SignatureValueType >);
 
     SignatureType (const ::xercesc::DOMElement& e,
                    ::xml_schema::Flags f = 0,
@@ -492,7 +497,7 @@ namespace ds
     setId (const IdOptional& x);
 
     void
-    setId (::std::auto_ptr< IdType > p);
+    setId (::std::unique_ptr< IdType > p);
 
     // Constructors.
     //
@@ -547,7 +552,7 @@ namespace ds
     setCanonicalizationMethod (const CanonicalizationMethodType& x);
 
     void
-    setCanonicalizationMethod (::std::auto_ptr< CanonicalizationMethodType > p);
+    setCanonicalizationMethod (::std::unique_ptr< CanonicalizationMethodType > p);
 
     // SignatureMethod
     //
@@ -564,7 +569,7 @@ namespace ds
     setSignatureMethod (const SignatureMethodType& x);
 
     void
-    setSignatureMethod (::std::auto_ptr< SignatureMethodType > p);
+    setSignatureMethod (::std::unique_ptr< SignatureMethodType > p);
 
     // Reference
     //
@@ -602,15 +607,15 @@ namespace ds
     setId (const IdOptional& x);
 
     void
-    setId (::std::auto_ptr< IdType > p);
+    setId (::std::unique_ptr< IdType > p);
 
     // Constructors.
     //
     SignedInfoType (const CanonicalizationMethodType&,
                     const SignatureMethodType&);
 
-    SignedInfoType (::std::auto_ptr< CanonicalizationMethodType >,
-                    ::std::auto_ptr< SignatureMethodType >);
+    SignedInfoType (::std::unique_ptr< CanonicalizationMethodType >,
+                    ::std::unique_ptr< SignatureMethodType >);
 
     SignedInfoType (const ::xercesc::DOMElement& e,
                     ::xml_schema::Flags f = 0,
@@ -677,7 +682,7 @@ namespace ds
     setAlgorithm (const AlgorithmType& x);
 
     void
-    setAlgorithm (::std::auto_ptr< AlgorithmType > p);
+    setAlgorithm (::std::unique_ptr< AlgorithmType > p);
 
     // DOMDocument for wildcard content.
     //
@@ -717,7 +722,7 @@ namespace ds
            ::xml_schema::Flags);
 
     protected:
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > dom_document_;
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > dom_document_;
 
     AnySequence any_;
     ::xsd::cxx::tree::one< AlgorithmType > Algorithm_;
@@ -745,7 +750,7 @@ namespace ds
     setHMACOutputLength (const HMACOutputLengthOptional& x);
 
     void
-    setHMACOutputLength (::std::auto_ptr< HMACOutputLengthType > p);
+    setHMACOutputLength (::std::unique_ptr< HMACOutputLengthType > p);
 
     // any
     //
@@ -777,7 +782,7 @@ namespace ds
     setAlgorithm (const AlgorithmType& x);
 
     void
-    setAlgorithm (::std::auto_ptr< AlgorithmType > p);
+    setAlgorithm (::std::unique_ptr< AlgorithmType > p);
 
     // DOMDocument for wildcard content.
     //
@@ -817,7 +822,7 @@ namespace ds
            ::xml_schema::Flags);
 
     protected:
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > dom_document_;
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > dom_document_;
 
     HMACOutputLengthOptional HMACOutputLength_;
     AnySequence any_;
@@ -846,7 +851,7 @@ namespace ds
     setTransforms (const TransformsOptional& x);
 
     void
-    setTransforms (::std::auto_ptr< TransformsType > p);
+    setTransforms (::std::unique_ptr< TransformsType > p);
 
     // DigestMethod
     //
@@ -863,7 +868,7 @@ namespace ds
     setDigestMethod (const DigestMethodType& x);
 
     void
-    setDigestMethod (::std::auto_ptr< DigestMethodType > p);
+    setDigestMethod (::std::unique_ptr< DigestMethodType > p);
 
     // DigestValue
     //
@@ -880,7 +885,7 @@ namespace ds
     setDigestValue (const DigestValueType& x);
 
     void
-    setDigestValue (::std::auto_ptr< DigestValueType > p);
+    setDigestValue (::std::unique_ptr< DigestValueType > p);
 
     // Id
     //
@@ -901,7 +906,7 @@ namespace ds
     setId (const IdOptional& x);
 
     void
-    setId (::std::auto_ptr< IdType > p);
+    setId (::std::unique_ptr< IdType > p);
 
     // URI
     //
@@ -922,7 +927,7 @@ namespace ds
     setURI (const URIOptional& x);
 
     void
-    setURI (::std::auto_ptr< URIType > p);
+    setURI (::std::unique_ptr< URIType > p);
 
     // Type
     //
@@ -943,14 +948,14 @@ namespace ds
     setType (const TypeOptional& x);
 
     void
-    setType (::std::auto_ptr< TypeType > p);
+    setType (::std::unique_ptr< TypeType > p);
 
     // Constructors.
     //
     ReferenceType (const DigestMethodType&,
                    const DigestValueType&);
 
-    ReferenceType (::std::auto_ptr< DigestMethodType >,
+    ReferenceType (::std::unique_ptr< DigestMethodType >,
                    const DigestValueType&);
 
     ReferenceType (const ::xercesc::DOMElement& e,
@@ -1090,7 +1095,7 @@ namespace ds
     setAlgorithm (const AlgorithmType& x);
 
     void
-    setAlgorithm (::std::auto_ptr< AlgorithmType > p);
+    setAlgorithm (::std::unique_ptr< AlgorithmType > p);
 
     // DOMDocument for wildcard content.
     //
@@ -1130,7 +1135,7 @@ namespace ds
            ::xml_schema::Flags);
 
     protected:
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > dom_document_;
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > dom_document_;
 
     AnySequence any_;
     XPathSequence XPath_;
@@ -1170,7 +1175,7 @@ namespace ds
     setAlgorithm (const AlgorithmType& x);
 
     void
-    setAlgorithm (::std::auto_ptr< AlgorithmType > p);
+    setAlgorithm (::std::unique_ptr< AlgorithmType > p);
 
     // DOMDocument for wildcard content.
     //
@@ -1210,7 +1215,7 @@ namespace ds
            ::xml_schema::Flags);
 
     protected:
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > dom_document_;
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > dom_document_;
 
     AnySequence any_;
     ::xsd::cxx::tree::one< AlgorithmType > Algorithm_;
@@ -1406,7 +1411,7 @@ namespace ds
     setId (const IdOptional& x);
 
     void
-    setId (::std::auto_ptr< IdType > p);
+    setId (::std::unique_ptr< IdType > p);
 
     // DOMDocument for wildcard content.
     //
@@ -1446,7 +1451,7 @@ namespace ds
            ::xml_schema::Flags);
 
     protected:
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > dom_document_;
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > dom_document_;
 
     KeyNameSequence KeyName_;
     KeyValueSequence KeyValue_;
@@ -1481,7 +1486,7 @@ namespace ds
     setDSAKeyValue (const DSAKeyValueOptional& x);
 
     void
-    setDSAKeyValue (::std::auto_ptr< DSAKeyValueType > p);
+    setDSAKeyValue (::std::unique_ptr< DSAKeyValueType > p);
 
     // RSAKeyValue
     //
@@ -1502,7 +1507,7 @@ namespace ds
     setRSAKeyValue (const RSAKeyValueOptional& x);
 
     void
-    setRSAKeyValue (::std::auto_ptr< RSAKeyValueType > p);
+    setRSAKeyValue (::std::unique_ptr< RSAKeyValueType > p);
 
     // any
     //
@@ -1561,7 +1566,7 @@ namespace ds
            ::xml_schema::Flags);
 
     protected:
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > dom_document_;
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > dom_document_;
 
     DSAKeyValueOptional DSAKeyValue_;
     RSAKeyValueOptional RSAKeyValue_;
@@ -1590,7 +1595,7 @@ namespace ds
     setTransforms (const TransformsOptional& x);
 
     void
-    setTransforms (::std::auto_ptr< TransformsType > p);
+    setTransforms (::std::unique_ptr< TransformsType > p);
 
     // URI
     //
@@ -1611,7 +1616,7 @@ namespace ds
     setURI (const URIOptional& x);
 
     void
-    setURI (::std::auto_ptr< URIType > p);
+    setURI (::std::unique_ptr< URIType > p);
 
     // Type
     //
@@ -1632,7 +1637,7 @@ namespace ds
     setType (const TypeOptional& x);
 
     void
-    setType (::std::auto_ptr< TypeType > p);
+    setType (::std::unique_ptr< TypeType > p);
 
     // Constructors.
     //
@@ -1810,7 +1815,7 @@ namespace ds
            ::xml_schema::Flags);
 
     protected:
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > dom_document_;
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > dom_document_;
 
     X509IssuerSerialSequence X509IssuerSerial_;
     X509SKISequence X509SKI_;
@@ -1838,7 +1843,7 @@ namespace ds
     setX509IssuerName (const X509IssuerNameType& x);
 
     void
-    setX509IssuerName (::std::auto_ptr< X509IssuerNameType > p);
+    setX509IssuerName (::std::unique_ptr< X509IssuerNameType > p);
 
     // X509SerialNumber
     //
@@ -1911,7 +1916,7 @@ namespace ds
     setPGPKeyID (const PGPKeyIDOptional& x);
 
     void
-    setPGPKeyID (::std::auto_ptr< PGPKeyIDType > p);
+    setPGPKeyID (::std::unique_ptr< PGPKeyIDType > p);
 
     // PGPKeyPacket
     //
@@ -1932,7 +1937,7 @@ namespace ds
     setPGPKeyPacket (const PGPKeyPacketOptional& x);
 
     void
-    setPGPKeyPacket (::std::auto_ptr< PGPKeyPacketType > p);
+    setPGPKeyPacket (::std::unique_ptr< PGPKeyPacketType > p);
 
     // any
     //
@@ -2002,7 +2007,7 @@ namespace ds
            ::xml_schema::Flags);
 
     protected:
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > dom_document_;
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > dom_document_;
 
     PGPKeyIDOptional PGPKeyID_;
     PGPKeyPacketOptional PGPKeyPacket_;
@@ -2083,7 +2088,7 @@ namespace ds
            ::xml_schema::Flags);
 
     protected:
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > dom_document_;
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > dom_document_;
 
     SPKISexpSequence SPKISexp_;
     AnySequence any_;
@@ -2126,7 +2131,7 @@ namespace ds
     setId (const IdOptional& x);
 
     void
-    setId (::std::auto_ptr< IdType > p);
+    setId (::std::unique_ptr< IdType > p);
 
     // MimeType
     //
@@ -2147,7 +2152,7 @@ namespace ds
     setMimeType (const MimeTypeOptional& x);
 
     void
-    setMimeType (::std::auto_ptr< MimeTypeType > p);
+    setMimeType (::std::unique_ptr< MimeTypeType > p);
 
     // Encoding
     //
@@ -2168,7 +2173,7 @@ namespace ds
     setEncoding (const EncodingOptional& x);
 
     void
-    setEncoding (::std::auto_ptr< EncodingType > p);
+    setEncoding (::std::unique_ptr< EncodingType > p);
 
     // DOMDocument for wildcard content.
     //
@@ -2208,7 +2213,7 @@ namespace ds
            ::xml_schema::Flags);
 
     protected:
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > dom_document_;
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > dom_document_;
 
     AnySequence any_;
     IdOptional Id_;
@@ -2255,7 +2260,7 @@ namespace ds
     setId (const IdOptional& x);
 
     void
-    setId (::std::auto_ptr< IdType > p);
+    setId (::std::unique_ptr< IdType > p);
 
     // Constructors.
     //
@@ -2330,7 +2335,7 @@ namespace ds
     setId (const IdOptional& x);
 
     void
-    setId (::std::auto_ptr< IdType > p);
+    setId (::std::unique_ptr< IdType > p);
 
     // Constructors.
     //
@@ -2399,7 +2404,7 @@ namespace ds
     setTarget (const TargetType& x);
 
     void
-    setTarget (::std::auto_ptr< TargetType > p);
+    setTarget (::std::unique_ptr< TargetType > p);
 
     // Id
     //
@@ -2420,7 +2425,7 @@ namespace ds
     setId (const IdOptional& x);
 
     void
-    setId (::std::auto_ptr< IdType > p);
+    setId (::std::unique_ptr< IdType > p);
 
     // DOMDocument for wildcard content.
     //
@@ -2460,7 +2465,7 @@ namespace ds
            ::xml_schema::Flags);
 
     protected:
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > dom_document_;
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > dom_document_;
 
     AnySequence any_;
     ::xsd::cxx::tree::one< TargetType > Target_;
@@ -2521,7 +2526,7 @@ namespace ds
     setP (const POptional& x);
 
     void
-    setP (::std::auto_ptr< PType > p);
+    setP (::std::unique_ptr< PType > p);
 
     // Q
     //
@@ -2542,7 +2547,7 @@ namespace ds
     setQ (const QOptional& x);
 
     void
-    setQ (::std::auto_ptr< QType > p);
+    setQ (::std::unique_ptr< QType > p);
 
     // G
     //
@@ -2563,7 +2568,7 @@ namespace ds
     setG (const GOptional& x);
 
     void
-    setG (::std::auto_ptr< GType > p);
+    setG (::std::unique_ptr< GType > p);
 
     // Y
     //
@@ -2580,7 +2585,7 @@ namespace ds
     setY (const YType& x);
 
     void
-    setY (::std::auto_ptr< YType > p);
+    setY (::std::unique_ptr< YType > p);
 
     // J
     //
@@ -2601,7 +2606,7 @@ namespace ds
     setJ (const JOptional& x);
 
     void
-    setJ (::std::auto_ptr< JType > p);
+    setJ (::std::unique_ptr< JType > p);
 
     // Seed
     //
@@ -2622,7 +2627,7 @@ namespace ds
     setSeed (const SeedOptional& x);
 
     void
-    setSeed (::std::auto_ptr< SeedType > p);
+    setSeed (::std::unique_ptr< SeedType > p);
 
     // PgenCounter
     //
@@ -2643,7 +2648,7 @@ namespace ds
     setPgenCounter (const PgenCounterOptional& x);
 
     void
-    setPgenCounter (::std::auto_ptr< PgenCounterType > p);
+    setPgenCounter (::std::unique_ptr< PgenCounterType > p);
 
     // Constructors.
     //
@@ -2702,7 +2707,7 @@ namespace ds
     setModulus (const ModulusType& x);
 
     void
-    setModulus (::std::auto_ptr< ModulusType > p);
+    setModulus (::std::unique_ptr< ModulusType > p);
 
     // Exponent
     //
@@ -2719,7 +2724,7 @@ namespace ds
     setExponent (const ExponentType& x);
 
     void
-    setExponent (::std::auto_ptr< ExponentType > p);
+    setExponent (::std::unique_ptr< ExponentType > p);
 
     // Constructors.
     //

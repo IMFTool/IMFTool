@@ -68,9 +68,9 @@ namespace ds
   }
 
   void SignatureType::
-  setSignedInfo (::std::auto_ptr< SignedInfoType > x)
+  setSignedInfo (::std::unique_ptr< SignedInfoType > x)
   {
-    this->SignedInfo_.set (x);
+    this->SignedInfo_.set (std::move (x));
   }
 
   const SignatureType::SignatureValueType& SignatureType::
@@ -92,9 +92,9 @@ namespace ds
   }
 
   void SignatureType::
-  setSignatureValue (::std::auto_ptr< SignatureValueType > x)
+  setSignatureValue (::std::unique_ptr< SignatureValueType > x)
   {
-    this->SignatureValue_.set (x);
+    this->SignatureValue_.set (std::move (x));
   }
 
   const SignatureType::KeyInfoOptional& SignatureType::
@@ -122,9 +122,9 @@ namespace ds
   }
 
   void SignatureType::
-  setKeyInfo (::std::auto_ptr< KeyInfoType > x)
+  setKeyInfo (::std::unique_ptr< KeyInfoType > x)
   {
-    this->KeyInfo_.set (x);
+    this->KeyInfo_.set (std::move (x));
   }
 
   const SignatureType::ObjectSequence& SignatureType::
@@ -170,9 +170,9 @@ namespace ds
   }
 
   void SignatureType::
-  setId (::std::auto_ptr< IdType > x)
+  setId (::std::unique_ptr< IdType > x)
   {
-    this->Id_.set (x);
+    this->Id_.set (std::move (x));
   }
 
 
@@ -204,9 +204,9 @@ namespace ds
   }
 
   void SignatureValueType::
-  setId (::std::auto_ptr< IdType > x)
+  setId (::std::unique_ptr< IdType > x)
   {
-    this->Id_.set (x);
+    this->Id_.set (std::move (x));
   }
 
 
@@ -232,9 +232,9 @@ namespace ds
   }
 
   void SignedInfoType::
-  setCanonicalizationMethod (::std::auto_ptr< CanonicalizationMethodType > x)
+  setCanonicalizationMethod (::std::unique_ptr< CanonicalizationMethodType > x)
   {
-    this->CanonicalizationMethod_.set (x);
+    this->CanonicalizationMethod_.set (std::move (x));
   }
 
   const SignedInfoType::SignatureMethodType& SignedInfoType::
@@ -256,9 +256,9 @@ namespace ds
   }
 
   void SignedInfoType::
-  setSignatureMethod (::std::auto_ptr< SignatureMethodType > x)
+  setSignatureMethod (::std::unique_ptr< SignatureMethodType > x)
   {
-    this->SignatureMethod_.set (x);
+    this->SignatureMethod_.set (std::move (x));
   }
 
   const SignedInfoType::ReferenceSequence& SignedInfoType::
@@ -304,9 +304,9 @@ namespace ds
   }
 
   void SignedInfoType::
-  setId (::std::auto_ptr< IdType > x)
+  setId (::std::unique_ptr< IdType > x)
   {
-    this->Id_.set (x);
+    this->Id_.set (std::move (x));
   }
 
 
@@ -350,9 +350,9 @@ namespace ds
   }
 
   void CanonicalizationMethodType::
-  setAlgorithm (::std::auto_ptr< AlgorithmType > x)
+  setAlgorithm (::std::unique_ptr< AlgorithmType > x)
   {
-    this->Algorithm_.set (x);
+    this->Algorithm_.set (std::move (x));
   }
 
   const ::xercesc::DOMDocument& CanonicalizationMethodType::
@@ -396,9 +396,9 @@ namespace ds
   }
 
   void SignatureMethodType::
-  setHMACOutputLength (::std::auto_ptr< HMACOutputLengthType > x)
+  setHMACOutputLength (::std::unique_ptr< HMACOutputLengthType > x)
   {
-    this->HMACOutputLength_.set (x);
+    this->HMACOutputLength_.set (std::move (x));
   }
 
   const SignatureMethodType::AnySequence& SignatureMethodType::
@@ -438,9 +438,9 @@ namespace ds
   }
 
   void SignatureMethodType::
-  setAlgorithm (::std::auto_ptr< AlgorithmType > x)
+  setAlgorithm (::std::unique_ptr< AlgorithmType > x)
   {
-    this->Algorithm_.set (x);
+    this->Algorithm_.set (std::move (x));
   }
 
   const ::xercesc::DOMDocument& SignatureMethodType::
@@ -484,9 +484,9 @@ namespace ds
   }
 
   void ReferenceType::
-  setTransforms (::std::auto_ptr< TransformsType > x)
+  setTransforms (::std::unique_ptr< TransformsType > x)
   {
-    this->Transforms_.set (x);
+    this->Transforms_.set (std::move (x));
   }
 
   const ReferenceType::DigestMethodType& ReferenceType::
@@ -508,9 +508,9 @@ namespace ds
   }
 
   void ReferenceType::
-  setDigestMethod (::std::auto_ptr< DigestMethodType > x)
+  setDigestMethod (::std::unique_ptr< DigestMethodType > x)
   {
-    this->DigestMethod_.set (x);
+    this->DigestMethod_.set (std::move (x));
   }
 
   const ReferenceType::DigestValueType& ReferenceType::
@@ -532,9 +532,9 @@ namespace ds
   }
 
   void ReferenceType::
-  setDigestValue (::std::auto_ptr< DigestValueType > x)
+  setDigestValue (::std::unique_ptr< DigestValueType > x)
   {
-    this->DigestValue_.set (x);
+    this->DigestValue_.set (std::move (x));
   }
 
   const ReferenceType::IdOptional& ReferenceType::
@@ -562,9 +562,9 @@ namespace ds
   }
 
   void ReferenceType::
-  setId (::std::auto_ptr< IdType > x)
+  setId (::std::unique_ptr< IdType > x)
   {
-    this->Id_.set (x);
+    this->Id_.set (std::move (x));
   }
 
   const ReferenceType::URIOptional& ReferenceType::
@@ -592,9 +592,9 @@ namespace ds
   }
 
   void ReferenceType::
-  setURI (::std::auto_ptr< URIType > x)
+  setURI (::std::unique_ptr< URIType > x)
   {
-    this->URI_.set (x);
+    this->URI_.set (std::move (x));
   }
 
   const ReferenceType::TypeOptional& ReferenceType::
@@ -622,9 +622,9 @@ namespace ds
   }
 
   void ReferenceType::
-  setType (::std::auto_ptr< TypeType > x)
+  setType (::std::unique_ptr< TypeType > x)
   {
-    this->Type_.set (x);
+    this->Type_.set (std::move (x));
   }
 
 
@@ -708,9 +708,9 @@ namespace ds
   }
 
   void TransformType::
-  setAlgorithm (::std::auto_ptr< AlgorithmType > x)
+  setAlgorithm (::std::unique_ptr< AlgorithmType > x)
   {
-    this->Algorithm_.set (x);
+    this->Algorithm_.set (std::move (x));
   }
 
   const ::xercesc::DOMDocument& TransformType::
@@ -766,9 +766,9 @@ namespace ds
   }
 
   void DigestMethodType::
-  setAlgorithm (::std::auto_ptr< AlgorithmType > x)
+  setAlgorithm (::std::unique_ptr< AlgorithmType > x)
   {
-    this->Algorithm_.set (x);
+    this->Algorithm_.set (std::move (x));
   }
 
   const ::xercesc::DOMDocument& DigestMethodType::
@@ -960,9 +960,9 @@ namespace ds
   }
 
   void KeyInfoType::
-  setId (::std::auto_ptr< IdType > x)
+  setId (::std::unique_ptr< IdType > x)
   {
-    this->Id_.set (x);
+    this->Id_.set (std::move (x));
   }
 
   const ::xercesc::DOMDocument& KeyInfoType::
@@ -1006,9 +1006,9 @@ namespace ds
   }
 
   void KeyValueType::
-  setDSAKeyValue (::std::auto_ptr< DSAKeyValueType > x)
+  setDSAKeyValue (::std::unique_ptr< DSAKeyValueType > x)
   {
-    this->DSAKeyValue_.set (x);
+    this->DSAKeyValue_.set (std::move (x));
   }
 
   const KeyValueType::RSAKeyValueOptional& KeyValueType::
@@ -1036,9 +1036,9 @@ namespace ds
   }
 
   void KeyValueType::
-  setRSAKeyValue (::std::auto_ptr< RSAKeyValueType > x)
+  setRSAKeyValue (::std::unique_ptr< RSAKeyValueType > x)
   {
-    this->RSAKeyValue_.set (x);
+    this->RSAKeyValue_.set (std::move (x));
   }
 
   const KeyValueType::AnyOptional& KeyValueType::
@@ -1112,9 +1112,9 @@ namespace ds
   }
 
   void RetrievalMethodType::
-  setTransforms (::std::auto_ptr< TransformsType > x)
+  setTransforms (::std::unique_ptr< TransformsType > x)
   {
-    this->Transforms_.set (x);
+    this->Transforms_.set (std::move (x));
   }
 
   const RetrievalMethodType::URIOptional& RetrievalMethodType::
@@ -1142,9 +1142,9 @@ namespace ds
   }
 
   void RetrievalMethodType::
-  setURI (::std::auto_ptr< URIType > x)
+  setURI (::std::unique_ptr< URIType > x)
   {
-    this->URI_.set (x);
+    this->URI_.set (std::move (x));
   }
 
   const RetrievalMethodType::TypeOptional& RetrievalMethodType::
@@ -1172,9 +1172,9 @@ namespace ds
   }
 
   void RetrievalMethodType::
-  setType (::std::auto_ptr< TypeType > x)
+  setType (::std::unique_ptr< TypeType > x)
   {
-    this->Type_.set (x);
+    this->Type_.set (std::move (x));
   }
 
 
@@ -1324,9 +1324,9 @@ namespace ds
   }
 
   void X509IssuerSerialType::
-  setX509IssuerName (::std::auto_ptr< X509IssuerNameType > x)
+  setX509IssuerName (::std::unique_ptr< X509IssuerNameType > x)
   {
-    this->X509IssuerName_.set (x);
+    this->X509IssuerName_.set (std::move (x));
   }
 
   const X509IssuerSerialType::X509SerialNumberType& X509IssuerSerialType::
@@ -1376,9 +1376,9 @@ namespace ds
   }
 
   void PGPDataType::
-  setPGPKeyID (::std::auto_ptr< PGPKeyIDType > x)
+  setPGPKeyID (::std::unique_ptr< PGPKeyIDType > x)
   {
-    this->PGPKeyID_.set (x);
+    this->PGPKeyID_.set (std::move (x));
   }
 
   const PGPDataType::PGPKeyPacketOptional& PGPDataType::
@@ -1406,9 +1406,9 @@ namespace ds
   }
 
   void PGPDataType::
-  setPGPKeyPacket (::std::auto_ptr< PGPKeyPacketType > x)
+  setPGPKeyPacket (::std::unique_ptr< PGPKeyPacketType > x)
   {
-    this->PGPKeyPacket_.set (x);
+    this->PGPKeyPacket_.set (std::move (x));
   }
 
   const PGPDataType::AnySequence& PGPDataType::
@@ -1558,9 +1558,9 @@ namespace ds
   }
 
   void ObjectType::
-  setId (::std::auto_ptr< IdType > x)
+  setId (::std::unique_ptr< IdType > x)
   {
-    this->Id_.set (x);
+    this->Id_.set (std::move (x));
   }
 
   const ObjectType::MimeTypeOptional& ObjectType::
@@ -1588,9 +1588,9 @@ namespace ds
   }
 
   void ObjectType::
-  setMimeType (::std::auto_ptr< MimeTypeType > x)
+  setMimeType (::std::unique_ptr< MimeTypeType > x)
   {
-    this->MimeType_.set (x);
+    this->MimeType_.set (std::move (x));
   }
 
   const ObjectType::EncodingOptional& ObjectType::
@@ -1618,9 +1618,9 @@ namespace ds
   }
 
   void ObjectType::
-  setEncoding (::std::auto_ptr< EncodingType > x)
+  setEncoding (::std::unique_ptr< EncodingType > x)
   {
-    this->Encoding_.set (x);
+    this->Encoding_.set (std::move (x));
   }
 
   const ::xercesc::DOMDocument& ObjectType::
@@ -1682,9 +1682,9 @@ namespace ds
   }
 
   void ManifestType::
-  setId (::std::auto_ptr< IdType > x)
+  setId (::std::unique_ptr< IdType > x)
   {
-    this->Id_.set (x);
+    this->Id_.set (std::move (x));
   }
 
 
@@ -1734,9 +1734,9 @@ namespace ds
   }
 
   void SignaturePropertiesType::
-  setId (::std::auto_ptr< IdType > x)
+  setId (::std::unique_ptr< IdType > x)
   {
-    this->Id_.set (x);
+    this->Id_.set (std::move (x));
   }
 
 
@@ -1780,9 +1780,9 @@ namespace ds
   }
 
   void SignaturePropertyType::
-  setTarget (::std::auto_ptr< TargetType > x)
+  setTarget (::std::unique_ptr< TargetType > x)
   {
-    this->Target_.set (x);
+    this->Target_.set (std::move (x));
   }
 
   const SignaturePropertyType::IdOptional& SignaturePropertyType::
@@ -1810,9 +1810,9 @@ namespace ds
   }
 
   void SignaturePropertyType::
-  setId (::std::auto_ptr< IdType > x)
+  setId (::std::unique_ptr< IdType > x)
   {
-    this->Id_.set (x);
+    this->Id_.set (std::move (x));
   }
 
   const ::xercesc::DOMDocument& SignaturePropertyType::
@@ -1860,9 +1860,9 @@ namespace ds
   }
 
   void DSAKeyValueType::
-  setP (::std::auto_ptr< PType > x)
+  setP (::std::unique_ptr< PType > x)
   {
-    this->P_.set (x);
+    this->P_.set (std::move (x));
   }
 
   const DSAKeyValueType::QOptional& DSAKeyValueType::
@@ -1890,9 +1890,9 @@ namespace ds
   }
 
   void DSAKeyValueType::
-  setQ (::std::auto_ptr< QType > x)
+  setQ (::std::unique_ptr< QType > x)
   {
-    this->Q_.set (x);
+    this->Q_.set (std::move (x));
   }
 
   const DSAKeyValueType::GOptional& DSAKeyValueType::
@@ -1920,9 +1920,9 @@ namespace ds
   }
 
   void DSAKeyValueType::
-  setG (::std::auto_ptr< GType > x)
+  setG (::std::unique_ptr< GType > x)
   {
-    this->G_.set (x);
+    this->G_.set (std::move (x));
   }
 
   const DSAKeyValueType::YType& DSAKeyValueType::
@@ -1944,9 +1944,9 @@ namespace ds
   }
 
   void DSAKeyValueType::
-  setY (::std::auto_ptr< YType > x)
+  setY (::std::unique_ptr< YType > x)
   {
-    this->Y_.set (x);
+    this->Y_.set (std::move (x));
   }
 
   const DSAKeyValueType::JOptional& DSAKeyValueType::
@@ -1974,9 +1974,9 @@ namespace ds
   }
 
   void DSAKeyValueType::
-  setJ (::std::auto_ptr< JType > x)
+  setJ (::std::unique_ptr< JType > x)
   {
-    this->J_.set (x);
+    this->J_.set (std::move (x));
   }
 
   const DSAKeyValueType::SeedOptional& DSAKeyValueType::
@@ -2004,9 +2004,9 @@ namespace ds
   }
 
   void DSAKeyValueType::
-  setSeed (::std::auto_ptr< SeedType > x)
+  setSeed (::std::unique_ptr< SeedType > x)
   {
-    this->Seed_.set (x);
+    this->Seed_.set (std::move (x));
   }
 
   const DSAKeyValueType::PgenCounterOptional& DSAKeyValueType::
@@ -2034,9 +2034,9 @@ namespace ds
   }
 
   void DSAKeyValueType::
-  setPgenCounter (::std::auto_ptr< PgenCounterType > x)
+  setPgenCounter (::std::unique_ptr< PgenCounterType > x)
   {
-    this->PgenCounter_.set (x);
+    this->PgenCounter_.set (std::move (x));
   }
 
 
@@ -2062,9 +2062,9 @@ namespace ds
   }
 
   void RSAKeyValueType::
-  setModulus (::std::auto_ptr< ModulusType > x)
+  setModulus (::std::unique_ptr< ModulusType > x)
   {
-    this->Modulus_.set (x);
+    this->Modulus_.set (std::move (x));
   }
 
   const RSAKeyValueType::ExponentType& RSAKeyValueType::
@@ -2086,9 +2086,9 @@ namespace ds
   }
 
   void RSAKeyValueType::
-  setExponent (::std::auto_ptr< ExponentType > x)
+  setExponent (::std::unique_ptr< ExponentType > x)
   {
-    this->Exponent_.set (x);
+    this->Exponent_.set (std::move (x));
   }
 }
 
@@ -2183,11 +2183,11 @@ namespace ds
   }
 
   SignatureType::
-  SignatureType (::std::auto_ptr< SignedInfoType > SignedInfo,
-                 ::std::auto_ptr< SignatureValueType > SignatureValue)
+  SignatureType (::std::unique_ptr< SignedInfoType > SignedInfo,
+                 ::std::unique_ptr< SignatureValueType > SignatureValue)
   : ::xml_schema::Type (),
-    SignedInfo_ (SignedInfo, this),
-    SignatureValue_ (SignatureValue, this),
+    SignedInfo_ (std::move (SignedInfo), this),
+    SignatureValue_ (std::move (SignatureValue), this),
     KeyInfo_ (this),
     Object_ (this),
     Id_ (this)
@@ -2239,12 +2239,12 @@ namespace ds
       //
       if (n.name () == "SignedInfo" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< SignedInfoType > r (
+        ::std::unique_ptr< SignedInfoType > r (
           SignedInfoTraits::create (i, f, this));
 
         if (!SignedInfo_.present ())
         {
-          this->SignedInfo_.set (r);
+          this->SignedInfo_.set (::std::move (r));
           continue;
         }
       }
@@ -2253,12 +2253,12 @@ namespace ds
       //
       if (n.name () == "SignatureValue" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< SignatureValueType > r (
+        ::std::unique_ptr< SignatureValueType > r (
           SignatureValueTraits::create (i, f, this));
 
         if (!SignatureValue_.present ())
         {
-          this->SignatureValue_.set (r);
+          this->SignatureValue_.set (::std::move (r));
           continue;
         }
       }
@@ -2267,12 +2267,12 @@ namespace ds
       //
       if (n.name () == "KeyInfo" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< KeyInfoType > r (
+        ::std::unique_ptr< KeyInfoType > r (
           KeyInfoTraits::create (i, f, this));
 
         if (!this->KeyInfo_)
         {
-          this->KeyInfo_.set (r);
+          this->KeyInfo_.set (::std::move (r));
           continue;
         }
       }
@@ -2281,10 +2281,10 @@ namespace ds
       //
       if (n.name () == "Object" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< ObjectType > r (
+        ::std::unique_ptr< ObjectType > r (
           ObjectTraits::create (i, f, this));
 
-        this->Object_.push_back (r);
+        this->Object_.push_back (::std::move (r));
         continue;
       }
 
@@ -2444,11 +2444,11 @@ namespace ds
   }
 
   SignedInfoType::
-  SignedInfoType (::std::auto_ptr< CanonicalizationMethodType > CanonicalizationMethod,
-                  ::std::auto_ptr< SignatureMethodType > SignatureMethod)
+  SignedInfoType (::std::unique_ptr< CanonicalizationMethodType > CanonicalizationMethod,
+                  ::std::unique_ptr< SignatureMethodType > SignatureMethod)
   : ::xml_schema::Type (),
-    CanonicalizationMethod_ (CanonicalizationMethod, this),
-    SignatureMethod_ (SignatureMethod, this),
+    CanonicalizationMethod_ (std::move (CanonicalizationMethod), this),
+    SignatureMethod_ (std::move (SignatureMethod), this),
     Reference_ (this),
     Id_ (this)
   {
@@ -2497,12 +2497,12 @@ namespace ds
       //
       if (n.name () == "CanonicalizationMethod" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< CanonicalizationMethodType > r (
+        ::std::unique_ptr< CanonicalizationMethodType > r (
           CanonicalizationMethodTraits::create (i, f, this));
 
         if (!CanonicalizationMethod_.present ())
         {
-          this->CanonicalizationMethod_.set (r);
+          this->CanonicalizationMethod_.set (::std::move (r));
           continue;
         }
       }
@@ -2511,12 +2511,12 @@ namespace ds
       //
       if (n.name () == "SignatureMethod" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< SignatureMethodType > r (
+        ::std::unique_ptr< SignatureMethodType > r (
           SignatureMethodTraits::create (i, f, this));
 
         if (!SignatureMethod_.present ())
         {
-          this->SignatureMethod_.set (r);
+          this->SignatureMethod_.set (::std::move (r));
           continue;
         }
       }
@@ -2525,10 +2525,10 @@ namespace ds
       //
       if (n.name () == "Reference" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< ReferenceType > r (
+        ::std::unique_ptr< ReferenceType > r (
           ReferenceTraits::create (i, f, this));
 
-        this->Reference_.push_back (r);
+        this->Reference_.push_back (::std::move (r));
         continue;
       }
 
@@ -2756,12 +2756,12 @@ namespace ds
       //
       if (n.name () == "HMACOutputLength" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< HMACOutputLengthType > r (
+        ::std::unique_ptr< HMACOutputLengthType > r (
           HMACOutputLengthTraits::create (i, f, this));
 
         if (!this->HMACOutputLength_)
         {
-          this->HMACOutputLength_.set (r);
+          this->HMACOutputLength_.set (::std::move (r));
           continue;
         }
       }
@@ -2845,11 +2845,11 @@ namespace ds
   }
 
   ReferenceType::
-  ReferenceType (::std::auto_ptr< DigestMethodType > DigestMethod,
+  ReferenceType (::std::unique_ptr< DigestMethodType > DigestMethod,
                  const DigestValueType& DigestValue)
   : ::xml_schema::Type (),
     Transforms_ (this),
-    DigestMethod_ (DigestMethod, this),
+    DigestMethod_ (std::move (DigestMethod), this),
     DigestValue_ (DigestValue, this),
     Id_ (this),
     URI_ (this),
@@ -2904,12 +2904,12 @@ namespace ds
       //
       if (n.name () == "Transforms" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< TransformsType > r (
+        ::std::unique_ptr< TransformsType > r (
           TransformsTraits::create (i, f, this));
 
         if (!this->Transforms_)
         {
-          this->Transforms_.set (r);
+          this->Transforms_.set (::std::move (r));
           continue;
         }
       }
@@ -2918,12 +2918,12 @@ namespace ds
       //
       if (n.name () == "DigestMethod" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< DigestMethodType > r (
+        ::std::unique_ptr< DigestMethodType > r (
           DigestMethodTraits::create (i, f, this));
 
         if (!DigestMethod_.present ())
         {
-          this->DigestMethod_.set (r);
+          this->DigestMethod_.set (::std::move (r));
           continue;
         }
       }
@@ -2932,12 +2932,12 @@ namespace ds
       //
       if (n.name () == "DigestValue" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< DigestValueType > r (
+        ::std::unique_ptr< DigestValueType > r (
           DigestValueTraits::create (i, f, this));
 
         if (!DigestValue_.present ())
         {
-          this->DigestValue_.set (r);
+          this->DigestValue_.set (::std::move (r));
           continue;
         }
       }
@@ -3061,10 +3061,10 @@ namespace ds
       //
       if (n.name () == "Transform" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< TransformType > r (
+        ::std::unique_ptr< TransformType > r (
           TransformTraits::create (i, f, this));
 
-        this->Transform_.push_back (r);
+        this->Transform_.push_back (::std::move (r));
         continue;
       }
 
@@ -3164,10 +3164,10 @@ namespace ds
       //
       if (n.name () == "XPath" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< XPathType > r (
+        ::std::unique_ptr< XPathType > r (
           XPathTraits::create (i, f, this));
 
-        this->XPath_.push_back (r);
+        this->XPath_.push_back (::std::move (r));
         continue;
       }
 
@@ -3465,10 +3465,10 @@ namespace ds
       //
       if (n.name () == "KeyName" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< KeyNameType > r (
+        ::std::unique_ptr< KeyNameType > r (
           KeyNameTraits::create (i, f, this));
 
-        this->KeyName_.push_back (r);
+        this->KeyName_.push_back (::std::move (r));
         continue;
       }
 
@@ -3476,10 +3476,10 @@ namespace ds
       //
       if (n.name () == "KeyValue" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< KeyValueType > r (
+        ::std::unique_ptr< KeyValueType > r (
           KeyValueTraits::create (i, f, this));
 
-        this->KeyValue_.push_back (r);
+        this->KeyValue_.push_back (::std::move (r));
         continue;
       }
 
@@ -3487,10 +3487,10 @@ namespace ds
       //
       if (n.name () == "RetrievalMethod" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< RetrievalMethodType > r (
+        ::std::unique_ptr< RetrievalMethodType > r (
           RetrievalMethodTraits::create (i, f, this));
 
-        this->RetrievalMethod_.push_back (r);
+        this->RetrievalMethod_.push_back (::std::move (r));
         continue;
       }
 
@@ -3498,10 +3498,10 @@ namespace ds
       //
       if (n.name () == "X509Data" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< X509DataType > r (
+        ::std::unique_ptr< X509DataType > r (
           X509DataTraits::create (i, f, this));
 
-        this->X509Data_.push_back (r);
+        this->X509Data_.push_back (::std::move (r));
         continue;
       }
 
@@ -3509,10 +3509,10 @@ namespace ds
       //
       if (n.name () == "PGPData" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< PGPDataType > r (
+        ::std::unique_ptr< PGPDataType > r (
           PGPDataTraits::create (i, f, this));
 
-        this->PGPData_.push_back (r);
+        this->PGPData_.push_back (::std::move (r));
         continue;
       }
 
@@ -3520,10 +3520,10 @@ namespace ds
       //
       if (n.name () == "SPKIData" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< SPKIDataType > r (
+        ::std::unique_ptr< SPKIDataType > r (
           SPKIDataTraits::create (i, f, this));
 
-        this->SPKIData_.push_back (r);
+        this->SPKIData_.push_back (::std::move (r));
         continue;
       }
 
@@ -3531,10 +3531,10 @@ namespace ds
       //
       if (n.name () == "MgmtData" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< MgmtDataType > r (
+        ::std::unique_ptr< MgmtDataType > r (
           MgmtDataTraits::create (i, f, this));
 
-        this->MgmtData_.push_back (r);
+        this->MgmtData_.push_back (::std::move (r));
         continue;
       }
 
@@ -3655,12 +3655,12 @@ namespace ds
       //
       if (n.name () == "DSAKeyValue" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< DSAKeyValueType > r (
+        ::std::unique_ptr< DSAKeyValueType > r (
           DSAKeyValueTraits::create (i, f, this));
 
         if (!this->DSAKeyValue_)
         {
-          this->DSAKeyValue_.set (r);
+          this->DSAKeyValue_.set (::std::move (r));
           continue;
         }
       }
@@ -3669,12 +3669,12 @@ namespace ds
       //
       if (n.name () == "RSAKeyValue" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< RSAKeyValueType > r (
+        ::std::unique_ptr< RSAKeyValueType > r (
           RSAKeyValueTraits::create (i, f, this));
 
         if (!this->RSAKeyValue_)
         {
-          this->RSAKeyValue_.set (r);
+          this->RSAKeyValue_.set (::std::move (r));
           continue;
         }
       }
@@ -3777,12 +3777,12 @@ namespace ds
       //
       if (n.name () == "Transforms" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< TransformsType > r (
+        ::std::unique_ptr< TransformsType > r (
           TransformsTraits::create (i, f, this));
 
         if (!this->Transforms_)
         {
-          this->Transforms_.set (r);
+          this->Transforms_.set (::std::move (r));
           continue;
         }
       }
@@ -3901,10 +3901,10 @@ namespace ds
       //
       if (n.name () == "X509IssuerSerial" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< X509IssuerSerialType > r (
+        ::std::unique_ptr< X509IssuerSerialType > r (
           X509IssuerSerialTraits::create (i, f, this));
 
-        this->X509IssuerSerial_.push_back (r);
+        this->X509IssuerSerial_.push_back (::std::move (r));
         continue;
       }
 
@@ -3912,10 +3912,10 @@ namespace ds
       //
       if (n.name () == "X509SKI" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< X509SKIType > r (
+        ::std::unique_ptr< X509SKIType > r (
           X509SKITraits::create (i, f, this));
 
-        this->X509SKI_.push_back (r);
+        this->X509SKI_.push_back (::std::move (r));
         continue;
       }
 
@@ -3923,10 +3923,10 @@ namespace ds
       //
       if (n.name () == "X509SubjectName" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< X509SubjectNameType > r (
+        ::std::unique_ptr< X509SubjectNameType > r (
           X509SubjectNameTraits::create (i, f, this));
 
-        this->X509SubjectName_.push_back (r);
+        this->X509SubjectName_.push_back (::std::move (r));
         continue;
       }
 
@@ -3934,10 +3934,10 @@ namespace ds
       //
       if (n.name () == "X509Certificate" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< X509CertificateType > r (
+        ::std::unique_ptr< X509CertificateType > r (
           X509CertificateTraits::create (i, f, this));
 
-        this->X509Certificate_.push_back (r);
+        this->X509Certificate_.push_back (::std::move (r));
         continue;
       }
 
@@ -3945,10 +3945,10 @@ namespace ds
       //
       if (n.name () == "X509CRL" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< X509CRLType > r (
+        ::std::unique_ptr< X509CRLType > r (
           X509CRLTraits::create (i, f, this));
 
-        this->X509CRL_.push_back (r);
+        this->X509CRL_.push_back (::std::move (r));
         continue;
       }
 
@@ -4048,12 +4048,12 @@ namespace ds
       //
       if (n.name () == "X509IssuerName" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< X509IssuerNameType > r (
+        ::std::unique_ptr< X509IssuerNameType > r (
           X509IssuerNameTraits::create (i, f, this));
 
         if (!X509IssuerName_.present ())
         {
-          this->X509IssuerName_.set (r);
+          this->X509IssuerName_.set (::std::move (r));
           continue;
         }
       }
@@ -4171,12 +4171,12 @@ namespace ds
       //
       if (n.name () == "PGPKeyID" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< PGPKeyIDType > r (
+        ::std::unique_ptr< PGPKeyIDType > r (
           PGPKeyIDTraits::create (i, f, this));
 
         if (!this->PGPKeyID_)
         {
-          this->PGPKeyID_.set (r);
+          this->PGPKeyID_.set (::std::move (r));
           continue;
         }
       }
@@ -4185,12 +4185,12 @@ namespace ds
       //
       if (n.name () == "PGPKeyPacket" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< PGPKeyPacketType > r (
+        ::std::unique_ptr< PGPKeyPacketType > r (
           PGPKeyPacketTraits::create (i, f, this));
 
         if (!this->PGPKeyPacket_)
         {
-          this->PGPKeyPacket_.set (r);
+          this->PGPKeyPacket_.set (::std::move (r));
           continue;
         }
       }
@@ -4303,10 +4303,10 @@ namespace ds
       //
       if (n.name () == "SPKISexp" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< SPKISexpType > r (
+        ::std::unique_ptr< SPKISexpType > r (
           SPKISexpTraits::create (i, f, this));
 
-        this->SPKISexp_.push_back (r);
+        this->SPKISexp_.push_back (::std::move (r));
         continue;
       }
 
@@ -4524,10 +4524,10 @@ namespace ds
       //
       if (n.name () == "Reference" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< ReferenceType > r (
+        ::std::unique_ptr< ReferenceType > r (
           ReferenceTraits::create (i, f, this));
 
-        this->Reference_.push_back (r);
+        this->Reference_.push_back (::std::move (r));
         continue;
       }
 
@@ -4623,10 +4623,10 @@ namespace ds
       //
       if (n.name () == "SignatureProperty" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< SignaturePropertyType > r (
+        ::std::unique_ptr< SignaturePropertyType > r (
           SignaturePropertyTraits::create (i, f, this));
 
-        this->SignatureProperty_.push_back (r);
+        this->SignatureProperty_.push_back (::std::move (r));
         continue;
       }
 
@@ -4911,12 +4911,12 @@ namespace ds
       //
       if (n.name () == "P" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< PType > r (
+        ::std::unique_ptr< PType > r (
           PTraits::create (i, f, this));
 
         if (!this->P_)
         {
-          this->P_.set (r);
+          this->P_.set (::std::move (r));
           continue;
         }
       }
@@ -4925,12 +4925,12 @@ namespace ds
       //
       if (n.name () == "Q" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< QType > r (
+        ::std::unique_ptr< QType > r (
           QTraits::create (i, f, this));
 
         if (!this->Q_)
         {
-          this->Q_.set (r);
+          this->Q_.set (::std::move (r));
           continue;
         }
       }
@@ -4939,12 +4939,12 @@ namespace ds
       //
       if (n.name () == "G" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< GType > r (
+        ::std::unique_ptr< GType > r (
           GTraits::create (i, f, this));
 
         if (!this->G_)
         {
-          this->G_.set (r);
+          this->G_.set (::std::move (r));
           continue;
         }
       }
@@ -4953,12 +4953,12 @@ namespace ds
       //
       if (n.name () == "Y" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< YType > r (
+        ::std::unique_ptr< YType > r (
           YTraits::create (i, f, this));
 
         if (!Y_.present ())
         {
-          this->Y_.set (r);
+          this->Y_.set (::std::move (r));
           continue;
         }
       }
@@ -4967,12 +4967,12 @@ namespace ds
       //
       if (n.name () == "J" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< JType > r (
+        ::std::unique_ptr< JType > r (
           JTraits::create (i, f, this));
 
         if (!this->J_)
         {
-          this->J_.set (r);
+          this->J_.set (::std::move (r));
           continue;
         }
       }
@@ -4981,12 +4981,12 @@ namespace ds
       //
       if (n.name () == "Seed" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< SeedType > r (
+        ::std::unique_ptr< SeedType > r (
           SeedTraits::create (i, f, this));
 
         if (!this->Seed_)
         {
-          this->Seed_.set (r);
+          this->Seed_.set (::std::move (r));
           continue;
         }
       }
@@ -4995,12 +4995,12 @@ namespace ds
       //
       if (n.name () == "PgenCounter" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< PgenCounterType > r (
+        ::std::unique_ptr< PgenCounterType > r (
           PgenCounterTraits::create (i, f, this));
 
         if (!this->PgenCounter_)
         {
-          this->PgenCounter_.set (r);
+          this->PgenCounter_.set (::std::move (r));
           continue;
         }
       }
@@ -5097,12 +5097,12 @@ namespace ds
       //
       if (n.name () == "Modulus" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< ModulusType > r (
+        ::std::unique_ptr< ModulusType > r (
           ModulusTraits::create (i, f, this));
 
         if (!Modulus_.present ())
         {
-          this->Modulus_.set (r);
+          this->Modulus_.set (::std::move (r));
           continue;
         }
       }
@@ -5111,12 +5111,12 @@ namespace ds
       //
       if (n.name () == "Exponent" && n.namespace_ () == "http://www.w3.org/2000/09/xmldsig#")
       {
-        ::std::auto_ptr< ExponentType > r (
+        ::std::unique_ptr< ExponentType > r (
           ExponentTraits::create (i, f, this));
 
         if (!Exponent_.present ())
         {
-          this->Exponent_.set (r);
+          this->Exponent_.set (::std::move (r));
           continue;
         }
       }

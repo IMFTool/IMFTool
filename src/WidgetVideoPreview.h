@@ -19,7 +19,6 @@
 #include <QWidget>
 #include <QThread>
 #include "JP2K_Preview.h"
-#include "JP2K_Player.h"
 #include "qcombobox.h"
 #include "qxmlstream.h"
 #include <QMenuBar>
@@ -29,8 +28,8 @@
 #include <QMessageBox>
 #ifdef APP5_ACES
 #include "ACES_Preview.h"
-#include "ACES_Player.h"
 #endif
+#include "Player.h"
 
 class WidgetImagePreview;
 class QPushButton;
@@ -46,9 +45,9 @@ public:
 	void UninstallImp();
 	void setPlaylist(QVector<VideoResource> &rPlayList, QVector<TTMLtimelineResource> &rTTMLs);
 	void setMenuQuality(int rWidth, int rHeight);
-	JP2K_Player *player;
+	Player *player;
 #ifdef APP5_ACES
-	ACES_Player *mpACESPlayer;
+	Player *mpACESPlayer;
 #endif
 	void setApplication(eImfApplications rImfApplication);
 	eImfApplications getApplication();

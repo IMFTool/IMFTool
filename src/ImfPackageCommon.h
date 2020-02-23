@@ -14,7 +14,7 @@
  * along with this program.If not, see <http://www.gnu.org/licenses/>.
  */
 #pragma once
-#include "SMPTE-429-8-2014-AM.h"
+#include "SMPTE-429-9-2007-AM.h"
 #include "SMPTE-429-8-2006-PKL.h"
 #include "SMPTE-2067-3-2013-CPL.h"
 #include "st2067-2b-2016-PKL.h"
@@ -444,7 +444,7 @@ public:
 
 		return ::UserText(rContentKindType.c_str(), "");
 	}
-	static std::auto_ptr<pkl2016::PackingListType> Convert(std::auto_ptr<pkl::PackingListType> rPackingList2013);
+	static std::unique_ptr<pkl2016::PackingListType> Convert(std::unique_ptr<pkl::PackingListType> &rPackingList2013);
 
 	static ::ContentVersion Convert(const cpl2016::ContentVersionType &rContentVersion) {
 		return ::ContentVersion( Convert(rContentVersion.getId()), Convert(rContentVersion.getLabelText()) );
@@ -459,11 +459,11 @@ public:
 
 	static ::ContentVersionList Convert(cpl2016::CompositionPlaylistType_ContentVersionListType rContentVersionList);
 
-	static std::auto_ptr<cpl2016::CompositionPlaylistType_ContentVersionListType> Convert(const ::ContentVersionList &rContentVersionList);
+	static std::unique_ptr<cpl2016::CompositionPlaylistType_ContentVersionListType> Convert(const ::ContentVersionList &rContentVersionList);
 
 	static ::LocaleList Convert(cpl2016::CompositionPlaylistType_LocaleListType rLocaleList);
 
-	static std::auto_ptr<cpl2016::CompositionPlaylistType_LocaleListType> Convert(const ::LocaleList &rLocaleList);
+	static std::unique_ptr<cpl2016::CompositionPlaylistType_LocaleListType> Convert(const ::LocaleList &rLocaleList);
 
 	static ::Locale Convert(const cpl2016::LocaleType &rLocale);
 

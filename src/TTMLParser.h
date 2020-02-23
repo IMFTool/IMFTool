@@ -16,6 +16,7 @@
 */
 #pragma once
 #include "ImfPackageCommon.h"
+#include "PreviewCommon.h"
 #include <QDebug>
 #include <QVector>
 #include "Error.h"
@@ -33,7 +34,7 @@ protected:
 	QString serializeCss(QMap<QString, QString>);
 };
 
-class TTMLParser : TTMLFns {
+class TTMLParser : TTMLFns, public PreviewCommon {
 
 public:
 	TTMLParser();

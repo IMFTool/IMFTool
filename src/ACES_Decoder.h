@@ -24,7 +24,7 @@
 #include "AS_02_ACES.h"
 
 
-class ACES_FrameRequest;
+class FrameRequest;
 class JP2Ktest;
 
 class ACES_Decoder : public QObject, public QRunnable, public ACES {
@@ -32,11 +32,11 @@ class ACES_Decoder : public QObject, public QRunnable, public ACES {
 	Q_OBJECT
 
 public:
-	ACES_Decoder(QSharedPointer<DecodedFrames>&, QSharedPointer<ACES_FrameRequest>&, float*&, float*&, float*&);
+	ACES_Decoder(QSharedPointer<DecodedFrames>&, QSharedPointer<FrameRequest>&);
 private:
 
 	QSharedPointer<DecodedFrames> decoded_shared;
-	QSharedPointer<ACES_FrameRequest> request;
+	QSharedPointer<FrameRequest> request;
 
 protected:
 	void run();

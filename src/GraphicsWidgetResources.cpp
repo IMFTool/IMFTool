@@ -266,7 +266,7 @@ void AbstractGraphicsWidgetResource::paint(QPainter *pPainter, const QStyleOptio
 		if(visible_rect.isEmpty() == true) continue;
 		visible_rect.adjust(0, 0, -1. / pPainter->transform().m11(), -1. / pPainter->transform().m22());
 
-		if(acceptHoverEvents() == true && pOption->state & QStyle::State_MouseOver) {
+		if(acceptHoverEvents() == true && (pOption->state & QStyle::State_MouseOver)) {
 			if(pOption->state & QStyle::State_Selected) {
 				pen.setColor(dark_color);
 				brush.setColor(dark_color);
@@ -655,7 +655,7 @@ void GraphicsWidgetDummyResource::paint(QPainter *pPainter, const QStyleOptionGr
 		if(visible_rect.isEmpty() == true) continue;
 		visible_rect.adjust(0, 0, -1. / pPainter->transform().m11(), -1. / pPainter->transform().m22());
 
-		if(acceptHoverEvents() == true && pOption->state & QStyle::State_MouseOver) {
+		if(acceptHoverEvents() == true && (pOption->state & QStyle::State_MouseOver)) {
 			if(pOption->state & QStyle::State_Selected) {
 				pen.setColor(dark_color);
 				brush.setColor(dark_color);
@@ -721,9 +721,9 @@ GraphicsWidgetFileResource* GraphicsWidgetFileResource::Clone() const {
 	return new GraphicsWidgetFileResource(NULL, intermediate_resource._clone(), mAssset, GetColor());
 }
 
-std::auto_ptr<cpl2016::BaseResourceType> GraphicsWidgetFileResource::Write() const {
+std::unique_ptr<cpl2016::BaseResourceType> GraphicsWidgetFileResource::Write() const {
 
-	return std::auto_ptr<cpl2016::BaseResourceType>(mpData->_clone());
+	return std::unique_ptr<cpl2016::BaseResourceType>(mpData->_clone());
 }
 
 // WR This slot is called for each asset loaded from an OV
@@ -1547,7 +1547,7 @@ mOldSourceDuration(-1), mOldIntrinsicDuration(-1) {
 	setAcceptHoverEvents(false);
 }
 
-std::auto_ptr<cpl2016::BaseResourceType> GraphicsWidgetMarkerResource::Write() const {
+std::unique_ptr<cpl2016::BaseResourceType> GraphicsWidgetMarkerResource::Write() const {
 
 	cpl2016::MarkerResourceType *p_marker_resource = static_cast<cpl2016::MarkerResourceType*>(mpData->_clone());
 	cpl2016::MarkerResourceType::MarkerSequence marker_sequence;
@@ -1562,12 +1562,12 @@ std::auto_ptr<cpl2016::BaseResourceType> GraphicsWidgetMarkerResource::Write() c
 		}
 	}
 	p_marker_resource->setMarker(marker_sequence);
-	return std::auto_ptr<cpl2016::BaseResourceType>(p_marker_resource);
+	return std::unique_ptr<cpl2016::BaseResourceType>(p_marker_resource);
 }
 
 GraphicsWidgetMarkerResource* GraphicsWidgetMarkerResource::Clone() const {
 
-	std::auto_ptr<cpl2016::BaseResourceType> intermediate = Write();
+	std::unique_ptr<cpl2016::BaseResourceType> intermediate = Write();
 	intermediate->setId(ImfXmlHelper::Convert(QUuid::createUuid()));
 	return new GraphicsWidgetMarkerResource(NULL, static_cast<cpl2016::MarkerResourceType*>(intermediate.release()));
 }

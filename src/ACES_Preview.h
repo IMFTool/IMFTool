@@ -30,6 +30,7 @@
 #include "ImathMatrix.h"
 #include "ImfRgbaFile.h"
 #include "As02AcesIStream.h"
+#include "PreviewCommon.h"
 
 using namespace Imf;
 using namespace Imath;
@@ -43,33 +44,11 @@ typedef struct
 	size_t offset; //Where are we currently in our data.
 }aces_memory_stream;
 
-class ACES {
+class ACES : public PreviewCommon {
 
 public:
 
-	//WR
-	quint32	ComponentMinRef;
-	quint32	ComponentMaxRef;
-	//WR
-
-	// change values with new asset:
-	int src_bitdepth, prec_shift, max, layer = 1, RGBrange, RGBmaxcv;
-
-	Metadata::eColorEncoding ColorEncoding; // YCbCr or RGB
-	SMPTE::eColorPrimaries colorPrimaries; // BT.709 / BT.2020 / DCI-P3
-	SMPTE::eTransferCharacteristic transferCharactersitics; // BT.709 / BT.2020 / PQ
-	//float Kb, Kr, Kg; // YCbCr -> RGB (depending on BT.709 or BT.2020)
-
-	QSharedPointer<AssetMxfTrack> current_asset; // pointer to current asset
-
 protected:
-
-	// luts
-	static const int bitdepth = 16; // lookup table size (default: 16 bit)
-	int max_f; // (float)pow(2, bitdepth)
-	float max_f_; // max_f - 1;
-	float *eotf_2020;
-	float *eotf_PQ;
 
 	//AS_02::JP2K::MXFReader *reader;
 	AS_02::ACES::MXFReader *reader;
@@ -101,7 +80,6 @@ protected:
 
 	static Imf::Chromaticities aces_chromaticities;
 	static Imath::M44f A0Rec709TransformMatrix;
-	float *oetf_709;
 };
 
 class ACES_Preview : public QObject, public ACES {

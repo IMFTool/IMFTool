@@ -340,7 +340,7 @@ ImfError WidgetComposition::Write(const QString &rDestination /*= QString()*/) {
 					for(int iii = 0; iii < p_sequence->GetResourceCount(); iii++) {
 						AbstractGraphicsWidgetResource *p_resource = p_sequence->GetResource(iii);
 						if(p_resource) {
-							std::auto_ptr<cpl2016::BaseResourceType> resource = p_resource->Write();
+							std::unique_ptr<cpl2016::BaseResourceType> resource = p_resource->Write();
 							//WR begin
 							// Test if resource is a track file resource
 							cpl2016::TrackFileResourceType *p_file_resource = dynamic_cast<cpl2016::TrackFileResourceType*>(&(*resource));
@@ -357,7 +357,7 @@ ImfError WidgetComposition::Write(const QString &rDestination /*= QString()*/) {
 								}
 							}
 							//WR end
-							resource_sequence.push_back(resource);
+							resource_sequence.push_back(*std::move(resource).get());
 						}
 					}
 					if(p_sequence->GetType() == MarkerSequence) {
@@ -544,7 +544,7 @@ ImfError WidgetComposition::WriteNew(const QString &rDestination /*= QString()*/
 					for(int iii = 0; iii < p_sequence->GetResourceCount(); iii++) {
 						AbstractGraphicsWidgetResource *p_resource = p_sequence->GetResource(iii);
 						if(p_resource) {
-							std::auto_ptr<cpl2016::BaseResourceType> resource = p_resource->Write();
+							std::unique_ptr<cpl2016::BaseResourceType> resource = p_resource->Write();
 							// Create a new UUID for all resources
 							resource->setId(ImfXmlHelper::Convert(QUuid::createUuid()));
 							//WR begin
@@ -564,7 +564,7 @@ ImfError WidgetComposition::WriteNew(const QString &rDestination /*= QString()*/
 							}
 							//WR end
 
-							resource_sequence.push_back(resource);
+							resource_sequence.push_back(*std::move(resource).get());
 						}
 					}
 					if(p_sequence->GetType() == MarkerSequence) {
@@ -683,7 +683,7 @@ ImfError WidgetComposition::ParseCpl() {
 	ImageSequenceIndex = -1; // (k)
 
 	// ---Parse Cpl---
-	std::auto_ptr<cpl2016::CompositionPlaylistType> cpl;
+	std::unique_ptr<cpl2016::CompositionPlaylistType> cpl;
 	try {
 		cpl = cpl2016::parseCompositionPlaylist(mAssetCpl->GetPath().absoluteFilePath().toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize);
 	}
@@ -700,7 +700,7 @@ ImfError WidgetComposition::ParseCpl() {
 
 	if(parse_error.IsError() == true) {  //probably a 2013 CPL ?
 		XmlParsingError parse_error2;
-		std::auto_ptr<cpl::CompositionPlaylistType> cpl2013;
+		std::unique_ptr<cpl::CompositionPlaylistType> cpl2013;
 		try {
 			cpl2013 = cpl::parseCompositionPlaylist(mAssetCpl->GetPath().absoluteFilePath().toStdString(), xml_schema::Flags::dont_validate | xml_schema::Flags::dont_initialize);
 		}
@@ -773,7 +773,7 @@ ImfError WidgetComposition::ParseCpl() {
 	}
 
 	if(parse_error.IsError() == false) {
-		mData = *cpl;
+		mData = *cpl.get();
 		mpCompositionScene->SetCplEditRate(GetEditRate());
 		mpTimelineScene->SetCplEditRate(GetEditRate());
 		// Iterate segments.

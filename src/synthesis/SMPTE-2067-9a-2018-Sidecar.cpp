@@ -64,9 +64,9 @@ namespace scm
   }
 
   void SidecarCompositionMapType::
-  setId (::std::auto_ptr< IdType > x)
+  setId (::std::unique_ptr< IdType > x)
   {
-    this->Id_.set (x);
+    this->Id_.set (std::move (x));
   }
 
   const SidecarCompositionMapType::PropertiesType& SidecarCompositionMapType::
@@ -88,9 +88,9 @@ namespace scm
   }
 
   void SidecarCompositionMapType::
-  setProperties (::std::auto_ptr< PropertiesType > x)
+  setProperties (::std::unique_ptr< PropertiesType > x)
   {
-    this->Properties_.set (x);
+    this->Properties_.set (std::move (x));
   }
 
   const SidecarCompositionMapType::SidecarAssetListType& SidecarCompositionMapType::
@@ -112,9 +112,9 @@ namespace scm
   }
 
   void SidecarCompositionMapType::
-  setSidecarAssetList (::std::auto_ptr< SidecarAssetListType > x)
+  setSidecarAssetList (::std::unique_ptr< SidecarAssetListType > x)
   {
-    this->SidecarAssetList_.set (x);
+    this->SidecarAssetList_.set (std::move (x));
   }
 
   const SidecarCompositionMapType::SignerOptional& SidecarCompositionMapType::
@@ -142,9 +142,9 @@ namespace scm
   }
 
   void SidecarCompositionMapType::
-  setSigner (::std::auto_ptr< SignerType > x)
+  setSigner (::std::unique_ptr< SignerType > x)
   {
-    this->Signer_.set (x);
+    this->Signer_.set (std::move (x));
   }
 
   const SidecarCompositionMapType::SignatureOptional& SidecarCompositionMapType::
@@ -172,9 +172,9 @@ namespace scm
   }
 
   void SidecarCompositionMapType::
-  setSignature (::std::auto_ptr< SignatureType > x)
+  setSignature (::std::unique_ptr< SignatureType > x)
   {
-    this->Signature_.set (x);
+    this->Signature_.set (std::move (x));
   }
 
 
@@ -200,9 +200,9 @@ namespace scm
   }
 
   void SidecarAssetType::
-  setId (::std::auto_ptr< IdType > x)
+  setId (::std::unique_ptr< IdType > x)
   {
-    this->Id_.set (x);
+    this->Id_.set (std::move (x));
   }
 
   const SidecarAssetType::AssociatedCPLListType& SidecarAssetType::
@@ -224,9 +224,9 @@ namespace scm
   }
 
   void SidecarAssetType::
-  setAssociatedCPLList (::std::auto_ptr< AssociatedCPLListType > x)
+  setAssociatedCPLList (::std::unique_ptr< AssociatedCPLListType > x)
   {
-    this->AssociatedCPLList_.set (x);
+    this->AssociatedCPLList_.set (std::move (x));
   }
 
 
@@ -258,9 +258,9 @@ namespace scm
   }
 
   void SidecarCompositionMapType_PropertiesType::
-  setAnnotation (::std::auto_ptr< AnnotationType > x)
+  setAnnotation (::std::unique_ptr< AnnotationType > x)
   {
-    this->Annotation_.set (x);
+    this->Annotation_.set (std::move (x));
   }
 
   const SidecarCompositionMapType_PropertiesType::IssueDateType& SidecarCompositionMapType_PropertiesType::
@@ -282,9 +282,9 @@ namespace scm
   }
 
   void SidecarCompositionMapType_PropertiesType::
-  setIssueDate (::std::auto_ptr< IssueDateType > x)
+  setIssueDate (::std::unique_ptr< IssueDateType > x)
   {
-    this->IssueDate_.set (x);
+    this->IssueDate_.set (std::move (x));
   }
 
   const SidecarCompositionMapType_PropertiesType::IssuerOptional& SidecarCompositionMapType_PropertiesType::
@@ -312,9 +312,9 @@ namespace scm
   }
 
   void SidecarCompositionMapType_PropertiesType::
-  setIssuer (::std::auto_ptr< IssuerType > x)
+  setIssuer (::std::unique_ptr< IssuerType > x)
   {
-    this->Issuer_.set (x);
+    this->Issuer_.set (std::move (x));
   }
 
   const SidecarCompositionMapType_PropertiesType::AnySequence& SidecarCompositionMapType_PropertiesType::
@@ -396,6 +396,15 @@ namespace scm
 
 #include <xsd/cxx/xml/dom/parsing-source.hxx>
 
+#include <xsd/cxx/tree/type-factory-map.hxx>
+
+namespace _xsd
+{
+  static
+  const ::xsd::cxx::tree::type_factory_plate< 0, char >
+  type_factory_plate_init;
+}
+
 namespace scm
 {
   // SidecarCompositionMapType
@@ -416,12 +425,12 @@ namespace scm
 
   SidecarCompositionMapType::
   SidecarCompositionMapType (const IdType& Id,
-                             ::std::auto_ptr< PropertiesType > Properties,
-                             ::std::auto_ptr< SidecarAssetListType > SidecarAssetList)
+                             ::std::unique_ptr< PropertiesType > Properties,
+                             ::std::unique_ptr< SidecarAssetListType > SidecarAssetList)
   : ::xml_schema::Type (),
     Id_ (Id, this),
-    Properties_ (Properties, this),
-    SidecarAssetList_ (SidecarAssetList, this),
+    Properties_ (std::move (Properties), this),
+    SidecarAssetList_ (std::move (SidecarAssetList), this),
     Signer_ (this),
     Signature_ (this)
   {
@@ -472,12 +481,12 @@ namespace scm
       //
       if (n.name () == "Id" && n.namespace_ () == "http://www.smpte-ra.org/ns/2067-9/2018")
       {
-        ::std::auto_ptr< IdType > r (
+        ::std::unique_ptr< IdType > r (
           IdTraits::create (i, f, this));
 
         if (!Id_.present ())
         {
-          this->Id_.set (r);
+          this->Id_.set (::std::move (r));
           continue;
         }
       }
@@ -486,12 +495,12 @@ namespace scm
       //
       if (n.name () == "Properties" && n.namespace_ () == "http://www.smpte-ra.org/ns/2067-9/2018")
       {
-        ::std::auto_ptr< PropertiesType > r (
+        ::std::unique_ptr< PropertiesType > r (
           PropertiesTraits::create (i, f, this));
 
         if (!Properties_.present ())
         {
-          this->Properties_.set (r);
+          this->Properties_.set (::std::move (r));
           continue;
         }
       }
@@ -500,12 +509,12 @@ namespace scm
       //
       if (n.name () == "SidecarAssetList" && n.namespace_ () == "http://www.smpte-ra.org/ns/2067-9/2018")
       {
-        ::std::auto_ptr< SidecarAssetListType > r (
+        ::std::unique_ptr< SidecarAssetListType > r (
           SidecarAssetListTraits::create (i, f, this));
 
         if (!SidecarAssetList_.present ())
         {
-          this->SidecarAssetList_.set (r);
+          this->SidecarAssetList_.set (::std::move (r));
           continue;
         }
       }
@@ -514,12 +523,12 @@ namespace scm
       //
       if (n.name () == "Signer" && n.namespace_ () == "http://www.smpte-ra.org/ns/2067-9/2018")
       {
-        ::std::auto_ptr< SignerType > r (
+        ::std::unique_ptr< SignerType > r (
           SignerTraits::create (i, f, this));
 
         if (!this->Signer_)
         {
-          this->Signer_.set (r);
+          this->Signer_.set (::std::move (r));
           continue;
         }
       }
@@ -528,12 +537,12 @@ namespace scm
       //
       if (n.name () == "Signature" && n.namespace_ () == "http://www.smpte-ra.org/ns/2067-9/2018")
       {
-        ::std::auto_ptr< SignatureType > r (
+        ::std::unique_ptr< SignatureType > r (
           SignatureTraits::create (i, f, this));
 
         if (!this->Signature_)
         {
-          this->Signature_.set (r);
+          this->Signature_.set (::std::move (r));
           continue;
         }
       }
@@ -605,10 +614,10 @@ namespace scm
 
   SidecarAssetType::
   SidecarAssetType (const IdType& Id,
-                    ::std::auto_ptr< AssociatedCPLListType > AssociatedCPLList)
+                    ::std::unique_ptr< AssociatedCPLListType > AssociatedCPLList)
   : ::xml_schema::Type (),
     Id_ (Id, this),
-    AssociatedCPLList_ (AssociatedCPLList, this)
+    AssociatedCPLList_ (std::move (AssociatedCPLList), this)
   {
   }
 
@@ -651,12 +660,12 @@ namespace scm
       //
       if (n.name () == "Id" && n.namespace_ () == "http://www.smpte-ra.org/ns/2067-9/2018")
       {
-        ::std::auto_ptr< IdType > r (
+        ::std::unique_ptr< IdType > r (
           IdTraits::create (i, f, this));
 
         if (!Id_.present ())
         {
-          this->Id_.set (r);
+          this->Id_.set (::std::move (r));
           continue;
         }
       }
@@ -665,12 +674,12 @@ namespace scm
       //
       if (n.name () == "AssociatedCPLList" && n.namespace_ () == "http://www.smpte-ra.org/ns/2067-9/2018")
       {
-        ::std::auto_ptr< AssociatedCPLListType > r (
+        ::std::unique_ptr< AssociatedCPLListType > r (
           AssociatedCPLListTraits::create (i, f, this));
 
         if (!AssociatedCPLList_.present ())
         {
-          this->AssociatedCPLList_.set (r);
+          this->AssociatedCPLList_.set (::std::move (r));
           continue;
         }
       }
@@ -777,12 +786,12 @@ namespace scm
       //
       if (n.name () == "Annotation" && n.namespace_ () == "http://www.smpte-ra.org/ns/2067-9/2018")
       {
-        ::std::auto_ptr< AnnotationType > r (
+        ::std::unique_ptr< AnnotationType > r (
           AnnotationTraits::create (i, f, this));
 
         if (!this->Annotation_)
         {
-          this->Annotation_.set (r);
+          this->Annotation_.set (::std::move (r));
           continue;
         }
       }
@@ -791,12 +800,12 @@ namespace scm
       //
       if (n.name () == "IssueDate" && n.namespace_ () == "http://www.smpte-ra.org/ns/2067-9/2018")
       {
-        ::std::auto_ptr< IssueDateType > r (
+        ::std::unique_ptr< IssueDateType > r (
           IssueDateTraits::create (i, f, this));
 
         if (!IssueDate_.present ())
         {
-          this->IssueDate_.set (r);
+          this->IssueDate_.set (::std::move (r));
           continue;
         }
       }
@@ -805,12 +814,12 @@ namespace scm
       //
       if (n.name () == "Issuer" && n.namespace_ () == "http://www.smpte-ra.org/ns/2067-9/2018")
       {
-        ::std::auto_ptr< IssuerType > r (
+        ::std::unique_ptr< IssuerType > r (
           IssuerTraits::create (i, f, this));
 
         if (!this->Issuer_)
         {
-          this->Issuer_.set (r);
+          this->Issuer_.set (::std::move (r));
           continue;
         }
       }
@@ -912,10 +921,10 @@ namespace scm
       //
       if (n.name () == "SidecarAsset" && n.namespace_ () == "http://www.smpte-ra.org/ns/2067-9/2018")
       {
-        ::std::auto_ptr< SidecarAssetType > r (
+        ::std::unique_ptr< SidecarAssetType > r (
           SidecarAssetTraits::create (i, f, this));
 
-        this->SidecarAsset_.push_back (r);
+        this->SidecarAsset_.push_back (::std::move (r));
         continue;
       }
 
@@ -994,10 +1003,10 @@ namespace scm
       //
       if (n.name () == "CPLId" && n.namespace_ () == "http://www.smpte-ra.org/ns/2067-9/2018")
       {
-        ::std::auto_ptr< CPLIdType > r (
+        ::std::unique_ptr< CPLIdType > r (
           CPLIdTraits::create (i, f, this));
 
-        this->CPLId_.push_back (r);
+        this->CPLId_.push_back (::std::move (r));
         continue;
       }
 
@@ -1031,6 +1040,15 @@ namespace scm
 }
 
 #include <ostream>
+
+#include <xsd/cxx/tree/std-ostream-map.hxx>
+
+namespace _xsd
+{
+  static
+  const ::xsd::cxx::tree::std_ostream_plate< 0, char >
+  std_ostream_plate_init;
+}
 
 namespace scm
 {
@@ -1111,7 +1129,7 @@ namespace scm
 
 namespace scm
 {
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (const ::std::string& u,
                               ::xml_schema::Flags f,
                               const ::xml_schema::Properties& p)
@@ -1122,18 +1140,18 @@ namespace scm
 
     ::xsd::cxx::tree::error_handler< char > h;
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         u, h, p, f));
 
     h.throw_if_failed< ::xsd::cxx::tree::parsing< char > > ();
 
-    return ::std::auto_ptr< ::scm::SidecarCompositionMapType > (
+    return ::std::unique_ptr< ::scm::SidecarCompositionMapType > (
       ::scm::parseSidecarCompositionMap (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (const ::std::string& u,
                               ::xml_schema::ErrorHandler& h,
                               ::xml_schema::Flags f,
@@ -1143,37 +1161,37 @@ namespace scm
       (f & ::xml_schema::Flags::dont_initialize) == 0,
       (f & ::xml_schema::Flags::keep_dom) == 0);
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         u, h, p, f));
 
     if (!d.get ())
       throw ::xsd::cxx::tree::parsing< char > ();
 
-    return ::std::auto_ptr< ::scm::SidecarCompositionMapType > (
+    return ::std::unique_ptr< ::scm::SidecarCompositionMapType > (
       ::scm::parseSidecarCompositionMap (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (const ::std::string& u,
                               ::xercesc::DOMErrorHandler& h,
                               ::xml_schema::Flags f,
                               const ::xml_schema::Properties& p)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         u, h, p, f));
 
     if (!d.get ())
       throw ::xsd::cxx::tree::parsing< char > ();
 
-    return ::std::auto_ptr< ::scm::SidecarCompositionMapType > (
+    return ::std::unique_ptr< ::scm::SidecarCompositionMapType > (
       ::scm::parseSidecarCompositionMap (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (::std::istream& is,
                               ::xml_schema::Flags f,
                               const ::xml_schema::Properties& p)
@@ -1186,7 +1204,7 @@ namespace scm
     return ::scm::parseSidecarCompositionMap (isrc, f, p);
   }
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (::std::istream& is,
                               ::xml_schema::ErrorHandler& h,
                               ::xml_schema::Flags f,
@@ -1200,7 +1218,7 @@ namespace scm
     return ::scm::parseSidecarCompositionMap (isrc, h, f, p);
   }
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (::std::istream& is,
                               ::xercesc::DOMErrorHandler& h,
                               ::xml_schema::Flags f,
@@ -1210,7 +1228,7 @@ namespace scm
     return ::scm::parseSidecarCompositionMap (isrc, h, f, p);
   }
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (::std::istream& is,
                               const ::std::string& sid,
                               ::xml_schema::Flags f,
@@ -1224,7 +1242,7 @@ namespace scm
     return ::scm::parseSidecarCompositionMap (isrc, f, p);
   }
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (::std::istream& is,
                               const ::std::string& sid,
                               ::xml_schema::ErrorHandler& h,
@@ -1239,7 +1257,7 @@ namespace scm
     return ::scm::parseSidecarCompositionMap (isrc, h, f, p);
   }
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (::std::istream& is,
                               const ::std::string& sid,
                               ::xercesc::DOMErrorHandler& h,
@@ -1250,73 +1268,73 @@ namespace scm
     return ::scm::parseSidecarCompositionMap (isrc, h, f, p);
   }
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (::xercesc::InputSource& i,
                               ::xml_schema::Flags f,
                               const ::xml_schema::Properties& p)
   {
     ::xsd::cxx::tree::error_handler< char > h;
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         i, h, p, f));
 
     h.throw_if_failed< ::xsd::cxx::tree::parsing< char > > ();
 
-    return ::std::auto_ptr< ::scm::SidecarCompositionMapType > (
+    return ::std::unique_ptr< ::scm::SidecarCompositionMapType > (
       ::scm::parseSidecarCompositionMap (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (::xercesc::InputSource& i,
                               ::xml_schema::ErrorHandler& h,
                               ::xml_schema::Flags f,
                               const ::xml_schema::Properties& p)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         i, h, p, f));
 
     if (!d.get ())
       throw ::xsd::cxx::tree::parsing< char > ();
 
-    return ::std::auto_ptr< ::scm::SidecarCompositionMapType > (
+    return ::std::unique_ptr< ::scm::SidecarCompositionMapType > (
       ::scm::parseSidecarCompositionMap (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (::xercesc::InputSource& i,
                               ::xercesc::DOMErrorHandler& h,
                               ::xml_schema::Flags f,
                               const ::xml_schema::Properties& p)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::parse< char > (
         i, h, p, f));
 
     if (!d.get ())
       throw ::xsd::cxx::tree::parsing< char > ();
 
-    return ::std::auto_ptr< ::scm::SidecarCompositionMapType > (
+    return ::std::unique_ptr< ::scm::SidecarCompositionMapType > (
       ::scm::parseSidecarCompositionMap (
-        d, f | ::xml_schema::Flags::own_dom, p));
+        std::move (d), f | ::xml_schema::Flags::own_dom, p));
   }
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
   parseSidecarCompositionMap (const ::xercesc::DOMDocument& doc,
                               ::xml_schema::Flags f,
                               const ::xml_schema::Properties& p)
   {
     if (f & ::xml_schema::Flags::keep_dom)
     {
-      ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+      ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
         static_cast< ::xercesc::DOMDocument* > (doc.cloneNode (true)));
 
-      return ::std::auto_ptr< ::scm::SidecarCompositionMapType > (
+      return ::std::unique_ptr< ::scm::SidecarCompositionMapType > (
         ::scm::parseSidecarCompositionMap (
-          d, f | ::xml_schema::Flags::own_dom, p));
+          std::move (d), f | ::xml_schema::Flags::own_dom, p));
     }
 
     const ::xercesc::DOMElement& e (*doc.getDocumentElement ());
@@ -1326,7 +1344,7 @@ namespace scm
     if (n.name () == "SidecarCompositionMap" &&
         n.namespace_ () == "http://www.smpte-ra.org/ns/2067-9/2018")
     {
-      ::std::auto_ptr< ::scm::SidecarCompositionMapType > r (
+      ::std::unique_ptr< ::scm::SidecarCompositionMapType > r (
         ::xsd::cxx::tree::traits< ::scm::SidecarCompositionMapType, char >::create (
           e, f, 0));
       return r;
@@ -1339,12 +1357,12 @@ namespace scm
       "http://www.smpte-ra.org/ns/2067-9/2018");
   }
 
-  ::std::auto_ptr< ::scm::SidecarCompositionMapType >
-  parseSidecarCompositionMap (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d,
+  ::std::unique_ptr< ::scm::SidecarCompositionMapType >
+  parseSidecarCompositionMap (::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d,
                               ::xml_schema::Flags f,
                               const ::xml_schema::Properties&)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > c (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > c (
       ((f & ::xml_schema::Flags::keep_dom) &&
        !(f & ::xml_schema::Flags::own_dom))
       ? static_cast< ::xercesc::DOMDocument* > (d->cloneNode (true))
@@ -1364,7 +1382,7 @@ namespace scm
     if (n.name () == "SidecarCompositionMap" &&
         n.namespace_ () == "http://www.smpte-ra.org/ns/2067-9/2018")
     {
-      ::std::auto_ptr< ::scm::SidecarCompositionMapType > r (
+      ::std::unique_ptr< ::scm::SidecarCompositionMapType > r (
         ::xsd::cxx::tree::traits< ::scm::SidecarCompositionMapType, char >::create (
           e, f, 0));
       return r;
@@ -1382,6 +1400,15 @@ namespace scm
 #include <xsd/cxx/tree/error-handler.hxx>
 #include <xsd/cxx/xml/dom/serialization-source.hxx>
 
+#include <xsd/cxx/tree/type-serializer-map.hxx>
+
+namespace _xsd
+{
+  static
+  const ::xsd::cxx::tree::type_serializer_plate< 0, char >
+  type_serializer_plate_init;
+}
+
 namespace scm
 {
   void
@@ -1394,7 +1421,7 @@ namespace scm
     ::xsd::cxx::xml::auto_initializer i (
       (f & ::xml_schema::Flags::dont_initialize) == 0);
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::scm::serializeSidecarCompositionMap (s, m, f));
 
     ::xsd::cxx::tree::error_handler< char > h;
@@ -1417,7 +1444,7 @@ namespace scm
     ::xsd::cxx::xml::auto_initializer i (
       (f & ::xml_schema::Flags::dont_initialize) == 0);
 
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::scm::serializeSidecarCompositionMap (s, m, f));
     ::xsd::cxx::xml::dom::ostream_format_target t (o);
     if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
@@ -1434,7 +1461,7 @@ namespace scm
                                   const ::std::string& e,
                                   ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::scm::serializeSidecarCompositionMap (s, m, f));
     ::xsd::cxx::xml::dom::ostream_format_target t (o);
     if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
@@ -1450,7 +1477,7 @@ namespace scm
                                   const ::std::string& e,
                                   ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::scm::serializeSidecarCompositionMap (s, m, f));
 
     ::xsd::cxx::tree::error_handler< char > h;
@@ -1469,7 +1496,7 @@ namespace scm
                                   const ::std::string& e,
                                   ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::scm::serializeSidecarCompositionMap (s, m, f));
     if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
     {
@@ -1485,7 +1512,7 @@ namespace scm
                                   const ::std::string& e,
                                   ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::scm::serializeSidecarCompositionMap (s, m, f));
     if (!::xsd::cxx::xml::dom::serialize (t, *d, e, h, f))
     {
@@ -1517,12 +1544,12 @@ namespace scm
     }
   }
 
-  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >
+  ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument >
   serializeSidecarCompositionMap (const ::scm::SidecarCompositionMapType& s,
                                   const ::xml_schema::NamespaceInfomap& m,
                                   ::xml_schema::Flags f)
   {
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d (
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d (
       ::xsd::cxx::xml::dom::serialize< char > (
         "SidecarCompositionMap",
         "http://www.smpte-ra.org/ns/2067-9/2018",

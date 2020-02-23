@@ -31,8 +31,12 @@
 // in the accompanying FLOSSE file.
 //
 
-#ifndef SMPTE_429_8_2014_AM_H
-#define SMPTE_429_8_2014_AM_H
+#ifndef SMPTE_429_9_2007_AM_H
+#define SMPTE_429_9_2007_AM_H
+
+#ifndef XSD_CXX11
+#define XSD_CXX11
+#endif
 
 #ifndef XSD_USE_CHAR
 #define XSD_USE_CHAR
@@ -239,7 +243,7 @@ namespace xml_schema
   {
     // Automatic pointer for DOMDocument.
     //
-    using ::xsd::cxx::xml::dom::auto_ptr;
+    using ::xsd::cxx::xml::dom::unique_ptr;
 
 #ifndef XSD_CXX_TREE_TREE_NODE_KEY__XML_SCHEMA
 #define XSD_CXX_TREE_TREE_NODE_KEY__XML_SCHEMA
@@ -265,9 +269,10 @@ namespace am
 }
 
 
-#include <memory>    // ::std::auto_ptr
+#include <memory>    // ::std::unique_ptr
 #include <limits>    // std::numeric_limits
 #include <algorithm> // std::binary_search
+#include <utility>   // std::move
 
 #include <xsd/cxx/xml/char-utf8.hxx>
 
@@ -332,7 +337,7 @@ namespace am
     setLanguage (const LanguageType& x);
 
     void
-    setLanguage (::std::auto_ptr< LanguageType > p);
+    setLanguage (::std::unique_ptr< LanguageType > p);
 
     static const LanguageType&
     getLanguageDefaultValue ();
@@ -395,7 +400,7 @@ namespace am
     setPath (const PathType& x);
 
     void
-    setPath (::std::auto_ptr< PathType > p);
+    setPath (::std::unique_ptr< PathType > p);
 
     // VolumeIndex
     //
@@ -505,7 +510,7 @@ namespace am
     setId (const IdType& x);
 
     void
-    setId (::std::auto_ptr< IdType > p);
+    setId (::std::unique_ptr< IdType > p);
 
     // AnnotationText
     //
@@ -526,7 +531,7 @@ namespace am
     setAnnotationText (const AnnotationTextOptional& x);
 
     void
-    setAnnotationText (::std::auto_ptr< AnnotationTextType > p);
+    setAnnotationText (::std::unique_ptr< AnnotationTextType > p);
 
     // PackingList
     //
@@ -561,7 +566,7 @@ namespace am
     setChunkList (const ChunkListType& x);
 
     void
-    setChunkList (::std::auto_ptr< ChunkListType > p);
+    setChunkList (::std::unique_ptr< ChunkListType > p);
 
     // Constructors.
     //
@@ -569,7 +574,7 @@ namespace am
                const ChunkListType&);
 
     AssetType (const IdType&,
-               ::std::auto_ptr< ChunkListType >);
+               ::std::unique_ptr< ChunkListType >);
 
     AssetType (const ::xercesc::DOMElement& e,
                ::xml_schema::Flags f = 0,
@@ -621,7 +626,7 @@ namespace am
     setId (const IdType& x);
 
     void
-    setId (::std::auto_ptr< IdType > p);
+    setId (::std::unique_ptr< IdType > p);
 
     // AnnotationText
     //
@@ -642,7 +647,7 @@ namespace am
     setAnnotationText (const AnnotationTextOptional& x);
 
     void
-    setAnnotationText (::std::auto_ptr< AnnotationTextType > p);
+    setAnnotationText (::std::unique_ptr< AnnotationTextType > p);
 
     // Creator
     //
@@ -659,7 +664,7 @@ namespace am
     setCreator (const CreatorType& x);
 
     void
-    setCreator (::std::auto_ptr< CreatorType > p);
+    setCreator (::std::unique_ptr< CreatorType > p);
 
     // VolumeCount
     //
@@ -690,7 +695,7 @@ namespace am
     setIssueDate (const IssueDateType& x);
 
     void
-    setIssueDate (::std::auto_ptr< IssueDateType > p);
+    setIssueDate (::std::unique_ptr< IssueDateType > p);
 
     // Issuer
     //
@@ -707,7 +712,7 @@ namespace am
     setIssuer (const IssuerType& x);
 
     void
-    setIssuer (::std::auto_ptr< IssuerType > p);
+    setIssuer (::std::unique_ptr< IssuerType > p);
 
     // AssetList
     //
@@ -724,7 +729,7 @@ namespace am
     setAssetList (const AssetListType& x);
 
     void
-    setAssetList (::std::auto_ptr< AssetListType > p);
+    setAssetList (::std::unique_ptr< AssetListType > p);
 
     // Constructors.
     //
@@ -736,11 +741,11 @@ namespace am
                   const AssetListType&);
 
     AssetMapType (const IdType&,
-                  ::std::auto_ptr< CreatorType >,
+                  ::std::unique_ptr< CreatorType >,
                   const VolumeCountType&,
                   const IssueDateType&,
-                  ::std::auto_ptr< IssuerType >,
-                  ::std::auto_ptr< AssetListType >);
+                  ::std::unique_ptr< IssuerType >,
+                  ::std::unique_ptr< AssetListType >);
 
     AssetMapType (const ::xercesc::DOMElement& e,
                   ::xml_schema::Flags f = 0,
@@ -974,18 +979,18 @@ namespace am
   // Parse a URI or a local file.
   //
 
-  ::std::auto_ptr< ::am::AssetMapType >
+  ::std::unique_ptr< ::am::AssetMapType >
   parseAssetMap (const ::std::string& uri,
                  ::xml_schema::Flags f = 0,
                  const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::am::AssetMapType >
+  ::std::unique_ptr< ::am::AssetMapType >
   parseAssetMap (const ::std::string& uri,
                  ::xml_schema::ErrorHandler& eh,
                  ::xml_schema::Flags f = 0,
                  const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::am::AssetMapType >
+  ::std::unique_ptr< ::am::AssetMapType >
   parseAssetMap (const ::std::string& uri,
                  ::xercesc::DOMErrorHandler& eh,
                  ::xml_schema::Flags f = 0,
@@ -994,37 +999,37 @@ namespace am
   // Parse std::istream.
   //
 
-  ::std::auto_ptr< ::am::AssetMapType >
+  ::std::unique_ptr< ::am::AssetMapType >
   parseAssetMap (::std::istream& is,
                  ::xml_schema::Flags f = 0,
                  const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::am::AssetMapType >
+  ::std::unique_ptr< ::am::AssetMapType >
   parseAssetMap (::std::istream& is,
                  ::xml_schema::ErrorHandler& eh,
                  ::xml_schema::Flags f = 0,
                  const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::am::AssetMapType >
+  ::std::unique_ptr< ::am::AssetMapType >
   parseAssetMap (::std::istream& is,
                  ::xercesc::DOMErrorHandler& eh,
                  ::xml_schema::Flags f = 0,
                  const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::am::AssetMapType >
+  ::std::unique_ptr< ::am::AssetMapType >
   parseAssetMap (::std::istream& is,
                  const ::std::string& id,
                  ::xml_schema::Flags f = 0,
                  const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::am::AssetMapType >
+  ::std::unique_ptr< ::am::AssetMapType >
   parseAssetMap (::std::istream& is,
                  const ::std::string& id,
                  ::xml_schema::ErrorHandler& eh,
                  ::xml_schema::Flags f = 0,
                  const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::am::AssetMapType >
+  ::std::unique_ptr< ::am::AssetMapType >
   parseAssetMap (::std::istream& is,
                  const ::std::string& id,
                  ::xercesc::DOMErrorHandler& eh,
@@ -1034,18 +1039,18 @@ namespace am
   // Parse xercesc::InputSource.
   //
 
-  ::std::auto_ptr< ::am::AssetMapType >
+  ::std::unique_ptr< ::am::AssetMapType >
   parseAssetMap (::xercesc::InputSource& is,
                  ::xml_schema::Flags f = 0,
                  const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::am::AssetMapType >
+  ::std::unique_ptr< ::am::AssetMapType >
   parseAssetMap (::xercesc::InputSource& is,
                  ::xml_schema::ErrorHandler& eh,
                  ::xml_schema::Flags f = 0,
                  const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::am::AssetMapType >
+  ::std::unique_ptr< ::am::AssetMapType >
   parseAssetMap (::xercesc::InputSource& is,
                  ::xercesc::DOMErrorHandler& eh,
                  ::xml_schema::Flags f = 0,
@@ -1054,31 +1059,31 @@ namespace am
   // Parse xercesc::DOMDocument.
   //
 
-  ::std::auto_ptr< ::am::AssetMapType >
+  ::std::unique_ptr< ::am::AssetMapType >
   parseAssetMap (const ::xercesc::DOMDocument& d,
                  ::xml_schema::Flags f = 0,
                  const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::am::AssetMapType >
-  parseAssetMap (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d,
+  ::std::unique_ptr< ::am::AssetMapType >
+  parseAssetMap (::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d,
                  ::xml_schema::Flags f = 0,
                  const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
   // Parse a URI or a local file.
   //
 
-  ::std::auto_ptr< ::am::VolumeIndexType >
+  ::std::unique_ptr< ::am::VolumeIndexType >
   parseVolumeIndex (const ::std::string& uri,
                     ::xml_schema::Flags f = 0,
                     const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::am::VolumeIndexType >
+  ::std::unique_ptr< ::am::VolumeIndexType >
   parseVolumeIndex (const ::std::string& uri,
                     ::xml_schema::ErrorHandler& eh,
                     ::xml_schema::Flags f = 0,
                     const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::am::VolumeIndexType >
+  ::std::unique_ptr< ::am::VolumeIndexType >
   parseVolumeIndex (const ::std::string& uri,
                     ::xercesc::DOMErrorHandler& eh,
                     ::xml_schema::Flags f = 0,
@@ -1087,37 +1092,37 @@ namespace am
   // Parse std::istream.
   //
 
-  ::std::auto_ptr< ::am::VolumeIndexType >
+  ::std::unique_ptr< ::am::VolumeIndexType >
   parseVolumeIndex (::std::istream& is,
                     ::xml_schema::Flags f = 0,
                     const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::am::VolumeIndexType >
+  ::std::unique_ptr< ::am::VolumeIndexType >
   parseVolumeIndex (::std::istream& is,
                     ::xml_schema::ErrorHandler& eh,
                     ::xml_schema::Flags f = 0,
                     const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::am::VolumeIndexType >
+  ::std::unique_ptr< ::am::VolumeIndexType >
   parseVolumeIndex (::std::istream& is,
                     ::xercesc::DOMErrorHandler& eh,
                     ::xml_schema::Flags f = 0,
                     const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::am::VolumeIndexType >
+  ::std::unique_ptr< ::am::VolumeIndexType >
   parseVolumeIndex (::std::istream& is,
                     const ::std::string& id,
                     ::xml_schema::Flags f = 0,
                     const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::am::VolumeIndexType >
+  ::std::unique_ptr< ::am::VolumeIndexType >
   parseVolumeIndex (::std::istream& is,
                     const ::std::string& id,
                     ::xml_schema::ErrorHandler& eh,
                     ::xml_schema::Flags f = 0,
                     const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::am::VolumeIndexType >
+  ::std::unique_ptr< ::am::VolumeIndexType >
   parseVolumeIndex (::std::istream& is,
                     const ::std::string& id,
                     ::xercesc::DOMErrorHandler& eh,
@@ -1127,18 +1132,18 @@ namespace am
   // Parse xercesc::InputSource.
   //
 
-  ::std::auto_ptr< ::am::VolumeIndexType >
+  ::std::unique_ptr< ::am::VolumeIndexType >
   parseVolumeIndex (::xercesc::InputSource& is,
                     ::xml_schema::Flags f = 0,
                     const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::am::VolumeIndexType >
+  ::std::unique_ptr< ::am::VolumeIndexType >
   parseVolumeIndex (::xercesc::InputSource& is,
                     ::xml_schema::ErrorHandler& eh,
                     ::xml_schema::Flags f = 0,
                     const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::am::VolumeIndexType >
+  ::std::unique_ptr< ::am::VolumeIndexType >
   parseVolumeIndex (::xercesc::InputSource& is,
                     ::xercesc::DOMErrorHandler& eh,
                     ::xml_schema::Flags f = 0,
@@ -1147,13 +1152,13 @@ namespace am
   // Parse xercesc::DOMDocument.
   //
 
-  ::std::auto_ptr< ::am::VolumeIndexType >
+  ::std::unique_ptr< ::am::VolumeIndexType >
   parseVolumeIndex (const ::xercesc::DOMDocument& d,
                     ::xml_schema::Flags f = 0,
                     const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::am::VolumeIndexType >
-  parseVolumeIndex (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d,
+  ::std::unique_ptr< ::am::VolumeIndexType >
+  parseVolumeIndex (::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d,
                     ::xml_schema::Flags f = 0,
                     const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 }
@@ -1253,7 +1258,7 @@ namespace am
   // Serialize to a new xercesc::DOMDocument.
   //
 
-  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >
+  ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument >
   serializeAssetMap (const ::am::AssetMapType& x, 
                      const ::xml_schema::NamespaceInfomap& m = ::xml_schema::NamespaceInfomap (),
                      ::xml_schema::Flags f = 0);
@@ -1324,7 +1329,7 @@ namespace am
   // Serialize to a new xercesc::DOMDocument.
   //
 
-  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >
+  ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument >
   serializeVolumeIndex (const ::am::VolumeIndexType& x, 
                         const ::xml_schema::NamespaceInfomap& m = ::xml_schema::NamespaceInfomap (),
                         ::xml_schema::Flags f = 0);
@@ -1343,4 +1348,4 @@ namespace am
 //
 // End epilogue.
 
-#endif // SMPTE_429_8_2014_AM_H
+#endif // SMPTE_429_9_2007_AM_H

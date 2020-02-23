@@ -34,6 +34,10 @@
 #ifndef SMPTE_2067_100A_2014_OPL_H
 #define SMPTE_2067_100A_2014_OPL_H
 
+#ifndef XSD_CXX11
+#define XSD_CXX11
+#endif
+
 #ifndef XSD_USE_CHAR
 #define XSD_USE_CHAR
 #endif
@@ -239,7 +243,7 @@ namespace xml_schema
   {
     // Automatic pointer for DOMDocument.
     //
-    using ::xsd::cxx::xml::dom::auto_ptr;
+    using ::xsd::cxx::xml::dom::unique_ptr;
 
 #ifndef XSD_CXX_TREE_TREE_NODE_KEY__XML_SCHEMA
 #define XSD_CXX_TREE_TREE_NODE_KEY__XML_SCHEMA
@@ -266,9 +270,10 @@ namespace opl
 }
 
 
-#include <memory>    // ::std::auto_ptr
+#include <memory>    // ::std::unique_ptr
 #include <limits>    // std::numeric_limits
 #include <algorithm> // std::binary_search
+#include <utility>   // std::move
 
 #include <xsd/cxx/xml/char-utf8.hxx>
 
@@ -281,7 +286,7 @@ namespace opl
 
 #include <xsd/cxx/tree/containers-wildcard.hxx>
 
-#include "dcmlTypes.h"
+#include "st0433-dcmlTypes.h"
 
 #include "xmldsig-core-schema.h"
 
@@ -305,7 +310,7 @@ namespace opl
     setId (const IdType& x);
 
     void
-    setId (::std::auto_ptr< IdType > p);
+    setId (::std::unique_ptr< IdType > p);
 
     // Annotation
     //
@@ -326,7 +331,7 @@ namespace opl
     setAnnotation (const AnnotationOptional& x);
 
     void
-    setAnnotation (::std::auto_ptr< AnnotationType > p);
+    setAnnotation (::std::unique_ptr< AnnotationType > p);
 
     // IssueDate
     //
@@ -343,7 +348,7 @@ namespace opl
     setIssueDate (const IssueDateType& x);
 
     void
-    setIssueDate (::std::auto_ptr< IssueDateType > p);
+    setIssueDate (::std::unique_ptr< IssueDateType > p);
 
     // Issuer
     //
@@ -364,7 +369,7 @@ namespace opl
     setIssuer (const IssuerOptional& x);
 
     void
-    setIssuer (::std::auto_ptr< IssuerType > p);
+    setIssuer (::std::unique_ptr< IssuerType > p);
 
     // Creator
     //
@@ -385,7 +390,7 @@ namespace opl
     setCreator (const CreatorOptional& x);
 
     void
-    setCreator (::std::auto_ptr< CreatorType > p);
+    setCreator (::std::unique_ptr< CreatorType > p);
 
     // CompositionPlaylistId
     //
@@ -402,7 +407,7 @@ namespace opl
     setCompositionPlaylistId (const CompositionPlaylistIdType& x);
 
     void
-    setCompositionPlaylistId (::std::auto_ptr< CompositionPlaylistIdType > p);
+    setCompositionPlaylistId (::std::unique_ptr< CompositionPlaylistIdType > p);
 
     // ExtensionProperties
     //
@@ -423,7 +428,7 @@ namespace opl
     setExtensionProperties (const ExtensionPropertiesOptional& x);
 
     void
-    setExtensionProperties (::std::auto_ptr< ExtensionPropertiesType > p);
+    setExtensionProperties (::std::unique_ptr< ExtensionPropertiesType > p);
 
     // AliasList
     //
@@ -440,7 +445,7 @@ namespace opl
     setAliasList (const AliasListType& x);
 
     void
-    setAliasList (::std::auto_ptr< AliasListType > p);
+    setAliasList (::std::unique_ptr< AliasListType > p);
 
     // MacroList
     //
@@ -457,7 +462,7 @@ namespace opl
     setMacroList (const MacroListType& x);
 
     void
-    setMacroList (::std::auto_ptr< MacroListType > p);
+    setMacroList (::std::unique_ptr< MacroListType > p);
 
     // Signer
     //
@@ -478,7 +483,7 @@ namespace opl
     setSigner (const SignerOptional& x);
 
     void
-    setSigner (::std::auto_ptr< SignerType > p);
+    setSigner (::std::unique_ptr< SignerType > p);
 
     // Signature
     //
@@ -499,7 +504,7 @@ namespace opl
     setSignature (const SignatureOptional& x);
 
     void
-    setSignature (::std::auto_ptr< SignatureType > p);
+    setSignature (::std::unique_ptr< SignatureType > p);
 
     // Constructors.
     //
@@ -512,8 +517,8 @@ namespace opl
     OutputProfileListType (const IdType&,
                            const IssueDateType&,
                            const CompositionPlaylistIdType&,
-                           ::std::auto_ptr< AliasListType >,
-                           ::std::auto_ptr< MacroListType >);
+                           ::std::unique_ptr< AliasListType >,
+                           ::std::unique_ptr< MacroListType >);
 
     OutputProfileListType (const ::xercesc::DOMElement& e,
                            ::xml_schema::Flags f = 0,
@@ -572,7 +577,7 @@ namespace opl
     setName (const NameType& x);
 
     void
-    setName (::std::auto_ptr< NameType > p);
+    setName (::std::unique_ptr< NameType > p);
 
     // Annotation
     //
@@ -593,7 +598,7 @@ namespace opl
     setAnnotation (const AnnotationOptional& x);
 
     void
-    setAnnotation (::std::auto_ptr< AnnotationType > p);
+    setAnnotation (::std::unique_ptr< AnnotationType > p);
 
     // Constructors.
     //
@@ -647,7 +652,7 @@ namespace opl
     setPreset (const PresetType& x);
 
     void
-    setPreset (::std::auto_ptr< PresetType > p);
+    setPreset (::std::unique_ptr< PresetType > p);
 
     // Constructors.
     //
@@ -809,7 +814,7 @@ namespace opl
            ::xml_schema::Flags);
 
     protected:
-    ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > dom_document_;
+    ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > dom_document_;
 
     AnySequence any_;
   };
@@ -938,7 +943,7 @@ namespace opl
     setHandle (const HandleType1& x);
 
     void
-    setHandle (::std::auto_ptr< HandleType1 > p);
+    setHandle (::std::unique_ptr< HandleType1 > p);
 
     // Constructors.
     //
@@ -1018,18 +1023,18 @@ namespace opl
   // Parse a URI or a local file.
   //
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (const ::std::string& uri,
                           ::xml_schema::Flags f = 0,
                           const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (const ::std::string& uri,
                           ::xml_schema::ErrorHandler& eh,
                           ::xml_schema::Flags f = 0,
                           const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (const ::std::string& uri,
                           ::xercesc::DOMErrorHandler& eh,
                           ::xml_schema::Flags f = 0,
@@ -1038,37 +1043,37 @@ namespace opl
   // Parse std::istream.
   //
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (::std::istream& is,
                           ::xml_schema::Flags f = 0,
                           const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (::std::istream& is,
                           ::xml_schema::ErrorHandler& eh,
                           ::xml_schema::Flags f = 0,
                           const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (::std::istream& is,
                           ::xercesc::DOMErrorHandler& eh,
                           ::xml_schema::Flags f = 0,
                           const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (::std::istream& is,
                           const ::std::string& id,
                           ::xml_schema::Flags f = 0,
                           const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (::std::istream& is,
                           const ::std::string& id,
                           ::xml_schema::ErrorHandler& eh,
                           ::xml_schema::Flags f = 0,
                           const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (::std::istream& is,
                           const ::std::string& id,
                           ::xercesc::DOMErrorHandler& eh,
@@ -1078,18 +1083,18 @@ namespace opl
   // Parse xercesc::InputSource.
   //
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (::xercesc::InputSource& is,
                           ::xml_schema::Flags f = 0,
                           const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (::xercesc::InputSource& is,
                           ::xml_schema::ErrorHandler& eh,
                           ::xml_schema::Flags f = 0,
                           const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (::xercesc::InputSource& is,
                           ::xercesc::DOMErrorHandler& eh,
                           ::xml_schema::Flags f = 0,
@@ -1098,13 +1103,13 @@ namespace opl
   // Parse xercesc::DOMDocument.
   //
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
+  ::std::unique_ptr< ::opl::OutputProfileListType >
   parseOutputProfileList (const ::xercesc::DOMDocument& d,
                           ::xml_schema::Flags f = 0,
                           const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 
-  ::std::auto_ptr< ::opl::OutputProfileListType >
-  parseOutputProfileList (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument > d,
+  ::std::unique_ptr< ::opl::OutputProfileListType >
+  parseOutputProfileList (::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument > d,
                           ::xml_schema::Flags f = 0,
                           const ::xml_schema::Properties& p = ::xml_schema::Properties ());
 }
@@ -1182,7 +1187,7 @@ namespace opl
   // Serialize to a new xercesc::DOMDocument.
   //
 
-  ::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >
+  ::xml_schema::dom::unique_ptr< ::xercesc::DOMDocument >
   serializeOutputProfileList (const ::opl::OutputProfileListType& x, 
                               const ::xml_schema::NamespaceInfomap& m = ::xml_schema::NamespaceInfomap (),
                               ::xml_schema::Flags f = 0);

@@ -1,4 +1,0 @@
-Translating schema to C++ code:
-Use CodeSynthesis XSD (http://www.codesynthesis.com/products/xsd/) as follows:
-
-xsd cxx-tree --options-file imf.options --output-dir ../src/synthesis *.xsd

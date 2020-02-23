@@ -70,12 +70,12 @@ set(tool_src main.cpp MainWindow.cpp KMQtLogSink.cpp QtWaitingSpinner.cpp Widget
 	CustomProxyStyle.cpp GraphicScenes.cpp GraphicsWidgetResources.cpp GraphicsViewScaleable.cpp WidgetTrackDedails.cpp GraphicsWidgetComposition.cpp
 	GraphicsWidgetSequence.cpp Events.cpp WidgetCentral.cpp
 	WidgetCompositionInfo.cpp UndoProxyModel.cpp JobQueue.cpp Jobs.cpp Error.cpp EmptyTimedTextGenerator.cpp WizardPartialImpGenerator.cpp
-	WidgetVideoPreview.cpp WidgetImagePreview.cpp JP2K_Preview.cpp JP2K_Player.cpp JP2K_Decoder.cpp TTMLParser.cpp WidgetTimedTextPreview.cpp TimelineParser.cpp # (k)
+	WidgetVideoPreview.cpp WidgetImagePreview.cpp JP2K_Preview.cpp JP2K_Decoder.cpp TTMLParser.cpp WidgetTimedTextPreview.cpp TimelineParser.cpp # (k)
 	WidgetContentVersionList.cpp WidgetContentVersionListCommands.cpp WidgetLocaleList.cpp WidgetLocaleListCommands.cpp WizardEssenceDescriptor.cpp#WR
-	WizardSidecarCompositionMapGenerator.cpp WizardCompositionGenerator.cpp
+	WizardSidecarCompositionMapGenerator.cpp WizardCompositionGenerator.cpp PreviewCommon.cpp Player.cpp
 	)
 if(BUILD_APP5_SUPPORT)
-set(tool_src ${tool_src} As02AcesIStream.cpp ACES_Preview.cpp ACES_Player.cpp ACES_Decoder.cpp
+set(tool_src ${tool_src} As02AcesIStream.cpp ACES_Preview.cpp ACES_Decoder.cpp
 	)
 endif(BUILD_APP5_SUPPORT)
 
@@ -87,16 +87,16 @@ set(tool_src ${tool_src} global.h MainWindow.h KMQtLogSink.h QtWaitingSpinner.h
 	CustomProxyStyle.h GraphicScenes.h GraphicsWidgetResources.h GraphicsViewScaleable.h WidgetTrackDedails.h GraphicsWidgetComposition.h
 	GraphicsWidgetSequence.h Events.h WidgetCentral.h Int24.h
 	WidgetCompositionInfo.h UndoProxyModel.h SafeBool.h JobQueue.h Jobs.h Error.h EmptyTimedTextGenerator.h WizardPartialImpGenerator.h
-	WidgetVideoPreview.h WidgetImagePreview.h JP2K_Preview.h JP2K_Player.h JP2K_Decoder.h TTMLParser.h WidgetTimedTextPreview.h TimelineParser.h SMPTE_Labels.h # (k)
+	WidgetVideoPreview.h WidgetImagePreview.h JP2K_Preview.h JP2K_Decoder.h TTMLParser.h WidgetTimedTextPreview.h TimelineParser.h SMPTE_Labels.h # (k)
 	WidgetContentVersionList.h WidgetContentVersionListCommands.h WidgetLocaleList.h WidgetLocaleListCommands.h WizardEssenceDescriptor.h# WR
-	WizardSidecarCompositionMapGenerator.h WizardCompositionGenerator.h
+	WizardSidecarCompositionMapGenerator.h WizardCompositionGenerator.h PreviewCommon.h Player.h
 	)
 if(BUILD_APP5_SUPPORT)
-set(tool_src ${tool_src} As02AcesIStream.h ACES_Preview.h ACES_Player.h ACES_Decoder.h
+set(tool_src ${tool_src} As02AcesIStream.h ACES_Preview.h ACES_Decoder.h
 	)
 endif(BUILD_APP5_SUPPORT)
 
-set(synthesis_src synthesis/dcmlTypes.cpp synthesis/SMPTE-429-8-2006-PKL.cpp synthesis/SMPTE-429-8-2014-AM.cpp synthesis/SMPTE-2067-2-2013-Core.cpp 
+set(synthesis_src synthesis/st0433-dcmlTypes.cpp synthesis/SMPTE-429-8-2006-PKL.cpp synthesis/SMPTE-429-9-2007-AM.cpp synthesis/SMPTE-2067-2-2013-Core.cpp 
 	synthesis/SMPTE-2067-3-2013-CPL.cpp synthesis/SMPTE-2067-100a-2014-OPL.cpp synthesis/xml.cpp synthesis/xmldsig-core-schema.cpp
 	synthesis/st2067-2a-2016-Core.cpp synthesis/st2067-2b-2016-PKL.cpp synthesis/st2067-3a-2016-CPL.cpp synthesis/SMPTE-2067-9a-2018-Sidecar.cpp
 	)

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<xs:schema xmlns:dcml="http://www.smpte-ra.org/schemas/433/2008/dcmlTypes" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:opl="http://www.smpte-ra.org/schemas/2067-100/2014" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.smpte-ra.org/schemas/2067-100/2014">
-	<xs:import namespace="http://www.smpte-ra.org/schemas/433/2008/dcmlTypes" schemaLocation="dcmlTypes.xsd"/>
+<xs:schema xmlns:dcml="http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:opl="http://www.smpte-ra.org/schemas/2067-100/2014" xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.smpte-ra.org/schemas/2067-100/2014">
+	<xs:import namespace="http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/" schemaLocation="st0433-dcmlTypes.xsd"/>
 	<xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
 	<xs:element name="OutputProfileList" type="opl:OutputProfileListType"/>
 	<xs:complexType name="OutputProfileListType">

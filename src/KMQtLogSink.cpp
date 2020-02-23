@@ -32,7 +32,8 @@ void Kumu::KMQtLogSink::WriteEntry(const LogEntry &Entry) {
 	if(Entry.TestFilter(m_filter)) {
 		Entry.CreateStringWithOptions(buf, m_options);
 		switch(Entry.Type) {
-			case LOG_DEBUG || LOG_INFO:
+			case LOG_DEBUG:
+			case LOG_INFO:
 				qDebug() << "KUMU" << buf.c_str();
 				break;
 			case LOG_WARN:

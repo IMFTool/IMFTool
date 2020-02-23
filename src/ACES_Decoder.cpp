@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.If not, see <http://www.gnu.org/licenses/>.
  */
-#include "ACES_Player.h"
+#include "Player.h"
 #include "ACES_Decoder.h"
 #include "global.h"
 #include <QRunnable>
@@ -28,17 +28,11 @@
 
 //#define DEBUG_JP2K
 
-ACES_Decoder::ACES_Decoder(QSharedPointer<DecodedFrames> &rdecoded_shared, QSharedPointer<ACES_FrameRequest> &rRequest, float* &Roetf_709_shared, float* &Reotf_2020_shared, float* &Reotf_PQ_shared) {
+ACES_Decoder::ACES_Decoder(QSharedPointer<DecodedFrames> &rdecoded_shared, QSharedPointer<FrameRequest> &rRequest) {
 
 	// set stuff
 	decoded_shared = rdecoded_shared;
 	request = rRequest;
-	oetf_709 = Roetf_709_shared;
-	eotf_2020 = Reotf_2020_shared;
-	eotf_PQ = Reotf_PQ_shared;
-
-	max_f = 1 << bitdepth;
-	max_f_ = (float)(max_f)-1.0;
 
 	reader = new AS_02::ACES::MXFReader();
 

@@ -27,7 +27,7 @@ class WidgetImagePreview : public QOpenGLWidget {
 	Q_OBJECT
 
 public:
-	WidgetImagePreview();
+	WidgetImagePreview(QWidget *pParent = nullptr);
 	~WidgetImagePreview() {}
 	virtual QSize sizeHint() const;
 	virtual QSize minimumSizeHint() const;

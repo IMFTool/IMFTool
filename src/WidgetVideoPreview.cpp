@@ -65,7 +65,7 @@ WidgetVideoPreview::WidgetVideoPreview(QWidget *pParent) : QWidget(pParent) {
 #endif
 
 	// create player
-	player = new JP2K_Player();
+	player = new Player(Player::Decoder_JP2K);
 	player->setFps(decode_speed); // set default speed
 
 	playerThread = new QThread();
@@ -84,7 +84,7 @@ WidgetVideoPreview::WidgetVideoPreview(QWidget *pParent) : QWidget(pParent) {
 
 #ifdef APP5_ACES
 	// create player
-	mpACESPlayer = new ACES_Player();
+	mpACESPlayer = new Player(Player::Decoder_ACES);
 	mpACESPlayer->setFps(decode_speed); // set default speed
 
 	mpACESPlayerThread = new QThread();
@@ -104,9 +104,9 @@ WidgetVideoPreview::WidgetVideoPreview(QWidget *pParent) : QWidget(pParent) {
 }
 
 WidgetVideoPreview::~WidgetVideoPreview(){
-	player->~JP2K_Player();
+	player->~Player();
 #ifdef APP5_ACES
-	mpACESPlayer->~ACES_Player();
+	mpACESPlayer->~Player();
 #endif
 }
 
@@ -120,7 +120,7 @@ void WidgetVideoPreview::InitLayout() {
 	p_layout->setVerticalSpacing(0);
 
 	// create new gl widget
-	mpImagePreview = new WidgetImagePreview(); 
+	mpImagePreview = new WidgetImagePreview(this);
 	p_layout->addWidget(mpImagePreview, 1, 0, 1, 5);
 
 	connect(this, SIGNAL(regionOptionsChanged(int)), mpImagePreview, SLOT(regionOptionsChanged(int)));
@@ -771,30 +771,26 @@ void WidgetVideoPreview::rChangeSpeed(QAction *action) {
 		decode_speed = action->data().value<int>();
 		decode_speed_index = decode_speed;
 	
-		if (mImfApplication != ::App5) {
-			bool was_playing = player->playing;
-			if (playerThread->isRunning()) playerThread->quit();
-			player->setFps(decode_speed);
-			player->clean();
+		bool was_playing = player->playing;
+		if (playerThread->isRunning()) playerThread->quit();
+		player->setFps(decode_speed);
+		player->clean();
 
-			if (was_playing) {
-				player->playing = true;
-				playerThread->start(QThread::TimeCriticalPriority); // resume playback
-			}
+		if (was_playing) {
+			player->playing = true;
+			playerThread->start(QThread::TimeCriticalPriority); // resume playback
 		}
 #ifdef APP5_ACES
-		else {
-			bool was_playing = mpACESPlayer->playing;
-			if (mpACESPlayerThread->isRunning()) mpACESPlayerThread->quit();
-			mpACESPlayer->setFps(decode_speed);
-			mpACESPlayer->clean();
+		was_playing = mpACESPlayer->playing;
+		if (mpACESPlayerThread->isRunning()) mpACESPlayerThread->quit();
+		mpACESPlayer->setFps(decode_speed);
+		mpACESPlayer->clean();
 
-			if (was_playing) {
-				mpACESPlayer->playing = true;
-				mpACESPlayerThread->start(QThread::TimeCriticalPriority); // resume playback
-			}
-
+		if (was_playing) {
+			mpACESPlayer->playing = true;
+			mpACESPlayerThread->start(QThread::TimeCriticalPriority); // resume playback
 		}
+
 #endif
 	}
 	else {

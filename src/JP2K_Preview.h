@@ -19,6 +19,7 @@
 #include "Error.h"
 #include "openjpeg.h"
 #include "ImfPackage.h"
+#include "PreviewCommon.h"
 
 class AssetMxfTrack;
 
@@ -29,40 +30,11 @@ typedef struct
 	OPJ_SIZE_T offset; //Where are we currently in our data.
 }opj_memory_stream;
 
-class JP2 {
+class JP2: public PreviewCommon {
 
 public:
 
-	//WR
-	quint32	ComponentMinRef;
-	quint32	ComponentMaxRef;
-	//WR
-
-	// change values with new asset:
-	//QSharedPointer<AS_02::JP2K::MXFReader> reader_shared;
-	int src_bitdepth, prec_shift, max, layer = 3, RGBrange, RGBmaxcv;
-
-	// enable conversion? (much slower!!)
-	bool convert_to_709 = true; // default
-
-	opj_dparameters_t params; // decoding parameters
-
-	Metadata::eColorEncoding ColorEncoding; // YCbCr or RGB
-	SMPTE::eColorPrimaries colorPrimaries; // BT.709 / BT.2020 / DCI-P3
-	SMPTE::eTransferCharacteristic transferCharactersitics; // BT.709 / BT.2020 / PQ
-	float Kb, Kr, Kg; // YCbCr -> RGB (depending on BT.709 or BT.2020)
-
-	QSharedPointer<AssetMxfTrack> current_asset; // pointer to current asset
-
 protected:
-
-	// luts
-	static const int bitdepth = 16; // lookup table size (default: 16 bit)
-	int max_f; // (float)pow(2, bitdepth)
-	float max_f_; // max_f - 1;
-	float *oetf_709;
-	float *eotf_2020;
-	float *eotf_PQ;
 
 	AS_02::JP2K::MXFReader *reader;
 	ASDCP::MXF::IndexTableSegment::IndexEntry IndexF1; // current frame offset
@@ -97,7 +69,7 @@ protected:
 	ASDCP::JP2K::FrameBuffer *buff;
 };
 
-class JP2K_Preview : public QObject, public JP2 {
+class JP2K_Preview : public QObject, public JP2  {
 	Q_OBJECT
 private:
 

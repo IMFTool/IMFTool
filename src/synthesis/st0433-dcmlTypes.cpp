@@ -38,7 +38,7 @@
 
 #include <xsd/cxx/pre.hxx>
 
-#include "dcmlTypes.h"
+#include "st0433-dcmlTypes.h"
 
 namespace dcml
 {
@@ -68,9 +68,9 @@ namespace dcml
   }
 
   void UserTextType::
-  setLanguage (::std::auto_ptr< LanguageType > x)
+  setLanguage (::std::unique_ptr< LanguageType > x)
   {
-    this->language_.set (x);
+    this->language_.set (std::move (x));
   }
 
   const UserTextType::LanguageType& UserTextType::
@@ -355,9 +355,9 @@ namespace dcml
   }
 
   void TemperatureType::
-  setUnits (::std::auto_ptr< UnitsType > x)
+  setUnits (::std::unique_ptr< UnitsType > x)
   {
-    this->units_.set (x);
+    this->units_.set (std::move (x));
   }
 
 
@@ -383,9 +383,9 @@ namespace dcml
   }
 
   void VoltageType::
-  setUnits (::std::auto_ptr< UnitsType > x)
+  setUnits (::std::unique_ptr< UnitsType > x)
   {
-    this->units_.set (x);
+    this->units_.set (std::move (x));
   }
 
   const VoltageType::ModeType& VoltageType::
@@ -407,9 +407,9 @@ namespace dcml
   }
 
   void VoltageType::
-  setMode (::std::auto_ptr< ModeType > x)
+  setMode (::std::unique_ptr< ModeType > x)
   {
-    this->mode_.set (x);
+    this->mode_.set (std::move (x));
   }
 
 
@@ -435,9 +435,9 @@ namespace dcml
   }
 
   void CurrentType::
-  setUnits (::std::auto_ptr< UnitsType > x)
+  setUnits (::std::unique_ptr< UnitsType > x)
   {
-    this->units_.set (x);
+    this->units_.set (std::move (x));
   }
 
   const CurrentType::ModeType& CurrentType::
@@ -459,9 +459,9 @@ namespace dcml
   }
 
   void CurrentType::
-  setMode (::std::auto_ptr< ModeType > x)
+  setMode (::std::unique_ptr< ModeType > x)
   {
-    this->mode_.set (x);
+    this->mode_.set (std::move (x));
   }
 
 
@@ -487,9 +487,9 @@ namespace dcml
   }
 
   void DurationType::
-  setUnits (::std::auto_ptr< UnitsType > x)
+  setUnits (::std::unique_ptr< UnitsType > x)
   {
-    this->units_.set (x);
+    this->units_.set (std::move (x));
   }
 
 
@@ -515,9 +515,9 @@ namespace dcml
   }
 
   void RateType::
-  setEventscope (::std::auto_ptr< EventscopeType > x)
+  setEventscope (::std::unique_ptr< EventscopeType > x)
   {
-    this->eventscope_.set (x);
+    this->eventscope_.set (std::move (x));
   }
 
   const RateType::EventscopeType& RateType::
@@ -551,9 +551,9 @@ namespace dcml
   }
 
   void RateType::
-  setEvent (::std::auto_ptr< EventType > x)
+  setEvent (::std::unique_ptr< EventType > x)
   {
-    this->event_.set (x);
+    this->event_.set (std::move (x));
   }
 
   const RateType::PeriodType& RateType::
@@ -575,9 +575,9 @@ namespace dcml
   }
 
   void RateType::
-  setPeriod (::std::auto_ptr< PeriodType > x)
+  setPeriod (::std::unique_ptr< PeriodType > x)
   {
-    this->period_.set (x);
+    this->period_.set (std::move (x));
   }
 
 
@@ -626,9 +626,9 @@ namespace dcml
   }
 
   void DeviceIdentifierPolyType::
-  setIdtype (::std::auto_ptr< IdtypeType > x)
+  setIdtype (::std::unique_ptr< IdtypeType > x)
   {
-    this->idtype_.set (x);
+    this->idtype_.set (std::move (x));
   }
 
 
@@ -654,9 +654,9 @@ namespace dcml
   }
 
   void DeviceIdentifierListType::
-  setPrimaryID (::std::auto_ptr< PrimaryIDType > x)
+  setPrimaryID (::std::unique_ptr< PrimaryIDType > x)
   {
-    this->PrimaryID_.set (x);
+    this->PrimaryID_.set (std::move (x));
   }
 
   const DeviceIdentifierListType::SecondaryIDOptional& DeviceIdentifierListType::
@@ -684,9 +684,9 @@ namespace dcml
   }
 
   void DeviceIdentifierListType::
-  setSecondaryID (::std::auto_ptr< SecondaryIDType > x)
+  setSecondaryID (::std::unique_ptr< SecondaryIDType > x)
   {
-    this->SecondaryID_.set (x);
+    this->SecondaryID_.set (std::move (x));
   }
 
 
@@ -712,9 +712,9 @@ namespace dcml
   }
 
   void DeviceTypeType::
-  setScope (::std::auto_ptr< ScopeType > x)
+  setScope (::std::unique_ptr< ScopeType > x)
   {
-    this->scope_.set (x);
+    this->scope_.set (std::move (x));
   }
 
   const DeviceTypeType::ScopeType& DeviceTypeType::
@@ -752,9 +752,9 @@ namespace dcml
   }
 
   void ScopedTokenType::
-  setScope (::std::auto_ptr< ScopeType > x)
+  setScope (::std::unique_ptr< ScopeType > x)
   {
-    this->scope_.set (x);
+    this->scope_.set (std::move (x));
   }
 
 
@@ -780,9 +780,9 @@ namespace dcml
   }
 
   void NamedParmType::
-  setName (::std::auto_ptr< NameType > x)
+  setName (::std::unique_ptr< NameType > x)
   {
-    this->Name_.set (x);
+    this->Name_.set (std::move (x));
   }
 
   const NamedParmType::ValueType& NamedParmType::
@@ -804,9 +804,9 @@ namespace dcml
   }
 
   void NamedParmType::
-  setValue (::std::auto_ptr< ValueType > x)
+  setValue (::std::unique_ptr< ValueType > x)
   {
-    this->Value_.set (x);
+    this->Value_.set (std::move (x));
   }
 
 
@@ -894,9 +894,9 @@ namespace dcml
   }
 
   void DeviceDescriptionType::
-  setDeviceIdentifier (::std::auto_ptr< DeviceIdentifierType > x)
+  setDeviceIdentifier (::std::unique_ptr< DeviceIdentifierType > x)
   {
-    this->DeviceIdentifier_.set (x);
+    this->DeviceIdentifier_.set (std::move (x));
   }
 
   const DeviceDescriptionType::DeviceTypeIDType& DeviceDescriptionType::
@@ -918,9 +918,9 @@ namespace dcml
   }
 
   void DeviceDescriptionType::
-  setDeviceTypeID (::std::auto_ptr< DeviceTypeIDType > x)
+  setDeviceTypeID (::std::unique_ptr< DeviceTypeIDType > x)
   {
-    this->DeviceTypeID_.set (x);
+    this->DeviceTypeID_.set (std::move (x));
   }
 
   const DeviceDescriptionType::DeviceSubsystemTypeIDOptional& DeviceDescriptionType::
@@ -948,9 +948,9 @@ namespace dcml
   }
 
   void DeviceDescriptionType::
-  setDeviceSubsystemTypeID (::std::auto_ptr< DeviceSubsystemTypeIDType > x)
+  setDeviceSubsystemTypeID (::std::unique_ptr< DeviceSubsystemTypeIDType > x)
   {
-    this->DeviceSubsystemTypeID_.set (x);
+    this->DeviceSubsystemTypeID_.set (std::move (x));
   }
 
   const DeviceDescriptionType::AdditionalIDOptional& DeviceDescriptionType::
@@ -978,9 +978,9 @@ namespace dcml
   }
 
   void DeviceDescriptionType::
-  setAdditionalID (::std::auto_ptr< AdditionalIDType > x)
+  setAdditionalID (::std::unique_ptr< AdditionalIDType > x)
   {
-    this->AdditionalID_.set (x);
+    this->AdditionalID_.set (std::move (x));
   }
 
   const DeviceDescriptionType::DeviceSerialType& DeviceDescriptionType::
@@ -1002,9 +1002,9 @@ namespace dcml
   }
 
   void DeviceDescriptionType::
-  setDeviceSerial (::std::auto_ptr< DeviceSerialType > x)
+  setDeviceSerial (::std::unique_ptr< DeviceSerialType > x)
   {
-    this->DeviceSerial_.set (x);
+    this->DeviceSerial_.set (std::move (x));
   }
 
   const DeviceDescriptionType::ManufacturerIDOptional& DeviceDescriptionType::
@@ -1032,9 +1032,9 @@ namespace dcml
   }
 
   void DeviceDescriptionType::
-  setManufacturerID (::std::auto_ptr< ManufacturerIDType > x)
+  setManufacturerID (::std::unique_ptr< ManufacturerIDType > x)
   {
-    this->ManufacturerID_.set (x);
+    this->ManufacturerID_.set (std::move (x));
   }
 
   const DeviceDescriptionType::ManufacturerCertIDOptional& DeviceDescriptionType::
@@ -1062,9 +1062,9 @@ namespace dcml
   }
 
   void DeviceDescriptionType::
-  setManufacturerCertID (::std::auto_ptr< ManufacturerCertIDType > x)
+  setManufacturerCertID (::std::unique_ptr< ManufacturerCertIDType > x)
   {
-    this->ManufacturerCertID_.set (x);
+    this->ManufacturerCertID_.set (std::move (x));
   }
 
   const DeviceDescriptionType::DeviceCertIDOptional& DeviceDescriptionType::
@@ -1092,9 +1092,9 @@ namespace dcml
   }
 
   void DeviceDescriptionType::
-  setDeviceCertID (::std::auto_ptr< DeviceCertIDType > x)
+  setDeviceCertID (::std::unique_ptr< DeviceCertIDType > x)
   {
-    this->DeviceCertID_.set (x);
+    this->DeviceCertID_.set (std::move (x));
   }
 
   const DeviceDescriptionType::ManufacturerNameOptional& DeviceDescriptionType::
@@ -1122,9 +1122,9 @@ namespace dcml
   }
 
   void DeviceDescriptionType::
-  setManufacturerName (::std::auto_ptr< ManufacturerNameType > x)
+  setManufacturerName (::std::unique_ptr< ManufacturerNameType > x)
   {
-    this->ManufacturerName_.set (x);
+    this->ManufacturerName_.set (std::move (x));
   }
 
   const DeviceDescriptionType::DeviceNameOptional& DeviceDescriptionType::
@@ -1152,9 +1152,9 @@ namespace dcml
   }
 
   void DeviceDescriptionType::
-  setDeviceName (::std::auto_ptr< DeviceNameType > x)
+  setDeviceName (::std::unique_ptr< DeviceNameType > x)
   {
-    this->DeviceName_.set (x);
+    this->DeviceName_.set (std::move (x));
   }
 
   const DeviceDescriptionType::ModelNumberOptional& DeviceDescriptionType::
@@ -1182,9 +1182,9 @@ namespace dcml
   }
 
   void DeviceDescriptionType::
-  setModelNumber (::std::auto_ptr< ModelNumberType > x)
+  setModelNumber (::std::unique_ptr< ModelNumberType > x)
   {
-    this->ModelNumber_.set (x);
+    this->ModelNumber_.set (std::move (x));
   }
 
   const DeviceDescriptionType::VersionInfoType& DeviceDescriptionType::
@@ -1206,9 +1206,9 @@ namespace dcml
   }
 
   void DeviceDescriptionType::
-  setVersionInfo (::std::auto_ptr< VersionInfoType > x)
+  setVersionInfo (::std::unique_ptr< VersionInfoType > x)
   {
-    this->VersionInfo_.set (x);
+    this->VersionInfo_.set (std::move (x));
   }
 
   const DeviceDescriptionType::DeviceCommentOptional& DeviceDescriptionType::
@@ -1236,9 +1236,9 @@ namespace dcml
   }
 
   void DeviceDescriptionType::
-  setDeviceComment (::std::auto_ptr< DeviceCommentType > x)
+  setDeviceComment (::std::unique_ptr< DeviceCommentType > x)
   {
-    this->DeviceComment_.set (x);
+    this->DeviceComment_.set (std::move (x));
   }
 
 
@@ -2299,7 +2299,7 @@ namespace dcml
   //
 
   const RateType::EventscopeType RateType::eventscope_default_value_ (
-    "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes#rate-scope-tokens");
+    "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/#rate-scope-tokens");
 
   RateType::
   RateType (const PeriodType& period)
@@ -2561,9 +2561,9 @@ namespace dcml
   }
 
   DeviceIdentifierListType::
-  DeviceIdentifierListType (::std::auto_ptr< PrimaryIDType > PrimaryID)
+  DeviceIdentifierListType (::std::unique_ptr< PrimaryIDType > PrimaryID)
   : ::xml_schema::Type (),
-    PrimaryID_ (PrimaryID, this),
+    PrimaryID_ (std::move (PrimaryID), this),
     SecondaryID_ (this)
   {
   }
@@ -2605,28 +2605,28 @@ namespace dcml
 
       // PrimaryID
       //
-      if (n.name () == "PrimaryID" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes")
+      if (n.name () == "PrimaryID" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/")
       {
-        ::std::auto_ptr< PrimaryIDType > r (
+        ::std::unique_ptr< PrimaryIDType > r (
           PrimaryIDTraits::create (i, f, this));
 
         if (!PrimaryID_.present ())
         {
-          this->PrimaryID_.set (r);
+          this->PrimaryID_.set (::std::move (r));
           continue;
         }
       }
 
       // SecondaryID
       //
-      if (n.name () == "SecondaryID" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes")
+      if (n.name () == "SecondaryID" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/")
       {
-        ::std::auto_ptr< SecondaryIDType > r (
+        ::std::unique_ptr< SecondaryIDType > r (
           SecondaryIDTraits::create (i, f, this));
 
         if (!this->SecondaryID_)
         {
-          this->SecondaryID_.set (r);
+          this->SecondaryID_.set (::std::move (r));
           continue;
         }
       }
@@ -2638,7 +2638,7 @@ namespace dcml
     {
       throw ::xsd::cxx::tree::expected_element< char > (
         "PrimaryID",
-        "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes");
+        "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/");
     }
   }
 
@@ -2880,10 +2880,10 @@ namespace dcml
   }
 
   NamedParmType::
-  NamedParmType (::std::auto_ptr< NameType > Name,
+  NamedParmType (::std::unique_ptr< NameType > Name,
                  const ValueType& Value)
   : ::xml_schema::Type (),
-    Name_ (Name, this),
+    Name_ (std::move (Name), this),
     Value_ (Value, this)
   {
   }
@@ -2925,28 +2925,28 @@ namespace dcml
 
       // Name
       //
-      if (n.name () == "Name" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes")
+      if (n.name () == "Name" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/")
       {
-        ::std::auto_ptr< NameType > r (
+        ::std::unique_ptr< NameType > r (
           NameTraits::create (i, f, this));
 
         if (!Name_.present ())
         {
-          this->Name_.set (r);
+          this->Name_.set (::std::move (r));
           continue;
         }
       }
 
       // Value
       //
-      if (n.name () == "Value" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes")
+      if (n.name () == "Value" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/")
       {
-        ::std::auto_ptr< ValueType > r (
+        ::std::unique_ptr< ValueType > r (
           ValueTraits::create (i, f, this));
 
         if (!Value_.present ())
         {
-          this->Value_.set (r);
+          this->Value_.set (::std::move (r));
           continue;
         }
       }
@@ -2958,14 +2958,14 @@ namespace dcml
     {
       throw ::xsd::cxx::tree::expected_element< char > (
         "Name",
-        "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes");
+        "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/");
     }
 
     if (!Value_.present ())
     {
       throw ::xsd::cxx::tree::expected_element< char > (
         "Value",
-        "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes");
+        "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/");
     }
   }
 
@@ -3039,12 +3039,12 @@ namespace dcml
 
       // Parameter
       //
-      if (n.name () == "Parameter" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes")
+      if (n.name () == "Parameter" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/")
       {
-        ::std::auto_ptr< ParameterType > r (
+        ::std::unique_ptr< ParameterType > r (
           ParameterTraits::create (i, f, this));
 
-        this->Parameter_.push_back (r);
+        this->Parameter_.push_back (::std::move (r));
         continue;
       }
 
@@ -3124,23 +3124,23 @@ namespace dcml
 
       // Name
       //
-      if (n.name () == "Name" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes")
+      if (n.name () == "Name" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/")
       {
-        ::std::auto_ptr< NameType > r (
+        ::std::unique_ptr< NameType > r (
           NameTraits::create (i, f, this));
 
-        this->Name_.push_back (r);
+        this->Name_.push_back (::std::move (r));
         continue;
       }
 
       // Value
       //
-      if (n.name () == "Value" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes")
+      if (n.name () == "Value" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/")
       {
-        ::std::auto_ptr< ValueType > r (
+        ::std::unique_ptr< ValueType > r (
           ValueTraits::create (i, f, this));
 
-        this->Value_.push_back (r);
+        this->Value_.push_back (::std::move (r));
         continue;
       }
 
@@ -3199,13 +3199,13 @@ namespace dcml
   }
 
   DeviceDescriptionType::
-  DeviceDescriptionType (::std::auto_ptr< DeviceIdentifierType > DeviceIdentifier,
-                         ::std::auto_ptr< DeviceTypeIDType > DeviceTypeID,
+  DeviceDescriptionType (::std::unique_ptr< DeviceIdentifierType > DeviceIdentifier,
+                         ::std::unique_ptr< DeviceTypeIDType > DeviceTypeID,
                          const DeviceSerialType& DeviceSerial,
-                         ::std::auto_ptr< VersionInfoType > VersionInfo)
+                         ::std::unique_ptr< VersionInfoType > VersionInfo)
   : ::xml_schema::Type (),
-    DeviceIdentifier_ (DeviceIdentifier, this),
-    DeviceTypeID_ (DeviceTypeID, this),
+    DeviceIdentifier_ (std::move (DeviceIdentifier), this),
+    DeviceTypeID_ (std::move (DeviceTypeID), this),
     DeviceSubsystemTypeID_ (this),
     AdditionalID_ (this),
     DeviceSerial_ (DeviceSerial, this),
@@ -3215,7 +3215,7 @@ namespace dcml
     ManufacturerName_ (this),
     DeviceName_ (this),
     ModelNumber_ (this),
-    VersionInfo_ (VersionInfo, this),
+    VersionInfo_ (std::move (VersionInfo), this),
     DeviceComment_ (this)
   {
   }
@@ -3279,182 +3279,182 @@ namespace dcml
 
       // DeviceIdentifier
       //
-      if (n.name () == "DeviceIdentifier" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes")
+      if (n.name () == "DeviceIdentifier" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/")
       {
-        ::std::auto_ptr< DeviceIdentifierType > r (
+        ::std::unique_ptr< DeviceIdentifierType > r (
           DeviceIdentifierTraits::create (i, f, this));
 
         if (!DeviceIdentifier_.present ())
         {
-          this->DeviceIdentifier_.set (r);
+          this->DeviceIdentifier_.set (::std::move (r));
           continue;
         }
       }
 
       // DeviceTypeID
       //
-      if (n.name () == "DeviceTypeID" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes")
+      if (n.name () == "DeviceTypeID" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/")
       {
-        ::std::auto_ptr< DeviceTypeIDType > r (
+        ::std::unique_ptr< DeviceTypeIDType > r (
           DeviceTypeIDTraits::create (i, f, this));
 
         if (!DeviceTypeID_.present ())
         {
-          this->DeviceTypeID_.set (r);
+          this->DeviceTypeID_.set (::std::move (r));
           continue;
         }
       }
 
       // DeviceSubsystemTypeID
       //
-      if (n.name () == "DeviceSubsystemTypeID" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes")
+      if (n.name () == "DeviceSubsystemTypeID" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/")
       {
-        ::std::auto_ptr< DeviceSubsystemTypeIDType > r (
+        ::std::unique_ptr< DeviceSubsystemTypeIDType > r (
           DeviceSubsystemTypeIDTraits::create (i, f, this));
 
         if (!this->DeviceSubsystemTypeID_)
         {
-          this->DeviceSubsystemTypeID_.set (r);
+          this->DeviceSubsystemTypeID_.set (::std::move (r));
           continue;
         }
       }
 
       // AdditionalID
       //
-      if (n.name () == "AdditionalID" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes")
+      if (n.name () == "AdditionalID" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/")
       {
-        ::std::auto_ptr< AdditionalIDType > r (
+        ::std::unique_ptr< AdditionalIDType > r (
           AdditionalIDTraits::create (i, f, this));
 
         if (!this->AdditionalID_)
         {
-          this->AdditionalID_.set (r);
+          this->AdditionalID_.set (::std::move (r));
           continue;
         }
       }
 
       // DeviceSerial
       //
-      if (n.name () == "DeviceSerial" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes")
+      if (n.name () == "DeviceSerial" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/")
       {
-        ::std::auto_ptr< DeviceSerialType > r (
+        ::std::unique_ptr< DeviceSerialType > r (
           DeviceSerialTraits::create (i, f, this));
 
         if (!DeviceSerial_.present ())
         {
-          this->DeviceSerial_.set (r);
+          this->DeviceSerial_.set (::std::move (r));
           continue;
         }
       }
 
       // ManufacturerID
       //
-      if (n.name () == "ManufacturerID" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes")
+      if (n.name () == "ManufacturerID" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/")
       {
-        ::std::auto_ptr< ManufacturerIDType > r (
+        ::std::unique_ptr< ManufacturerIDType > r (
           ManufacturerIDTraits::create (i, f, this));
 
         if (!this->ManufacturerID_)
         {
-          this->ManufacturerID_.set (r);
+          this->ManufacturerID_.set (::std::move (r));
           continue;
         }
       }
 
       // ManufacturerCertID
       //
-      if (n.name () == "ManufacturerCertID" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes")
+      if (n.name () == "ManufacturerCertID" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/")
       {
-        ::std::auto_ptr< ManufacturerCertIDType > r (
+        ::std::unique_ptr< ManufacturerCertIDType > r (
           ManufacturerCertIDTraits::create (i, f, this));
 
         if (!this->ManufacturerCertID_)
         {
-          this->ManufacturerCertID_.set (r);
+          this->ManufacturerCertID_.set (::std::move (r));
           continue;
         }
       }
 
       // DeviceCertID
       //
-      if (n.name () == "DeviceCertID" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes")
+      if (n.name () == "DeviceCertID" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/")
       {
-        ::std::auto_ptr< DeviceCertIDType > r (
+        ::std::unique_ptr< DeviceCertIDType > r (
           DeviceCertIDTraits::create (i, f, this));
 
         if (!this->DeviceCertID_)
         {
-          this->DeviceCertID_.set (r);
+          this->DeviceCertID_.set (::std::move (r));
           continue;
         }
       }
 
       // ManufacturerName
       //
-      if (n.name () == "ManufacturerName" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes")
+      if (n.name () == "ManufacturerName" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/")
       {
-        ::std::auto_ptr< ManufacturerNameType > r (
+        ::std::unique_ptr< ManufacturerNameType > r (
           ManufacturerNameTraits::create (i, f, this));
 
         if (!this->ManufacturerName_)
         {
-          this->ManufacturerName_.set (r);
+          this->ManufacturerName_.set (::std::move (r));
           continue;
         }
       }
 
       // DeviceName
       //
-      if (n.name () == "DeviceName" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes")
+      if (n.name () == "DeviceName" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/")
       {
-        ::std::auto_ptr< DeviceNameType > r (
+        ::std::unique_ptr< DeviceNameType > r (
           DeviceNameTraits::create (i, f, this));
 
         if (!this->DeviceName_)
         {
-          this->DeviceName_.set (r);
+          this->DeviceName_.set (::std::move (r));
           continue;
         }
       }
 
       // ModelNumber
       //
-      if (n.name () == "ModelNumber" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes")
+      if (n.name () == "ModelNumber" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/")
       {
-        ::std::auto_ptr< ModelNumberType > r (
+        ::std::unique_ptr< ModelNumberType > r (
           ModelNumberTraits::create (i, f, this));
 
         if (!this->ModelNumber_)
         {
-          this->ModelNumber_.set (r);
+          this->ModelNumber_.set (::std::move (r));
           continue;
         }
       }
 
       // VersionInfo
       //
-      if (n.name () == "VersionInfo" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes")
+      if (n.name () == "VersionInfo" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/")
       {
-        ::std::auto_ptr< VersionInfoType > r (
+        ::std::unique_ptr< VersionInfoType > r (
           VersionInfoTraits::create (i, f, this));
 
         if (!VersionInfo_.present ())
         {
-          this->VersionInfo_.set (r);
+          this->VersionInfo_.set (::std::move (r));
           continue;
         }
       }
 
       // DeviceComment
       //
-      if (n.name () == "DeviceComment" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes")
+      if (n.name () == "DeviceComment" && n.namespace_ () == "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/")
       {
-        ::std::auto_ptr< DeviceCommentType > r (
+        ::std::unique_ptr< DeviceCommentType > r (
           DeviceCommentTraits::create (i, f, this));
 
         if (!this->DeviceComment_)
         {
-          this->DeviceComment_.set (r);
+          this->DeviceComment_.set (::std::move (r));
           continue;
         }
       }
@@ -3466,28 +3466,28 @@ namespace dcml
     {
       throw ::xsd::cxx::tree::expected_element< char > (
         "DeviceIdentifier",
-        "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes");
+        "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/");
     }
 
     if (!DeviceTypeID_.present ())
     {
       throw ::xsd::cxx::tree::expected_element< char > (
         "DeviceTypeID",
-        "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes");
+        "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/");
     }
 
     if (!DeviceSerial_.present ())
     {
       throw ::xsd::cxx::tree::expected_element< char > (
         "DeviceSerial",
-        "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes");
+        "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/");
     }
 
     if (!VersionInfo_.present ())
     {
       throw ::xsd::cxx::tree::expected_element< char > (
         "VersionInfo",
-        "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes");
+        "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/");
     }
   }
 
@@ -4282,7 +4282,7 @@ namespace dcml
       ::xercesc::DOMElement& s (
         ::xsd::cxx::xml::dom::create_element (
           "PrimaryID",
-          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes",
+          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/",
           e));
 
       s << i.getPrimaryID ();
@@ -4295,7 +4295,7 @@ namespace dcml
       ::xercesc::DOMElement& s (
         ::xsd::cxx::xml::dom::create_element (
           "SecondaryID",
-          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes",
+          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/",
           e));
 
       s << *i.getSecondaryID ();
@@ -4348,7 +4348,7 @@ namespace dcml
       ::xercesc::DOMElement& s (
         ::xsd::cxx::xml::dom::create_element (
           "Name",
-          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes",
+          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/",
           e));
 
       s << i.getName ();
@@ -4360,7 +4360,7 @@ namespace dcml
       ::xercesc::DOMElement& s (
         ::xsd::cxx::xml::dom::create_element (
           "Value",
-          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes",
+          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/",
           e));
 
       s << i.getValue ();
@@ -4381,7 +4381,7 @@ namespace dcml
       ::xercesc::DOMElement& s (
         ::xsd::cxx::xml::dom::create_element (
           "Parameter",
-          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes",
+          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/",
           e));
 
       s << *b;
@@ -4402,7 +4402,7 @@ namespace dcml
       ::xercesc::DOMElement& s (
         ::xsd::cxx::xml::dom::create_element (
           "Name",
-          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes",
+          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/",
           e));
 
       s << *b;
@@ -4417,7 +4417,7 @@ namespace dcml
       ::xercesc::DOMElement& s (
         ::xsd::cxx::xml::dom::create_element (
           "Value",
-          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes",
+          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/",
           e));
 
       s << *b;
@@ -4435,7 +4435,7 @@ namespace dcml
       ::xercesc::DOMElement& s (
         ::xsd::cxx::xml::dom::create_element (
           "DeviceIdentifier",
-          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes",
+          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/",
           e));
 
       s << i.getDeviceIdentifier ();
@@ -4447,7 +4447,7 @@ namespace dcml
       ::xercesc::DOMElement& s (
         ::xsd::cxx::xml::dom::create_element (
           "DeviceTypeID",
-          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes",
+          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/",
           e));
 
       s << i.getDeviceTypeID ();
@@ -4460,7 +4460,7 @@ namespace dcml
       ::xercesc::DOMElement& s (
         ::xsd::cxx::xml::dom::create_element (
           "DeviceSubsystemTypeID",
-          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes",
+          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/",
           e));
 
       s << *i.getDeviceSubsystemTypeID ();
@@ -4473,7 +4473,7 @@ namespace dcml
       ::xercesc::DOMElement& s (
         ::xsd::cxx::xml::dom::create_element (
           "AdditionalID",
-          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes",
+          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/",
           e));
 
       s << *i.getAdditionalID ();
@@ -4485,7 +4485,7 @@ namespace dcml
       ::xercesc::DOMElement& s (
         ::xsd::cxx::xml::dom::create_element (
           "DeviceSerial",
-          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes",
+          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/",
           e));
 
       s << i.getDeviceSerial ();
@@ -4498,7 +4498,7 @@ namespace dcml
       ::xercesc::DOMElement& s (
         ::xsd::cxx::xml::dom::create_element (
           "ManufacturerID",
-          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes",
+          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/",
           e));
 
       s << *i.getManufacturerID ();
@@ -4511,7 +4511,7 @@ namespace dcml
       ::xercesc::DOMElement& s (
         ::xsd::cxx::xml::dom::create_element (
           "ManufacturerCertID",
-          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes",
+          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/",
           e));
 
       s << *i.getManufacturerCertID ();
@@ -4524,7 +4524,7 @@ namespace dcml
       ::xercesc::DOMElement& s (
         ::xsd::cxx::xml::dom::create_element (
           "DeviceCertID",
-          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes",
+          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/",
           e));
 
       s << *i.getDeviceCertID ();
@@ -4537,7 +4537,7 @@ namespace dcml
       ::xercesc::DOMElement& s (
         ::xsd::cxx::xml::dom::create_element (
           "ManufacturerName",
-          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes",
+          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/",
           e));
 
       s << *i.getManufacturerName ();
@@ -4550,7 +4550,7 @@ namespace dcml
       ::xercesc::DOMElement& s (
         ::xsd::cxx::xml::dom::create_element (
           "DeviceName",
-          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes",
+          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/",
           e));
 
       s << *i.getDeviceName ();
@@ -4563,7 +4563,7 @@ namespace dcml
       ::xercesc::DOMElement& s (
         ::xsd::cxx::xml::dom::create_element (
           "ModelNumber",
-          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes",
+          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/",
           e));
 
       s << *i.getModelNumber ();
@@ -4575,7 +4575,7 @@ namespace dcml
       ::xercesc::DOMElement& s (
         ::xsd::cxx::xml::dom::create_element (
           "VersionInfo",
-          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes",
+          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/",
           e));
 
       s << i.getVersionInfo ();
@@ -4588,7 +4588,7 @@ namespace dcml
       ::xercesc::DOMElement& s (
         ::xsd::cxx::xml::dom::create_element (
           "DeviceComment",
-          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes",
+          "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/",
           e));
 
       s << *i.getDeviceComment ();

@@ -36,31 +36,12 @@ ACES_Preview::~ACES_Preview()
 	{
 		qDebug() << "no reader found!";
 	}
-	
-	delete oetf_709;
-	delete eotf_2020;
-	delete eotf_PQ;
 }
 
 void ACES_Preview::setUp() {
 
 	mDecode_time.start();
 	mScale = 0;
-
-	max_f = 1 << bitdepth;
-	max_f_ = (float)(max_f)-1.0;
-
-	oetf_709 = new float[max_f];
-
-	for (int i = 0; i < max_f; i++) {
-
-		float input = (float)(i / max_f_); // convert input to value between 0...1
-
-		// BT.709 - OETF
-		oetf_709[i] = pow(input, 1.0f / 2.4f);
-	}
-
-
 }
 
 void ACES_Preview::getProxy() {
