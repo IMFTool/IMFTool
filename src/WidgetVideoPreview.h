@@ -99,7 +99,7 @@ private:
 	QMenu *menuSpeed;
 	QAction *speeds[50];
 	QMenu *menuQuality;
-	QAction *qualities[5];
+	QAction *qualities[6];
 	QMenu *menuProcessing;
 	QMenu *menuView;
 	QAction *view_actions[1];

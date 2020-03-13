@@ -16,7 +16,7 @@
 #pragma once
 #include <QObject>
 #include <QTime>
-#include <QThreadpool>
+#include <QThreadPool>
 #include <chrono>
 #include "ImfPackage.h"
 #include "PreviewCommon.h"
