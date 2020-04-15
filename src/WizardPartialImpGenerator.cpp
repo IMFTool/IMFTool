@@ -23,7 +23,6 @@
 #include <QFileDialog>
 #include <QDialogButtonBox>
 #include <QWizardPage>
-#include <QFileDialog>
 #include <QCompleter>
 #include <QDirModel>
 #include <QRegExpValidator>

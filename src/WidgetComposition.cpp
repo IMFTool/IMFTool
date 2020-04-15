@@ -191,9 +191,6 @@ void WidgetComposition::AddNewTrackRequest(eSequenceType type) {
 	QUndoCommand *p_root = new QUndoCommand(NULL);
 	AbstractWidgetTrackDetails *p_track = NULL;
 	if(type == MainAudioSequence) p_track = new WidgetAudioTrackDetails(track_id, mpCompositionTracksWidget);
-
-	else if(type == SubtitlesSequence) p_track = new WidgetTrackDetails(track_id, type, mpCompositionTracksWidget);
-
 	else p_track = new WidgetTrackDetails(track_id, type, mpCompositionTracksWidget);
 	int track_index = GetLastTrackDetailIndexForType(type) + 1;
 	if(track_index == 0) {
@@ -369,7 +366,7 @@ ImfError WidgetComposition::Write(const QString &rDestination /*= QString()*/) {
 								cpl2016::MarkerResourceType::MarkerSequence& marker_sequence = p_marker_resource->getMarker();
 								cpl2016::MarkerResourceType::MarkerSequence sorted_marker_sequence = cpl2016::MarkerResourceType::MarkerSequence();
 								cpl2016::MarkerResourceType::MarkerIterator sorted_iterator;
-								int size = sorted_marker_sequence.size();
+								int size = (int)sorted_marker_sequence.size();
 								QList<QPair<int, quint64> > sorted_marker_list; // int: Index in Original MarkerSequence, quint64: Associated Offset
 								for (cpl2016::MarkerResourceType::MarkerIterator marker_iterator(p_marker_resource->getMarker().begin()); marker_iterator != p_marker_resource->getMarker().end(); ++marker_iterator) {
 									// QPair of current index and Offset

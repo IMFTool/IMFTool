@@ -30,7 +30,6 @@
 #include <QPair>
 #include <QVector>
 #include "Error.h"
-#include "st2067-2b-2016-PKL.h"
 
 
 
@@ -386,8 +385,7 @@ public:
 	}
 
 	static QByteArray Convert(const xml_schema::Base64Binary &rHash) {
-
-		return QByteArray(rHash.data(), rHash.size());
+		return QByteArray(rHash.data(), (int)rHash.size());
 	}
 
 	static QUuid Convert(const dcml::UUIDType &rUuid) {

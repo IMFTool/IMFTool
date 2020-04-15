@@ -53,6 +53,7 @@ if (NOT SVN_REV)
 endif (NOT SVN_REV)
 # The version number.
 set(VERSION_STRING ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
+message(STATUS "version string is ${VERSION_STRING}")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "Default Targets")
 set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER "Generated Files")

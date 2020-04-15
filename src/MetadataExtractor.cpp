@@ -132,7 +132,6 @@ Error MetadataExtractor::ReadAcesMxfDescriptor(Metadata &rMetadata, const QFileI
 		WriterInfo writerinfo;
 		result = reader.FillWriterInfo(writerinfo);
 		if(KM_SUCCESS(result)) {
-			char str_buf[16], str_buf2[40];
 			metadata.assetId = convert_uuid((unsigned char*)writerinfo.AssetUUID);
 		}
 		ASDCP::MXF::RGBAEssenceDescriptor *aces_descriptor = NULL;
@@ -171,7 +170,8 @@ Error MetadataExtractor::ReadAcesMxfDescriptor(Metadata &rMetadata, const QFileI
 
 				CP = ColorPrimaries.EncodeString(buf, 64);
 				CP = CP.toLower(); //.replace(".", "");
-				metadata.colorPrimaries = SMPTE::ColorPrimariesMap[CP];
+				if (SMPTE::ColorPrimariesMap.contains(CP))
+					metadata.colorPrimaries = SMPTE::ColorPrimariesMap[CP];
 			}
 
 			// get TransferCharacteristic
@@ -179,7 +179,8 @@ Error MetadataExtractor::ReadAcesMxfDescriptor(Metadata &rMetadata, const QFileI
 			if (TransferCharacteristic.HasValue()){
 				TC = TransferCharacteristic.EncodeString(buf, 64);
 				TC = TC.toLower(); //.replace(".", "");
-				metadata.transferCharcteristics = SMPTE::TransferCharacteristicMap[TC];
+				if (SMPTE::TransferCharacteristicMap.contains(TC))
+					metadata.transferCharcteristics = SMPTE::TransferCharacteristicMap[TC];
 
 			}
 			if (aces_descriptor->PictureEssenceCoding.HasValue()) {
@@ -217,7 +218,6 @@ Error MetadataExtractor::ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileI
 		WriterInfo writerinfo;
 		result = reader.FillWriterInfo(writerinfo);
 		if(KM_SUCCESS(result)) {
-			char str_buf[16], str_buf2[40];
 			metadata.assetId = convert_uuid((unsigned char*)writerinfo.AssetUUID);
 		}
 
@@ -327,7 +327,8 @@ Error MetadataExtractor::ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileI
 
 			CP = ColorPrimaries.EncodeString(buf, 64);
 			CP = CP.toLower(); //.replace(".", "");
-			metadata.colorPrimaries = SMPTE::ColorPrimariesMap[CP];
+			if (SMPTE::ColorPrimariesMap.contains(CP))
+				metadata.colorPrimaries = SMPTE::ColorPrimariesMap[CP];
 		}
 
 		// get TransferCharacteristic
@@ -335,7 +336,8 @@ Error MetadataExtractor::ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileI
 		if (TransferCharacteristic.HasValue()){
 			TC = TransferCharacteristic.EncodeString(buf, 64);
 			TC = TC.toLower(); //.replace(".", "");
-			metadata.transferCharcteristics = SMPTE::TransferCharacteristicMap[TC];
+			if (SMPTE::TransferCharacteristicMap.contains(TC))
+				metadata.transferCharcteristics = SMPTE::TransferCharacteristicMap[TC];
 
 		}
 		// (k) - end
@@ -368,7 +370,6 @@ Error MetadataExtractor::ReadPcmMxfDescriptor(Metadata &rMetadata, const QFileIn
 		WriterInfo writerinfo;
 		result = reader.FillWriterInfo(writerinfo);
 		if(KM_SUCCESS(result)) {
-			char str_buf[16], str_buf2[40];
 			metadata.assetId = convert_uuid((unsigned char*)writerinfo.AssetUUID);
 		}
 
@@ -518,7 +519,6 @@ Error MetadataExtractor::ReadTimedTextMxfDescriptor(Metadata &rMetadata, const Q
 		WriterInfo writerinfo;
 		result = reader.FillWriterInfo(writerinfo);
 		if(KM_SUCCESS(result)) {
-			char str_buf[16], str_buf2[40];
 			metadata.assetId = convert_uuid((unsigned char*)writerinfo.AssetUUID);
 		}
 		ASDCP::MXF::InterchangeObject* tmp_obj = NULL;
@@ -578,7 +578,6 @@ Error MetadataExtractor::ReadISXDDescriptor(Metadata &rMetadata, const QFileInfo
 		WriterInfo writerinfo;
 		result = reader.FillWriterInfo(writerinfo);
 		if(KM_SUCCESS(result)) {
-			char str_buf[16], str_buf2[40];
 			metadata.assetId = convert_uuid((unsigned char*)writerinfo.AssetUUID);
 		}
 		ASDCP::MXF::InterchangeObject* tmp_obj = NULL;
@@ -624,7 +623,6 @@ Error MetadataExtractor::ReadIABDescriptor(Metadata &rMetadata, const QFileInfo 
 		WriterInfo writerinfo;
 		result = reader.FillWriterInfo(writerinfo);
 		if(KM_SUCCESS(result)) {
-			char str_buf[16], str_buf2[40];
 			metadata.assetId = convert_uuid((unsigned char*)writerinfo.AssetUUID);
 		}
 		ASDCP::MXF::InterchangeObject* tmp_obj = NULL;
@@ -729,7 +727,6 @@ Error MetadataExtractor::ReadProResMxfDescriptor(Metadata &rMetadata, const QFil
 		WriterInfo writerinfo;
 		result = reader.FillWriterInfo(writerinfo);
 		if(KM_SUCCESS(result)) {
-			char str_buf[16], str_buf2[40];
 			metadata.assetId = convert_uuid((unsigned char*)writerinfo.AssetUUID);
 		}
 
@@ -826,7 +823,8 @@ Error MetadataExtractor::ReadProResMxfDescriptor(Metadata &rMetadata, const QFil
 
 			CP = ColorPrimaries.EncodeString(buf, 64);
 			CP = CP.toLower(); //.replace(".", "");
-			metadata.colorPrimaries = SMPTE::ColorPrimariesMap[CP];
+			if (SMPTE::ColorPrimariesMap.contains(CP))
+				metadata.colorPrimaries = SMPTE::ColorPrimariesMap[CP];
 		}
 
 		// get TransferCharacteristic
@@ -834,7 +832,8 @@ Error MetadataExtractor::ReadProResMxfDescriptor(Metadata &rMetadata, const QFil
 		if (TransferCharacteristic.HasValue()){
 			TC = TransferCharacteristic.EncodeString(buf, 64);
 			TC = TC.toLower(); //.replace(".", "");
-			metadata.transferCharcteristics = SMPTE::TransferCharacteristicMap[TC];
+			if (SMPTE::TransferCharacteristicMap.contains(TC))
+				metadata.transferCharcteristics = SMPTE::TransferCharacteristicMap[TC];
 
 		}
 		// (k) - end
@@ -1133,7 +1132,9 @@ Error MetadataExtractor::ReadTimedTextMetadata(Metadata &rMetadata, const QFileI
 		return error;
 	}
 
-	XercesDOMParser *parser = new XercesDOMParser();
+	XercesDOMParser *parser = new XercesDOMParser;
+	parser->setCreateEntityReferenceNodes(true);
+	parser->setDisableDefaultEntityResolution(true);
 	ErrorHandler *errHandler = (ErrorHandler*) new HandlerBase();
 
 	parser->setValidationScheme(XercesDOMParser::Val_Always);		//TODO:Schema validation

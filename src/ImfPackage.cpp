@@ -769,22 +769,16 @@ QVariant ImfPackage::data(const QModelIndex &rIndex, int role /*= Qt::DisplayRol
 				switch(mAssetList.at(row)->GetType()) {
 					case Asset::mxf:
 						return QVariant(QPixmap(":/asset_mxf.png"));
-						break;
 					case Asset::cpl:
 						return QVariant(QPixmap(":/asset_cpl.png"));
-						break;
 					case Asset::opl:
 						return QVariant(QPixmap(":/asset_opl.png"));
-						break;
 					case Asset::scm:
 						return QVariant(QPixmap(":/asset_scm.png"));
-						break;
 					case Asset::sidecar:
 						return QVariant(QPixmap(":/asset_sidecar.png"));
-						break;
 					default:
 						return QVariant(QPixmap(":/asset_unknown.png"));
-						break;
 				}
 			}
 			else if(role == Qt::SizeHintRole) {
@@ -796,19 +790,14 @@ QVariant ImfPackage::data(const QModelIndex &rIndex, int role /*= Qt::DisplayRol
 				switch(mAssetList.at(row)->GetType()) {
 					case Asset::mxf:
 						return QVariant("mxf");
-						break;
 					case Asset::cpl:
 						return QVariant("cpl");
-						break;
 					case Asset::opl:
 						return QVariant("opl");
-						break;
 					case Asset::pkl:
 						return QVariant("pkl");
-						break;
 					default:
 						return QVariant("unknown");
-						break;
 				}
 			}
 		}
@@ -1037,9 +1026,9 @@ bool ImfPackage::selectedIsOutsidePackage(const QModelIndex &selected) {
 void ImfPackage::CheckIfSupplemental() {
 	// Loop all CPLs
 	QList<QUuid> cpl_track_file_uuids;
-	for (unsigned int i = 0; i < mCplList.size(); i++ ) {
+	for (int i = 0; i < mCplList.size(); i++ ) {
 		// Loop segments
-		for(unsigned int ii = 0; ii < mCplList.at(i).getSegmentList().getSegment().size(); ii++) {
+		for(int ii = 0; ii < mCplList.at(i).getSegmentList().getSegment().size(); ii++) {
 
 			cpl2016::CompositionPlaylistType_SegmentListType::SegmentType *r_segment = new cpl2016::CompositionPlaylistType_SegmentListType::SegmentType(mCplList.at(i).getSegmentList().getSegment().at(ii));
 			cpl2016::SegmentType::SequenceListType &r_sequence_list = r_segment->getSequenceList();
@@ -1060,10 +1049,10 @@ void ImfPackage::CheckIfSupplemental() {
 		}
 	}
 	// Loop CPL Track File IDs
-	for (unsigned int i = 0; i < cpl_track_file_uuids.size(); i++) {
+	for (int i = 0; i < cpl_track_file_uuids.size(); i++) {
 		bool found = false;
 		// Loop ASSETMAP Assets
-		for (unsigned int ii=0; ii < mAssetList.size(); ii++) {
+		for (int ii=0; ii < mAssetList.size(); ii++) {
 			QSharedPointer <AssetMxfTrack> assetMxfTrack = qSharedPointerCast<AssetMxfTrack>(mAssetList.at(ii));
 			if (!assetMxfTrack.isNull())
 				if (cpl_track_file_uuids.at(i) == assetMxfTrack->GetId())
@@ -1527,8 +1516,9 @@ Error AssetMxfTrack::ExtractEssenceDescriptor(const QString &filePath) {
 
 	XMLPlatformUtils::Initialize();
 
-	XercesDOMParser *parser = new XercesDOMParser();
-
+	XercesDOMParser *parser = new XercesDOMParser;
+	parser->setCreateEntityReferenceNodes(true);
+	parser->setDisableDefaultEntityResolution(true);
 	parser->setDoNamespaces(true);
 
 	MetaDictionaryCollection mds;

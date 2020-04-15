@@ -1586,7 +1586,7 @@ void GraphicsWidgetMarkerResource::InitMarker() {
 	qint64 source_duration = p_marker_resource->getSourceDuration().present() ? p_marker_resource->getSourceDuration().get() : (intrinsic_duration-entry_point);
 	for(unsigned int i = 0; i < r_marker_sequence.size(); i++) {
 		// Create GraphicsWidgetMarker only when marker is on the visible timeline
-		if ((r_marker_sequence.at(i).getOffset() >= entry_point) && (r_marker_sequence.at(i).getOffset() < entry_point+source_duration)) {
+		if (((qint64)r_marker_sequence.at(i).getOffset() >= entry_point) && ((qint64)r_marker_sequence.at(i).getOffset() < entry_point+source_duration)) {
 			GraphicsWidgetMarker *p_marker = new GraphicsWidgetMarker(this, 1, boundingRect().height(),
 					ImfXmlHelper::Convert(r_marker_sequence.at(i).getLabel()),
 					QColor(CPL_COLOR_DEFAULT_MARKER),

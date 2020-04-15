@@ -363,22 +363,22 @@ void Player::setPlaylist(QVector<VideoResource> &rPlaylist) {
 			switch (colorPrimaries) {
 			case SMPTE::ColorPrimaries_ITU709:
 				// set YCbCr -> RGB conversion parameters
-				Kr = 0.2126;
-				Kg = 0.7152;
-				Kb = 0.0722;
+				Kr = 0.2126f;
+				Kg = 0.7152f;
+				Kb = 0.0722f;
 				break;
 			case SMPTE::ColorPrimaries_ITU2020:
 				// set YCbCr -> RGB conversion parameters
-				Kr = 0.2627;
-				Kg = 0.6780;
-				Kb = 0.0593;
+				Kr = 0.2627f;
+				Kg = 0.6780f;
+				Kb = 0.0593f;
 				break;
 			case SMPTE::ColorPrimaries_SMPTE170M:
 			case SMPTE::ColorPrimaries_ITU470_PAL:
 				// set YCbCr -> RGB conversion parameters
-				Kr = 0.299;
-				Kg = 0.587;
-				Kb = 0.114;
+				Kr = 0.299f;
+				Kg = 0.587f;
+				Kb = 0.114f;
 				break;
 			default: break;
 			}

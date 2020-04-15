@@ -225,7 +225,6 @@ bool GraphicsWidgetSequence::ExtendGrid(QPointF &rPoint, eGridPosition which) co
 		case Unknown:
 		default:
 			return false;
-			break;
 	}
 	rPoint = mapToScene(ret);
 	return true;

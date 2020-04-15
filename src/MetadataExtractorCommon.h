@@ -66,8 +66,8 @@ public:
 	quint32									displayWidth;
 	quint32									displayHeight;
 	eColorEncoding							colorEncoding;
-	SMPTE::eColorPrimaries                  colorPrimaries; // (k)
-	SMPTE::eTransferCharacteristic        	transferCharcteristics; // (k)
+	SMPTE::eColorPrimaries                  colorPrimaries = SMPTE::ColorPrimaries_UNKNOWN; // (k)
+	SMPTE::eTransferCharacteristic        	transferCharcteristics = SMPTE::TransferCharacteristic_UNKNOWN; // (k)
 	quint32									horizontalSubsampling;
 	quint32									componentDepth;
 	Duration								duration;

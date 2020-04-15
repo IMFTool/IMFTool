@@ -28,7 +28,6 @@
 #include "ImfRgba.h"
 #include "ImfArray.h"
 #include "ImathMatrix.h"
-#include "ImfRgbaFile.h"
 #include "As02AcesIStream.h"
 #include "PreviewCommon.h"
 

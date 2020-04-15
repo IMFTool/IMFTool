@@ -274,7 +274,7 @@ QImage ACES::DataToQImage(quint8 rScale /* = 0 */, bool rShowDisplayWindow /* = 
 			Imath::Vec3<float> vec3out;
 			//vec3out.x = 0.1; vec3out.y = 0.2; vec3out.z = 0.3;
 			A0Rec709TransformMatrix.multVecMatrix(vec3in, vec3out);
-			int r,g,b,a;
+			int r,g,b;
 			r = max_f_*vec3out[0]; if (r>=max_f) r = max_f - 1; if (r<0) r = 0;
 			g = max_f_*vec3out[1]; if (g>=max_f) g = max_f - 1; if (g<0) g = 0;
 			b = max_f_*vec3out[2]; if (b>=max_f) b = max_f - 1; if (b<0) b = 0;

@@ -566,7 +566,9 @@ void TTMLParser::parse(std::string xml) {
 	ErrorHandler*      errorHandler = NULL;
 
 	XMLPlatformUtils::Initialize();
-	parser = new XercesDOMParser();
+	parser = new XercesDOMParser;
+	parser->setCreateEntityReferenceNodes(true);
+	parser->setDisableDefaultEntityResolution(true);
 	parser->setValidationScheme(XercesDOMParser::Val_Always);		//TODO:Schema validation
 	parser->setValidationSchemaFullChecking(true);
 	parser->useScanner(XMLUni::fgWFXMLScanner);

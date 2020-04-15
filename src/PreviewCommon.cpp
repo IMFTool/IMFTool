@@ -23,18 +23,18 @@ PreviewCommon::PreviewCommon() {
 
 	oetf_709 = new float[max_f];
 
-	float alpha = 1.09929682680944;
-	float beta = 0.018053968510807;
+	float alpha = 1.09929682680944f;
+	float beta = 0.018053968510807f;
 	eotf_2020 = new float[max_f];
 
-	float m1 = 0.1593017578125;
-	float m2 = 78.84375;
-	float c1 = 0.8359375;
-	float c2 = 18.8515625;
-	float c3 = 18.6875;
+	float m1 = 0.1593017578125f;
+	float m2 = 78.84375f;
+	float c1 = 0.8359375f;
+	float c2 = 18.8515625f;
+	float c3 = 18.6875f;
 	eotf_PQ = new float[max_f];
 
-	float a = 0.17883277;
+	float a = 0.17883277f;
 	float b = 1 - 4*a;
 	float c = 0.5 - a * log(4*a);
 	eoft_HLG= new float[max_f];
@@ -77,8 +77,8 @@ PreviewCommon::PreviewCommon() {
 }
 
 PreviewCommon::~PreviewCommon() {
-	delete oetf_709;
-	delete eotf_2020;
-	delete eotf_PQ;
-	delete eoft_HLG;
+	delete[] oetf_709;
+	delete[] eotf_2020;
+	delete[] eotf_PQ;
+	delete[] eoft_HLG;
 }

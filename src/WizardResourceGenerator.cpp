@@ -33,7 +33,6 @@
 #include <QTimer>
 #include <QHeaderView>
 #include <QCursor>
-#include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <qevent.h>

@@ -211,13 +211,6 @@ int LocaleListModel::columnCount(const QModelIndex &parent) const {
 	//Didn't work - all items forced to have two columns.
 
 	return mpRootItem->columnCount();
-
-    if (parent.isValid()) {
-        return static_cast<LocaleTreeItem*>(parent.internalPointer())->columnCount();
-    }
-    else {
-        return mpRootItem->columnCount();
-    }
 }
 
 QVariant LocaleListModel::data(const QModelIndex &index, int role) const {
@@ -263,7 +256,6 @@ void LocaleListModel::SetComposition(WidgetComposition *pComposition, QUndoStack
 	LocaleList::iterator i;
 	for (i = locale_list.begin(); i < locale_list.end(); i++) {
 		LocaleTreeItem* parentItem;
-		QStandardItem *item;
 		Locale locale = *i;
 		QVector<QVariant> itemList;
 

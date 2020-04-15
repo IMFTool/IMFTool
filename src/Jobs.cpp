@@ -339,7 +339,9 @@ Error JobExtractEssenceDescriptor::Execute() {
 
 	XMLPlatformUtils::Initialize();
 
-	XercesDOMParser *parser = new XercesDOMParser();
+	XercesDOMParser *parser = new XercesDOMParser;
+	parser->setCreateEntityReferenceNodes(true);
+	parser->setDisableDefaultEntityResolution(true);
 
 	parser->setDoNamespaces(true);
 
@@ -400,6 +402,7 @@ Error JobExtractEssenceDescriptor::Execute() {
 		delete it->second;
 	}
 	XMLPlatformUtils::Terminate();
+	if (parser) delete parser;
 	return error;
 }
 //WR

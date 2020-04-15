@@ -134,22 +134,22 @@ void JP2K_Preview::setAsset() {
 		switch (colorPrimaries) {
 		case SMPTE::ColorPrimaries_ITU709:
 			// set YCbCr -> RGB conversion parameters
-			Kr = 0.2126;
-			Kg = 0.7152;
-			Kb = 0.0722;
+			Kr = 0.2126f;
+			Kg = 0.7152f;
+			Kb = 0.0722f;
 			break;
 		case SMPTE::ColorPrimaries_ITU2020:
 			// set YCbCr -> RGB conversion parameters
-			Kr = 0.2627;
-			Kg = 0.6780;
-			Kb = 0.0593;
+			Kr = 0.2627f;
+			Kg = 0.6780f;
+			Kb = 0.0593f;
 			break;
 		case SMPTE::ColorPrimaries_SMPTE170M:
 		case SMPTE::ColorPrimaries_ITU470_PAL:
 			// set YCbCr -> RGB conversion parameters
-			Kr = 0.299;
-			Kg = 0.587;
-			Kb = 0.114;
+			Kr = 0.299f;
+			Kg = 0.587f;
+			Kb = 0.114f;
 			break;
 		case SMPTE::ColorPrimaries_P3D65:
 			//P365 is 4:4:4 only
@@ -267,8 +267,6 @@ bool JP2K_Preview::extractFrame(qint64 frameNr) {
 		err = true;
 		return false;
 	}
-
-	return false; // default
 }
 
 bool JP2K_Preview::decodeImage() {
@@ -396,7 +394,7 @@ QImage JP2::DataToQImage()
 					if (b < 0) { b = 0; }
 					else if (b >= maxcv) { b = maxcv; }
 					break;
-				default: return QImage(":/frame_error.png"); break; // abort!
+				default: return QImage(":/frame_error.png");  // abort!
 				}
 
 				// now we have rgb data -> linearize the data!
@@ -467,7 +465,7 @@ QImage JP2::DataToQImage()
 
 					break;
 
-				default: return QImage(":/frame_error.png"); break; // abort!
+				default: return QImage(":/frame_error.png"); // abort!
 				}
 
 				switch (colorPrimaries) {
@@ -487,7 +485,7 @@ QImage JP2::DataToQImage()
 					out_b = -r*0.0196 - g*0.0786 + b*1.0983;
 
 					break;
-				default: return QImage(":/frame_error.png"); break; // abort!
+				default: return QImage(":/frame_error.png"); // abort!
 				}
 
 				// clamp between 0...1
@@ -583,7 +581,7 @@ QImage JP2::DataToQImage()
 		return QImage(":/frame_error.png");
 	}
 
-	delete img_buff; // clear char buffer
+	delete[] img_buff; // clear char buffer
 
 	return image;
 }
