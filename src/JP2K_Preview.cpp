@@ -45,13 +45,13 @@ void JP2K_Preview::setUp() {
 
 	pDecompressor = OPENJPEG_H::opj_create_decompress(OPJ_CODEC_J2K);
 
-	opj_codec_set_threads(pDecompressor, mCpus);
-
 	// Setup the decoder (first time), using user parameters
 	if (!OPENJPEG_H::opj_setup_decoder(pDecompressor, &params)) {
 		mMsg = "Error setting up decoder!"; // ERROR
 		opj_destroy_codec(pDecompressor);
 	}
+	opj_codec_set_threads(pDecompressor, mCpus);
+
 }
 
 void JP2K_Preview::getProxy() {
@@ -123,10 +123,6 @@ void JP2K_Preview::setAsset() {
 		ComponentMaxRef = asset->GetMetadata().componentMaxRef;
 		//WR
 
-		if (ComponentMinRef && ComponentMaxRef) {
-			RGBrange = ComponentMaxRef - ComponentMinRef;
-			RGBmaxcv = (1 << src_bitdepth) - 1;
-		}
 
 		prec_shift = src_bitdepth - 8;
 		max = (1 << src_bitdepth) - 1;
@@ -459,9 +455,9 @@ QImage JP2::DataToQImage()
 
 					break;
 				case SMPTE::TransferCharacteristic_HLG_OETF:
-					r = eoft_HLG[(int)((r / max) * max_f_)]; // 0...1
-					g = eoft_HLG[(int)((g / max) * max_f_)]; // 0...1
-					b = eoft_HLG[(int)((b / max) * max_f_)]; // 0...1
+					r = eotf_HLG[(int)((r / max) * max_f_)]; // 0...1
+					g = eotf_HLG[(int)((g / max) * max_f_)]; // 0...1
+					b = eotf_HLG[(int)((b / max) * max_f_)]; // 0...1
 
 					break;
 
@@ -685,15 +681,4 @@ opj_stream_t* JP2::opj_stream_create_default_memory_stream(opj_memory_stream* p_
 	return l_stream;
 }
 
-void JP2::info_callback(const char *mMsg, void *client_data) {
-	qDebug() << "INFO" << mMsg;
-}
-
-void JP2::warning_callback(const char *mMsg, void *client_data) {
-	qDebug() << "WARNING" << mMsg;
-}
-
-void JP2::error_callback(const char *mMsg, void *client_data) {
-	qDebug() << "ERROR" << mMsg;
-}
 

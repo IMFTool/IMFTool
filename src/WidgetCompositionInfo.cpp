@@ -52,10 +52,12 @@ void WidgetCompositionInfo::InitLayout() {
 	mpMapper->addMapping(p_content_originator, CompositionInfoModel::ColumnContentOriginator);
 
 	QComboBox *p_application_identification = new QComboBox(this);
+	p_application_identification->setMaximumWidth(320);
 	for (QMap<QString, QString>::const_iterator i = mApplicationIdentificationSelectionMap.cbegin(); i != mApplicationIdentificationSelectionMap.cend(); i++) {
 		p_application_identification->addItem(i.key());
 	}
 	p_application_identification->setEditable(true);
+	//p_application_identification->setSizeAdjustPolicy(QComboBox::AdjustToContentsOnFirstShow);
 	connect(p_application_identification, SIGNAL(currentTextChanged(QString)), this, SLOT(onCurrentIndexChanged(QString)));
 	mpMapper->addMapping(p_application_identification, CompositionInfoModel::ColumnApplicationIdentification);
 	QLineEdit *p_application_string = new QLineEdit(this);

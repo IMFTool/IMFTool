@@ -38,6 +38,9 @@ public:
 #ifdef APP5_ACES
 		Aces,
 #endif
+#ifdef CODEC_HTJ2K
+		HTJ2K,
+#endif
 		Jpeg2000,
 		Pcm,
 		TimedText,
@@ -90,7 +93,7 @@ public:
 	QString									essenceCoding; // IAB only
 	EditRate								referenceImageEditRate; // IAB only
 	EditRate								audioSamplingRate; // IAB only
-	EditRate								effectiveFrameRate; // For TTML only: Effective Frame Rate of TTML1/IMSC1 file
+	EditRate								effectiveFrameRate = EditRate(0,0); // For TTML only: Effective Frame Rate of TTML1/IMSC1 file
 	Duration								originalDuration; // For TTML only: Duration of TTML1/IMSC1 file expressed in effectiveFrameRate
 	quint32									componentMinRef;  // J2K RGBA only
 	quint32									componentMaxRef;  // J2K RGBA only

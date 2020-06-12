@@ -262,8 +262,8 @@ void WidgetCentral::rCurrentChanged(int tabWidgetIndex) {
 		mpLocaleListWidget->SetComposition(p_composition);
 
 		//WR
-		if (mApplicationIdentificationMap.contains(p_composition->GetApplicationIdentification().first)) {
-			mpPreview->setApplication(mApplicationIdentificationMap[p_composition->GetApplicationIdentification().first]);
+		if (mApplicationIdentificationIntegerMap.contains(p_composition->GetApplicationIdentification().first)) {
+			mpPreview->setApplication(mApplicationIdentificationIntegerMap[p_composition->GetApplicationIdentification().first]);
 		}
 		// (k) - start
 		mpPreview->CPLEditRate = p_composition->GetEditRate().GetQuotient(); // set CPL edit rate

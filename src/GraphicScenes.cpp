@@ -909,6 +909,9 @@ void GraphicsSceneComposition::dragEnterEvent(QGraphicsSceneDragDropEvent *pEven
 #ifdef APP5_ACES
 					case Metadata::Aces:
 #endif
+#ifdef CODEC_HTJ2K
+					case Metadata::HTJ2K:
+#endif
 						p_resource = new GraphicsWidgetVideoResource(NULL, asset);
 						p_resource->hide();
 						addItem(p_resource);

@@ -1,5 +1,5 @@
 // Copyright(C) Krispin Weiss, Wolfgang Ruppel
-// Generated 21/01/2020 @ 16:01:43 by Wolfgangs-MacBook-Pro.local!
+// Generated 24/04/2020 @ 11:38:02 by Wolfgangs-MacBook-Pro.local!
 
 #pragma once
 #include <QObject>
@@ -59,13 +59,13 @@ namespace SMPTE {
 		ColorPrimaries_SMPTE_DCDM,
 		ColorPrimaries_P3D65,
 		ColorPrimaries_ACES,
-		ColorPrimaries_CinemaMezzanine,
 		ColorPrimaries_P3D60,
 		ColorPrimaries_P3DCI,
 		ColorPrimaries_ST2115_CameraGamutS3,
 		ColorPrimaries_ST2115_CameraGamutSC,
 		ColorPrimaries_ST2115_CameraGamutV,
 		ColorPrimaries_ST2115_CameraGamutC,
+		ColorPrimaries_CinemaMezzanine,
 		ColorPrimaries_UNKNOWN,
 	};
 
@@ -78,13 +78,13 @@ namespace SMPTE {
 		{ "060e2b34.0401010d.04010101.03050000", ColorPrimaries_SMPTE_DCDM },
 		{ "060e2b34.0401010d.04010101.03060000", ColorPrimaries_P3D65 },
 		{ "060e2b34.0401010d.04010101.03070000", ColorPrimaries_ACES },
-		{ "060e2b34.0401010d.04010101.03080000", ColorPrimaries_CinemaMezzanine },
 		{ "060e2b34.0401010d.04010101.03090000", ColorPrimaries_P3D60 },
 		{ "060e2b34.0401010d.04010101.030a0000", ColorPrimaries_P3DCI },
 		{ "060e2b34.0401010d.04010101.030b0000", ColorPrimaries_ST2115_CameraGamutS3 },
 		{ "060e2b34.0401010d.04010101.030c0000", ColorPrimaries_ST2115_CameraGamutSC },
 		{ "060e2b34.0401010d.04010101.030d0000", ColorPrimaries_ST2115_CameraGamutV },
 		{ "060e2b34.0401010d.04010101.030e0000", ColorPrimaries_ST2115_CameraGamutC },
+		{ "060e2b34.0401010d.04010101.03080000", ColorPrimaries_CinemaMezzanine },
 	};
 
 
@@ -96,13 +96,13 @@ namespace SMPTE {
 		{ ColorPrimaries_SMPTE_DCDM, "060e2b34.0401010d.04010101.03050000" },
 		{ ColorPrimaries_P3D65, "060e2b34.0401010d.04010101.03060000" },
 		{ ColorPrimaries_ACES, "060e2b34.0401010d.04010101.03070000" },
-		{ ColorPrimaries_CinemaMezzanine, "060e2b34.0401010d.04010101.03080000" },
 		{ ColorPrimaries_P3D60, "060e2b34.0401010d.04010101.03090000" },
 		{ ColorPrimaries_P3DCI, "060e2b34.0401010d.04010101.030a0000" },
 		{ ColorPrimaries_ST2115_CameraGamutS3, "060e2b34.0401010d.04010101.030b0000" },
 		{ ColorPrimaries_ST2115_CameraGamutSC, "060e2b34.0401010d.04010101.030c0000" },
 		{ ColorPrimaries_ST2115_CameraGamutV, "060e2b34.0401010d.04010101.030d0000" },
 		{ ColorPrimaries_ST2115_CameraGamutC, "060e2b34.0401010d.04010101.030e0000" },
+		{ ColorPrimaries_CinemaMezzanine, "060e2b34.0401010d.04010101.03080000" },
 	};
 
 
@@ -114,13 +114,13 @@ namespace SMPTE {
 		{ ColorPrimaries_SMPTE_DCDM, "SMPTEDCDM" },
 		{ ColorPrimaries_P3D65, "P3D65" },
 		{ ColorPrimaries_ACES, "ACES" },
-		{ ColorPrimaries_CinemaMezzanine, "CinemaMezzanine" },
 		{ ColorPrimaries_P3D60, "P3D60" },
 		{ ColorPrimaries_P3DCI, "P3DCI" },
 		{ ColorPrimaries_ST2115_CameraGamutS3, "ST2115CameraGamutS3" },
 		{ ColorPrimaries_ST2115_CameraGamutSC, "ST2115CameraGamutSC" },
 		{ ColorPrimaries_ST2115_CameraGamutV, "ST2115CameraGamutV" },
 		{ ColorPrimaries_ST2115_CameraGamutC, "ST2115CameraGamutC" },
+		{ ColorPrimaries_CinemaMezzanine, "CinemaMezzanine" },
 	};
 
 
@@ -515,6 +515,7 @@ namespace SMPTE {
 		J2K_8KIMF_SingleMultiTileReversibleProfile_M11S7,
 		J2K_8KIMF_SingleMultiTileReversibleProfile_M11S8,
 		J2K_8KIMF_SingleMultiTileReversibleProfile_M11S9,
+		HTJ2KPictureCodingSchemeGeneric,
 		J2K_Profiles_UNKNOWN,
 	};
 
@@ -885,6 +886,7 @@ namespace SMPTE {
 		{ "060e2b34.0401010d.04010202.03010739", J2K_8KIMF_SingleMultiTileReversibleProfile_M11S7 },
 		{ "060e2b34.0401010d.04010202.0301073a", J2K_8KIMF_SingleMultiTileReversibleProfile_M11S8 },
 		{ "060e2b34.0401010d.04010202.0301073b", J2K_8KIMF_SingleMultiTileReversibleProfile_M11S9 },
+		{ "060e2b34.0401010d.04010202.03010801", HTJ2KPictureCodingSchemeGeneric },
 	};
 
 
@@ -1254,6 +1256,7 @@ namespace SMPTE {
 		{ J2K_8KIMF_SingleMultiTileReversibleProfile_M11S7, "060e2b34.0401010d.04010202.03010739" },
 		{ J2K_8KIMF_SingleMultiTileReversibleProfile_M11S8, "060e2b34.0401010d.04010202.0301073a" },
 		{ J2K_8KIMF_SingleMultiTileReversibleProfile_M11S9, "060e2b34.0401010d.04010202.0301073b" },
+		{ HTJ2KPictureCodingSchemeGeneric, "060e2b34.0401010d.04010202.03010801" },
 	};
 
 
@@ -1623,6 +1626,7 @@ namespace SMPTE {
 		{ J2K_8KIMF_SingleMultiTileReversibleProfile_M11S7, "J2K_8KIMF_SingleMultiTileReversibleProfile_M11S7" },
 		{ J2K_8KIMF_SingleMultiTileReversibleProfile_M11S8, "J2K_8KIMF_SingleMultiTileReversibleProfile_M11S8" },
 		{ J2K_8KIMF_SingleMultiTileReversibleProfile_M11S9, "J2K_8KIMF_SingleMultiTileReversibleProfile_M11S9" },
+		{ HTJ2KPictureCodingSchemeGeneric, "HTJ2KPictureCodingSchemeGeneric" },
 	};
 
 
@@ -1685,6 +1689,9 @@ namespace SMPTE {
 		TransferCharacteristic_ST2115_CameraLogV,
 		TransferCharacteristic_ST2115_CameraLogC2,
 		TransferCharacteristic_ST2115_CameraLogC3,
+		TransferCharacteristic_CinemaMezzanineLinear,
+		TransferCharacteristic_CinemaMezzanineDCDM,
+		TransferCharacteristic_CinemaMezzanineDCDM_Wrong,
 		TransferCharacteristic_UNKNOWN,
 	};
 
@@ -1707,6 +1714,9 @@ namespace SMPTE {
 		{ "060e2b34.0401010d.04010101.010f0000", TransferCharacteristic_ST2115_CameraLogV },
 		{ "060e2b34.0401010d.04010101.01100000", TransferCharacteristic_ST2115_CameraLogC2 },
 		{ "060e2b34.0401010d.04010101.01110000", TransferCharacteristic_ST2115_CameraLogC3 },
+		{ "060e2b34.0401010d.04010101.01120000", TransferCharacteristic_CinemaMezzanineLinear },
+		{ "060e2b34.0401010d.04010101.01130000", TransferCharacteristic_CinemaMezzanineDCDM },
+		{ "060e2b34.0401010e.04010101.01130000", TransferCharacteristic_CinemaMezzanineDCDM_Wrong },
 	};
 
 
@@ -1728,6 +1738,9 @@ namespace SMPTE {
 		{ TransferCharacteristic_ST2115_CameraLogV, "060e2b34.0401010d.04010101.010f0000" },
 		{ TransferCharacteristic_ST2115_CameraLogC2, "060e2b34.0401010d.04010101.01100000" },
 		{ TransferCharacteristic_ST2115_CameraLogC3, "060e2b34.0401010d.04010101.01110000" },
+		{ TransferCharacteristic_CinemaMezzanineLinear, "060e2b34.0401010d.04010101.01120000" },
+		{ TransferCharacteristic_CinemaMezzanineDCDM, "060e2b34.0401010d.04010101.01130000" },
+		{ TransferCharacteristic_CinemaMezzanineDCDM_Wrong, "060e2b34.0401010e.04010101.01130000" },
 	};
 
 
@@ -1749,5 +1762,8 @@ namespace SMPTE {
 		{ TransferCharacteristic_ST2115_CameraLogV, "ST2115CameraLogV" },
 		{ TransferCharacteristic_ST2115_CameraLogC2, "ST2115CameraLogC2" },
 		{ TransferCharacteristic_ST2115_CameraLogC3, "ST2115CameraLogC3" },
+		{ TransferCharacteristic_CinemaMezzanineLinear, "CinemaMezzanineLinear" },
+		{ TransferCharacteristic_CinemaMezzanineDCDM, "CinemaMezzanineDCDM" },
+		{ TransferCharacteristic_CinemaMezzanineDCDM_Wrong, "CinemaMezzanineDCDM Wrong UL" },
 	};
 };

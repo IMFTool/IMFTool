@@ -33,6 +33,7 @@ typedef struct
 class JP2: public PreviewCommon {
 
 public:
+	opj_dparameters_t params; // decoding parameters
 
 protected:
 
@@ -48,8 +49,6 @@ protected:
 
 	// data to qimage
 	unsigned char *img_buff;
-	int w, h, xpos, buff_pos, x, y, bytes_per_line;
-	float Y, Cb, Cr, r, g, b, out_r, out_g, out_b, out_r8, out_g8, out_b8;
 	QImage DataToQImage(); // converts opj_image_t -> QImage
 
 	// memory stream methods
@@ -61,11 +60,6 @@ protected:
 	OPENJPEG_H::opj_stream_t* opj_stream_create_default_memory_stream(opj_memory_stream* p_memoryStream, OPJ_BOOL p_is_read_stream);
 
 	// info methods
-	static void info_callback(const char *msg, void *data);
-	static void warning_callback(const char *msg, void *data);
-	static void error_callback(const char *msg, void *data);
-
-	bool err = false; // error in the decoding process?
 	ASDCP::JP2K::FrameBuffer *buff;
 };
 
@@ -79,7 +73,7 @@ private:
 	void setAsset();
 	bool extractFrame(qint64 frameNr);
 	
-	int mCpus = 0; // nr of threads used for decoding
+	int mCpus = 1; // nr of threads used for decoding
 	QTime mDecode_time; // time (ms) needed to decode/convert the image
 	QString mMsg; // error message
 	QString mMxf_path; // path to current asset

@@ -412,26 +412,30 @@ JobCallPhoton::JobCallPhoton(const QString &rWorkingDirectory, WidgetImpBrowser*
 AbstractJob("Generating Photon IMP QC Report"), mWorkingDirectory(rWorkingDirectory),  mWidgetImpBrowser(rWidgetImpBrowser){
 
 }
-
+//#define NO_UNIVERSAL_PHOTON
 Error JobCallPhoton::Execute() {
 
 	Error error;
 	QString qresult;
 
+#ifdef NO_UNIVERSAL_PHOTON
 	//Figure out IMF App
 	QString appString = "app2or2E";
 	if (mWidgetImpBrowser && mWidgetImpBrowser->GetImfPackage()) {
 		QVector<QString> appList = mWidgetImpBrowser->GetImfPackage().data()->GetApplicationIdentificationList();
 		if ( appList.contains("http://www.smpte-ra.org/ns/2067-50/2017") ) appString = "app5";
 	}
+#endif
 	QProcess *myProcess = new QProcess();
 	const QString program = "java";
 	QStringList arg;
 	arg << "-cp";
 	QString lib_dir = QString("/photon/build/libs/*");
+#ifdef NO_UNIVERSAL_PHOTON
 	if (appString == "app5") {
 		lib_dir = QString("/photon/build/libs-app5/*");
 	}
+#endif
 #ifdef WIN32
 	arg << QApplication::applicationDirPath() + lib_dir + QString(";");
 #else

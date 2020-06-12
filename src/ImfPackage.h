@@ -448,7 +448,6 @@ private:
 	Q_DISABLE_COPY(AssetMxfTrack);
 	void SetDefaultProxyImages();
 
-	JPEG2000 *mpJP2K; // (k) JP2K decoder
 	Metadata		mMetadata;
 	QStringList mSourceFiles;
 	QImage			mFirstProxyImage;

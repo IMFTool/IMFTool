@@ -22,6 +22,10 @@
 #ifdef APP5_ACES
 #include "ACES_Preview.h" // (WR)
 #endif
+#ifdef CODEC_HTJ2K
+#include "HTJ2K_Preview.h" // (WR)
+#endif
+
 
 class GraphicsWidgetSequence;
 
@@ -263,6 +267,9 @@ private:
 	JP2K_Preview *mpJP2K; // (k) JP2K decoder
 #ifdef APP5_ACES
 	ACES_Preview *mpACES; // (WR) ACES decoder
+#endif
+#ifdef CODEC_HTJ2K
+	HTJ2K_Preview *mpHTJ2K; // (WR) ACES decoder
 #endif
 	QThread *decodeProxyThread = 0;
 	QImage mLeftProxyImage;

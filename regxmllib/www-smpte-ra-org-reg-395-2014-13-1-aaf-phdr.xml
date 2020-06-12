@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--Created: Tue Aug 06 07:07:02 CEST 2019--><!--By: regxmllib build 831a55742a9f8488e47a2831ff741a265360fc18--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
+<!--Created: Fri Apr 24 11:36:50 CEST 2020--><!--By: regxmllib build 51d295b54f74f6c0d89838614e53de6aed41013b--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
 <SchemeID>urn:uuid:21177fc2-e9cd-5fb5-7f18-50a997da0981</SchemeID>
 <SchemeURI>http://www.smpte-ra.org/reg/395/2014/13/1/aaf</SchemeURI>
 <MetaDefinitions>
@@ -1179,6 +1179,20 @@
 <Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.02260000</Identification>
 <Symbol>ExtensionScheme</Symbol>
 <Name>Extension Scheme</Name>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.02270000</Identification>
+<Symbol>PropertyAliasDefinition</Symbol>
+<Name>Property Alias Definition</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.02020000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.02280000</Identification>
+<Symbol>ExtendibleEnumerationElement</Symbol>
+<Name>Extendible Enumeration Element</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01011a00</ParentClass>
 <IsConcrete>true</IsConcrete>
 </ClassDefinition>
 <ClassDefinition>

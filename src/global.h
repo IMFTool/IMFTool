@@ -120,8 +120,11 @@ enum eUserItemDataRole {
 enum eImfApplications {
 	App2 = 0,
 	App2e,
+//	App2e_HTJ2K,
 	App4,
 	App5,
+	App4DCDM,
+	App4DCDM_HTJ2K,
 };
 
 class Id {
