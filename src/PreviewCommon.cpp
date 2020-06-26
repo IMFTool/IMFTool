@@ -39,7 +39,7 @@ PreviewCommon::PreviewCommon() {
 	float c = 0.5 - a * log(4*a);
 	eotf_HLG= new float[max_f];
 	eotf_sRGB= new float[max_f];
-	eotf_DCDM = new float[max_f];
+	oetf_709i = new quint8[max_f];
 
 	for (int i = 0; i < max_f; i++) {
 
@@ -47,6 +47,7 @@ PreviewCommon::PreviewCommon() {
 
 		// BT.709 - OETF (Inverse of BT.1886 EOTF)
 		oetf_709[i] = pow(input, 1.0f / 2.4f);
+		oetf_709i[i] = (quint8)(255.0f * pow(input, 1.0f / 2.4f) + 0.5);
 
 		// BT.2020 - EOTF
 		if (input < (4.5 * beta)) {
@@ -72,11 +73,19 @@ PreviewCommon::PreviewCommon() {
 		} else {
 			eotf_sRGB[i] = pow((input + 0.055)/1.055, 2.4f);
 		}
-		// DCDM
-		eotf_DCDM[i] = pow(input, 2.6f);
 	}
 
 	eotf_PQ[0] = 0;
+
+	// DCDM
+	int max_cv_dcdm = 1 << bitdepth_dcdm;
+	float max_cv_dcdm_1 = (float)(max_cv_dcdm)-1.0;
+	eotf_DCDM = new quint16[max_cv_dcdm];
+
+	for (int i = 0; i < max_cv_dcdm; i++) {
+		float input = (float)(i / max_cv_dcdm_1); // convert input to value between 0...1
+		eotf_DCDM[i] = (quint16)(pow(input, 2.6f) * 65535.0f);
+	}
 }
 
 void PreviewCommon::info_callback(const char *mMsg, void *client_data) {

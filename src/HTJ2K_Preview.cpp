@@ -326,9 +326,13 @@ QImage HTJ2K::DataToQImage()
 					xpos = (y*w + x); // don't calculate 3 times
 
 					// get XYZ
-					r = (float)mpOutBuf[0][xpos];
-					g = (float)mpOutBuf[1][xpos];
-					b = (float)mpOutBuf[2][xpos];
+					cv_x = mpOutBuf[0][xpos];
+					cv_y = mpOutBuf[1][xpos];
+					cv_z = mpOutBuf[2][xpos];
+					// clamp values between 0...4095
+					if (cv_x < 0) cv_x = 0; else if (cv_x > 4095) cv_x = 4095;
+					if (cv_y < 0) cv_y = 0; else if (cv_y > 4095) cv_y = 4095;
+					if (cv_z < 0) cv_z = 0; else if (cv_z > 4095) cv_z = 4095;
 
 					break;
 				case Metadata::CDCI:
@@ -342,10 +346,9 @@ QImage HTJ2K::DataToQImage()
 				switch (transferCharacteristics) {
 				case SMPTE::TransferCharacteristic_CinemaMezzanineDCDM:
 				case SMPTE::TransferCharacteristic_CinemaMezzanineDCDM_Wrong:
-
-					r = eotf_DCDM[(int)((r / max) * max_f_)]; // 0...1
-					g = eotf_DCDM[(int)((g / max) * max_f_)]; // 0...1
-					b = eotf_DCDM[(int)((b / max) * max_f_)]; // 0...1
+					cv_x = eotf_DCDM[cv_x]; // convert to 16 bit linear
+					cv_y = eotf_DCDM[cv_y]; // convert to 16 bit linear
+					cv_z = eotf_DCDM[cv_z]; // convert to 16 bit linear
 
 					break;
 				case SMPTE::TransferCharacteristic_CinemaMezzanineLinear:
@@ -359,10 +362,10 @@ QImage HTJ2K::DataToQImage()
 				switch (colorPrimaries) {
 				case SMPTE::ColorPrimaries_CinemaMezzanine:
 
-					// convert from XYZ -> BT.709
-					out_r = r*1.6605 + g*-0.5877 + b*-0.0728;
-					out_g = r*-0.1246 + g*1.1330 + b*-0.0084;
-					out_b = r*-0.0182 + g*-0.1006 + b*1.1187;
+					// convert from XYZ -> BT.709, matrix coefficients are scaled by 1024 to allow for integer processing
+					out_ri = cv_x*1700 + cv_y*-602 + cv_z*-75;
+					out_gi = cv_x*-128 + cv_y*1160 + cv_z*-9;
+					out_bi = cv_x*-19  + cv_y*-103 + cv_z*1146;
 					break;
 
 				default:
@@ -370,31 +373,20 @@ QImage HTJ2K::DataToQImage()
 					return QImage(":/frame_error.png"); // abort!
 				}
 
-				// clamp between 0...1
-				if (out_r < 0) { out_r = 0; }
-				else if (out_r > 1) { out_r = 1; }
-				if (out_g < 0) { out_g = 0; }
-				else if (out_g > 1) { out_g = 1; }
-				if (out_b < 0) { out_b = 0; }
-				else if (out_b > 1) { out_b = 1; }
+				// convert back to 16 bit
+				out_ri = out_ri >> 10;
+				out_gi = out_gi >> 10;
+				out_bi = out_bi >> 10;
 
-				// unlinearize
-				out_r = oetf_709[(int)(out_r * max_f_)] * max;
-				out_g = oetf_709[(int)(out_g * max_f_)] * max;
-				out_b = oetf_709[(int)(out_b * max_f_)] * max;
+				// clamp values between 0...65535
+				if (out_ri < 0) out_ri = 0;	else if (out_ri > 65535) out_ri = 65535;
+				if (out_gi < 0) out_gi = 0;	else if (out_gi > 65535) out_gi = 65535;
+				if (out_bi < 0) out_bi = 0;	else if (out_bi > 65535) out_bi = 65535;
 
-				// convert to 8 bit
-				out_r8 = (int)out_r >> prec_shift;
-				out_g8 = (int)out_g >> prec_shift;
-				out_b8 = (int)out_b >> prec_shift;
-
-				// clamp values between 0...255
-				if (out_r8 < 0) { out_r8 = 0; }
-				else if (out_r8 > 255) { out_r8 = 255; }
-				if (out_g8 < 0) { out_g8 = 0; }
-				else if (out_g8 > 255) { out_g8 = 255; }
-				if (out_b8 < 0) { out_b8 = 0; }
-				else if (out_b8 > 255) { out_b8 = 255; }
+				//convert to 709
+				out_r8 = oetf_709i[out_ri];
+				out_g8 = oetf_709i[out_gi];
+				out_b8 = oetf_709i[out_bi];
 
 				// set data
 				buff_pos = x * 3; // don't calculate 3 times

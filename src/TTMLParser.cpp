@@ -443,7 +443,7 @@ QString elem::serializeTT(DOMElement *rEl) {
 	size_t len = XMLString::stringLen(xmlch);
 	XMLByte* utf8 = new XMLByte[(len * 4) + 1];  
 	XMLSize_t eaten;
-	unsigned int utf8Len = utf8Transcoder->transcodeTo(xmlch, len, utf8, len * 4,
+	XMLSize_t utf8Len = utf8Transcoder->transcodeTo(xmlch, len, utf8, len * 4,
 		eaten, XMLTranscoder::UnRep_Throw);
 
 	utf8[utf8Len] = '\0';

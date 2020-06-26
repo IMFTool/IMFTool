@@ -44,6 +44,7 @@ public:
 protected:
 	// luts
 	static const int bitdepth = 16; // lookup table size (default: 16 bit)
+	static const int bitdepth_dcdm = 12;
 	int max_f; // (float)pow(2, bitdepth)
 	float max_f_; // max_f - 1;
 	float *oetf_709;
@@ -51,10 +52,12 @@ protected:
 	float *eotf_PQ;
 	float *eotf_HLG;
 	float *eotf_sRGB;
-	float *eotf_DCDM;
+	quint16 *eotf_DCDM;
+	quint8 *oetf_709i;
 
 	// data to qimage
 	int w=0, h=0, xpos=0, buff_pos=0, x=0, y=0, bytes_per_line=0;
+	qint32 out_ri=0, out_gi=0, out_bi=0, cv_x=0, cv_y=0, cv_z=0;
 	float Y=0, Cb=0, Cr=0, r=0, g=0, b=0, out_r=0, out_g=0, out_b=0, out_r8=0, out_g8=0, out_b8=0;
 
 	// info methods

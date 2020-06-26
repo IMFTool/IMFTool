@@ -42,7 +42,7 @@ Imf::Int64 As02AcesIStream::tellg() {
 
 void As02AcesIStream::seekg(Imf::Int64 pos) {
 
-	if(pos > d->mSize) return;
+	if(pos > (Imf::Int64)d->mSize) return;
 	d->mpReadPosition = d->mpData + pos;
 }
 
