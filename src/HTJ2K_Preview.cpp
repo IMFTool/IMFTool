@@ -363,9 +363,9 @@ QImage HTJ2K::DataToQImage()
 				case SMPTE::ColorPrimaries_CinemaMezzanine:
 
 					// convert from XYZ -> BT.709, matrix coefficients are scaled by 1024 to allow for integer processing
-					out_ri = cv_x*1700 + cv_y*-602 + cv_z*-75;
-					out_gi = cv_x*-128 + cv_y*1160 + cv_z*-9;
-					out_bi = cv_x*-19  + cv_y*-103 + cv_z*1146;
+					out_ri = cv_x*3319 + cv_y*-1574 + cv_z*-511;
+					out_gi = cv_x*-992 + cv_y*1921 + cv_z*43;
+					out_bi = cv_x*57  + cv_y*-209 + cv_z*1082;
 					break;
 
 				default:

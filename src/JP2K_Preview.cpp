@@ -148,7 +148,8 @@ void JP2K_Preview::setAsset() {
 			Kb = 0.114f;
 			break;
 		case SMPTE::ColorPrimaries_P3D65:
-			//P365 is 4:4:4 only
+		case SMPTE::ColorPrimaries_CinemaMezzanine:
+			//P365 and DCDM is 4:4:4 only
 			break;
 		default:
 			mMsg = "Unknown color encoding"; // ERROR
@@ -460,6 +461,18 @@ QImage JP2::DataToQImage()
 					b = eotf_HLG[(int)((b / max) * max_f_)]; // 0...1
 
 					break;
+				case SMPTE::TransferCharacteristic_CinemaMezzanineDCDM:
+					r = eotf_DCDM[(int)(r)]/max_f_; // 0...1
+					g = eotf_DCDM[(int)(g)]/max_f_;
+					b = eotf_DCDM[(int)(b)]/max_f_;
+
+					break;
+				case SMPTE::TransferCharacteristic_CinemaMezzanineLinear:
+				case SMPTE::TransferCharacteristic_linear:
+					r /= max_f_; // 0...1
+					g /= max_f_; // 0...1
+					b /= max_f_; // 0...1
+					break;
 
 				default: return QImage(":/frame_error.png"); // abort!
 				}
@@ -471,7 +484,6 @@ QImage JP2::DataToQImage()
 					out_r = r*1.6605 + g*-0.5877 + b*-0.0728;
 					out_g = r*-0.1246 + g*1.1330 + b*-0.0084;
 					out_b = r*-0.0182 + g*-0.1006 + b*1.1187;
-
 					break;
 				case SMPTE::ColorPrimaries_P3D65:
 
@@ -479,7 +491,12 @@ QImage JP2::DataToQImage()
 					out_r = r*1.2248 - g*0.2249 - b*0.0001;
 					out_g = -r*0.042 + g*1.042;
 					out_b = -r*0.0196 - g*0.0786 + b*1.0983;
-
+					break;
+ 				case SMPTE::ColorPrimaries_CinemaMezzanine:
+					// convert from XYZ -> BT.709
+					out_r = r*3.2410 + g*-1.5374 + b*-0.4986;
+					out_g = r*-0.9692 + g*1.8760 + b*0.0416;
+					out_b = r*0.0556 + g*-0.2040 + b*1.0570;
 					break;
 				default: return QImage(":/frame_error.png"); // abort!
 				}
