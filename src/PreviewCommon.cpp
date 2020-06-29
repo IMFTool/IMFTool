@@ -37,8 +37,9 @@ PreviewCommon::PreviewCommon() {
 	float a = 0.17883277f;
 	float b = 1 - 4*a;
 	float c = 0.5 - a * log(4*a);
-	eoft_HLG= new float[max_f];
-	eoft_sRGB= new float[max_f];
+	eotf_HLG= new float[max_f];
+	eotf_sRGB= new float[max_f];
+	oetf_709i = new quint8[max_f];
 
 	for (int i = 0; i < max_f; i++) {
 
@@ -46,6 +47,7 @@ PreviewCommon::PreviewCommon() {
 
 		// BT.709 - OETF (Inverse of BT.1886 EOTF)
 		oetf_709[i] = pow(input, 1.0f / 2.4f);
+		oetf_709i[i] = (quint8)(255.0f * pow(input, 1.0f / 2.4f) + 0.5);
 
 		// BT.2020 - EOTF
 		if (input < (4.5 * beta)) {
@@ -60,25 +62,49 @@ PreviewCommon::PreviewCommon() {
 
 		//HLG OEFT^-1 including the inverted gamma correction and scaling per Figure 42 of BT.2390-7
 		if (input <= 0.5) {
-			eoft_HLG[i] = pow(input * input / 3.0, 1.03) / 0.2546;
+			eotf_HLG[i] = pow(input * input / 3.0, 1.03) / 0.2546;
 		}
 		else {
-			eoft_HLG[i] = pow((exp((input - c) / a) + b)/12.0, 1.03) / 0.2546;
+			eotf_HLG[i] = pow((exp((input - c) / a) + b)/12.0, 1.03) / 0.2546;
 		}
 		//sRGB
 		if (input <= 0.03928) {
-			eoft_sRGB[i] = input / 12.92;
+			eotf_sRGB[i] = input / 12.92;
 		} else {
-			eoft_sRGB[i] = pow((input + 0.055)/1.055, 2.4f);
+			eotf_sRGB[i] = pow((input + 0.055)/1.055, 2.4f);
 		}
 	}
 
 	eotf_PQ[0] = 0;
+
+	// DCDM
+	int max_cv_dcdm = 1 << bitdepth_dcdm;
+	float max_cv_dcdm_1 = (float)(max_cv_dcdm)-1.0;
+	eotf_DCDM = new quint16[max_cv_dcdm];
+
+	for (int i = 0; i < max_cv_dcdm; i++) {
+		float input = (float)(i / max_cv_dcdm_1); // convert input to value between 0...1
+		eotf_DCDM[i] = (quint16)(pow(input, 2.6f) * 65535.0f);
+	}
 }
+
+void PreviewCommon::info_callback(const char *mMsg, void *client_data) {
+	qDebug() << "INFO" << mMsg;
+}
+
+void PreviewCommon::warning_callback(const char *mMsg, void *client_data) {
+	qDebug() << "WARNING" << mMsg;
+}
+
+void PreviewCommon::error_callback(const char *mMsg, void *client_data) {
+	qDebug() << "ERROR" << mMsg;
+}
+
 
 PreviewCommon::~PreviewCommon() {
 	delete[] oetf_709;
 	delete[] eotf_2020;
 	delete[] eotf_PQ;
-	delete[] eoft_HLG;
+	delete[] eotf_HLG;
+	delete[] eotf_DCDM;
 }

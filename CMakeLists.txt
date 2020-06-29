@@ -12,7 +12,7 @@ FIND_PROGRAM(GIT_EXECUTABLE git
   DOC "git command line client")
 set(SVN_REV 0)
 set(VERSION_MAJOR 1)
-set(VERSION_MINOR 6)
+set(VERSION_MINOR 7)
 set(VERSION_PATCH 0)
 
 # only do this if we have an svn client.

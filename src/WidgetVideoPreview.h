@@ -29,6 +29,9 @@
 #ifdef APP5_ACES
 #include "ACES_Preview.h"
 #endif
+#ifdef CODEC_HTJ2K
+#include "HTJ2K_Preview.h"
+#endif
 #include "Player.h"
 
 class WidgetImagePreview;
@@ -48,6 +51,9 @@ public:
 	Player *player;
 #ifdef APP5_ACES
 	Player *mpACESPlayer;
+#endif
+#ifdef CODEC_HTJ2K
+	Player *mpHTJ2KPlayer;
 #endif
 	void setApplication(eImfApplications rImfApplication);
 	eImfApplications getApplication();
@@ -123,6 +129,9 @@ private:
 #ifdef APP5_ACES
 	QThread *mpACESPlayerThread;
 #endif
+#ifdef CODEC_HTJ2K
+	QThread *mpHTJ2KPlayerThread;
+#endif
 	eImfApplications mImfApplication = ::App2;
 	int current_playlist_index = 0; // frame indicator position within the playlisqt
 	QVector<VideoResource> currentPlaylist; // playlist ressources
@@ -131,11 +140,16 @@ private:
 
 	// preview decoding
 	JP2K_Preview *decoders[2];
+	QThread *decodingThreads[2];
 #ifdef APP5_ACES
 	ACES_Preview *mpACESDecoders[2];
-#endif
-	QThread *decodingThreads[2];
 	QThread *mpACESDecodingThreads[2];
+#endif
+#ifdef CODEC_HTJ2K
+	HTJ2K_Preview *mpHTJ2KDecoders[2];
+	QThread *mpHTJ2KDecodingThreads[2];
+	bool mHTJ2KRunning[2];
+#endif
 	bool running[2];
 	bool mACESRunning[2];
 	bool now_running = false; // false: 0, true: 1

@@ -443,7 +443,7 @@ QString elem::serializeTT(DOMElement *rEl) {
 	size_t len = XMLString::stringLen(xmlch);
 	XMLByte* utf8 = new XMLByte[(len * 4) + 1];  
 	XMLSize_t eaten;
-	unsigned int utf8Len = utf8Transcoder->transcodeTo(xmlch, len, utf8, len * 4,
+	XMLSize_t utf8Len = utf8Transcoder->transcodeTo(xmlch, len, utf8, len * 4,
 		eaten, XMLTranscoder::UnRep_Throw);
 
 	utf8[utf8Len] = '\0';
@@ -530,11 +530,11 @@ void TTMLParser::readAncilleryData() {
 						double r, g, b, a;
 						QColor pixelColor = img.pixelColor(x,y); // sRGB: 255 = 80cd/m2
 						pixelColor.getRgbF(&r, &g, &b, &a);
-						r = eoft_sRGB[(int)(r * max_f_)]; // 0...1
+						r = eotf_sRGB[(int)(r * max_f_)]; // 0...1
 						r = oetf_709[(int)(r * max_f_)] * max;
-						g = eoft_sRGB[(int)(g * max_f_)]; // 0...1
+						g = eotf_sRGB[(int)(g * max_f_)]; // 0...1
 						g = oetf_709[(int)(g * max_f_)] * max;
-						b = eoft_sRGB[(int)(b * max_f_ )]; // 0...1
+						b = eotf_sRGB[(int)(b * max_f_ )]; // 0...1
 						b = oetf_709[(int)(b * max_f_)] * max;
 
 						pixelColor.setRgb((int)r, (int)g, (int)b, (int)(a*255));

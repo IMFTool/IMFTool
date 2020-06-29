@@ -14,7 +14,6 @@
 * along with this program.If not, see <http://www.gnu.org/licenses/>.
 */
 #pragma once
-#include <QObject>
 #include "Error.h"
 #include "ImfPackage.h"
 
@@ -26,14 +25,11 @@ public:
 	quint32	ComponentMaxRef = 0;
 	//WR
 
-	// change values with new asset:
-	//QSharedPointer<AS_02::JP2K::MXFReader> reader_shared;
-	int src_bitdepth = 0, prec_shift = 0, max = 0, layer = 3, RGBrange = 0, RGBmaxcv = 0;
+	// Values are set when opening a new asset:
+	int src_bitdepth = 0, prec_shift = 0, max = 0, layer = 3;
 
 	// enable conversion? (much slower!!)
 	bool convert_to_709 = true; // default
-
-	opj_dparameters_t params; // decoding parameters
 
 	Metadata::eColorEncoding ColorEncoding = Metadata::eColorEncoding::Unknown_Color_Encoding; // YCbCr or RGB
 	SMPTE::eColorPrimaries colorPrimaries = SMPTE::eColorPrimaries::ColorPrimaries_UNKNOWN; // BT.709 / BT.2020 / DCI-P3
@@ -48,12 +44,27 @@ public:
 protected:
 	// luts
 	static const int bitdepth = 16; // lookup table size (default: 16 bit)
+	static const int bitdepth_dcdm = 12;
 	int max_f; // (float)pow(2, bitdepth)
 	float max_f_; // max_f - 1;
 	float *oetf_709;
 	float *eotf_2020;
 	float *eotf_PQ;
-	float *eoft_HLG;
-	float *eoft_sRGB;
+	float *eotf_HLG;
+	float *eotf_sRGB;
+	quint16 *eotf_DCDM;
+	quint8 *oetf_709i;
+
+	// data to qimage
+	int w=0, h=0, xpos=0, buff_pos=0, x=0, y=0, bytes_per_line=0;
+	qint32 out_ri=0, out_gi=0, out_bi=0, cv_x=0, cv_y=0, cv_z=0;
+	float Y=0, Cb=0, Cr=0, r=0, g=0, b=0, out_r=0, out_g=0, out_b=0, out_r8=0, out_g8=0, out_b8=0;
+
+	// info methods
+	static void info_callback(const char *msg, void *data);
+	static void warning_callback(const char *msg, void *data);
+	static void error_callback(const char *msg, void *data);
+
+	bool err = false; // error in the decoding process?
 
 };

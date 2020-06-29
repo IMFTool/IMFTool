@@ -1,4 +1,4 @@
-/* Copyright(C) 2016 Björn Stresing, Denis Manthey, Wolfgang Ruppel, Krispin Weiss
+/* Copyright(C) 2020 Wolfgang Ruppel
 *
 * This program is free software : you can redistribute it and / or modify
 * it under the terms of the GNU General Public License as published by
@@ -18,76 +18,56 @@
 #include <QThreadPool>
 #include "Error.h"
 #include "ImfPackage.h"
-
-#include "ACES.h"
-#include "AS_02_ACES.h"
-#include "ImfRgbaFile.h"
-#include "ImfFrameBuffer.h"
-#include "ImfStandardAttributes.h"
-#include "ImfChromaticities.h"
-#include "ImfRgba.h"
-#include "ImfArray.h"
-#include "ImathMatrix.h"
-#include "As02AcesIStream.h"
 #include "PreviewCommon.h"
-
-using namespace Imf;
-using namespace Imath;
+#include "ojph_mem.h"
+#include "ojph_file.h"
+#include "ojph_codestream.h"
+#include "ojph_params.h"
+#include "ojph_img_io.h"
 
 class AssetMxfTrack;
 
-typedef struct
-{
-	uint8_t* pData; //Our data.
-	size_t dataSize; //How big is our data.
-	size_t offset; //Where are we currently in our data.
-}aces_memory_stream;
-
-class ACES : public PreviewCommon {
+class HTJ2K: public PreviewCommon {
 
 public:
+	bool extractFrame(qint64 frameNr);
+	bool decodeImage();
+	quint8 cp_reduce; // layers to be skipped for decoding and reconstruction
+	QString mMsg; // error message
 
 protected:
 
-	//AS_02::JP2K::MXFReader *reader;
-	AS_02::ACES::MXFReader *reader;
+	AS_02::JP2K::MXFReader *reader;
 	ASDCP::MXF::IndexTableSegment::IndexEntry IndexF1; // current frame offset
 	ASDCP::MXF::IndexTableSegment::IndexEntry IndexF2; // next frame offset
 	int default_buffer_size = 30000000; // byte
 
-	
-	As02AcesIStream* pAcesIStream;
+    ojph::codestream* mpCodestream;
+    ojph::mem_infile* mpMemBuf = NULL;
+    ojph::ui16* mpOutBuf[3]; // Holding X,Y,Z of decoded image
+	// data to QImage
+	unsigned char *img_buff;
 
-	QImage DataToQImage(quint8 rScale = 0, bool rShowActiveArea = false); // converts opj_image_t -> QImage
-
+	QImage DataToQImage(); // converts mpOutBuf[3] -> QImage
 
 	bool err = false; // error in the decoding process?
-	AS_02::ACES::FrameBuffer *buff;
-
-	static Imf::Chromaticities aces_chromaticities;
-	static Imath::M44f A0Rec709TransformMatrix;
+	ASDCP::JP2K::FrameBuffer *buff;
 };
 
-class ACES_Preview : public QObject, public ACES {
+class HTJ2K_Preview : public QObject, public HTJ2K  {
 	Q_OBJECT
 private:
 
 	void cleanUp();
 	void setUp();
-	bool decodeImage();
 	void setAsset();
-	bool extractFrame(qint64 frameNr);
 	
 	QTime mDecode_time; // time (ms) needed to decode/convert the image
-	QString mMsg; // error message
 	QString mMxf_path; // path to current asset
-	quint8 mScale; // scale factor for images
-	bool mShowActiveArea; // Show Active Area (true) or Show Native Resolution (false)
-
 
 public:
-	ACES_Preview();
-	~ACES_Preview();
+	HTJ2K_Preview();
+	~HTJ2K_Preview();
 
 	qint64 mFrameNr;
 	qint64 mFirst_proxy;
@@ -102,8 +82,6 @@ public slots:
 	void getProxy();
 	void decode();
 	void setLayer(int);
-	// Show Active Area (true) or Show Native Resolution (false)
-	void showActiveArea(bool);
 };
 
 

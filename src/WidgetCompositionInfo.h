@@ -53,6 +53,7 @@ private:
 #ifdef APP5_ACES
 			{"http://www.smpte-ra.org/ns/2067-50/2017", "App #5 ACES"},
 #endif
+			{"http://www.smpte-ra.org/ns/2067-40/2020 http://www.smpte-ra.org/ns/2067-40-DCDM/2020", "App #4 DCDM"},
 	};
 	const QStringList mContentKindList {
 		"advertisement",
@@ -114,5 +115,8 @@ private:
 			{"http://www.smpte-ra.org/ns/2067-50/2017", "App #5 ACES"},
 			{"tag:apple.com,2017:imf:rdd45:2017", "App ProRes"},
 			{"http://www.digitalproductionpartnership.co.uk/schema/imf/TSP2121-1/2018", "Application DPP (ProRes)"},
+			{"http://www.smpte-ra.org/ns/2067-40/2020 http://www.smpte-ra.org/ns/2067-40-DCDM/2020", "App #4 DCDM"},
+			{"http://www.smpte-ra.org/ns/2067-40-DCDM/2020 http://www.smpte-ra.org/ns/2067-40/2020", "App #4 DCDM"},
+			{"http://www.smpte-ra.org/ns/2067-40/2020", "App #4"},
 	};
 };

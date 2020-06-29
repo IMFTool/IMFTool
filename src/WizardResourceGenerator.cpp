@@ -80,6 +80,9 @@ void WizardResourceGenerator::InitLayout() {
 		switch(mAsset->GetEssenceType()) {
 		case Metadata::Jpeg2000:
 		case Metadata::ProRes:
+#ifdef APP4_DCDM
+		case Metadata::HTJ2K:
+#endif
 			SwitchMode(eMode::Jpeg2000Mode);
 			break;
 #ifdef APP5_ACES

@@ -24,10 +24,9 @@
 #ifdef APP5_ACES
 #include "ACES_Decoder.h"
 #endif
-//#include "JP2K_Decoder.h"
-
-//class Player;
-//class JP2K_Decoder;
+#ifdef CODEC_HTJ2K
+#include "HTJ2K_Decoder.h"
+#endif
 
 class FrameRequest
 {
@@ -53,6 +52,9 @@ public:
 		Decoder_JP2K,
 #ifdef APP5_ACES
 		Decoder_ACES,
+#endif
+#ifdef CODEC_HTJ2K
+		Decoder_HTJ2K,
 #endif
 		Decoder_UNKNOWN,
 	};
@@ -88,6 +90,9 @@ private:
 	JP2K_Decoder* decoder_queue_JP2K[decoders]; // array were n decoder instances are stored
 #ifdef APP5_ACES
 	ACES_Decoder* decoder_queue_ACES[decoders]; // array were n decoder instances are stored
+#endif
+#ifdef CODEC_HTJ2K
+	HTJ2K_Decoder* decoder_queue_HTJ2K[decoders]; // array were n decoder instances are stored
 #endif
 	QSharedPointer<FrameRequest> pointer_queue[decoders];
 	QSharedPointer<DecodedFrames> decoded_shared; // decoding status shared among player and all decoders

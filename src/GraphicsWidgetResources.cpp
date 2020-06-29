@@ -24,7 +24,6 @@
 #include <QMenu>
 #include <QToolTip>
 #include <QInputDialog>
-#include "JP2K_Preview.h"
 
 AbstractGraphicsWidgetResource::AbstractGraphicsWidgetResource(GraphicsWidgetSequence *pParent, cpl2016::BaseResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/, const QColor &rColor /*= QColor(Qt::white)*/) :
 GraphicsWidgetBase(pParent), mpData(pResource), mAssset(rAsset), mColor(rColor), mOldEntryPoint(), mOldSourceDuration(-1), mpLeftTrimHandle(NULL), mpRightTrimHandle(NULL), mpDurationIndicator(NULL), mpVerticalIndicator(NULL) {
@@ -767,13 +766,23 @@ void GraphicsWidgetVideoResource::restartThread(QSharedPointer<AssetMxfTrack> rA
 			mImfApplication = ::App5;
 			break;
 #endif
+#ifdef CODEC_HTJ2K
+		case Metadata::HTJ2K:
+			if (mAssset->GetMetadata().colorPrimaries == SMPTE::ColorPrimaries_CinemaMezzanine) mImfApplication = ::App4DCDM_HTJ2K;
+			else mImfApplication = ::App2e;
+			break;
+#endif
 
 		default:
 			mImfApplication = ::App2e;
 		}
 
 	}
-	if (mImfApplication != ::App5) {
+	if ((mImfApplication == ::App2) || (mImfApplication == ::App2e)
+#ifdef APP4_DCDM
+			|| (mImfApplication == ::App4)
+#endif
+	) {
 		mpJP2K = new JP2K_Preview(); // (k)
 		mpJP2K->asset = rAsset; // (k)
 
@@ -785,7 +794,7 @@ void GraphicsWidgetVideoResource::restartThread(QSharedPointer<AssetMxfTrack> rA
 		connect(mpJP2K, SIGNAL(proxyFinished(const QImage&, const QImage&)), this, SLOT(rShowProxyImage(const QImage&, const QImage&)));
 	}
 #ifdef APP5_ACES
-	else {
+	else if (mImfApplication == ::App5) {
 		mpACES = new ACES_Preview(); // (k)
 		mpACES->asset = rAsset; // (k)
 
@@ -795,7 +804,19 @@ void GraphicsWidgetVideoResource::restartThread(QSharedPointer<AssetMxfTrack> rA
 		connect(decodeProxyThread, SIGNAL(started()), mpACES, SLOT(getProxy()));
 		connect(mpACES, SIGNAL(finished()), decodeProxyThread, SLOT(quit()));
 		connect(mpACES, SIGNAL(proxyFinished(const QImage&, const QImage&)), this, SLOT(rShowProxyImage(const QImage&, const QImage&)));
+	}
+#endif
+#ifdef CODEC_HTJ2K
+	else if (mImfApplication == ::App4DCDM_HTJ2K) {
+		mpHTJ2K = new HTJ2K_Preview(); // (k)
+		mpHTJ2K->asset = rAsset; // (k)
 
+		decodeProxyThread = new QThread();
+		mpHTJ2K->moveToThread(decodeProxyThread);
+
+		connect(decodeProxyThread, SIGNAL(started()), mpHTJ2K, SLOT(getProxy()));
+		connect(mpHTJ2K, SIGNAL(finished()), decodeProxyThread, SLOT(quit()));
+		connect(mpHTJ2K, SIGNAL(proxyFinished(const QImage&, const QImage&)), this, SLOT(rShowProxyImage(const QImage&, const QImage&)));
 	}
 #endif
 
@@ -807,6 +828,9 @@ GraphicsWidgetVideoResource::GraphicsWidgetVideoResource(GraphicsWidgetSequence 
 mpJP2K(0),
 #ifdef APP5_ACES
 mpACES(0),
+#endif
+#ifdef CODEC_HTJ2K
+mpHTJ2K(0),
 #endif
 GraphicsWidgetFileResource(pParent, pResource, rAsset, QColor(CPL_COLOR_VIDEO_RESOURCE), rImfPackage), mLeftProxyImage(":/proxy_film.png"), mRightProxyImage(":/proxy_film.png"), mTrimActive(false) {
 
@@ -824,6 +848,9 @@ GraphicsWidgetVideoResource::GraphicsWidgetVideoResource(GraphicsWidgetSequence 
 mpJP2K(0),
 #ifdef APP5_ACES
 mpACES(0),
+#endif
+#ifdef CODEC_HTJ2K
+mpHTJ2K(0),
 #endif
 GraphicsWidgetFileResource(pParent, rAsset, QColor(CPL_COLOR_VIDEO_RESOURCE)), mLeftProxyImage(":/proxy_film.png"), mRightProxyImage(":/proxy_film.png"), mTrimActive(false) {
 
@@ -998,7 +1025,7 @@ void GraphicsWidgetVideoResource::rEntryPointChanged() {
 void GraphicsWidgetVideoResource::RefreshProxy() {
 	if (decodeProxyThread->isRunning()) decodeProxyThread->quit();
 
-	if (mImfApplication != ::App5) {
+	if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4)) {
 		// first proxy
 		Timecode first_frame = GetFirstVisibleFrame();
 		mpJP2K->mFirst_proxy = first_frame.GetTargetFrame(); // set frame number
@@ -1008,7 +1035,7 @@ void GraphicsWidgetVideoResource::RefreshProxy() {
 		mpJP2K->mSecond_proxy = last_frame.GetTargetFrame(); // set frame number
 	}
 #ifdef APP5_ACES
-	else {
+	else if (mImfApplication == ::App5) {
 		// first proxy
 		Timecode first_frame = GetFirstVisibleFrame();
 		mpACES->mFirst_proxy = first_frame.GetTargetFrame(); // set frame number
@@ -1017,6 +1044,19 @@ void GraphicsWidgetVideoResource::RefreshProxy() {
 		// second proxy
 		Timecode last_frame = GetLastVisibleFrame();
 		mpACES->mSecond_proxy = last_frame.GetTargetFrame(); // set frame number
+
+	}
+#endif
+#ifdef CODEC_HTJ2K
+	else if (mImfApplication == ::App4DCDM_HTJ2K) {
+		// first proxy
+		Timecode first_frame = GetFirstVisibleFrame();
+		mpHTJ2K->mFirst_proxy = first_frame.GetTargetFrame(); // set frame number
+
+
+		// second proxy
+		Timecode last_frame = GetLastVisibleFrame();
+		mpHTJ2K->mSecond_proxy = last_frame.GetTargetFrame(); // set frame number
 
 	}
 #endif

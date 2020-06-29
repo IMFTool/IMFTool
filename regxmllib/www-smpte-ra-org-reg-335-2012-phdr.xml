@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--Created: Tue Aug 06 07:07:01 CEST 2019--><!--By: regxmllib build 831a55742a9f8488e47a2831ff741a265360fc18--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
+<!--Created: Fri Apr 24 11:36:50 CEST 2020--><!--By: regxmllib build 51d295b54f74f6c0d89838614e53de6aed41013b--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
 <SchemeID>urn:uuid:e9ad45b5-abdb-5f16-7ffc-ff560e475a87</SchemeID>
 <SchemeURI>http://www.smpte-ra.org/reg/335/2012</SchemeURI>
 <MetaDefinitions>
@@ -783,6 +783,18 @@
 <Description>Unique ID of an instance</Description>
 <Name>Instance ID</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>15370</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.02240000</MemberOf>
+<OriginalProperty>urn:smpte:ul:060e2b34.01010101.01011502.00000000</OriginalProperty>
+</PropertyAliasDefinition>
+<PropertyAliasDefinition>
+<Identification>urn:smpte:ul:060e2b34.01010101.01011502.00000000</Identification>
+<Symbol>InstanceID</Symbol>
+<Description>Unique ID of an instance</Description>
+<Name>Instance ID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
 <IsOptional>false</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>15370</LocalIdentification>
@@ -795,7 +807,7 @@
 <Description>Unique ID of an instance</Description>
 <Name>Instance ID</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
-<IsOptional>false</IsOptional>
+<IsOptional>true</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>15370</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.03000000</MemberOf>
@@ -5110,6 +5122,39 @@
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01015a00</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010603.0f000000</Identification>
+<Symbol>J2KExtendedCapabilities</Symbol>
+<Description>Signals that extended capabilities were used to create (and are recommended or required to decode) a codestream. The value is a record that comprises the Pcap parameter followed by an array of consisting of the Ccap(i) parameters of the CAP Marker Segment, as specified in ISO/IEC 15444-1.</Description>
+<Name>J2K Extended Capabilities</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010d00.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01015a00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010603.10000000</Identification>
+<Symbol>J2KProfile</Symbol>
+<Description>Signals the profile to which the codestream conforms. Profiles provide limits on the codestream syntax parameters. The value comprises an array of the Pprf(i) parameters of the PRF Marker Segment, as specified in ISO/IEC 15444-1.</Description>
+<Name>J2K Profile</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04011200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01015a00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010603.11000000</Identification>
+<Symbol>J2KCorrespondingProfile</Symbol>
+<Description>Facilitate the reversible transcoding of HTJ2K codestreams, as specified in ISO/IEC 15444-15, to and from codestreams that conform to Rec. ISO/IEC 15444-1. The value comprises an array of the Pcpf(i) parameters of the CPF Marker Segment, as specified in ISO/IEC 15444-15.</Description>
+<Name>J2K Corresponding Profile</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04011200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01015a00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010a.04020403.01020000</Identification>
 <Symbol>MPEGAudioBitRate</Symbol>
 <Description>Specifies the rate of a compressed MPEG audio bitstream in kbit/s. The allowed values are typically determined by a given MPEG audio layer and mode.</Description>
@@ -5321,9 +5366,42 @@
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010e.03010102.02160000</Identification>
 <Symbol>RFC5646LanguageTagList</Symbol>
-<Description>Identifies one or more languages as a comma-separated list of RFC 5646 language tags.</Description>
+<Description>An RFC 5646 Language Tag List that identifies one or more languages as a comma-separated list of RFC 5646 language tags.</Description>
 <Name>RFC 5646 Language Tag List</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01016400</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.06010102.04000000</Identification>
+<Symbol>DisplayType</Symbol>
+<Description>A text string giving an application specific means to indicate the intended use of the content of the XML document.</Description>
+<Name>Display Type</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01016400</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.06010102.05000000</Identification>
+<Symbol>IntrinsicPictureResolution</Symbol>
+<Description>Indicates the resolution of the primary picture on which Sub-Picture Ancillary Resources are to be rendered</Description>
+<Name>Intrinsic Picture Resolution</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01016400</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.06010102.06000000</Identification>
+<Symbol>ZpositionInUse</Symbol>
+<Description>When non-zero, indicates that one or more subtitle instances in the enclosed XML resource make use of stereoscopic positioning features</Description>
+<Name>Z-Position In Use</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
 <IsOptional>true</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>0</LocalIdentification>
@@ -5500,6 +5578,83 @@
 <Description>The MCA Audio Element Kind item shall indicate the kind of audio element contained in the audio essence as described in SMPTE RP 428-4.</Description>
 <Name>MCA Audio Element Kind</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01016a00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.03020102.22000000</Identification>
+<Symbol>MCAContent</Symbol>
+<Description>Unique value that identifies the content contained in the audio essence</Description>
+<Name>MCA Content</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01016a00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.03020102.23000000</Identification>
+<Symbol>MCAUseClass</Symbol>
+<Description>Unique value that identifies the class of the audio essence with respect to its completeness and usability</Description>
+<Name>MCA Use Class</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01016a00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.03020102.24000000</Identification>
+<Symbol>MCAContentSubtype</Symbol>
+<Description>Supplemental modifier to MCA Content</Description>
+<Name>MCA Content Subtype</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01016a00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.03020102.25000000</Identification>
+<Symbol>MCAContentDifferentiator</Symbol>
+<Description>Label that distinguishes between audio that otherwise has the same MCALabelSubDescriptor values</Description>
+<Name>MCA Content Differentiator</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01016a00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.03020102.26000000</Identification>
+<Symbol>MCASpokenLanguageAttribute</Symbol>
+<Description>Depiction of whether the RFC 5646 Spoken Language is the original language or a dubbed language</Description>
+<Name>MCA Spoken Language Attribute</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100400.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01016a00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.03020102.27000000</Identification>
+<Symbol>RFC5646AdditionalSpokenLanguages</Symbol>
+<Description>List of RFC 5646 Spoken Language tags depicting spoken languages in addition to the primary spoken language</Description>
+<Name>RFC 5646 Additional Spoken Languages</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100400.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01016a00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.03020102.28000000</Identification>
+<Symbol>MCAAdditionalLanguageAttributes</Symbol>
+<Description>Indication of whether each RFC 5646 language tag in MCA Additional Languages references original audio or dubbed audio</Description>
+<Name>MCA Additional Language Attributes</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100400.00000000</Type>
 <IsOptional>true</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>0</LocalIdentification>
@@ -6249,7 +6404,7 @@
 <Description>Specifies a local identifier used by the container format to identity a property</Description>
 <Name>Local ID</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
-<IsOptional>false</IsOptional>
+<IsOptional>true</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>13</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.02020000</MemberOf>
@@ -6263,6 +6418,17 @@
 <IsOptional>true</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>14</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.02020000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010d.06010107.22000000</Identification>
+<Symbol>MemberOf</Symbol>
+<Description>Specified the class in which this property may be present</Description>
+<Name>Member Of</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.05010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>43</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.02020000</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
@@ -6447,7 +6613,7 @@
 <Description>Specifies, as a single string value, a list of names zero delineated between each name in an extendible enumeration</Description>
 <Name>Extendible Element Name List</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.04010500.00000000</Type>
-<IsOptional>false</IsOptional>
+<IsOptional>true</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>31</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.02200000</MemberOf>
@@ -6458,7 +6624,7 @@
 <Description>Specifies as a single string value a list of values to match the SMPTE labels or AUIDs in the Type Definition Extendible Element Names</Description>
 <Name>Type Definition Extendible Element Values</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.04010600.00000000</Type>
-<IsOptional>false</IsOptional>
+<IsOptional>true</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>32</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.02200000</MemberOf>
@@ -6574,12 +6740,34 @@
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.02260000</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010d.06010107.20000000</Identification>
+<Symbol>OriginalProperty</Symbol>
+<Description>Specifies the original definition of the reused Property</Description>
+<Name>Original Property</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.05010c00.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>41</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.02270000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010d.06010107.21000000</Identification>
+<Symbol>ElementOf</Symbol>
+<Description>References the ExtendibleEnumerations in which this element is known to be used</Description>
+<Name>Element Of</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.05031100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>42</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.02280000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010a.06010107.16000000</Identification>
 <Symbol>RootMetaDictionary</Symbol>
 <Description>Specifies a reference to a collection of class, type and property definitions</Description>
 <Name>Root Meta Dictionary</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.05022700.00000000</Type>
-<IsOptional>false</IsOptional>
+<IsOptional>true</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>1</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.03000000</MemberOf>
@@ -6615,6 +6803,17 @@
 <IsOptional>true</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>34</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.03000000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010d.06010107.1a000000</Identification>
+<Symbol>RootExtensions</Symbol>
+<Description>References the Extension Schemes that are used in the file</Description>
+<Name>Root Extensions</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.05051200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>35</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.03000000</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
@@ -9036,6 +9235,17 @@
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.05010000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020301.0f000000</Identification>
+<Symbol>IABSampleRate</Symbol>
+<Description>Sample rate of the audio essence contained in the bistream</Description>
+<Name>IAB Sample Rate</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0105.0e090606.00000000</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.01010105.0e090400.00000000</Identification>

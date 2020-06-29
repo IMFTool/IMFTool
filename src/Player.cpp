@@ -15,10 +15,10 @@
  */
 #include "Player.h"
 #include "global.h"
+#include "PreviewCommon.h"
 #include <QRunnable>
 #include <QTime>
 #include "AS_DCP_internal.h"
-//#define DEBUG_MSGS
 
 Player::Player(enum eDecoder rDecoder) {
 
@@ -44,6 +44,12 @@ Player::Player(enum eDecoder rDecoder) {
 			decoder_queue_ACES[i]->setAutoDelete(false);
 		}
 #endif
+#ifdef CODEC_HTJ2K
+		else if (mDecoder == Player::Decoder_HTJ2K) {
+			decoder_queue_HTJ2K[i] = new HTJ2K_Decoder(decoded_shared, pointer_queue[i]);
+			decoder_queue_HTJ2K[i]->setAutoDelete(false);
+		}
+#endif
 	}
 }
 
@@ -58,6 +64,11 @@ Player::~Player()
 #ifdef APP5_ACES
 		else if (mDecoder == Player::Decoder_ACES) {
 			threadPool->cancel(decoder_queue_ACES[i]);
+		}
+#endif
+#ifdef CODEC_HTJ2K
+		else if (mDecoder == Player::Decoder_HTJ2K) {
+			threadPool->cancel(decoder_queue_HTJ2K[i]);
 		}
 #endif
 	}
@@ -117,6 +128,11 @@ void Player::clean() {
 #ifdef APP5_ACES
 		else if (mDecoder == Player::Decoder_ACES) {
 			threadPool->cancel(decoder_queue_ACES[i]);
+		}
+#endif
+#ifdef CODEC_HTJ2K
+		else if (mDecoder == Player::Decoder_HTJ2K) {
+			threadPool->cancel(decoder_queue_HTJ2K[i]);
 		}
 #endif
 	}
@@ -201,6 +217,11 @@ void Player::playLoop(){
 #ifdef APP5_ACES
 				else if (mDecoder == Player::Decoder_ACES) {
 					threadPool->start(decoder_queue_ACES[request_index], QThread::HighPriority);
+				}
+#endif
+#ifdef CODEC_HTJ2K
+				else if (mDecoder == Player::Decoder_HTJ2K) {
+					threadPool->start(decoder_queue_HTJ2K[request_index], QThread::HighPriority);
 				}
 #endif
 			}
@@ -355,11 +376,6 @@ void Player::setPlaylist(QVector<VideoResource> &rPlaylist) {
 			ComponentMinRef = rPlaylist.at(count).asset->GetMetadata().componentMinRef;
 			ComponentMaxRef = rPlaylist.at(count).asset->GetMetadata().componentMaxRef;
 
-			if (ComponentMinRef && ComponentMaxRef) {
-				RGBrange = ComponentMaxRef - ComponentMinRef;
-				RGBmaxcv = (1 << src_bitdepth) - 1;
-			}
-
 			switch (colorPrimaries) {
 			case SMPTE::ColorPrimaries_ITU709:
 				// set YCbCr -> RGB conversion parameters
@@ -385,41 +401,33 @@ void Player::setPlaylist(QVector<VideoResource> &rPlaylist) {
 
 			// set params in decoders
 			for (int i = 0; i < decoders; i++) {
-
-				// color transformation
+				PreviewCommon* pDecoder;
 				if (mDecoder == Player::Decoder_JP2K) {
-					decoder_queue_JP2K[i]->ColorEncoding = rPlaylist.at(count).asset->GetMetadata().colorEncoding;
-					decoder_queue_JP2K[i]->colorPrimaries = colorPrimaries;
-					decoder_queue_JP2K[i]->transferCharacteristics = rPlaylist.at(count).asset->GetMetadata().transferCharcteristics;
-					decoder_queue_JP2K[i]->src_bitdepth = src_bitdepth;
-
-					decoder_queue_JP2K[i]->ComponentMinRef = ComponentMinRef;
-					decoder_queue_JP2K[i]->ComponentMaxRef = ComponentMaxRef;
-					decoder_queue_JP2K[i]->RGBmaxcv = RGBmaxcv;
-					decoder_queue_JP2K[i]->RGBrange = RGBrange;
-					decoder_queue_JP2K[i]->Kr = Kr;
-					decoder_queue_JP2K[i]->Kg = Kg;
-					decoder_queue_JP2K[i]->Kb = Kb;
-
-					decoder_queue_JP2K[i]->prec_shift = prec_shift;
-					decoder_queue_JP2K[i]->max = max;
+					pDecoder = static_cast<PreviewCommon *>(decoder_queue_JP2K[i]);
 				}
 #ifdef APP5_ACES
 				else if (mDecoder == Player::Decoder_ACES) {
-					decoder_queue_ACES[i]->ColorEncoding = rPlaylist.at(count).asset->GetMetadata().colorEncoding;
-					decoder_queue_ACES[i]->colorPrimaries = colorPrimaries;
-					decoder_queue_ACES[i]->transferCharacteristics = rPlaylist.at(count).asset->GetMetadata().transferCharcteristics;
-					decoder_queue_ACES[i]->src_bitdepth = src_bitdepth;
-
-					decoder_queue_ACES[i]->ComponentMinRef = ComponentMinRef;
-					decoder_queue_ACES[i]->ComponentMaxRef = ComponentMaxRef;
-					decoder_queue_ACES[i]->RGBmaxcv = RGBmaxcv;
-					decoder_queue_ACES[i]->RGBrange = RGBrange;
-
-					decoder_queue_ACES[i]->prec_shift = prec_shift;
-					decoder_queue_ACES[i]->max = max;
+					pDecoder = static_cast<PreviewCommon *>(decoder_queue_ACES[i]);
 				}
 #endif
+#ifdef CODEC_HTJ2K
+				else if (mDecoder == Player::Decoder_HTJ2K) {
+					pDecoder = static_cast<PreviewCommon *>(decoder_queue_HTJ2K[i]);
+				}
+#endif
+				pDecoder->ColorEncoding = rPlaylist.at(count).asset->GetMetadata().colorEncoding;
+				pDecoder->colorPrimaries = colorPrimaries;
+				pDecoder->transferCharacteristics = rPlaylist.at(count).asset->GetMetadata().transferCharcteristics;
+				pDecoder->src_bitdepth = src_bitdepth;
+
+				pDecoder->ComponentMinRef = ComponentMinRef;
+				pDecoder->ComponentMaxRef = ComponentMaxRef;
+				pDecoder->Kr = Kr;
+				pDecoder->Kg = Kg;
+				pDecoder->Kb = Kb;
+
+				pDecoder->prec_shift = prec_shift;
+				pDecoder->max = max;
 			}
 		}
 		count++;
@@ -442,7 +450,6 @@ void Player::setLayer(int rLayer){
 }
 
 void Player::convert_to_709(bool convert) {
-
 	for (int i = 0; i < decoders; i++) {
 		if (mDecoder == Player::Decoder_JP2K) {
 			decoder_queue_JP2K[i]->convert_to_709 = convert; // set in decoder [i]
@@ -450,6 +457,11 @@ void Player::convert_to_709(bool convert) {
 #ifdef APP5_ACES
 		else if (mDecoder == Player::Decoder_ACES) {
 			// option does not exist for ACES
+		}
+#endif
+#ifdef CODEC_HTJ2K
+		else if (mDecoder == Player::Decoder_HTJ2K) {
+			decoder_queue_HTJ2K[i]->convert_to_709 = convert; // set in decoder [i]
 		}
 #endif
 	}

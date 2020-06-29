@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--Created: Tue Aug 06 07:07:02 CEST 2019--><!--By: regxmllib build 831a55742a9f8488e47a2831ff741a265360fc18--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
+<!--Created: Fri Apr 24 11:36:50 CEST 2020--><!--By: regxmllib build 51d295b54f74f6c0d89838614e53de6aed41013b--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
 <SchemeID>urn:uuid:eb4c6bf8-c197-5ffe-7f01-2123ea606f17</SchemeID>
 <SchemeURI>http://www.smpte-ra.org/reg/2003/2012</SchemeURI>
 <MetaDefinitions>
@@ -127,6 +127,18 @@
 <Size>4</Size>
 <IsSigned>true</IsSigned>
 </TypeDefinitionInteger>
+<TypeDefinitionFloat>
+<Identification>urn:smpte:ul:060e2b34.01040101.01020200.00000000</Identification>
+<Symbol>Double</Symbol>
+<Name>Double</Name>
+<Size>8</Size>
+</TypeDefinitionFloat>
+<TypeDefinitionFloat>
+<Identification>urn:smpte:ul:060e2b34.01040101.01020300.00000000</Identification>
+<Symbol>HalfFloat</Symbol>
+<Name>HalfFloat</Name>
+<Size>2</Size>
+</TypeDefinitionFloat>
 <TypeDefinitionRecord>
 <Identification>urn:smpte:ul:060e2b34.01040101.01030100.00000000</Identification>
 <Symbol>AUID</Symbol>
@@ -166,6 +178,13 @@
 <Symbol>UUID</Symbol>
 <Name>UUID</Name>
 <ElementCount>16</ElementCount>
+<ElementType>urn:smpte:ul:060e2b34.01040101.01010100.00000000</ElementType>
+</TypeDefinitionFixedArray>
+<TypeDefinitionFixedArray>
+<Identification>urn:smpte:ul:060e2b34.01040101.01030400.00000000</Identification>
+<Symbol>UInt8Array20</Symbol>
+<Name>UInt8Array20</Name>
+<ElementCount>20</ElementCount>
 <ElementType>urn:smpte:ul:060e2b34.01040101.01010100.00000000</ElementType>
 </TypeDefinitionFixedArray>
 <TypeDefinitionEnumeration>
@@ -983,6 +1002,20 @@
 </Elements>
 </TypeDefinitionEnumeration>
 <TypeDefinitionEnumeration>
+<Identification>urn:smpte:ul:060e2b34.01040101.02010133.00000000</Identification>
+<Symbol>HEVCCodedContentType</Symbol>
+<Name>HEVCCodedContentType</Name>
+<ElementType>urn:smpte:ul:060e2b34.01040101.01010100.00000000</ElementType>
+<Elements>
+<Name>HEVCCodedContent_NotKnown</Name>
+<Value>0</Value>
+<Name>HEVCCodedContent_ProgressiveFramePicture</Name>
+<Value>1</Value>
+<Name>HEVCCodedContent_InterlacedFieldPicture</Name>
+<Value>2</Value>
+</Elements>
+</TypeDefinitionEnumeration>
+<TypeDefinitionEnumeration>
 <Identification>urn:smpte:ul:060e2b34.01040101.02010201.00000000</Identification>
 <Symbol>TIFFByteOrderType</Symbol>
 <Name>TIFFByteOrderType</Name>
@@ -1022,11 +1055,6 @@
 <Identification>urn:smpte:ul:060e2b34.01040101.02020101.00000000</Identification>
 <Symbol>OperationCategoryType</Symbol>
 <Name>OperationCategoryType</Name>
-</TypeDefinitionExtendibleEnumeration>
-<TypeDefinitionExtendibleEnumeration>
-<Identification>urn:smpte:ul:060e2b34.01040101.02020102.00000000</Identification>
-<Symbol>TransferCharacteristicType</Symbol>
-<Name>Transfer Characteristic Type</Name>
 </TypeDefinitionExtendibleEnumeration>
 <TypeDefinitionExtendibleEnumeration>
 <Identification>urn:smpte:ul:060e2b34.01040101.02020103.00000000</Identification>
@@ -1208,6 +1236,43 @@
 <Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
 </Members>
 </TypeDefinitionRecord>
+<TypeDefinitionRecord>
+<Identification>urn:smpte:ul:060e2b34.01040101.03010d00.00000000</Identification>
+<Symbol>J2KExtendedCapabilities</Symbol>
+<Name>JPEG 2000 Extended Capabilities</Name>
+<Members>
+<Name>Pcap</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<Name>Ccapi</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04011200.00000000</Type>
+</Members>
+</TypeDefinitionRecord>
+<TypeDefinitionRecord>
+<Identification>urn:smpte:ul:060e2b34.01040101.03010e00.00000000</Identification>
+<Symbol>AssetIntegrityHash</Symbol>
+<Name>Asset Integrity Hash</Name>
+<Members>
+<Name>AssetID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04011100.00000000</Type>
+<Name>AssetHash</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01030400.00000000</Type>
+</Members>
+</TypeDefinitionRecord>
+<TypeDefinitionRecord>
+<Identification>urn:smpte:ul:060e2b34.01040101.03010f00.00000000</Identification>
+<Symbol>CplValidation</Symbol>
+<Name>CPL Validation</Name>
+<Members>
+<Name>CPLID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04011100.00000000</Type>
+<Name>ErrorCode</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<Name>PermittedPlaybackStartTime</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010800.00000000</Type>
+<Name>ExpirationTime</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010800.00000000</Type>
+</Members>
+</TypeDefinitionRecord>
 <TypeDefinitionVariableArray>
 <Identification>urn:smpte:ul:060e2b34.01040101.04010100.00000000</Identification>
 <Symbol>UInt8Array</Symbol>
@@ -1325,6 +1390,12 @@
 <ElementType>urn:smpte:ul:060e2b34.01040101.01010200.00000000</ElementType>
 </TypeDefinitionVariableArray>
 <TypeDefinitionVariableArray>
+<Identification>urn:smpte:ul:060e2b34.01040101.04011300.00000000</Identification>
+<Symbol>HalfFloatArray</Symbol>
+<Name>HalfFloatArray</Name>
+<ElementType>urn:smpte:ul:060e2b34.01040101.01020300.00000000</ElementType>
+</TypeDefinitionVariableArray>
+<TypeDefinitionVariableArray>
 <Identification>urn:smpte:ul:060e2b34.01040101.04011400.00000000</Identification>
 <Symbol>VC2WaveletArray</Symbol>
 <Name>VC2 Wavelet Array</Name>
@@ -1422,6 +1493,24 @@
 <Name>ASMLEKeyIDMappingSet</Name>
 <ElementType>urn:smpte:ul:060e2b34.01040101.03010b00.00000000</ElementType>
 </TypeDefinitionSet>
+<TypeDefinitionSet>
+<Identification>urn:smpte:ul:060e2b34.01040101.04030500.00000000</Identification>
+<Symbol>AssetIntegrityHashSet</Symbol>
+<Name>AssetIntegrityHashSet</Name>
+<ElementType>urn:smpte:ul:060e2b34.01040101.03010e00.00000000</ElementType>
+</TypeDefinitionSet>
+<TypeDefinitionSet>
+<Identification>urn:smpte:ul:060e2b34.01040101.04030600.00000000</Identification>
+<Symbol>CplValidationSet</Symbol>
+<Name>CplValidationSet</Name>
+<ElementType>urn:smpte:ul:060e2b34.01040101.03010f00.00000000</ElementType>
+</TypeDefinitionSet>
+<TypeDefinitionSet>
+<Identification>urn:smpte:ul:060e2b34.01040101.04030700.00000000</Identification>
+<Symbol>DataEssenceCodingSet</Symbol>
+<Name>DataEssenceCodingSet</Name>
+<ElementType>urn:smpte:ul:060e2b34.01040101.04011100.00000000</ElementType>
+</TypeDefinitionSet>
 <TypeDefinitionVariableArray>
 <Identification>urn:smpte:ul:060e2b34.01040101.04100100.00000000</Identification>
 <Symbol>DataValue</Symbol>
@@ -1471,6 +1560,12 @@
 <Identification>urn:smpte:ul:060e2b34.01040101.04100a00.00000000</Identification>
 <Symbol>DeltaEntry</Symbol>
 <Name>DeltaEntry</Name>
+<RenamedType>urn:smpte:ul:060e2b34.01040101.04100100.00000000</RenamedType>
+</TypeDefinitionRename>
+<TypeDefinitionRename>
+<Identification>urn:smpte:ul:060e2b34.01040101.04100b00.00000000</Identification>
+<Symbol>ST2109PayloadSeries</Symbol>
+<Name>ST 2109 Payload Series</Name>
 <RenamedType>urn:smpte:ul:060e2b34.01040101.04100100.00000000</RenamedType>
 </TypeDefinitionRename>
 <TypeDefinitionWeakObjectReference>
@@ -2199,5 +2294,10 @@
 <ReferencedType>urn:smpte:ul:060e2b34.027f0101.0d010101.01014100</ReferencedType>
 <TargetSet/>
 </TypeDefinitionWeakObjectReference>
+<TypeDefinitionExtendibleEnumeration>
+<Identification>urn:smpte:ul:060e2b34.01040101.02020102.00000000</Identification>
+<Symbol>TransferCharacteristicType</Symbol>
+<Name>Transfer Characteristic Type</Name>
+</TypeDefinitionExtendibleEnumeration>
 </MetaDefinitions>
 </Extension>

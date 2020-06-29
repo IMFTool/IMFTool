@@ -317,7 +317,10 @@ Error MetadataExtractor::ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileI
 			TransferCharacteristic = cdci_descriptor->TransferCharacteristic; // (k)
 			ColorPrimaries = cdci_descriptor->ColorPrimaries; // (k)
 		}
-
+#ifdef CODEC_HTJ2K
+		if (metadata.pictureEssenceCoding.contains(SMPTE::J2K_ProfilesMapInverse[SMPTE::HTJ2KPictureCodingSchemeGeneric]))
+			metadata.type = Metadata::HTJ2K;
+#endif
 		// (k) - start
 		char buf[64];
 

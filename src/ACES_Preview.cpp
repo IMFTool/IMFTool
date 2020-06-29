@@ -47,8 +47,6 @@ void ACES_Preview::setUp() {
 void ACES_Preview::getProxy() {
 
 
-	mCpus = 1; // (default for proxys)
-
 	setAsset(); // initialize reader
 	QImage p1, p2;
 
@@ -289,19 +287,6 @@ QImage ACES::DataToQImage(quint8 rScale /* = 0 */, bool rShowDisplayWindow /* = 
 	// Clean up
 	if (pAcesIStream) pAcesIStream->~As02AcesIStream();
 	return image;
-}
-
-
-void ACES::info_callback(const char *mMsg, void *client_data) {
-	qDebug() << "INFO" << mMsg;
-}
-
-void ACES::warning_callback(const char *mMsg, void *client_data) {
-	qDebug() << "WARNING" << mMsg;
-}
-
-void ACES::error_callback(const char *mMsg, void *client_data) {
-	qDebug() << "ERROR" << mMsg;
 }
 
 Imf::Chromaticities ACES::aces_chromaticities = Chromaticities(V2f(0.7347f, 0.2653f), V2f(0.0f, 1.0f), V2f(0.0001f, -0.077f), V2f(0.32168f, 0.33767f));

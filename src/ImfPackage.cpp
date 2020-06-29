@@ -1437,6 +1437,9 @@ void AssetMxfTrack::SetDefaultProxyImages() {
 #ifdef APP5_ACES
 		case Metadata::Aces:
 #endif
+#ifdef CODEC_HTJ2K
+		case Metadata::HTJ2K:
+#endif
 		case Metadata::Jpeg2000:
 		case Metadata::ProRes:
 			mFirstProxyImage = QImage(":/proxy_film.png");
