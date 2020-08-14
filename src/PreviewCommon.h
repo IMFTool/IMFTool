@@ -53,11 +53,14 @@ protected:
 	float *eotf_HLG;
 	float *eotf_sRGB;
 	quint16 *eotf_DCDM;
+	quint16 *eotf_PQi;
+	quint16 *eotf_2020i;
+	quint16 *eotf_HLGi;
 	quint8 *oetf_709i;
 
 	// data to qimage
 	int w=0, h=0, xpos=0, buff_pos=0, x=0, y=0, bytes_per_line=0;
-	qint32 out_ri=0, out_gi=0, out_bi=0, cv_x=0, cv_y=0, cv_z=0;
+	qint32 out_ri=0, out_gi=0, out_bi=0, cv_comp1=0, cv_comp2=0, cv_comp3=0;
 	float Y=0, Cb=0, Cr=0, r=0, g=0, b=0, out_r=0, out_g=0, out_b=0, out_r8=0, out_g8=0, out_b8=0;
 
 	// info methods

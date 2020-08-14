@@ -132,7 +132,7 @@ private:
 #ifdef CODEC_HTJ2K
 	QThread *mpHTJ2KPlayerThread;
 #endif
-	eImfApplications mImfApplication = ::App2;
+	eImfApplications mImfApplication = ::App2e;
 	int current_playlist_index = 0; // frame indicator position within the playlisqt
 	QVector<VideoResource> currentPlaylist; // playlist ressources
 	bool setFrameIndicator = false; // ignore next signal xPosChanged?

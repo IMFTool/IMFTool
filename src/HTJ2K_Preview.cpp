@@ -18,7 +18,7 @@
 #include <QTime>
 #include "AS_DCP_internal.h"
 
-//#define DEBUG_HT
+#define DEBUG_HT
 
 // timeline preview constructor
 HTJ2K_Preview::HTJ2K_Preview() {
@@ -114,6 +114,8 @@ void HTJ2K_Preview::setAsset() {
 		ColorEncoding = asset->GetMetadata().colorEncoding;
 
 		src_bitdepth = asset->GetMetadata().componentDepth;
+		ComponentMinRef = asset->GetMetadata().componentMinRef;
+		ComponentMaxRef = asset->GetMetadata().componentMaxRef;
 
 		prec_shift = src_bitdepth - 8;
 		max = (1 << src_bitdepth) - 1;
@@ -236,11 +238,9 @@ bool HTJ2K::decodeImage() {
 	ojph::param_siz siz = mpCodestream->access_siz();
 	w = siz.get_recon_width(0);
     h = siz.get_recon_height(0);
-    QImage myImage = QImage(siz.get_recon_width(0), siz.get_recon_height(0), QImage::Format_RGB888); // create image
     mpOutBuf[0] = new ojph::ui16[w * h]; // For X component
     mpOutBuf[1] = new ojph::ui16[w * h]; // For Y component
     mpOutBuf[2] = new ojph::ui16[w * h]; // For Z component
-	for (int i = 0; i < w * h; i++) { mpOutBuf[0][i] = 1000; mpOutBuf[1][i] = 2000; mpOutBuf[2][i] = 3000; }
 	
 	mpCodestream->create();
 	mpCodestream->set_planar(false);
@@ -277,14 +277,12 @@ bool HTJ2K::decodeImage() {
         	err = true;
         	return false;
         }
-        int bit_depth = 12;
-        int max_val = (1<<bit_depth) - 1;
         const ojph::si32 *sp = line->i32;
         for (int ii = 0; ii < w; ii++)
         {
           int val = *sp++;
           val = val >= 0 ? val : 0; //decoded image may contain negative values, when layers are skipped
-          val = val <= max_val ? val : max_val;
+          val = val <= max ? val : max;
           mpOutBuf[c][i*w + ii] = (ojph::ui16)val;
         }
 
@@ -314,7 +312,6 @@ QImage HTJ2K::DataToQImage()
 
 	int offset = 16 << (src_bitdepth - 8);
 	int maxcv = (1 << src_bitdepth) - 1;
-	int maxcv_plus_1 = maxcv + 1;
 	if (convert_to_709) {
 
 		for (y = 0; y < h; y++) {
@@ -322,17 +319,30 @@ QImage HTJ2K::DataToQImage()
 
 				switch (ColorEncoding) {
 				case Metadata::RGBA:
+					xpos = (y*w + x);
+					// get three color components
+					cv_comp1 = mpOutBuf[0][xpos];
+					cv_comp2 = mpOutBuf[1][xpos];
+					cv_comp3 = mpOutBuf[2][xpos];
 
-					xpos = (y*w + x); // don't calculate 3 times
+					// clamp values between 0...maxcv
+					if (cv_comp1 < 0) cv_comp1 = 0; else if (cv_comp1 > maxcv) cv_comp1 = maxcv;
+					if (cv_comp2 < 0) cv_comp2 = 0; else if (cv_comp2 > maxcv) cv_comp2 = maxcv;
+					if (cv_comp3 < 0) cv_comp3 = 0; else if (cv_comp3 > maxcv) cv_comp3 = maxcv;
 
-					// get XYZ
-					cv_x = mpOutBuf[0][xpos];
-					cv_y = mpOutBuf[1][xpos];
-					cv_z = mpOutBuf[2][xpos];
-					// clamp values between 0...4095
-					if (cv_x < 0) cv_x = 0; else if (cv_x > 4095) cv_x = 4095;
-					if (cv_y < 0) cv_y = 0; else if (cv_y > 4095) cv_y = 4095;
-					if (cv_z < 0) cv_z = 0; else if (cv_z > 4095) cv_z = 4095;
+					// Scale to full range 16 bit
+					if (ComponentMinRef != 0) { //offset compensation for legal range signals
+						cv_comp1 -= ComponentMinRef;
+						cv_comp2 -= ComponentMinRef;
+						cv_comp3 -= ComponentMinRef;
+						cv_comp1 *= (max_f -1) / (ComponentMaxRef - ComponentMinRef);
+						cv_comp2 *= (max_f -1) / (ComponentMaxRef - ComponentMinRef);
+						cv_comp3 *= (max_f -1) / (ComponentMaxRef - ComponentMinRef);
+					} else { // faster for full scale input
+						cv_comp1 = cv_comp1 << (bitdepth - src_bitdepth);
+						cv_comp2 = cv_comp2 << (bitdepth - src_bitdepth);
+						cv_comp3 = cv_comp3 << (bitdepth - src_bitdepth);
+					}
 
 					break;
 				case Metadata::CDCI:
@@ -344,14 +354,43 @@ QImage HTJ2K::DataToQImage()
 
 				// linearize XYZ data
 				switch (transferCharacteristics) {
+
 				case SMPTE::TransferCharacteristic_CinemaMezzanineDCDM:
 				case SMPTE::TransferCharacteristic_CinemaMezzanineDCDM_Wrong:
-					cv_x = eotf_DCDM[cv_x]; // convert to 16 bit linear
-					cv_y = eotf_DCDM[cv_y]; // convert to 16 bit linear
-					cv_z = eotf_DCDM[cv_z]; // convert to 16 bit linear
-
+					cv_comp1 = eotf_DCDM[cv_comp1]; // convert to 16 bit linear
+					cv_comp2 = eotf_DCDM[cv_comp2]; // convert to 16 bit linear
+					cv_comp3 = eotf_DCDM[cv_comp3]; // convert to 16 bit linear
 					break;
+
 				case SMPTE::TransferCharacteristic_CinemaMezzanineLinear:
+					break;
+
+				case SMPTE::TransferCharacteristic_SMPTEST2084:
+					cv_comp1 = eotf_PQi[cv_comp1]; // convert to 16 bit linear, scale by 100 such that 100 nits correspond to 65535
+					cv_comp2 = eotf_PQi[cv_comp2]; // convert to 16 bit linear
+					cv_comp3 = eotf_PQi[cv_comp3]; // convert to 16 bit linear
+					cv_comp1 *= 100;
+					cv_comp2 *= 100;
+					cv_comp3 *= 100;
+					// clamp values between 0...maxcv
+					if (cv_comp1 < 0) cv_comp1 = 0; else if (cv_comp1 >= max_f) cv_comp1 = max_f - 1;
+					if (cv_comp2 < 0) cv_comp2 = 0; else if (cv_comp2 >= max_f) cv_comp2 = max_f - 1;
+					if (cv_comp3 < 0) cv_comp3 = 0; else if (cv_comp3 >= max_f) cv_comp3 = max_f - 1;
+					break;
+
+				case SMPTE::TransferCharacteristic_ITU2020:
+					cv_comp1 = eotf_2020i[cv_comp1]; // convert to 16 bit linear
+					cv_comp2 = eotf_2020i[cv_comp2]; // convert to 16 bit linear
+					cv_comp3 = eotf_2020i[cv_comp3]; // convert to 16 bit linear
+					break;
+
+				case SMPTE::TransferCharacteristic_HLG_OETF:
+					cv_comp1 = eotf_HLGi[cv_comp1]; // convert to 16 bit linear
+					cv_comp2 = eotf_HLGi[cv_comp2]; // convert to 16 bit linear
+					cv_comp3 = eotf_HLGi[cv_comp3]; // convert to 16 bit linear
+					break;
+
+				case SMPTE::TransferCharacteristic_ITU709:
 					break;
 
 				default:
@@ -361,11 +400,23 @@ QImage HTJ2K::DataToQImage()
 
 				switch (colorPrimaries) {
 				case SMPTE::ColorPrimaries_CinemaMezzanine:
-
 					// convert from XYZ -> BT.709, matrix coefficients are scaled by 1024 to allow for integer processing
-					out_ri = cv_x*3319 + cv_y*-1574 + cv_z*-511;
-					out_gi = cv_x*-992 + cv_y*1921 + cv_z*43;
-					out_bi = cv_x*57  + cv_y*-209 + cv_z*1082;
+					out_ri = cv_comp1*3319 + cv_comp2*-1574 + cv_comp3*-511;
+					out_gi = cv_comp1*-993 + cv_comp2*1921 + cv_comp3*43;
+					out_bi = cv_comp1*57  + cv_comp2*-209 + cv_comp3*1082;
+					break;
+
+				case SMPTE::ColorPrimaries_ITU2020:
+					// convert from BT.2020 -> BT.709, matrix coefficients are scaled by 1024 to allow for integer processing (CV 655 = 100 nits, CV 65535 = 10,000 nits)
+					out_ri = cv_comp1*1700 + cv_comp2*-602 + cv_comp3*-75;
+					out_gi = cv_comp1*-128 + cv_comp2*1160 + cv_comp3*-9;
+					out_bi = cv_comp1*-19  + cv_comp2*-103 + cv_comp3*1146;
+					break;
+
+				case SMPTE::ColorPrimaries_ITU709:
+					out_ri = cv_comp1 << 10;
+					out_gi = cv_comp2 << 10;
+					out_bi = cv_comp3 << 10;
 					break;
 
 				default:
@@ -373,17 +424,17 @@ QImage HTJ2K::DataToQImage()
 					return QImage(":/frame_error.png"); // abort!
 				}
 
-				// convert back to 16 bit
+				// convert back to a 16 bit representation
 				out_ri = out_ri >> 10;
 				out_gi = out_gi >> 10;
 				out_bi = out_bi >> 10;
 
 				// clamp values between 0...65535
-				if (out_ri < 0) out_ri = 0;	else if (out_ri > 65535) out_ri = 65535;
-				if (out_gi < 0) out_gi = 0;	else if (out_gi > 65535) out_gi = 65535;
-				if (out_bi < 0) out_bi = 0;	else if (out_bi > 65535) out_bi = 65535;
+				if (out_ri < 0) out_ri = 0;	else if (out_ri >= max_f) out_ri = max_f - 1;
+				if (out_gi < 0) out_gi = 0;	else if (out_gi >= max_f) out_gi = max_f - 1;
+				if (out_bi < 0) out_bi = 0;	else if (out_bi >= max_f) out_bi = max_f - 1;
 
-				//convert to 709
+				//apply 709 OETF
 				out_r8 = oetf_709i[out_ri];
 				out_g8 = oetf_709i[out_gi];
 				out_b8 = oetf_709i[out_bi];

@@ -359,7 +359,7 @@ void WidgetVideoPreview::stopPlayback(bool clicked) {
 		mpACESPlayer->clean();
 #endif
 #ifdef CODEC_HTJ2K
-	else if (mImfApplication == ::App4DCDM_HTJ2K)
+	else if ((mImfApplication == ::App4DCDM_HTJ2K) || (mImfApplication == ::App2e_HTJ2K))
 		mpHTJ2KPlayer->clean();
 #endif
 	if (currentPlaylist.length() > 0) player->setPos(currentPlaylist[0].in, 0, 0);
@@ -373,7 +373,7 @@ void WidgetVideoPreview::stopPlayback(bool clicked) {
 	}
 #endif
 #ifdef CODEC_HTJ2K
-	else if (mImfApplication == ::App4DCDM_HTJ2K) {
+	else if ((mImfApplication == ::App4DCDM_HTJ2K) || (mImfApplication == ::App2e_HTJ2K)) {
 		if (mpHTJ2KPlayerThread->isRunning()) mpHTJ2KPlayerThread->quit();
 	}
 #endif
@@ -392,7 +392,7 @@ void WidgetVideoPreview::stopPlayback(bool clicked) {
 	}
 #endif
 #ifdef CODEC_HTJ2K
-	else if (mImfApplication == ::App4DCDM_HTJ2K) {
+	else if ((mImfApplication == ::App4DCDM_HTJ2K) || (mImfApplication == ::App2e_HTJ2K)) {
 		if (mpHTJ2KDecodingThreads[0]->isRunning()) mpHTJ2KDecodingThreads[0]->quit();
 		if (mpHTJ2KDecodingThreads[1]->isRunning()) mpHTJ2KDecodingThreads[1]->quit();
 	}
@@ -443,7 +443,7 @@ void WidgetVideoPreview::rShowMsgBox(const QString &msg, int new_fps) {
 		}
 #endif
 #ifdef CODEC_HTJ2K
-		else if (mImfApplication == ::App4DCDM_HTJ2K) {
+		else if ((mImfApplication == ::App4DCDM_HTJ2K) || (mImfApplication == ::App2e_HTJ2K)){
 			mpHTJ2KPlayer->setFps(new_fps); // set new framreate in player
 			mpHTJ2KPlayerThread->start(QThread::TimeCriticalPriority); // resume playback
 		}
@@ -463,7 +463,7 @@ void WidgetVideoPreview::rPlaybackEnded() {
 	}
 #endif
 #ifdef CODEC_HTJ2K
-	else if (mImfApplication == ::App4DCDM_HTJ2K) {
+	else if ((mImfApplication == ::App4DCDM_HTJ2K) || (mImfApplication == ::App2e_HTJ2K)) {
 		if(mpHTJ2KPlayerThread->isRunning()) mpHTJ2KPlayerThread->quit();
 	}
 #endif
@@ -581,7 +581,7 @@ void WidgetVideoPreview::xPosChanged(const QSharedPointer<AssetMxfTrack> &rAsset
 		}
 #endif
 #ifdef CODEC_HTJ2K
-		else if (mImfApplication == ::App4DCDM_HTJ2K) {
+		else if ((mImfApplication == ::App4DCDM_HTJ2K) || (mImfApplication == ::App2e_HTJ2K)) {
 			mpHTJ2KPlayer->setPos(xSliderFrame, xSliderTotal, playlist_index); // set current frame in player
 			// Terminate running decodes
 			if (mpHTJ2KDecodingThreads[0]->isRunning()) mpHTJ2KDecodingThreads[0]->quit();
@@ -659,7 +659,7 @@ void WidgetVideoPreview::decodingStatus(qint64 frameNr,QString status) {
 		}
 #endif
 #ifdef CODEC_HTJ2K
-		else if (mImfApplication == ::App4DCDM_HTJ2K) {
+		else if ((mImfApplication == ::App4DCDM_HTJ2K) || (mImfApplication == ::App2e_HTJ2K)) {
 			mpHTJ2KDecoders[run]->asset = currentAsset; // set new asset in current decoder
 			//decoders[run]->frameNr = xSliderFrame; // set frame number in decoder
 			mpHTJ2KDecoders[run]->mFrameNr = vr.in + (xSliderFrame - vr.in) % vr.Duration; // set current frame number in decoder
@@ -743,7 +743,7 @@ void WidgetVideoPreview::rPlayPauseButtonClicked(bool checked) {
 	}
 #endif
 #ifdef CODEC_HTJ2K
-	else if (mImfApplication == ::App4DCDM_HTJ2K) {
+	else if ((mImfApplication == ::App4DCDM_HTJ2K) || (mImfApplication == ::App2e_HTJ2K)) {
 		if (mpHTJ2KPlayerThread->isRunning() && mpHTJ2KPlayer->playing) { // pause playback
 
 			mpHTJ2KPlayer->playing = false;
@@ -825,6 +825,17 @@ void WidgetVideoPreview::setPlaylist(QVector<VideoResource> &rPlayList, QVector<
 
 	ttmls = &rTTMLs; // set timed text elements
 	currentPlaylist = rPlayList; // set playlist
+#ifdef CODEC_HTJ2K
+	if (! currentPlaylist.isEmpty() && !currentPlaylist.first().asset.isNull()) {
+		if (currentPlaylist.first().asset->GetEssenceType() == Metadata::HTJ2K) {
+			if (mImfApplication == ::App2e)
+				setApplication(::App2e_HTJ2K);
+	} else {
+		mImfApplication = ::App2e; // default
+	}
+}
+
+#endif
 	if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4))
 		player->setPlaylist(rPlayList); // set playlist in player
 #ifdef APP5_ACES
@@ -832,7 +843,7 @@ void WidgetVideoPreview::setPlaylist(QVector<VideoResource> &rPlayList, QVector<
 		mpACESPlayer->setPlaylist(rPlayList); // set playlist in player
 #endif
 #ifdef CODEC_HTJ2K
-	else if (mImfApplication == ::App4DCDM_HTJ2K)
+	else if ((mImfApplication == ::App4DCDM_HTJ2K) || (mImfApplication == ::App2e_HTJ2K))
 		mpHTJ2KPlayer->setPlaylist(rPlayList); // set playlist in player
 #endif
 	current_playlist_index = 0; // set to first item in playlist 
@@ -893,7 +904,7 @@ void WidgetVideoPreview::setPlaylist(QVector<VideoResource> &rPlayList, QVector<
 		}
 #endif
 #ifdef CODEC_HTJ2K
-		else if (mImfApplication == ::App4DCDM_HTJ2K) {
+		else if ((mImfApplication == ::App4DCDM_HTJ2K) || (mImfApplication == ::App2e_HTJ2K)) {
 			mpHTJ2KDecoders[0]->asset = currentAsset; // set new asset in decoder 1
 			mpHTJ2KDecoders[1]->asset = currentAsset; // set new asset in decoder 2
 			mpHTJ2KDecoders[(int)(now_running)]->mFrameNr = rPlayList[0].in; // set first frame
@@ -912,7 +923,7 @@ void WidgetVideoPreview::setPlaylist(QVector<VideoResource> &rPlayList, QVector<
 			mpACESPlayer->setPos(rPlayList.at(0).in, xSliderTotal, current_playlist_index); // set current frame in player
 #endif
 #ifdef CODEC_HTJ2K
-		else if (mImfApplication == ::App4DCDM_HTJ2K)
+		else if ((mImfApplication == ::App4DCDM_HTJ2K) || (mImfApplication == ::App2e_HTJ2K))
 			mpHTJ2KPlayer->setPos(rPlayList.at(0).in, xSliderTotal, current_playlist_index); // set current frame in player
 #endif
 	}
@@ -1021,7 +1032,7 @@ void WidgetVideoPreview::rChangeQuality(QAction *action) {
 		}
 #endif
 #ifdef CODEC_HTJ2K
-		else if (mImfApplication == ::App4DCDM_HTJ2K) {
+		else if ((mImfApplication == ::App4DCDM_HTJ2K) || (mImfApplication == ::App2e_HTJ2K)) {
 			mpHTJ2KPlayer->setLayer(decode_layer);
 			mpHTJ2KDecoders[0]->setLayer(decode_layer);
 			mpHTJ2KDecoders[1]->setLayer(decode_layer);
@@ -1048,7 +1059,7 @@ void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 		player_playing = mpACESPlayer->playing;
 #endif
 #ifdef CODEC_HTJ2K
-	else if (mImfApplication == ::App4DCDM_HTJ2K)
+	else if ((mImfApplication == ::App4DCDM_HTJ2K) || (mImfApplication == ::App2e_HTJ2K))
 		player_playing = mpHTJ2KPlayer->playing;
 #endif
 
@@ -1132,7 +1143,7 @@ void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 		}
 #endif
 #ifdef CODEC_HTJ2K
-		else if (mImfApplication == ::App4DCDM_HTJ2K) {
+		else if ((mImfApplication == ::App4DCDM_HTJ2K) || (mImfApplication == ::App2e_HTJ2K)) {
 			mpHTJ2KPlayer->show_subtitles = action->isChecked();
 			if (!mpHTJ2KPlayer->show_subtitles) {
 				emit ttmlChanged(QVector<visibleTTtrack>(), ttml_search_time.elapsed()); // clear subtitle preview
@@ -1165,7 +1176,7 @@ void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 		}
 #endif
 #ifdef CODEC_HTJ2K
-		else if (mImfApplication == ::App4DCDM_HTJ2K) {
+		else if ((mImfApplication == ::App4DCDM_HTJ2K) || (mImfApplication == ::App2e_HTJ2K)) {
 			if(mpHTJ2KPlayerThread->isRunning()) mpHTJ2KPlayerThread->quit();
 			mpHTJ2KPlayer->realspeed = action->isChecked();
 			mpHTJ2KPlayer->clean();
@@ -1178,14 +1189,14 @@ void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 #endif
 		break;
 	case 6: // color space conversion
-		if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4) || (mImfApplication == ::App4DCDM_HTJ2K)) {
+		if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4) || (mImfApplication == ::App4DCDM_HTJ2K) || (mImfApplication == ::App2e_HTJ2K)) {
 			if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4)) {
 				decoders[0]->convert_to_709 = action->isChecked(); // set in decoder 0
 				decoders[1]->convert_to_709 = action->isChecked(); // set in decoder 1
 				player->convert_to_709(action->isChecked()); // set in player
 			}
 #ifdef CODEC_HTJ2K
-			else if (mImfApplication == ::App4DCDM_HTJ2K) {
+			else if ((mImfApplication == ::App4DCDM_HTJ2K) || (mImfApplication == ::App2e_HTJ2K)) {
 				mpHTJ2KDecoders[0]->convert_to_709 = action->isChecked(); // set in decoder 0
 				mpHTJ2KDecoders[1]->convert_to_709 = action->isChecked(); // set in decoder 1
 				mpHTJ2KPlayer->convert_to_709(action->isChecked());
@@ -1194,7 +1205,7 @@ void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 			if (!player_playing) {
 				decoding_time->setText("loading...");
 				now_running = !now_running; // use same decoder (relevant frame is still set)
-				if (mImfApplication == ::App4DCDM_HTJ2K) {
+				if ((mImfApplication == ::App4DCDM_HTJ2K) || (mImfApplication == ::App2e_HTJ2K)) {
 #ifdef CODEC_HTJ2K
 					mpHTJ2KDecodingThreads[(int)(now_running)]->start(QThread::HighestPriority); // start decoder (again)
 #endif

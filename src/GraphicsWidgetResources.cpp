@@ -769,7 +769,7 @@ void GraphicsWidgetVideoResource::restartThread(QSharedPointer<AssetMxfTrack> rA
 #ifdef CODEC_HTJ2K
 		case Metadata::HTJ2K:
 			if (mAssset->GetMetadata().colorPrimaries == SMPTE::ColorPrimaries_CinemaMezzanine) mImfApplication = ::App4DCDM_HTJ2K;
-			else mImfApplication = ::App2e;
+			else mImfApplication = ::App2e_HTJ2K;
 			break;
 #endif
 
@@ -807,7 +807,7 @@ void GraphicsWidgetVideoResource::restartThread(QSharedPointer<AssetMxfTrack> rA
 	}
 #endif
 #ifdef CODEC_HTJ2K
-	else if (mImfApplication == ::App4DCDM_HTJ2K) {
+	else if ((mImfApplication == ::App4DCDM_HTJ2K) || (mImfApplication == ::App2e_HTJ2K)) {
 		mpHTJ2K = new HTJ2K_Preview(); // (k)
 		mpHTJ2K->asset = rAsset; // (k)
 
@@ -1048,7 +1048,7 @@ void GraphicsWidgetVideoResource::RefreshProxy() {
 	}
 #endif
 #ifdef CODEC_HTJ2K
-	else if (mImfApplication == ::App4DCDM_HTJ2K) {
+	else if ((mImfApplication == ::App4DCDM_HTJ2K) || (mImfApplication == ::App2e_HTJ2K)) {
 		// first proxy
 		Timecode first_frame = GetFirstVisibleFrame();
 		mpHTJ2K->mFirst_proxy = first_frame.GetTargetFrame(); // set frame number
