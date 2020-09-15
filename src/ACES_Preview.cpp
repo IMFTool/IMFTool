@@ -276,9 +276,9 @@ QImage ACES::DataToQImage(quint8 rScale /* = 0 */, bool rShowDisplayWindow /* = 
 			r = max_f_*vec3out[0]; if (r>=max_f) r = max_f - 1; if (r<0) r = 0;
 			g = max_f_*vec3out[1]; if (g>=max_f) g = max_f - 1; if (g<0) g = 0;
 			b = max_f_*vec3out[2]; if (b>=max_f) b = max_f - 1; if (b<0) b = 0;
-			r = oetf_709[r] * 255.0;
-			g = oetf_709[g] * 255.0;
-			b = oetf_709[b] * 255.0;
+			r = oetf_709[r];
+			g = oetf_709[g];
+			b = oetf_709[b];
 			image.setPixelColor(x, y, QColor(r,g,b));
 		}
 	}

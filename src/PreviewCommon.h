@@ -27,6 +27,7 @@ public:
 
 	// Values are set when opening a new asset:
 	int src_bitdepth = 0, prec_shift = 0, max = 0, layer = 3;
+	int offset_y = 0, range_y = 0, range_c = 0;
 
 	// enable conversion? (much slower!!)
 	bool convert_to_709 = true; // default
@@ -34,7 +35,7 @@ public:
 	Metadata::eColorEncoding ColorEncoding = Metadata::eColorEncoding::Unknown_Color_Encoding; // YCbCr or RGB
 	SMPTE::eColorPrimaries colorPrimaries = SMPTE::eColorPrimaries::ColorPrimaries_UNKNOWN; // BT.709 / BT.2020 / DCI-P3
 	SMPTE::eTransferCharacteristic transferCharacteristics = SMPTE::eTransferCharacteristic::TransferCharacteristic_UNKNOWN; // BT.709 / BT.2020 / PQ
-	float Kb = 0, Kr = 0, Kg = 0; // YCbCr -> RGB (depending on BT.709 or BT.2020)
+	qint16 Kb = 0, Kr = 0, Kg = 0, Kbg = 0, Krg = 0; // YCbCr -> RGB parameters (depending on BT.709 or BT.2020)
 
 	QSharedPointer<AssetMxfTrack> current_asset; // pointer to current asset
 
@@ -44,24 +45,24 @@ public:
 protected:
 	// luts
 	static const int bitdepth = 16; // lookup table size (default: 16 bit)
-	static const int bitdepth_dcdm = 12;
 	int max_f; // (float)pow(2, bitdepth)
 	float max_f_; // max_f - 1;
-	float *oetf_709;
-	float *eotf_2020;
-	float *eotf_PQ;
-	float *eotf_HLG;
-	float *eotf_sRGB;
+
 	quint16 *eotf_DCDM;
-	quint16 *eotf_PQi;
-	quint16 *eotf_2020i;
-	quint16 *eotf_HLGi;
-	quint8 *oetf_709i;
+	quint16 *eotf_PQ;
+	quint16 *eotf_2020;
+	quint32 *eotf_HLG;
+	quint8 *oetf_709;
 
 	// data to qimage
-	int w=0, h=0, xpos=0, buff_pos=0, x=0, y=0, bytes_per_line=0;
-	qint32 out_ri=0, out_gi=0, out_bi=0, cv_comp1=0, cv_comp2=0, cv_comp3=0;
-	float Y=0, Cb=0, Cr=0, r=0, g=0, b=0, out_r=0, out_g=0, out_b=0, out_r8=0, out_g8=0, out_b8=0;
+	int w=0, h=0, xpos=0, buff_pos=0, x=0, y=0, bytes_per_line=0, index_422=0;
+	qint32 out_ri=0, out_gi=0, out_bi=0;
+	qint32 cv_comp1=0, cv_comp2=0, cv_comp3=0;
+	qint32 cv_compY=0, cv_compCb=0, cv_compCr=0;
+
+	bool linearize();
+	bool colorTransform();
+	bool setCodingParameters();
 
 	// info methods
 	static void info_callback(const char *msg, void *data);

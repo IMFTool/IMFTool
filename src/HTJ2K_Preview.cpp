@@ -18,7 +18,7 @@
 #include <QTime>
 #include "AS_DCP_internal.h"
 
-#define DEBUG_HT
+//#define DEBUG_HT
 
 // timeline preview constructor
 HTJ2K_Preview::HTJ2K_Preview() {
@@ -117,9 +117,10 @@ void HTJ2K_Preview::setAsset() {
 		ComponentMinRef = asset->GetMetadata().componentMinRef;
 		ComponentMaxRef = asset->GetMetadata().componentMaxRef;
 
-		prec_shift = src_bitdepth - 8;
-		max = (1 << src_bitdepth) - 1;
-
+		if (setCodingParameters() == false ) {
+			mMsg = "Unknown color encoding"; // ERROR
+			err = true;
+		}
 
 		if (mMxf_path != "") { // close old asset/reader
 			reader->Close();
@@ -243,50 +244,103 @@ bool HTJ2K::decodeImage() {
     mpOutBuf[2] = new ojph::ui16[w * h]; // For Z component
 	
 	mpCodestream->create();
-	mpCodestream->set_planar(false);
 
     if (siz.get_num_components() != 3) {
-        qDebug() << "HTJ2K: Number of components is " << QString::number(siz.get_num_components());
-    	mMsg = "HTJ2K: Number of components is " + QString::number(siz.get_num_components());
-    	err = true;
-    	return false;
+		qDebug() << "HTJ2K: Number of components is " << QString::number(siz.get_num_components());
+		mMsg = "HTJ2K: Number of components is " + QString::number(siz.get_num_components());
+		err = true;
+		return false;
     }
-	bool all_same = true;
-    ojph::point p = siz.get_downsampling(0);
-    for (int i = 1; i < siz.get_num_components(); ++i)
-    {
-      ojph::point p1 = siz.get_downsampling(i);
-      all_same = all_same && (p1.x == p.x) && (p1.y == p.y);
+	bool is_444 = true;
+	bool is_422 = true;
+	ojph::point p = siz.get_downsampling(0);
+	for (int i = 1; i < siz.get_num_components(); ++i) {
+		ojph::point p1 = siz.get_downsampling(i);
+		is_444 = is_444 && (p1.x == p.x) && (p1.y == p.y);
+		is_422 = is_422 && (p1.x == 2 * p.x) && (p1.y == p.y);
     }
-	if (!all_same) {
-        qDebug() << "HTJ2K: components do not have identical downsampling ratios";
-    	mMsg = "HTJ2K: components do not have identical downsampling ratios";
-    	err = true;
-    	return false;
-    }
+	if (is_444) {
+    	mpCodestream->set_planar(false);
+	} else if(is_422) {
+    	mpCodestream->set_planar(true);
+	} else {
+		qDebug() << "HTJ2K: Only 4:2:2 or 4:4:4 are supported!";
+		mMsg = "HTJ2K: Only 4:2:2 or 4:4:4 are supported!";
+		err = true;
+		return false;
+	}
 
-    for (int i = 0; i < h; ++i)
-    {
-      for (int c = 0; c < siz.get_num_components(); ++c)
-      {
-        int comp_num;
-        ojph::line_buf *line = mpCodestream->pull(comp_num);
-        if (comp_num != c) {
-        	mMsg = "Error during decoding";
-        	qDebug() << "Error during decoding";
-        	err = true;
-        	return false;
-        }
-        const ojph::si32 *sp = line->i32;
-        for (int ii = 0; ii < w; ii++)
-        {
-          int val = *sp++;
-          val = val >= 0 ? val : 0; //decoded image may contain negative values, when layers are skipped
-          val = val <= max ? val : max;
-          mpOutBuf[c][i*w + ii] = (ojph::ui16)val;
-        }
-
-      }
+    if (mpCodestream->is_planar()) {
+		ojph::param_siz siz = mpCodestream->access_siz();
+#ifdef DEBUG_HT
+		qDebug() << src_bitdepth << max << w << h;
+#endif
+		for (int c = 0; c < siz.get_num_components(); ++c) {
+			for (int i = 0; i < h; ++i) {
+				try {
+					int comp_num;
+					ojph::line_buf *line = mpCodestream->pull(comp_num);
+					if (comp_num != c) {
+						mMsg = "Error during decoding";
+						qDebug() << "Error during decoding";
+						err = true;
+						return false;
+					}
+					const ojph::si32 *sp = line->i32;
+					if (c == 0) {
+						for (int ii = 0; ii < w; ii++) {
+							int val = *sp++;
+							val = val >= 0 ? val : 0; //decoded image may contain negative values, when layers are skipped
+							val = val <= max ? val : max;
+							mpOutBuf[c][i*w + ii] = (ojph::ui16)val;
+						}
+					} else {
+						for (int ii = 0; ii < w/2; ii++) {
+							int val = *sp++;
+							val = val >= 0 ? val : 0; //decoded image may contain negative values, when layers are skipped
+							val = val <= max ? val : max;
+							mpOutBuf[c][i*w + 2*ii] = (ojph::ui16)val;
+							mpOutBuf[c][i*w + 2*ii + 1] = (ojph::ui16)val;
+						}
+					}
+				}
+				catch (const std::exception& e) {
+					qDebug() << "OpenJPH exception caught!";
+					if (e.what()) qDebug() << e.what();
+					err = true;
+					return false;
+				}
+			}
+		}
+    }
+    else {
+		for (int i = 0; i < h; ++i)	{
+			for (int c = 0; c < siz.get_num_components(); ++c) {
+				try {
+					int comp_num;
+					ojph::line_buf *line = mpCodestream->pull(comp_num);
+					if (comp_num != c) {
+						mMsg = "Error during decoding";
+						qDebug() << "Error during decoding";
+						err = true;
+						return false;
+					}
+					const ojph::si32 *sp = line->i32;
+					for (int ii = 0; ii < w; ii++) {
+						int val = *sp++;
+						val = val >= 0 ? val : 0; //decoded image may contain negative values, when layers are skipped
+						val = val <= max ? val : max;
+						mpOutBuf[c][i*w + ii] = (ojph::ui16)val;
+					}
+				}
+				catch (const std::exception& e) {
+					qDebug() << "OpenJPH exception caught!";
+					if (e.what()) qDebug() << e.what();
+					err = true;
+					return false;
+				}
+			}
+		}
     }
     mpMemBuf->close();
     mpCodestream->close();
@@ -310,25 +364,17 @@ QImage HTJ2K::DataToQImage()
 	bytes_per_line = w * 3;
 	img_buff = new unsigned char[bytes_per_line];
 
-	int offset = 16 << (src_bitdepth - 8);
-	int maxcv = (1 << src_bitdepth) - 1;
 	if (convert_to_709) {
 
 		for (y = 0; y < h; y++) {
 			for (x = 0; x < w; x++) {
-
+				xpos = (y*w + x);
 				switch (ColorEncoding) {
 				case Metadata::RGBA:
-					xpos = (y*w + x);
 					// get three color components
 					cv_comp1 = mpOutBuf[0][xpos];
 					cv_comp2 = mpOutBuf[1][xpos];
 					cv_comp3 = mpOutBuf[2][xpos];
-
-					// clamp values between 0...maxcv
-					if (cv_comp1 < 0) cv_comp1 = 0; else if (cv_comp1 > maxcv) cv_comp1 = maxcv;
-					if (cv_comp2 < 0) cv_comp2 = 0; else if (cv_comp2 > maxcv) cv_comp2 = maxcv;
-					if (cv_comp3 < 0) cv_comp3 = 0; else if (cv_comp3 > maxcv) cv_comp3 = maxcv;
 
 					// Scale to full range 16 bit
 					if (ComponentMinRef != 0) { //offset compensation for legal range signals
@@ -338,112 +384,73 @@ QImage HTJ2K::DataToQImage()
 						cv_comp1 *= (max_f -1) / (ComponentMaxRef - ComponentMinRef);
 						cv_comp2 *= (max_f -1) / (ComponentMaxRef - ComponentMinRef);
 						cv_comp3 *= (max_f -1) / (ComponentMaxRef - ComponentMinRef);
+						if (cv_comp1 < 0) cv_comp1 = 0; else if (cv_comp1 >= max_f) cv_comp1 = max_f - 1;
+						if (cv_comp2 < 0) cv_comp2 = 0; else if (cv_comp2 >= max_f) cv_comp2 = max_f - 1;
+						if (cv_comp3 < 0) cv_comp3 = 0; else if (cv_comp3 >= max_f) cv_comp3 = max_f - 1;
 					} else { // faster for full scale input
 						cv_comp1 = cv_comp1 << (bitdepth - src_bitdepth);
 						cv_comp2 = cv_comp2 << (bitdepth - src_bitdepth);
 						cv_comp3 = cv_comp3 << (bitdepth - src_bitdepth);
+						if (cv_comp1 >= max_f) cv_comp1 = max_f - 1;
+						if (cv_comp2 >= max_f) cv_comp2 = max_f - 1;
+						if (cv_comp3 >= max_f) cv_comp3 = max_f - 1;
 					}
 
 					break;
 				case Metadata::CDCI:
-					qDebug() << "CDCI color encoding is not supported!";
-					// no break!
+					cv_compY =  mpOutBuf[0][xpos]  - offset_y;
+					cv_compCb = mpOutBuf[1][xpos]  - (max + 1) / 2;
+					cv_compCr = mpOutBuf[2][xpos]  - (max + 1) / 2;
+
+					cv_compY =  cv_compY * max / range_y;
+					cv_compCb = cv_compCb * max / range_c;
+					cv_compCr = cv_compCr * max / range_c;
+
+					cv_comp1 = cv_compY + ((2 * (1024 - Kr)*cv_compCr) / 1024);
+					cv_comp2 = cv_compY - ((Kbg * cv_compCb + Krg * cv_compCr) / 1024);
+					cv_comp3 = cv_compY + ((2 * (1024 - Kb)*cv_compCb) / 1024);
+
+					if (cv_comp1 < 0) cv_comp1 = 0; else if (cv_comp1 >= max) cv_comp1 = max - 1;
+					if (cv_comp2 < 0) cv_comp2 = 0; else if (cv_comp2 >= max) cv_comp2 = max - 1;
+					if (cv_comp3 < 0) cv_comp3 = 0; else if (cv_comp3 >= max) cv_comp3 = max - 1;
+
+					cv_comp1 = cv_comp1 << (bitdepth - src_bitdepth);
+					cv_comp2 = cv_comp2 << (bitdepth - src_bitdepth);
+					cv_comp3 = cv_comp3 << (bitdepth - src_bitdepth);
+					break;
 				default:
 					return QImage(":/frame_error.png");  // abort!
 				}
 
+				if (cv_comp1 < 0) cv_comp1 = 0; else if (cv_comp1 >= max_f) cv_comp1 = max_f - 1;
+				if (cv_comp2 < 0) cv_comp2 = 0; else if (cv_comp2 >= max_f) cv_comp2 = max_f - 1;
+				if (cv_comp3 < 0) cv_comp3 = 0; else if (cv_comp3 >= max_f) cv_comp3 = max_f - 1;
+
 				// linearize XYZ data
-				switch (transferCharacteristics) {
-
-				case SMPTE::TransferCharacteristic_CinemaMezzanineDCDM:
-				case SMPTE::TransferCharacteristic_CinemaMezzanineDCDM_Wrong:
-					cv_comp1 = eotf_DCDM[cv_comp1]; // convert to 16 bit linear
-					cv_comp2 = eotf_DCDM[cv_comp2]; // convert to 16 bit linear
-					cv_comp3 = eotf_DCDM[cv_comp3]; // convert to 16 bit linear
-					break;
-
-				case SMPTE::TransferCharacteristic_CinemaMezzanineLinear:
-					break;
-
-				case SMPTE::TransferCharacteristic_SMPTEST2084:
-					cv_comp1 = eotf_PQi[cv_comp1]; // convert to 16 bit linear, scale by 100 such that 100 nits correspond to 65535
-					cv_comp2 = eotf_PQi[cv_comp2]; // convert to 16 bit linear
-					cv_comp3 = eotf_PQi[cv_comp3]; // convert to 16 bit linear
-					cv_comp1 *= 100;
-					cv_comp2 *= 100;
-					cv_comp3 *= 100;
-					// clamp values between 0...maxcv
-					if (cv_comp1 < 0) cv_comp1 = 0; else if (cv_comp1 >= max_f) cv_comp1 = max_f - 1;
-					if (cv_comp2 < 0) cv_comp2 = 0; else if (cv_comp2 >= max_f) cv_comp2 = max_f - 1;
-					if (cv_comp3 < 0) cv_comp3 = 0; else if (cv_comp3 >= max_f) cv_comp3 = max_f - 1;
-					break;
-
-				case SMPTE::TransferCharacteristic_ITU2020:
-					cv_comp1 = eotf_2020i[cv_comp1]; // convert to 16 bit linear
-					cv_comp2 = eotf_2020i[cv_comp2]; // convert to 16 bit linear
-					cv_comp3 = eotf_2020i[cv_comp3]; // convert to 16 bit linear
-					break;
-
-				case SMPTE::TransferCharacteristic_HLG_OETF:
-					cv_comp1 = eotf_HLGi[cv_comp1]; // convert to 16 bit linear
-					cv_comp2 = eotf_HLGi[cv_comp2]; // convert to 16 bit linear
-					cv_comp3 = eotf_HLGi[cv_comp3]; // convert to 16 bit linear
-					break;
-
-				case SMPTE::TransferCharacteristic_ITU709:
-					break;
-
-				default:
+				if (linearize() == false) {
 					qDebug() << "Unsupported Transfer Characteristic: " << SMPTE::vTransferCharacteristic[transferCharacteristics];
 					return QImage(":/frame_error.png"); // abort!
 				}
+				if ((transferCharacteristics == SMPTE::TransferCharacteristic_ITU709) ||(transferCharacteristics == SMPTE::TransferCharacteristic_IEC6196624_xvYCC)) {
+					// set data
+					buff_pos = x * 3; // don't calculate 3 times
+					img_buff[buff_pos] = (unsigned char)cv_comp1;
+					img_buff[buff_pos + 1] = (unsigned char)cv_comp2;
+					img_buff[buff_pos + 2] = (unsigned char)cv_comp3;
+					continue;
+				}
 
-				switch (colorPrimaries) {
-				case SMPTE::ColorPrimaries_CinemaMezzanine:
-					// convert from XYZ -> BT.709, matrix coefficients are scaled by 1024 to allow for integer processing
-					out_ri = cv_comp1*3319 + cv_comp2*-1574 + cv_comp3*-511;
-					out_gi = cv_comp1*-993 + cv_comp2*1921 + cv_comp3*43;
-					out_bi = cv_comp1*57  + cv_comp2*-209 + cv_comp3*1082;
-					break;
-
-				case SMPTE::ColorPrimaries_ITU2020:
-					// convert from BT.2020 -> BT.709, matrix coefficients are scaled by 1024 to allow for integer processing (CV 655 = 100 nits, CV 65535 = 10,000 nits)
-					out_ri = cv_comp1*1700 + cv_comp2*-602 + cv_comp3*-75;
-					out_gi = cv_comp1*-128 + cv_comp2*1160 + cv_comp3*-9;
-					out_bi = cv_comp1*-19  + cv_comp2*-103 + cv_comp3*1146;
-					break;
-
-				case SMPTE::ColorPrimaries_ITU709:
-					out_ri = cv_comp1 << 10;
-					out_gi = cv_comp2 << 10;
-					out_bi = cv_comp3 << 10;
-					break;
-
-				default:
+				if (colorTransform() == false) {
 					qDebug() << "Unsupported Color Primaries: " << SMPTE::vColorPrimaries[colorPrimaries];
 					return QImage(":/frame_error.png"); // abort!
 				}
 
-				// convert back to a 16 bit representation
-				out_ri = out_ri >> 10;
-				out_gi = out_gi >> 10;
-				out_bi = out_bi >> 10;
 
-				// clamp values between 0...65535
-				if (out_ri < 0) out_ri = 0;	else if (out_ri >= max_f) out_ri = max_f - 1;
-				if (out_gi < 0) out_gi = 0;	else if (out_gi >= max_f) out_gi = max_f - 1;
-				if (out_bi < 0) out_bi = 0;	else if (out_bi >= max_f) out_bi = max_f - 1;
-
-				//apply 709 OETF
-				out_r8 = oetf_709i[out_ri];
-				out_g8 = oetf_709i[out_gi];
-				out_b8 = oetf_709i[out_bi];
-
-				// set data
+				//apply 709 OETF and set data
 				buff_pos = x * 3; // don't calculate 3 times
-				img_buff[buff_pos] = (unsigned char)out_r8;
-				img_buff[buff_pos + 1] = (unsigned char)out_g8;
-				img_buff[buff_pos + 2] = (unsigned char)out_b8;
+				img_buff[buff_pos] = (unsigned char)oetf_709[out_ri];
+				img_buff[buff_pos + 1] = (unsigned char)oetf_709[out_gi];
+				img_buff[buff_pos + 2] = (unsigned char)oetf_709[out_bi];
 			}
 			memcpy(image.scanLine(y), img_buff, bytes_per_line);
 		}
@@ -463,11 +470,34 @@ QImage HTJ2K::DataToQImage()
 			memcpy(image.scanLine(y), img_buff, bytes_per_line);
 		}
 	}
-	// YCbCr: not supported
+	// YCbCr: Apply coding equations, keep color encoding
 	else if (ColorEncoding == Metadata::eColorEncoding::CDCI) {
-		qDebug() << "HTJ2K: CDCI color encoding is not supported by IMF Tool!" ;
-		return QImage(":/frame_error.png"); // abort!
+		for (y = 0; y < h; y++) {
+			for (x = 0; x < w; x++) {
+				xpos = (y*w + x); // don't calculate 3 times
+				buff_pos = x * 3; // don't calculate 3 times
+				cv_compY =  mpOutBuf[0][xpos]  - offset_y;
+				cv_compCb = mpOutBuf[1][xpos]  - (max + 1) / 2;
+				cv_compCr = mpOutBuf[2][xpos]  - (max + 1) / 2;
 
+				cv_compY =  (qint32)(cv_compY * max / range_y);
+				cv_compCb = (qint32)(cv_compCb * max / range_c);
+				cv_compCr = (qint32)(cv_compCr * max / range_c);
+
+				cv_comp1 = cv_compY + ((2 * (1024 - Kr)*cv_compCr) / 1024);
+				cv_comp2 = cv_compY - ((Kbg * cv_compCb + Krg * cv_compCr) / 1024);
+				cv_comp3 = cv_compY + ((2 * (1024 - Kb)*cv_compCb) / 1024);
+
+				if (cv_comp1 < 0) cv_comp1 = 0; else if (cv_comp1 >= max) cv_comp1 = max - 1;
+				if (cv_comp2 < 0) cv_comp2 = 0; else if (cv_comp2 >= max) cv_comp2 = max - 1;
+				if (cv_comp3 < 0) cv_comp3 = 0; else if (cv_comp3 >= max) cv_comp3 = max - 1;
+
+				img_buff[buff_pos] = cv_comp1 >> prec_shift;
+				img_buff[buff_pos + 1] = cv_comp2 >> prec_shift;
+				img_buff[buff_pos + 2] = cv_comp3 >> prec_shift;
+			}
+			memcpy(image.scanLine(y), img_buff, bytes_per_line);
+		}
 	}
 	else { // unknown ColorEncoding
 		return QImage(":/frame_error.png");

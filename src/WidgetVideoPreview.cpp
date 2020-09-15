@@ -825,17 +825,24 @@ void WidgetVideoPreview::setPlaylist(QVector<VideoResource> &rPlayList, QVector<
 
 	ttmls = &rTTMLs; // set timed text elements
 	currentPlaylist = rPlayList; // set playlist
-#ifdef CODEC_HTJ2K
 	if (! currentPlaylist.isEmpty() && !currentPlaylist.first().asset.isNull()) {
+		if (currentPlaylist.first().asset->GetEssenceType() == Metadata::Jpeg2000) {
+			if (currentPlaylist.first().asset->GetMetadata().colorPrimaries == SMPTE::ColorPrimaries_CinemaMezzanine) mImfApplication = ::App4DCDM;
+			else mImfApplication = ::App2e;
+		}
+#ifdef CODEC_HTJ2K
 		if (currentPlaylist.first().asset->GetEssenceType() == Metadata::HTJ2K) {
-			if (mImfApplication == ::App2e)
-				setApplication(::App2e_HTJ2K);
-	} else {
-		mImfApplication = ::App2e; // default
-	}
-}
-
+			if (currentPlaylist.first().asset->GetMetadata().colorPrimaries == SMPTE::ColorPrimaries_CinemaMezzanine) mImfApplication = ::App4DCDM_HTJ2K;
+			else mImfApplication = ::App2e_HTJ2K;
+		}
 #endif
+#ifdef APP5_ACES
+		if (currentPlaylist.first().asset->GetEssenceType() == Metadata::Aces) {
+			mImfApplication = ::App5;
+		}
+#endif
+	}
+
 	if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4))
 		player->setPlaylist(rPlayList); // set playlist in player
 #ifdef APP5_ACES
@@ -1406,7 +1413,7 @@ void WidgetVideoPreview::rPrevNextSubClicked(bool direction) {
 }
 
 void WidgetVideoPreview::setApplication(eImfApplications rImfApplication) {
-	qDebug() << "Setting Application to" << rImfApplication;
+//	qDebug() << "Setting Application to" << rImfApplication;
 	mImfApplication = rImfApplication;
 }
 

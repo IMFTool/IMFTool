@@ -366,38 +366,14 @@ void Player::setPlaylist(QVector<VideoResource> &rPlaylist) {
 			found = true;
 
 			// get metadata (these values may not change within same CPL?)
-			SMPTE::eColorPrimaries colorPrimaries = rPlaylist.at(count).asset->GetMetadata().colorPrimaries;
+			colorPrimaries = rPlaylist.at(count).asset->GetMetadata().colorPrimaries;
+			ColorEncoding = rPlaylist.at(count).asset->GetMetadata().colorEncoding;
+			transferCharacteristics = rPlaylist.at(count).asset->GetMetadata().transferCharcteristics;
 			src_bitdepth = rPlaylist.at(count).asset->GetMetadata().componentDepth;
-			prec_shift = src_bitdepth - 8;
-			float Kr = 0, Kg = 0, Kb = 0;
-
-			max = (1 << src_bitdepth) - 1;
-
 			ComponentMinRef = rPlaylist.at(count).asset->GetMetadata().componentMinRef;
 			ComponentMaxRef = rPlaylist.at(count).asset->GetMetadata().componentMaxRef;
 
-			switch (colorPrimaries) {
-			case SMPTE::ColorPrimaries_ITU709:
-				// set YCbCr -> RGB conversion parameters
-				Kr = 0.2126f;
-				Kg = 0.7152f;
-				Kb = 0.0722f;
-				break;
-			case SMPTE::ColorPrimaries_ITU2020:
-				// set YCbCr -> RGB conversion parameters
-				Kr = 0.2627f;
-				Kg = 0.6780f;
-				Kb = 0.0593f;
-				break;
-			case SMPTE::ColorPrimaries_SMPTE170M:
-			case SMPTE::ColorPrimaries_ITU470_PAL:
-				// set YCbCr -> RGB conversion parameters
-				Kr = 0.299f;
-				Kg = 0.587f;
-				Kb = 0.114f;
-				break;
-			default: break;
-			}
+			setCodingParameters();
 
 			// set params in decoders
 			for (int i = 0; i < decoders; i++) {
@@ -415,9 +391,9 @@ void Player::setPlaylist(QVector<VideoResource> &rPlaylist) {
 					pDecoder = static_cast<PreviewCommon *>(decoder_queue_HTJ2K[i]);
 				}
 #endif
-				pDecoder->ColorEncoding = rPlaylist.at(count).asset->GetMetadata().colorEncoding;
 				pDecoder->colorPrimaries = colorPrimaries;
-				pDecoder->transferCharacteristics = rPlaylist.at(count).asset->GetMetadata().transferCharcteristics;
+				pDecoder->ColorEncoding = ColorEncoding;
+				pDecoder->transferCharacteristics = transferCharacteristics;
 				pDecoder->src_bitdepth = src_bitdepth;
 
 				pDecoder->ComponentMinRef = ComponentMinRef;
@@ -425,9 +401,14 @@ void Player::setPlaylist(QVector<VideoResource> &rPlaylist) {
 				pDecoder->Kr = Kr;
 				pDecoder->Kg = Kg;
 				pDecoder->Kb = Kb;
+				pDecoder->Kbg = Kbg;
+				pDecoder->Krg = Krg;
 
 				pDecoder->prec_shift = prec_shift;
 				pDecoder->max = max;
+				pDecoder->offset_y = offset_y;
+				pDecoder->range_y = range_y;
+				pDecoder->range_c = range_c;
 			}
 		}
 		count++;

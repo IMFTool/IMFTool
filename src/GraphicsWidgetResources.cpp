@@ -758,7 +758,8 @@ void GraphicsWidgetVideoResource::restartThread(QSharedPointer<AssetMxfTrack> rA
 	if (!rAsset.isNull()) {
 		switch (mAssset->GetEssenceType()) {
 		case Metadata::Jpeg2000:
-			mImfApplication = ::App2e;
+			if (mAssset->GetMetadata().colorPrimaries == SMPTE::ColorPrimaries_CinemaMezzanine) mImfApplication = ::App4DCDM;
+			else mImfApplication = ::App2e;
 			break;
 
 #ifdef APP5_ACES
@@ -780,7 +781,7 @@ void GraphicsWidgetVideoResource::restartThread(QSharedPointer<AssetMxfTrack> rA
 	}
 	if ((mImfApplication == ::App2) || (mImfApplication == ::App2e)
 #ifdef APP4_DCDM
-			|| (mImfApplication == ::App4)
+			|| (mImfApplication == ::App4) || (mImfApplication == ::App4DCDM)
 #endif
 	) {
 		mpJP2K = new JP2K_Preview(); // (k)

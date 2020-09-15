@@ -63,13 +63,9 @@ void HTJ2K_Decoder::run() {
 
 
 	/*
-	 * set asset metadata
+	 * Check J2K profile
 	 */
 
-
-	colorPrimaries = request->asset->GetMetadata().colorPrimaries;
-	transferCharacteristics = request->asset->GetMetadata().transferCharcteristics;
-	ColorEncoding = request->asset->GetMetadata().colorEncoding;
 	QString jp2k_profile = SMPTE::vJ2K_Profiles[SMPTE::J2K_ProfilesMap[request->asset->GetMetadata().pictureEssenceCoding]];
 
 	if (jp2k_profile != "HTJ2KPictureCodingSchemeGeneric") {

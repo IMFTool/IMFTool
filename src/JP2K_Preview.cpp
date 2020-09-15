@@ -123,38 +123,9 @@ void JP2K_Preview::setAsset() {
 		ComponentMaxRef = asset->GetMetadata().componentMaxRef;
 		//WR
 
-
-		prec_shift = src_bitdepth - 8;
-		max = (1 << src_bitdepth) - 1;
-
-		switch (colorPrimaries) {
-		case SMPTE::ColorPrimaries_ITU709:
-			// set YCbCr -> RGB conversion parameters
-			Kr = 0.2126f;
-			Kg = 0.7152f;
-			Kb = 0.0722f;
-			break;
-		case SMPTE::ColorPrimaries_ITU2020:
-			// set YCbCr -> RGB conversion parameters
-			Kr = 0.2627f;
-			Kg = 0.6780f;
-			Kb = 0.0593f;
-			break;
-		case SMPTE::ColorPrimaries_SMPTE170M:
-		case SMPTE::ColorPrimaries_ITU470_PAL:
-			// set YCbCr -> RGB conversion parameters
-			Kr = 0.299f;
-			Kg = 0.587f;
-			Kb = 0.114f;
-			break;
-		case SMPTE::ColorPrimaries_P3D65:
-		case SMPTE::ColorPrimaries_CinemaMezzanine:
-			//P365 and DCDM is 4:4:4 only
-			break;
-		default:
+		if (setCodingParameters() == false ) {
 			mMsg = "Unknown color encoding"; // ERROR
 			err = true;
-			break; // abort!
 		}
 
 		if (mMxf_path != "") { // close old asset/reader
@@ -335,209 +306,97 @@ QImage JP2::DataToQImage()
 	bytes_per_line = w * 3;
 	img_buff = new unsigned char[bytes_per_line];
 
-	int offset = 16 << (src_bitdepth - 8);
-	int maxcv = (1 << src_bitdepth) - 1;
-	int maxcv_plus_1 = maxcv + 1;
-	int range_y = 219 << (src_bitdepth - 8);
-	int range_c = (maxcv_plus_1 - 2 * offset);
 	if (convert_to_709) {
 
 		for (y = 0; y < h; y++) {
 			for (x = 0; x < w; x++) {
-
+				xpos = (y*w + x);
 				switch (ColorEncoding) {
 				case Metadata::RGBA:
+					// get three color components
+					cv_comp1 = psImage->comps[0].data[xpos];
+					cv_comp2 = psImage->comps[1].data[xpos];
+					cv_comp3 = psImage->comps[2].data[xpos];
 
-					xpos = (y*w + x); // don't calculate 3 times
-
-					// get RGB																
-					r = (float)psImage->comps[0].data[xpos];
-					g = (float)psImage->comps[1].data[xpos];
-					b = (float)psImage->comps[2].data[xpos];
-
-					//WR
-					if (ComponentMinRef && ComponentMaxRef) { // QE.2 If ComponentMinRef is != 0, it's Legal Range. Don't convert if ComponentMaxRef is (accidentally) zero, or not set.
-						r = (r - ComponentMinRef) / (ComponentMaxRef - ComponentMinRef) * maxcv;
-						g = (g - ComponentMinRef) / (ComponentMaxRef - ComponentMinRef) * maxcv;
-						b = (b - ComponentMinRef) / (ComponentMaxRef - ComponentMinRef) * maxcv;
-						// clamp between 0...CVmax
-						if (r < 0) { r = 0; }
-						else if (r > maxcv) { r = maxcv; }
-						if (g < 0) { g = 0; }
-						else if (g > maxcv) { g = maxcv; }
-						if (b < 0) { b = 0; }
-						else if (b > maxcv) { b = maxcv; }
+					// Scale to full range 16 bit
+					if (ComponentMinRef != 0) { //offset compensation for legal range signals
+						cv_comp1 -= ComponentMinRef;
+						cv_comp2 -= ComponentMinRef;
+						cv_comp3 -= ComponentMinRef;
+						cv_comp1 *= (max_f -1) / (ComponentMaxRef - ComponentMinRef);
+						cv_comp2 *= (max_f -1) / (ComponentMaxRef - ComponentMinRef);
+						cv_comp3 *= (max_f -1) / (ComponentMaxRef - ComponentMinRef);
+						if (cv_comp1 < 0) cv_comp1 = 0; else if (cv_comp1 >= max_f) cv_comp1 = max_f - 1;
+						if (cv_comp2 < 0) cv_comp2 = 0; else if (cv_comp2 >= max_f) cv_comp2 = max_f - 1;
+						if (cv_comp3 < 0) cv_comp3 = 0; else if (cv_comp3 >= max_f) cv_comp3 = max_f - 1;
+					} else { // faster for full scale input
+						cv_comp1 = cv_comp1 << (bitdepth - src_bitdepth);
+						cv_comp2 = cv_comp2 << (bitdepth - src_bitdepth);
+						cv_comp3 = cv_comp3 << (bitdepth - src_bitdepth);
+						if (cv_comp1 >= max_f) cv_comp1 = max_f - 1;
+						if (cv_comp2 >= max_f) cv_comp2 = max_f - 1;
+						if (cv_comp3 >= max_f) cv_comp3 = max_f - 1;
 					}
-					//WR
 					break;
 				case Metadata::CDCI:
+					index_422 = (y*w + x) / 2;
+					cv_compY =  psImage->comps[0].data[xpos]  - offset_y;
+					cv_compCb = psImage->comps[1].data[index_422]  - (max + 1) / 2;
+					cv_compCr = psImage->comps[2].data[index_422]  - (max + 1) / 2;
 
-					xpos = (int)(y*w + x) / 2; // don't calculate twice
+					cv_compY =  cv_compY * max / range_y;
+					cv_compCb = cv_compCb * max / range_c;
+					cv_compCr = cv_compCr * max / range_c;
 
-					// get YCbCr values
-					Y = (float)psImage->comps[0].data[(int)(y*w + x)];
-					Cb = (float)psImage->comps[1].data[xpos];
-					Cr = (float)psImage->comps[2].data[xpos];
-					// convert to rgb
-					r = (Y - offset)*maxcv / range_y + 2 * (1 - Kr)*(Cr - maxcv_plus_1 / 2)*maxcv / range_c;
-					g = (Y - offset)*maxcv / range_y - 2 * Kb*(1 - Kb) / Kg*(Cb - maxcv_plus_1 / 2)*maxcv / range_c - 2 * Kr*(1 - Kr) / Kg*(Cr - maxcv_plus_1 / 2)*maxcv / range_c;
-					b = (Y - offset)*maxcv / range_y + 2 * (1 - Kb)*(Cb - maxcv_plus_1 / 2)*maxcv / range_c;
+					cv_comp1 = cv_compY + ((2 * (1024 - Kr)*cv_compCr) / 1024);
+					cv_comp2 = cv_compY - ((Kbg * cv_compCb + Krg * cv_compCr) / 1024);
+					cv_comp3 = cv_compY + ((2 * (1024 - Kb)*cv_compCb) / 1024);
 
-					// clamp between 0...CVmax
-					if (r < 0) { r = 0; }
-					else if (r >= maxcv) { r = maxcv; }
-					if (g < 0) { g = 0; }
-					else if (g >= maxcv) { g = maxcv; }
-					if (b < 0) { b = 0; }
-					else if (b >= maxcv) { b = maxcv; }
+					if (cv_comp1 < 0) cv_comp1 = 0; else if (cv_comp1 >= max) cv_comp1 = max - 1;
+					if (cv_comp2 < 0) cv_comp2 = 0; else if (cv_comp2 >= max) cv_comp2 = max - 1;
+					if (cv_comp3 < 0) cv_comp3 = 0; else if (cv_comp3 >= max) cv_comp3 = max - 1;
+
+					cv_comp1 = cv_comp1 << (bitdepth - src_bitdepth);
+					cv_comp2 = cv_comp2 << (bitdepth - src_bitdepth);
+					cv_comp3 = cv_comp3 << (bitdepth - src_bitdepth);
 					break;
-				default: return QImage(":/frame_error.png");  // abort!
+				default:
+					return QImage(":/frame_error.png");  // abort!
 				}
 
-				// now we have rgb data -> linearize the data!
-				switch (transferCharacteristics) {
-				case SMPTE::TransferCharacteristic_ITU709:
+				if (cv_comp1 < 0) cv_comp1 = 0; else if (cv_comp1 >= max_f) cv_comp1 = max_f - 1;
+				if (cv_comp2 < 0) cv_comp2 = 0; else if (cv_comp2 >= max_f) cv_comp2 = max_f - 1;
+				if (cv_comp3 < 0) cv_comp3 = 0; else if (cv_comp3 >= max_f) cv_comp3 = max_f - 1;
 
-					// convert to 8 bit
-					out_r8 = (int)r >> prec_shift;
-					out_g8 = (int)g >> prec_shift;
-					out_b8 = (int)b >> prec_shift;
-
+				// linearize XYZ data
+				if (linearize() == false) {
+					qDebug() << "Unsupported Transfer Characteristic: " << SMPTE::vTransferCharacteristic[transferCharacteristics];
+					return QImage(":/frame_error.png"); // abort!
+				}
+				if ((transferCharacteristics == SMPTE::TransferCharacteristic_ITU709) ||(transferCharacteristics == SMPTE::TransferCharacteristic_IEC6196624_xvYCC)) {
 					// set data
 					buff_pos = x * 3; // don't calculate 3 times
-					img_buff[buff_pos] = (unsigned char)out_r8;
-					img_buff[buff_pos + 1] = (unsigned char)out_g8;
-					img_buff[buff_pos + 2] = (unsigned char)out_b8;
-
-					continue; // jump to next pixel
-
-					break;
-				case SMPTE::TransferCharacteristic_ITU2020:
-
-					r = eotf_2020[(int)((r / max) * max_f_)]; // 0...1
-					g = eotf_2020[(int)((g / max) * max_f_)]; // 0...1
-					b = eotf_2020[(int)((b / max) * max_f_)]; // 0...1
-
-					break;
-				case SMPTE::TransferCharacteristic_SMPTEST2084:
-
-					r = eotf_PQ[(int)((r / max) * max_f_)]; // 0...10 000
-					g = eotf_PQ[(int)((g / max) * max_f_)]; // 0...10 000
-					b = eotf_PQ[(int)((b / max) * max_f_)]; // 0...10 000
-
-					// convert to 0.0..100.0 ( 1.0 = 100 nits)
-					r /= 100;
-					g /= 100;
-					b /= 100;
-
-					break;
-				case SMPTE::TransferCharacteristic_IEC6196624_xvYCC:
-
-					// convert to 8 bit
-					out_r8 = (int)r >> prec_shift;
-					out_g8 = (int)g >> prec_shift;
-					out_b8 = (int)b >> prec_shift;
-
-					// clamp values between 0...255
-					if (out_r8 < 0) { out_r8 = 0; }
-					else if (out_r8 > 255) { out_r8 = 255; }
-					if (out_g8 < 0) { out_g8 = 0; }
-					else if (out_g8 > 255) { out_g8 = 255; }
-					if (out_b8 < 0) { out_b8 = 0; }
-					else if (out_b8 > 255) { out_b8 = 255; }
-
-					// set data
-					buff_pos = x * 3; // don't calculate 3 times
-					img_buff[buff_pos] = (unsigned char)out_r8;
-					img_buff[buff_pos + 1] = (unsigned char)out_g8;
-					img_buff[buff_pos + 2] = (unsigned char)out_b8;
-
-					continue; // jump to next pixel
-
-					break;
-				case SMPTE::TransferCharacteristic_HLG_OETF:
-					r = eotf_HLG[(int)((r / max) * max_f_)]; // 0...1
-					g = eotf_HLG[(int)((g / max) * max_f_)]; // 0...1
-					b = eotf_HLG[(int)((b / max) * max_f_)]; // 0...1
-
-					break;
-				case SMPTE::TransferCharacteristic_CinemaMezzanineDCDM:
-					r = eotf_DCDM[(int)(r)]/max_f_; // 0...1
-					g = eotf_DCDM[(int)(g)]/max_f_;
-					b = eotf_DCDM[(int)(b)]/max_f_;
-
-					break;
-				case SMPTE::TransferCharacteristic_CinemaMezzanineLinear:
-				case SMPTE::TransferCharacteristic_linear:
-					r /= max_f_; // 0...1
-					g /= max_f_; // 0...1
-					b /= max_f_; // 0...1
-					break;
-
-				default: return QImage(":/frame_error.png"); // abort!
+					img_buff[buff_pos] = (unsigned char)cv_comp1;
+					img_buff[buff_pos + 1] = (unsigned char)cv_comp2;
+					img_buff[buff_pos + 2] = (unsigned char)cv_comp3;
+					continue;
+				}
+				if (colorTransform() == false) {
+					qDebug() << "Unsupported Color Primaries: " << SMPTE::vColorPrimaries[colorPrimaries];
+					return QImage(":/frame_error.png"); // abort!
 				}
 
-				switch (colorPrimaries) {
-				case SMPTE::ColorPrimaries_ITU2020:
-
-					// convert from BT.2020 -> BT.709
-					out_r = r*1.6605 + g*-0.5877 + b*-0.0728;
-					out_g = r*-0.1246 + g*1.1330 + b*-0.0084;
-					out_b = r*-0.0182 + g*-0.1006 + b*1.1187;
-					break;
-				case SMPTE::ColorPrimaries_P3D65:
-
-					// convert from DCI-P3 -> BT.709
-					out_r = r*1.2248 - g*0.2249 - b*0.0001;
-					out_g = -r*0.042 + g*1.042;
-					out_b = -r*0.0196 - g*0.0786 + b*1.0983;
-					break;
- 				case SMPTE::ColorPrimaries_CinemaMezzanine:
-					// convert from XYZ -> BT.709
-					out_r = r*3.2410 + g*-1.5374 + b*-0.4986;
-					out_g = r*-0.9692 + g*1.8760 + b*0.0416;
-					out_b = r*0.0556 + g*-0.2040 + b*1.0570;
-					break;
-				default: return QImage(":/frame_error.png"); // abort!
-				}
-
-				// clamp between 0...1
-				if (out_r < 0) { out_r = 0; }
-				else if (out_r > 1) { out_r = 1; }
-				if (out_g < 0) { out_g = 0; }
-				else if (out_g > 1) { out_g = 1; }
-				if (out_b < 0) { out_b = 0; }
-				else if (out_b > 1) { out_b = 1; }
-
-				// unlinearize
-				out_r = oetf_709[(int)(out_r * max_f_)] * max;
-				out_g = oetf_709[(int)(out_g * max_f_)] * max;
-				out_b = oetf_709[(int)(out_b * max_f_)] * max;
-
-				// convert to 8 bit
-				out_r8 = (int)out_r >> prec_shift;
-				out_g8 = (int)out_g >> prec_shift;
-				out_b8 = (int)out_b >> prec_shift;
-
-				// clamp values between 0...255
-				if (out_r8 < 0) { out_r8 = 0; }
-				else if (out_r8 > 255) { out_r8 = 255; }
-				if (out_g8 < 0) { out_g8 = 0; }
-				else if (out_g8 > 255) { out_g8 = 255; }
-				if (out_b8 < 0) { out_b8 = 0; }
-				else if (out_b8 > 255) { out_b8 = 255; }
-
-				// set data
+				//apply 709 OETF and set data
 				buff_pos = x * 3; // don't calculate 3 times
-				img_buff[buff_pos] = (unsigned char)out_r8;
-				img_buff[buff_pos + 1] = (unsigned char)out_g8;
-				img_buff[buff_pos + 2] = (unsigned char)out_b8;
+				img_buff[buff_pos] = (unsigned char)oetf_709[out_ri];
+				img_buff[buff_pos + 1] = (unsigned char)oetf_709[out_gi];
+				img_buff[buff_pos + 2] = (unsigned char)oetf_709[out_bi];
 			}
 			memcpy(image.scanLine(y), img_buff, bytes_per_line);
 		}
 	}
 	else if (ColorEncoding == Metadata::eColorEncoding::RGBA) {
-		// RGB: keep original color encoding, or color encoding == REC.709
+		// RGBA: keep original color encoding
 
 		for (y = 0; y < h; y++) {
 			for (x = 0; x < w; x++) {
@@ -556,36 +415,28 @@ QImage JP2::DataToQImage()
 		for (y = 0; y < h; y++) {
 			for (x = 0; x < w; x++) {
 
-				xpos = (int)(y*w + x) / 2; // don't calculate twice
+				xpos = y*w + x; // don't calculate twice
+				index_422 = (y*w + x) / 2;
 				buff_pos = x * 3; // don't calculate 3 times
+				cv_compY =  psImage->comps[0].data[xpos]  - offset_y;
+				cv_compCb = psImage->comps[1].data[index_422]  - (max + 1) / 2;
+				cv_compCr = psImage->comps[2].data[index_422]  - (max + 1) / 2;
 
-				// get Yuv & convert x bit -> 8 bit
-				Y = psImage->comps[0].data[(int)(y*w + x)];
-				Cb = psImage->comps[1].data[xpos];
-				Cr = psImage->comps[2].data[xpos];
+				cv_compY =  (qint32)(cv_compY * max / range_y);
+				cv_compCb = (qint32)(cv_compCb * max / range_c);
+				cv_compCr = (qint32)(cv_compCr * max / range_c);
 
-				// convert to rgb
-				r = (Y - offset)*maxcv / range_y + 2 * (1 - Kr)          *(Cr - maxcv_plus_1 / 2)*maxcv / range_c;
-				g = (Y - offset)*maxcv / range_y - 2 * Kb*(1 - Kb) / Kg*(Cb - maxcv_plus_1 / 2)*maxcv / range_c - 2 * Kr*(1 - Kr) / Kg*(Cr - maxcv_plus_1 / 2)*maxcv / range_c;
-				b = (Y - offset)*maxcv / range_y + 2 * (1 - Kb)          *(Cb - maxcv_plus_1 / 2)*maxcv / range_c;
+				cv_comp1 = cv_compY + ((2 * (1024 - Kr)*cv_compCr) / 1024);
+				cv_comp2 = cv_compY - ((Kbg * cv_compCb + Krg * cv_compCr) / 1024);
+				cv_comp3 = cv_compY + ((2 * (1024 - Kb)*cv_compCb) / 1024);
 
-				out_r8 = (int)r >> prec_shift;
-				out_g8 = (int)g >> prec_shift;
-				out_b8 = (int)b >> prec_shift;
+				if (cv_comp1 < 0) cv_comp1 = 0; else if (cv_comp1 >= max) cv_comp1 = max - 1;
+				if (cv_comp2 < 0) cv_comp2 = 0; else if (cv_comp2 >= max) cv_comp2 = max - 1;
+				if (cv_comp3 < 0) cv_comp3 = 0; else if (cv_comp3 >= max) cv_comp3 = max - 1;
 
-				// clamp values between 0...255
-				if (out_r8 < 0) { out_r8 = 0; }
-				else if (out_r8 > 255) { out_r8 = 255; }
-				if (out_g8 < 0) { out_g8 = 0; }
-				else if (out_g8 > 255) { out_g8 = 255; }
-				if (out_b8 < 0) { out_b8 = 0; }
-				else if (out_b8 > 255) { out_b8 = 255; }
-
-				// set data
-				buff_pos = x * 3; // don't calculate 3 times
-				img_buff[buff_pos] = (unsigned char)out_r8;
-				img_buff[buff_pos + 1] = (unsigned char)out_g8;
-				img_buff[buff_pos + 2] = (unsigned char)out_b8;
+				img_buff[buff_pos] = cv_comp1 >> prec_shift;
+				img_buff[buff_pos + 1] = cv_comp2 >> prec_shift;
+				img_buff[buff_pos + 2] = cv_comp3 >> prec_shift;
 			}
 			memcpy(image.scanLine(y), img_buff, bytes_per_line);
 		}
