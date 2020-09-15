@@ -6,7 +6,7 @@
 --namespace-map "http://www.smpte-ra.org/schemas/2067-3/2016=cpl2016"
 --namespace-map "http://www.w3.org/2000/09/xmldsig#=ds"
 --namespace-map "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/=dcml"
---namespace-map "http://www.smpte-ra.org/schemas/2067-2/2016=cc2016"
+--namespace-map "http://www.smpte-ra.org/ns/2067-2/2020=cc2020"
 --namespace-map "http://www.smpte-ra.org/schemas/2067-100/2014=opl"
 --namespace-map "http://www.smpte-ra.org/schemas/429-9/2007/AM=am"
 --namespace-map "http://www.smpte-ra.org/schemas/2067-2/2016/PKL=pkl2016"

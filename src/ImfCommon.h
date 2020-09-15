@@ -185,6 +185,12 @@ public:
 	//WR
 	static const MarkerLabel MarkerLabelFFDC;
 	static const MarkerLabel MarkerLabelLFDC;
+	static const MarkerLabel MarkerLabelFFEI;
+	static const MarkerLabel MarkerLabelFFER;
+	static const MarkerLabel MarkerLabelFFUN;
+	static const MarkerLabel MarkerLabelLFEI;
+	static const MarkerLabel MarkerLabelLFER;
+	static const MarkerLabel MarkerLabelLFUN;
 
 	//! Initialized with MarkerLabelNone.
 	MarkerLabel() { *this = MarkerLabelNone; }

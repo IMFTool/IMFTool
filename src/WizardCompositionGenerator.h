@@ -67,12 +67,12 @@ private:
 	QComboBox *mpComboBoxEditRate;
 	QComboBox *mpComboBoxApp;
 	const QMap<QString, QString> mApplicationIdentificationMap {
-			{"http://www.smpte-ra.org/schemas/2067-20/2016", "App #2"},
-			{"http://www.smpte-ra.org/schemas/2067-21/2016", "App #2E"},
-			{"http://www.smpte-ra.org/schemas/2067-20/2013", "App #2 2013"},
-			{"http://www.smpte-ra.org/schemas/2067-21/2014", "App #2E 2014"},
+//			{"http://www.smpte-ra.org/schemas/2067-20/2016", "App #2"},
+			{"http://www.smpte-ra.org/ns/2067-21/2020", "App #2E"},
+//			{"http://www.smpte-ra.org/schemas/2067-20/2013", "App #2 2013"},
+//			{"http://www.smpte-ra.org/schemas/2067-21/2014", "App #2E 2014"},
 			{"http://www.smpte-ra.org/ns/2067-50/2017", "App 5 ACES"},
-			{"http://www.smpte-ra.org/ns/2067-40/2020 http://www.smpte-ra.org/ns/2067-40-DCDM/2020", "App 4 DCDM 2020"},
+			{"http://www.smpte-ra.org/ns/2067-40-DCDM/2020", "App 4 DCDM 2020"},
 	};
 	QString mAppString;
 private slots:

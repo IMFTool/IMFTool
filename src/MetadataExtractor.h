@@ -36,6 +36,7 @@ public:
 	Error ReadMetadata(Metadata &rMetadata, const QString &rSourceFile);
 	Error ReadAncillaryResource(QByteArray &rRawData, const byte_t ResourceID[], const QString &rSourceFile);
 	void SetCplEditRate(EditRate rCplEditRate) {mCplEditRate = rCplEditRate;};
+	void SetNamespaceURI(QString rNamespaceURI) {mNamespaceURI = rNamespaceURI;};
 private:
 
 	Q_DISABLE_COPY(MetadataExtractor);
@@ -55,6 +56,7 @@ private:
 	float ConvertTimingQStringtoDouble(QString string_time, float fr, int tr);
 	//WR
 	EditRate mCplEditRate;  // for creating TT files
+	QString mNamespaceURI;
 	//WR
 };
 

@@ -36,7 +36,6 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <qevent.h>
-#include "EmptyTimedTextGenerator.h"
 #include "SMPTE_Labels.h"
 
 
@@ -115,7 +114,7 @@ void WizardResourceGenerator::SwitchMode(eMode mode) {
 
 WizardResourceGeneratorPage::WizardResourceGeneratorPage(QWidget *pParent /*= NULL*/, QVector<EditRate> rEditRates /* = QVector<EditRate>()*/, bool rReadOnly, QSharedPointer<AssetMxfTrack> rAsset ) :
 QWizardPage(pParent), mpFileDialog(NULL), mpSoundFieldGroupModel(NULL), mpTimedTextModel(NULL), mpTableViewExr(NULL), mpTableViewWav(NULL), mpTableViewTimedText(NULL), mpProxyImageWidget(NULL), mpStackedLayout(NULL), mpComboBoxEditRate(NULL),
-mpComboBoxSoundfieldGroup(NULL), mpMsgBox(NULL), mpAs02Wrapper(NULL), mpLineEditDuration(NULL), mpComboBoxCplEditRate(NULL) {
+mpComboBoxSoundfieldGroup(NULL), mpMsgBox(NULL), mpAs02Wrapper(NULL), mpLineEditDuration(NULL), mpComboBoxCplEditRate(NULL), mpComboBoxNamespaceURI(NULL) {
 	mpAs02Wrapper = new MetadataExtractor(this);
 	mReadOnly = rReadOnly;
 	mAsset = rAsset;
@@ -147,6 +146,14 @@ void WizardResourceGeneratorPage::InitLayout() {
 	QStringListModel *p_edit_rates_model = new QStringListModel(this);
 	p_edit_rates_model->setStringList(EditRate::GetFrameRateNames());
 	mpComboBoxEditRate->setModel(p_edit_rates_model);
+
+	mpComboBoxNamespaceURI = new QComboBox(this);
+	mpComboBoxNamespaceURI->setWhatsThis(tr("An IMSC1.1 profile to which the Document Instance conforms."));
+	QStringListModel *p_namespace_model = new QStringListModel(this);
+	QStringList imsc_namespaces;
+	imsc_namespaces << IMSC_11_PROFILE_TEXT << IMSC_11_PROFILE_IMAGE << IMSC_10_PROFILE_TEXT << IMSC_10_PROFILE_IMAGE << NETFLIX_IMSC11_TT << EBU_TT_D << TTML10_DP_US;
+	p_namespace_model->setStringList(imsc_namespaces);
+	mpComboBoxNamespaceURI->setModel(p_namespace_model);
 
 
 	//--- soundfield group ---
@@ -218,12 +225,30 @@ void WizardResourceGeneratorPage::InitLayout() {
 	mpComboBoxCplEditRate->setWhatsThis(tr("Select a frame rate. It shall match the CPL Edit Rate"));
 	QStringListModel *p_edit_rate_group_model = new QStringListModel(this);
 	QStringList p_edit_rate_string_list;
-	for (QVector<EditRate>::iterator i=mEditRates.begin(); i < mEditRates.end(); i++) {
-		p_edit_rate_string_list << i->GetName();
+	if (mReadOnly) {
+		p_edit_rate_string_list << mAsset->GetEditRate().GetName();
+	} else {
+		if (!mEditRates.isEmpty()) {
+			for (QVector<EditRate>::iterator i=mEditRates.begin(); i < mEditRates.end(); i++) {
+				p_edit_rate_string_list << i->GetName();
+			}
+		} else { //NO CPL in IMP yet
+			p_edit_rate_string_list << "Select an Edit Rate";
+			p_edit_rate_string_list << EditRate::GetFrameRateNames();
+		}
 	}
 	p_edit_rate_group_model->setStringList(p_edit_rate_string_list);
 	mpComboBoxCplEditRate->setModel(p_edit_rate_group_model);
 	if (mReadOnly) mpComboBoxCplEditRate->setDisabled(true);
+	mpLineEditNamespaceURI = new QLineEdit(this);
+	mpLineEditNamespaceURI->setDisabled(true);
+	mpLineEditNamespaceURI->setStyleSheet("QLineEdit {color: #b1b1b1;}");
+	mpLineEditDurationReadOnly = new QLineEdit(this);
+	mpLineEditDurationReadOnly->setDisabled(true);
+	mpLineEditDurationReadOnly->setStyleSheet("QLineEdit {color: #b1b1b1;}");
+
+	//connect(mpLineEditNamespaceURI, SIGNAL(textEdited(QString)), this, SLOT(languageTagTTChanged()));
+
 	//WR
 
 			/* -----Denis Manthey----- */
@@ -264,7 +289,10 @@ void WizardResourceGeneratorPage::InitLayout() {
 	mpLineEditDuration = new QLineEdit(this);
 	mpLineEditDuration->setAlignment(Qt::AlignRight);
 	mpLineEditDuration->setPlaceholderText("Duration [frames]");
-	mpLineEditDuration->setValidator(new QIntValidator(this));
+	mpLineEditDurationEmptyTTGenerator = new QLineEdit(this);
+	mpLineEditDurationEmptyTTGenerator->setAlignment(Qt::AlignRight);
+	mpLineEditDurationEmptyTTGenerator->setPlaceholderText("Duration [frames]");
+	mpLineEditDurationEmptyTTGenerator->setValidator(new QIntValidator(this));
 	mpGenerateEmpty_button = new QPushButton(this);
 	mpGenerateEmpty_button->setText(tr("Generate"));
 	mpGenerateEmpty_button->setAutoDefault(false);
@@ -272,25 +300,14 @@ void WizardResourceGeneratorPage::InitLayout() {
 	connect(pBrowseDir, SIGNAL(clicked(bool)), this, SLOT(ShowDirDialog()));
 	connect(mpDirDialog, SIGNAL(fileSelected(const QString &)), mpLineEditFileDir, SLOT(setText(const QString &)));
 	connect(pGenNew,SIGNAL(clicked()),this,SLOT(hideGroupBox()));
-	connect(mpLineEditDuration, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
+	//connect(mpLineEditDuration, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
+	connect(mpLineEditDurationEmptyTTGenerator, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
 	connect(mpLineEditFileName, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
 	connect(mpLineEditFileDir, SIGNAL(textChanged(QString)), this, SLOT(textChanged()));
 	connect(mpGenerateEmpty_button, SIGNAL(clicked(bool)), this, SLOT(GenerateEmptyTimedText()));
 	QLabel *GenNew = new QLabel(this);
 	GenNew->setStyleSheet("font: bold; text-decoration: underline");
 	GenNew->setText("Generate Empty Timed Text Resource");
-	mpTimedTextModel = new TimedTextModel(this);
-	mpTableViewTimedText = new QTableView(this);
-	mpTableViewTimedText->setModel(mpTimedTextModel);
-	mpTableViewTimedText->setEditTriggers(QAbstractItemView::NoEditTriggers);
-	mpTableViewTimedText->setSelectionBehavior(QAbstractItemView::SelectRows);
-	mpTableViewTimedText->setSelectionMode(QAbstractItemView::SingleSelection);
-	mpTableViewTimedText->setShowGrid(false);
-	mpTableViewTimedText->horizontalHeader()->setHidden(true);
-	mpTableViewTimedText->horizontalHeader()->setStretchLastSection(true);
-	mpTableViewTimedText->verticalHeader()->setHidden(true);
-	mpTableViewTimedText->resizeRowsToContents();
-	mpTableViewTimedText->resizeColumnsToContents();
 
 			/* -----Denis Manthey----- */
 
@@ -325,28 +342,65 @@ void WizardResourceGeneratorPage::InitLayout() {
 	QGridLayout *p_wrapper_layout_three = new QGridLayout();
 	QGridLayout *vbox = new QGridLayout;
 	p_wrapper_layout_three->setContentsMargins(0, 0, 0, 0);
-	if (!mReadOnly) p_wrapper_layout_three->addWidget(new QLabel(tr("Select a Timed Text Resource (.xml) compliant to IMSC1"), this), 0, 0, 1, 3);
-	p_wrapper_layout_three->addWidget(new QLabel(tr("CPL Edit Rate:"), this), 1, 0, 1, 2);
+	if (!mReadOnly) p_wrapper_layout_three->addWidget(new QLabel(tr("Select a Timed Text Resource (.xml) compliant to IMSC1.1"), this), 0, 0, 1, 3);
+	p_wrapper_layout_three->addWidget(new QLabel(tr("Edit Rate:"), this), 1, 0, 1, 2);
 	p_wrapper_layout_three->addWidget(mpComboBoxCplEditRate, 1, 2, 1, 1);
 	p_wrapper_layout_three->addWidget(new QLabel(tr("RFC 5646 Language Tag (e.g. en-US):"), this), 2, 0, 1, 2);
 	p_wrapper_layout_three->addWidget(mpLineEditLanguageTagTT, 2, 2, 1, 1);
-	p_wrapper_layout_three->addWidget(mpTableViewTimedText, 3, 0, 1, 3);
-	if (!mReadOnly) p_wrapper_layout_three->addWidget(pGenNew, 4, 0, 1, 3);
+	p_wrapper_layout_three->addWidget(new QLabel(tr("Duration (frames):"), this), 3, 0, 1, 2);
+	p_wrapper_layout_three->addWidget(mpLineEditDurationReadOnly, 3, 2, 1, 1);
+	p_wrapper_layout_three->addWidget(new QLabel(tr("NamespaceURI:"), this), 4, 0, 1, 2);
+	p_wrapper_layout_three->addWidget(mpLineEditNamespaceURI, 4, 2, 1, 1);
+	p_wrapper_layout_three->addWidget(mpTableViewTimedText, 5, 0, 1, 3);
+	if (!mReadOnly) p_wrapper_layout_three->addWidget(pGenNew, 6, 0, 1, 3);
 
+/*
 	vbox->addWidget(new QLabel(tr("Set the file name of the empty tt resource:"), this), 1, 0, 1, 1);
 	vbox->addWidget(mpLineEditFileName, 1, 1, 1, 1);
 	vbox->addWidget(new QLabel(tr(".xml"), this), 1, 2, 1, 1);
 	vbox->addWidget(new QLabel(tr("Set the directory of the empty tt resource:"), this), 2, 0, 1, 1);
 	vbox->addWidget(mpLineEditFileDir, 2, 1, 1, 1);
 	vbox->addWidget(pBrowseDir, 2, 2, 1, 1);
-	vbox->addWidget(new QLabel(tr("Set the duration of the empty tt resource:"), this), 3, 0, 1, 1);
-	vbox->addWidget(mpLineEditDuration, 3, 1, 1, 1);
-	vbox->addWidget(mpGenerateEmpty_button, 3, 2, 1, 1);
+*/
+	vbox->addWidget(new QLabel(tr("Set the duration of the empty tt resource:"), this), 1, 0, 1, 1);
+	vbox->addWidget(mpLineEditDurationEmptyTTGenerator, 1, 1, 1, 1);
+	vbox->addWidget(mpGenerateEmpty_button, 2, 1, 1, 1);
 	mpGroupBox->setLayout(vbox);
 	mpGroupBox->hide();
 
-	p_wrapper_layout_three->addWidget(mpGroupBox, 3, 0, 1, 3);
+	p_wrapper_layout_three->addWidget(mpGroupBox, 5, 0, 1, 3);
 	p_wrapper_widget_three->setLayout(p_wrapper_layout_three);
+
+
+	mpEditDurationDialog = new QDialog(this);
+	QGridLayout *mpEditDurationDialogLay = new QGridLayout();
+	QPushButton *pOk = new QPushButton("OK");
+	QPushButton *pCancel = new QPushButton("Cancel");
+
+	mpEditDurationDialogLay->addWidget(new QLabel(tr("Duration could not be resolved.\n\nEnter a higher duration than needed.\nDuration can be shortened in the timeline"), this), 0, 0, 1, 2);
+	mpEditDurationDialogLay->addWidget(mpLineEditDuration, 1, 0, 1, 2);
+	mpEditDurationDialogLay->addWidget(pOk, 2, 0, 1, 1);
+	mpEditDurationDialogLay->addWidget(pCancel, 2, 1, 1, 1);
+
+	mpEditDurationDialog->setLayout(mpEditDurationDialogLay);
+
+	connect(pCancel, SIGNAL(clicked(bool)), mpEditDurationDialog, SLOT(close()));
+	connect(pOk, SIGNAL(clicked(bool)), mpEditDurationDialog, SLOT(accept()));
+
+	mpSelectNamespaceDialog = new QDialog(this);
+	QGridLayout *mpSelectNamespaceDialogLayout = new QGridLayout();
+	QPushButton *pNamsepaceOk = new QPushButton("OK");
+	QPushButton *mpSelectNamespaceDialogCancel = new QPushButton("Cancel");
+
+	mpSelectNamespaceDialogLayout->addWidget(new QLabel(tr("No IMSC1.1 profile found in TTML file.\n\nSelect an appropriate profile from the list"), this), 0, 0, 1, 2);
+	mpSelectNamespaceDialogLayout->addWidget(mpComboBoxNamespaceURI, 1, 0, 1, 2);
+	mpSelectNamespaceDialogLayout->addWidget(pNamsepaceOk, 2, 0, 1, 1);
+	mpSelectNamespaceDialogLayout->addWidget(mpSelectNamespaceDialogCancel, 2, 1, 1, 1);
+
+	mpSelectNamespaceDialog->setLayout(mpSelectNamespaceDialogLayout);
+
+	connect(mpSelectNamespaceDialogCancel, SIGNAL(clicked(bool)), mpSelectNamespaceDialog, SLOT(close()));
+	connect(pNamsepaceOk, SIGNAL(clicked(bool)), mpSelectNamespaceDialog, SLOT(accept()));
 
 
 			/* -----Denis Manthey----- */
@@ -379,7 +433,7 @@ void WizardResourceGeneratorPage::InitLayout() {
 			p_wrapper_layout_four->addWidget(new QLabel("Unknown"), ++i, 1, 1, 1);
 		p_wrapper_layout_four->addWidget(new QLabel(tr("Duration:")), ++i, 0, 1, 1);
 		if(metadata.duration.IsValid() && metadata.editRate.IsValid())
-			p_wrapper_layout_four->addWidget(new QLabel(metadata.duration.GetAsString(metadata.editRate)), i, 1, 1, 1);
+			p_wrapper_layout_four->addWidget(new QLabel(QString::number(metadata.duration.GetCount())+ " frames"), i, 1, 1, 1);
 		p_wrapper_layout_four->addWidget(new QLabel(tr("Frame Rate:")), ++i, 0, 1, 1);
 		if(metadata.editRate.IsValid() == true)
 			p_wrapper_layout_four->addWidget(new QLabel(metadata.editRate.GetName()), i, 1, 1, 1);
@@ -440,7 +494,7 @@ void WizardResourceGeneratorPage::InitLayout() {
 		p_wrapper_layout_five->addWidget(new QLabel(tr("Edit Rate:")), ++i, 0, 1, 1);
 		p_wrapper_layout_five->addWidget(new QLabel(metadata.editRate.GetName()), i, 1, 1, 1);
 		p_wrapper_layout_five->addWidget(new QLabel(tr("Duration:")), ++i, 0, 1, 1);
-		p_wrapper_layout_five->addWidget(new QLabel(metadata.duration.GetAsString(metadata.editRate)), i, 1, 1, 1);
+		p_wrapper_layout_five->addWidget(new QLabel(QString::number(metadata.duration.GetCount())+ " frames"), i, 1, 1, 1);
 		p_wrapper_layout_five->addWidget(new QLabel(tr("Namespace URI:")), ++i, 0, 1, 1);
 		p_wrapper_layout_five->addWidget(new QLabel(metadata.namespaceURI), i, 1, 1, 1);
 
@@ -472,6 +526,7 @@ void WizardResourceGeneratorPage::InitLayout() {
 	registerField(FIELD_NAME_MCA_AUDIO_CONTENT_KIND, this, "MCAAudioContentKindSelected", SIGNAL(MCAAudioContentKindChanged()));
 	registerField(FIELD_NAME_MCA_AUDIO_ELEMENT_KIND, this, "MCAAudioElementKindSelected", SIGNAL(MCAAudioElementKindChanged()));
 	registerField(FIELD_NAME_CPL_EDIT_RATE, this, "CplEditRateSelected", SIGNAL(CplEditRateChanged()));
+	registerField(FIELD_NAME_NAMESPACE_URI, this, "NamespaceURISelected", SIGNAL(NamespaceURIChanged()));
 	//WR
 
 	connect(mpFileDialog, SIGNAL(filesSelected(const QStringList &)), this, SLOT(SetSourceFiles(const QStringList &)));
@@ -482,7 +537,7 @@ void WizardResourceGeneratorPage::InitLayout() {
 //set "Generate" button enabled if all necessary values are edited
 void WizardResourceGeneratorPage::textChanged()
 {
-	if (mpLineEditDuration->text().toInt() > 0 && !mpLineEditFileName->text().isEmpty() && !mpLineEditFileDir->text().isEmpty()){
+	if (mpLineEditDurationEmptyTTGenerator->text().toInt() > 0 ){
 		mpGenerateEmpty_button->setEnabled(true);
 	}
 	else
@@ -522,42 +577,48 @@ void WizardResourceGeneratorPage::hideGroupBox() {
 
 void WizardResourceGeneratorPage::GenerateEmptyTimedText(){
 
-	QStringList filePath(tr("%1/%2.xml").arg(mpLineEditFileDir->text()).arg(mpLineEditFileName->text()));
-	QFileInfo *file = new QFileInfo(mpLineEditFileDir->text());
-	QString dur(tr("%1f").arg(mpLineEditDuration->text()));
-
-	//check if filename already exists in directory
-	if (QFile::exists(filePath.at(0))) {
-		mpMsgBox->setText(tr("Error"));
-		mpMsgBox->setInformativeText(tr("Filename %1.xml exists in directory %2").arg(mpLineEditFileName->text()).arg(mpLineEditFileDir->text()));
+	Error error;
+	//QStringList filePath(tr("%1/%2.xml").arg(mpLineEditFileDir->text()).arg(mpLineEditFileName->text()));
+	QStringList filePath(QApplication::applicationDirPath() + QString("/files/TTML_Empty_Minimal.xml"));
+	if (!QFileInfo::exists(filePath.at(0))) error =  Error(Error::SourceFileOpenError, filePath.at(0));
+	if(error.IsError() == true) {
+		QString error_string = error.GetErrorDescription();
+		mpMsgBox->setText(tr("Source File Error"));
+		mpMsgBox->setInformativeText(error.GetErrorMsg()+error_string);
 		mpMsgBox->setStandardButtons(QMessageBox::Ok);
 		mpMsgBox->setDefaultButton(QMessageBox::Ok);
+		mpMsgBox->setIcon(QMessageBox::Critical);
 		mpMsgBox->exec();
-		mpLineEditFileName->clear();
+		return;
 	}
 
-	//check for writing permissions
-	else if (file->isWritable() == false) {
-		mpMsgBox->setText(tr("Permission denied"));
-		mpMsgBox->setInformativeText(tr("make sure you have write permission for folder %1").arg(mpLineEditFileDir->text()));
-		mpMsgBox->setStandardButtons(QMessageBox::Ok);
-		mpMsgBox->setDefaultButton(QMessageBox::Ok);
-		mpMsgBox->exec();
-		mpLineEditFileDir->clear();
+
+	QString dur = mpLineEditDurationEmptyTTGenerator->text();
+
+	mpTimedTextModel->SetFile(filePath);
+	mpTableViewTimedText->resizeRowsToContents();
+	mpTableViewTimedText->resizeColumnsToContents();
+	SwitchMode(WizardResourceGenerator::TTMLMode);
+	emit FilesListChanged();
+	QString profile;
+	this->SetDuration(Duration(dur.toInt()));
+	while(profile.isEmpty()) {
+
+		int ret = mpSelectNamespaceDialog->exec();
+		switch (ret) {
+			case QDialog::Accepted:
+				profile = mpComboBoxNamespaceURI->currentText();
+				this->SetNamespaceURI(profile);
+				break;
+			case QDialog::Rejected:
+				return;
+		}
 	}
-	else {
-		mpEmptyTt = new EmptyTimedTextGenerator(filePath.at(0), dur, GetCplEditRate());
-		mpTimedTextModel->SetFile(filePath);
-		mpTableViewTimedText->resizeRowsToContents();
-		mpTableViewTimedText->resizeColumnsToContents();
-		SwitchMode(WizardResourceGenerator::TTMLMode);
-		emit FilesListChanged();
-		mpGroupBox->hide();
-		mGroupBoxCheck = 0;
-		mpLineEditFileDir->clear();
-		mpLineEditDuration->clear();
-		mpLineEditFileName->clear();
-	}
+	mpGroupBox->hide();
+	mGroupBoxCheck = 0;
+	mpLineEditFileDir->clear();
+	mpLineEditDurationEmptyTTGenerator->clear();
+	mpLineEditFileName->clear();
 }
 
 void WizardResourceGeneratorPage::SetSourceFiles(const QStringList &rFiles) {
@@ -571,7 +632,7 @@ void WizardResourceGeneratorPage::SetSourceFiles(const QStringList &rFiles) {
 			mpAs02Wrapper->ReadMetadata(metadata, rFiles.at(0));
 			for(int i = 0; i < rFiles.size(); i++) {
 				Metadata other_metadata;
-				mpAs02Wrapper->ReadMetadata(other_metadata, rFiles.at(0));
+				mpAs02Wrapper->ReadMetadata(other_metadata, rFiles.at(i));
 				if(other_metadata.editRate != EditRate::EditRate48000 && other_metadata.editRate != EditRate::EditRate96000) {
 					mpMsgBox->setText(tr("Unsupported Sampling Rate"));
 					mpMsgBox->setInformativeText(tr("%1 (%2 Hz). Only 48000 Hz and 96000 Hz are supported.").arg(other_metadata.fileName).arg(other_metadata.editRate.GetQuotient()));
@@ -619,28 +680,20 @@ void WizardResourceGeneratorPage::SetSourceFiles(const QStringList &rFiles) {
 
 			Metadata metadata;
 			Error error;
-			QDialog *pEditDur = new QDialog(this);
-
-			mpLineEditDuration = new QLineEdit(this);
-			mpLineEditDuration->setValidator(new QIntValidator(this));
-			mpLineEditDuration->setAlignment(Qt::AlignRight);
-			mpLineEditDuration->setPlaceholderText("Duration [frames]");
-			QPushButton *pOk = new QPushButton("OK");
-			QPushButton *pCancel = new QPushButton("Cancel");
-
-			QGridLayout *pEditDurLay = new QGridLayout();
-			pEditDurLay->addWidget(new QLabel(tr("Duration could not be resolved.\n\nEnter a higher duration than needed.\nDuration can be shortened in the timeline"), this), 0, 0, 1, 2);
-			pEditDurLay->addWidget(mpLineEditDuration, 1, 0, 1, 2);
-			pEditDurLay->addWidget(pOk, 2, 0, 1, 1);
-			pEditDurLay->addWidget(pCancel, 2, 1, 1, 1);
-
-			pEditDur->setLayout(pEditDurLay);
-
-			connect(pCancel, SIGNAL(clicked(bool)), pEditDur, SLOT(close()));
-			connect(pOk, SIGNAL(clicked(bool)), pEditDur, SLOT(accept()));
 
 			mpAs02Wrapper->SetCplEditRate(GetCplEditRate());
 			error = mpAs02Wrapper->ReadMetadata(metadata, rFiles.at(0));
+
+			if (!field(FIELD_NAME_NAMESPACE_URI).toString().isEmpty()) {
+				metadata.profile = field(FIELD_NAME_NAMESPACE_URI).toString();
+			}
+			this->SetNamespaceURI(metadata.profile);
+			//qvariant_cast<Duration>(p_resource_generator->field(FIELD_NAME_DURATION))
+			if (mTimedTextDuration.GetCount() > 0) {
+				metadata.duration = mTimedTextDuration;
+				this->SetDuration(metadata.duration);
+			}
+
 			if(error.IsError()){
 				mpMsgBox->setText(error.GetErrorDescription());
 				mpMsgBox->setInformativeText(error.GetErrorMsg());
@@ -649,17 +702,42 @@ void WizardResourceGeneratorPage::SetSourceFiles(const QStringList &rFiles) {
 				mpMsgBox->exec();
 				return;
 			}
+
+			if(!metadata.editRate.IsValid()) {
+				mpMsgBox->setText(tr("No Edit Rate selected"));
+				mpMsgBox->setInformativeText(tr("Select an Edit Rate for the Track File.\nIt is usually set to the Composition Edit Rate"));
+				mpMsgBox->setStandardButtons(QMessageBox::Ok);
+				mpMsgBox->setDefaultButton(QMessageBox::Ok);
+				mpMsgBox->exec();
+				//return;
+			}
+
 			while(metadata.duration.GetCount() == 0) {
 
-				int ret = pEditDur->exec();
+				int ret = mpEditDurationDialog->exec();
 				switch (ret) {
-					case 1:
+					case QDialog::Accepted:
 						metadata.duration = Duration(mpLineEditDuration->text().toInt());
 						break;
-					case 0:
+					case QDialog::Rejected:
 						return;
 				}
 			}
+			SetDuration(metadata.duration);
+
+			while(metadata.profile.isEmpty()) {
+
+				int ret = mpSelectNamespaceDialog->exec();
+				switch (ret) {
+					case QDialog::Accepted:
+						metadata.profile = mpComboBoxNamespaceURI->currentText();
+						this->SetNamespaceURI(metadata.profile);
+						break;
+					case QDialog::Rejected:
+						return;
+				}
+			}
+
 			SwitchMode(WizardResourceGenerator::TTMLMode);
 			mpTimedTextModel->SetFile(rFiles);
 			mpTableViewTimedText->resizeRowsToContents();
@@ -736,7 +814,8 @@ void WizardResourceGeneratorPage::SetEditRate(const EditRate &rEditRate) {
 }
 
 void WizardResourceGeneratorPage::SetDuration(const Duration &rDuration) {
-
+	mTimedTextDuration = rDuration;
+	mpLineEditDurationReadOnly->setText(QString::number(rDuration.GetCount()));
 	emit DurationChanged();
 	emit completeChanged();
 }
@@ -783,6 +862,12 @@ void WizardResourceGeneratorPage::SetCplEditRate(const EditRate &rEditRate) {
 	emit CplEditRateChanged();
 	emit completeChanged();
 }
+
+void WizardResourceGeneratorPage::SetNamespaceURI(const QString &text) {
+	mpLineEditNamespaceURI->setText(text);
+	emit NamespaceURIChanged();
+	emit completeChanged();
+}
 //WR
 
 
@@ -793,7 +878,7 @@ EditRate WizardResourceGeneratorPage::GetEditRate() const {
 
 Duration WizardResourceGeneratorPage::GetDuration() const {
 
-	return Duration(mpLineEditDuration->text().toInt());
+	return Duration(mpLineEditDurationReadOnly->text().toInt());
 }
 
 //WR
@@ -831,6 +916,11 @@ QString WizardResourceGeneratorPage::GetMCAAudioElementKind() const {
 EditRate WizardResourceGeneratorPage::GetCplEditRate() const {
 
 	return EditRate::GetEditRate(mpComboBoxCplEditRate->currentText());
+}
+
+QString WizardResourceGeneratorPage::GetNamespaceURI() const {
+
+	return mpLineEditNamespaceURI->text();
 }
 
 

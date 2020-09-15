@@ -266,7 +266,6 @@ ImfError WidgetComposition::Read() {
 	ImfError error; // Reset last error.
 	if(mAssetCpl) {
 		if(mAssetCpl->Exists() == true) {
-			qDebug() << "Read Cpl: " << mAssetCpl->GetPath().absoluteFilePath();
 			// clean old cpl
 			mpUndoStack->clear();
 			for(int i = 0; i < GetTrackDetailCount(); i++) {
@@ -289,8 +288,6 @@ ImfError WidgetComposition::Read() {
 			if (mpCompositionGraphicsWidget) mpCompositionGraphicsWidget->SetParseCplInProgress(false);
 			mpCompositionView->ensureVisible(0, 0, 1, 1);
 			mpTimelineView->ensureVisible(0, 0, 1, 1);
-
-			qDebug() << "Finished Read Cpl: " << mAssetCpl->GetPath().absoluteFilePath();
 		}
 		else error = ImfError(ImfError::AssetFileMissing, tr("CPL: %1").arg(mAssetCpl->GetPath().absoluteFilePath()));
 	}
@@ -412,6 +409,9 @@ ImfError WidgetComposition::Write(const QString &rDestination /*= QString()*/) {
 								break;
 							case VisuallyImpairedTextSequence:
 								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("cc")->second.name).c_str(), (xsd::cxx::xml::string("cc:VisuallyImpairedTextSequence").c_str()));
+								break;
+							case ForcedNarrativeSequence:
+								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("cc")->second.name).c_str(), (xsd::cxx::xml::string("cc:ForcedNarrativeSequence").c_str()));
 								break;
 							case IABSequence:
 								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("iab")->second.name).c_str(), (xsd::cxx::xml::string("iab:IABSequence").c_str()));
@@ -596,6 +596,9 @@ ImfError WidgetComposition::WriteNew(const QString &rDestination /*= QString()*/
 								break;
 							case VisuallyImpairedTextSequence:
 								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("cc")->second.name).c_str(), (xsd::cxx::xml::string("cc:VisuallyImpairedTextSequence").c_str()));
+								break;
+							case ForcedNarrativeSequence:
+								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("cc")->second.name).c_str(), (xsd::cxx::xml::string("cc:ForcedNarrativeSequence").c_str()));
 								break;
 							case IABSequence:
 								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("iab")->second.name).c_str(), (xsd::cxx::xml::string("iab:IABSequence").c_str()));
@@ -852,6 +855,10 @@ ImfError WidgetComposition::ParseCpl() {
 					if(p_track_detail == NULL) p_track_detail = new WidgetTrackDetails(ImfXmlHelper::Convert(sequence.getTrackId()), HearingImpairedCaptionsSequence, mpCompositionTracksWidget);
 					p_graphics_sequence = new GraphicsWidgetSequence(p_graphics_segment, HearingImpairedCaptionsSequence, ImfXmlHelper::Convert(sequence.getTrackId()), ImfXmlHelper::Convert(sequence.getId()));
 				}
+				else if(name == "ForcedNarrativeSequence") {
+					if(p_track_detail == NULL) p_track_detail = new WidgetTrackDetails(ImfXmlHelper::Convert(sequence.getTrackId()), ForcedNarrativeSequence, mpCompositionTracksWidget);
+					p_graphics_sequence = new GraphicsWidgetSequence(p_graphics_segment, ForcedNarrativeSequence, ImfXmlHelper::Convert(sequence.getTrackId()), ImfXmlHelper::Convert(sequence.getId()));
+				}
 				else if(name == "AncillaryDataSequence") {
 					if(p_track_detail == NULL) p_track_detail = new WidgetTrackDetails(ImfXmlHelper::Convert(sequence.getTrackId()), AncillaryDataSequence, mpCompositionTracksWidget);
 					p_graphics_sequence = new GraphicsWidgetSequence(p_graphics_segment, AncillaryDataSequence, ImfXmlHelper::Convert(sequence.getTrackId()), ImfXmlHelper::Convert(sequence.getId()));
@@ -896,6 +903,7 @@ ImfError WidgetComposition::ParseCpl() {
 							case KaraokeSequence:
 							case SubtitlesSequence:
 							case VisuallyImpairedTextSequence:
+							case ForcedNarrativeSequence:
 								if(mImp) p_graphics_sequence->AddResource(new GraphicsWidgetTimedTextResource(p_graphics_sequence, p_file_resource->_clone(), mImp->GetAsset(ImfXmlHelper::Convert(p_file_resource->getTrackFileId())).objectCast<AssetMxfTrack>(), 0, mImp), p_graphics_sequence->GetResourceCount());
 								else p_graphics_sequence->AddResource(new GraphicsWidgetTimedTextResource(p_graphics_sequence, p_file_resource->_clone()), p_graphics_sequence->GetResourceCount());
 								break;
@@ -1074,8 +1082,15 @@ void WidgetComposition::InitToolbar() {
 	p_button_add_track->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 	p_button_add_track->setPopupMode(QToolButton::InstantPopup);
 	QMenu *p_add_track_menu = new QMenu(tr("Add Track"), this);
-	mpAddMainAudioTrackAction = p_add_track_menu->addAction(QIcon(":/sound.png"), tr("main audio track"));
-	mpAddSubtitlesTrackAction = p_add_track_menu->addAction(QIcon(":/text.png"), tr("subtitles track"));
+	mpAddMainAudioTrackAction = p_add_track_menu->addAction(QIcon(":/sound.png"), tr("Main Audio track"));
+	p_add_track_menu->addSeparator();
+	QMenu* submenuTimedTextTrack = p_add_track_menu->addMenu( "Timed Text track" );
+	mpAddSubtitlesTrackAction = submenuTimedTextTrack->addAction(QIcon(":/text.png"), tr("subtitles track"));
+	mpAddForcedNarrativeTrackAction = submenuTimedTextTrack->addAction(QIcon(":/text.png"), tr("forced narrative track"));
+	mpAddHearingImpairedCaptionsTrackAction = submenuTimedTextTrack->addAction(QIcon(":/hi.png"), tr("hearing impaired captions track"));
+	mpAddVisuallyImpairedTextTrackAction = submenuTimedTextTrack->addAction(QIcon(":/vi.png"), tr("visually impaired text data track"));
+	mpAddCommentaryTrackAction = submenuTimedTextTrack->addAction(QIcon(":/comment.png"), tr("commentary track"));
+	mpAddKaraokeTrackAction = submenuTimedTextTrack->addAction(QIcon(":/microphone.png"), tr("karaoke track"));
 	p_add_track_menu->addSeparator();
 	mpAddMarkerTrackAction = p_add_track_menu->addAction(QIcon(":/marker.png"), tr("marker track"));
 	mpAddIABTrackAction = p_add_track_menu->addAction(QIcon(":/sound.png"), tr("Immersive Audio track"));
@@ -1179,8 +1194,13 @@ void WidgetComposition::rToolBarActionTriggered(QAction *pAction) {
 void WidgetComposition::rAddTrackMenuActionTriggered(QAction *pAction) {
 
 	if(pAction == mpAddMarkerTrackAction) AddNewTrackRequest(MarkerSequence);
+	else if(pAction == mpAddCommentaryTrackAction) AddNewTrackRequest(CommentarySequence);
+	else if(pAction == mpAddHearingImpairedCaptionsTrackAction) AddNewTrackRequest(HearingImpairedCaptionsSequence);
+	else if(pAction == mpAddKaraokeTrackAction) AddNewTrackRequest(KaraokeSequence);
 	else if(pAction == mpAddMainAudioTrackAction) AddNewTrackRequest(MainAudioSequence);
 	else if(pAction == mpAddSubtitlesTrackAction) AddNewTrackRequest(SubtitlesSequence);
+	else if(pAction == mpAddForcedNarrativeTrackAction) AddNewTrackRequest(ForcedNarrativeSequence);
+	else if(pAction == mpAddVisuallyImpairedTextTrackAction) AddNewTrackRequest(VisuallyImpairedTextSequence);
 	else if(pAction == mpAddIABTrackAction) AddNewTrackRequest(IABSequence);
 	else if(pAction == mpAddISXDTrackAction) AddNewTrackRequest(ISXDSequence);
 	else AddNewTrackRequest(Unknown);

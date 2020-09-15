@@ -104,6 +104,7 @@ public:
 	Timecode lastPosition; // (k)
 	void getVerticalIndicator() {
 		if (lastPosition.IsValid()) {
+			if (lastPosition.GetFrames() == 0) lastPosition = Timecode(this->GetEditRate(), 0); // lastPosition is initialized with 24 fps as default edit rate
 			rCurrentFrameChanged(lastPosition);
 		}
 	}; // (k)
@@ -186,6 +187,7 @@ private:
 	QAction *mpAddKaraokeTrackAction;
 	QAction *mpAddMainAudioTrackAction;
 	QAction *mpAddSubtitlesTrackAction;
+	QAction *mpAddForcedNarrativeTrackAction;
 	QAction *mpAddVisuallyImpairedTextTrackAction;
 	QAction *mpAddMainImageTrackAction;
 	QAction *mpAddIABTrackAction;

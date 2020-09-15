@@ -577,7 +577,6 @@ void WidgetImpBrowser::rShowResourceGeneratorForAsset(const QUuid &rAssetId) {
 			else
 				p_wizard_resource_generator = new WizardResourceGenerator(this, mpImfPackage->GetImpEditRates(), asset);
 			p_wizard_resource_generator->setAttribute(Qt::WA_DeleteOnClose, true);
-			p_wizard_resource_generator->setField(FIELD_NAME_SELECTED_FILES, QVariant(asset->GetSourceFiles()));
 			p_wizard_resource_generator->setField(FIELD_NAME_SOUNDFIELD_GROUP, QVariant::fromValue<SoundfieldGroup>(asset->GetSoundfieldGroup()));
 			p_wizard_resource_generator->setField(FIELD_NAME_EDIT_RATE, QVariant::fromValue<EditRate>(asset->GetEditRate()));
 			//WR
@@ -588,6 +587,9 @@ void WidgetImpBrowser::rShowResourceGeneratorForAsset(const QUuid &rAssetId) {
 			p_wizard_resource_generator->setField(FIELD_NAME_MCA_AUDIO_CONTENT_KIND, QVariant(asset->GetMCAAudioContentKind()));
 			p_wizard_resource_generator->setField(FIELD_NAME_MCA_AUDIO_ELEMENT_KIND, QVariant(asset->GetMCAAudioElementKind()));
 			p_wizard_resource_generator->setField(FIELD_NAME_CPL_EDIT_RATE, QVariant::fromValue<EditRate>(asset->GetCplEditRate()));
+			p_wizard_resource_generator->setField(FIELD_NAME_NAMESPACE_URI, QVariant(asset->GetProfile()));
+			p_wizard_resource_generator->setField(FIELD_NAME_DURATION, QVariant::fromValue<Duration>(asset->GetDuration()));
+			p_wizard_resource_generator->setField(FIELD_NAME_SELECTED_FILES, QVariant(asset->GetSourceFiles()));
 			//WR
 			p_wizard_resource_generator->setProperty(ASSET_ID_DYNAMIK_PROPERTY, QVariant(asset->GetId()));
 			p_wizard_resource_generator->show();
@@ -622,6 +624,7 @@ void WidgetImpBrowser::rResourceGeneratorAccepted() {
 		QString mca_audio_content_kind = qvariant_cast<QString>(p_resource_generator->field(FIELD_NAME_MCA_AUDIO_CONTENT_KIND));
 		QString mca_audio_element_kind = qvariant_cast<QString>(p_resource_generator->field(FIELD_NAME_MCA_AUDIO_ELEMENT_KIND));
 		EditRate cpl_edit_rate = qvariant_cast<EditRate>(p_resource_generator->field(FIELD_NAME_CPL_EDIT_RATE));
+		QString namespace_uri = qvariant_cast<QString>(p_resource_generator->field(FIELD_NAME_NAMESPACE_URI));
 		//WR
 		if(mpImfPackage) {
 			QVariant asset_id = p_resource_generator->property(ASSET_ID_DYNAMIK_PROPERTY);
@@ -654,10 +657,9 @@ void WidgetImpBrowser::rResourceGeneratorAccepted() {
 					QSharedPointer<AssetMxfTrack> mxf_asset(new AssetMxfTrack(mxf_asset_file_path, id));
 					mxf_asset->SetCplEditRate(cpl_edit_rate);
 					mxf_asset->SetSourceFiles(selected_files);
-					if (mxf_asset->GetDuration().GetCount() == 0) {
-						mxf_asset->SetDuration(duration);
-					}
+					mxf_asset->SetDuration(duration);
 					mxf_asset->SetLanguageTag(language_tag_tt);
+					mxf_asset->SetProfile(namespace_uri);
 					//WR
 					mpUndoStack->push(new AddAssetCommand(mpImfPackage, mxf_asset, mpImfPackage->GetPackingListId()));
 				}
@@ -682,6 +684,8 @@ void WidgetImpBrowser::rResourceGeneratorAccepted() {
 					if (is_ttml_file(selected_files.first())) {
 						mxf_asset->SetLanguageTag(language_tag_tt);
 						mxf_asset->SetCplEditRate(cpl_edit_rate);
+						mxf_asset->SetProfile(namespace_uri);
+						mxf_asset->SetDuration(duration);
 					}
 					//WR
 				}
@@ -1146,7 +1150,6 @@ void WidgetImpBrowser::SetMxfFile(const QStringList &rFiles) {
 		Metadata metadata;
 		Error error(Error::None);
 		extractor.ReadMetadata(metadata, QDir(rFiles.at(0)).absolutePath());
-		qDebug() << "Asset ID of imported MXF track file:" << metadata.assetId.toString();
 		QFileInfo path = QFileInfo(QDir(rFiles.at(0)).absolutePath());
 		if (metadata.assetId.isNull()) {
 			mpMsgBox->setText(tr("MXF Error"));
@@ -1185,9 +1188,11 @@ void WidgetImpBrowser::SetMxfFile(const QStringList &rFiles) {
 						break;
 
 					case ASDCP::ESS_AS02_TIMED_TEXT:
-						// Convert originalDuration to CPL Edit Units
-						metadata.editRate = mpImfPackage->GetImpEditRates().first();
+						// commented out - keep Edit Rate and IntrinsicDuration consistent to Track File!
+/*
+						metadata.editRate = mpImfPackage->GetImpEditRates().count() > 0 ? mpImfPackage->GetImpEditRates().first() : metadata.editRate;
 						metadata.duration = Duration(ceil(metadata.originalDuration.GetCount() / metadata.effectiveFrameRate.GetQuotient() * metadata.editRate.GetQuotient()));
+*/
 
 						break;
 					default:

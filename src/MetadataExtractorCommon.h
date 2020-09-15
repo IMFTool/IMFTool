@@ -81,6 +81,7 @@ public:
 	QString									filePath;
 	QString									fileType;
 	QString									profile;	//Timed Text Profile
+	bool									tt_profile_is_text = true;
 	//WR
 	QString									languageTag;
 	QString									mcaTitle;

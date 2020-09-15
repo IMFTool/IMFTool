@@ -53,7 +53,7 @@ private:
 		ButtonTimecode,
 		ButtonFrames
 	};
-	bool mShowFrames = false;
+	bool mShowFrames = true;
 	Timecode mLastTimeCode;
 
 public:

@@ -66,11 +66,20 @@ bool elem::process() {
 
 	if (mpDomElement) {
 		// check if irrelevant element -> ignore
+/*
 		if(!tt_tags.contains(XMLString::transcode(mpDomElement->getTagName()))){
 			//dur = 2; remove?
 			stop = true;
 			return stop;
 		}
+*/
+		stop = true;
+		for (int i=0; i < tt_tags.length(); i++) {
+			if (QString(XMLString::transcode(mpDomElement->getTagName())).contains(tt_tags.at(i))) {
+				stop = false;
+			}
+		}
+		if (stop) return stop;
 
 		// check for region attribute
 		GetRegion();
@@ -505,7 +514,6 @@ void TTMLParser::readAncilleryData() {
 	AS_02::Result_t result = reader.FillTimedTextDescriptor(TDesc);
 	TimedText::FrameBuffer buffer;
 	buffer.Capacity(2 * Kumu::Megabyte);
-	max = 255;
 	
 	if (ASDCP_SUCCESS(result)) {
 		AS_02::TimedText::ResourceList_t::const_iterator ri;
@@ -523,27 +531,7 @@ void TTMLParser::readAncilleryData() {
 #endif
 				QPixmap pix;
 				pix.loadFromData(buffer.RoData(), buffer.Size(), "png");
-				QImage img = pix.toImage();
-
-				for (int x = 0; x < img.width(); x++) {
-					for (int y = 0; y < img.height(); y++) {
-						double r, g, b, a;
-						QColor pixelColor = img.pixelColor(x,y); // sRGB: 255 = 80cd/m2
-						pixelColor.getRgbF(&r, &g, &b, &a);
-						r = eotf_sRGB[(int)(r * max_f_)]; // 0...1
-						r = oetf_709[(int)(r * max_f_)] * max;
-						g = eotf_sRGB[(int)(g * max_f_)]; // 0...1
-						g = oetf_709[(int)(g * max_f_)] * max;
-						b = eotf_sRGB[(int)(b * max_f_ )]; // 0...1
-						b = oetf_709[(int)(b * max_f_)] * max;
-
-						pixelColor.setRgb((int)r, (int)g, (int)b, (int)(a*255));
-						img.setPixelColor(x, y, pixelColor);
-					}
-				}
-
-
-				anc_resources[id] = img; //pix.toImage();
+				anc_resources[id] = pix.toImage();
 			}
 			else {
 #ifdef DEBUG_TTML
@@ -621,6 +609,10 @@ void TTMLParser::parse(std::string xml) {
 
 	// check if body has styling information
 	DOMNode *body_node = dom_doc->getElementsByTagNameNS(IMSC1_NS_TT, XMLString::transcode("body"))->item(0);
+	if (body_node == nullptr) {
+		parser->~XercesDOMParser(); // delete DOM parser
+		return; // nothing to do
+	}
 	DOMElement *body_el = dynamic_cast<DOMElement*>(body_node);
 
 	QString body_region;

@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <!--
 This document is an element of
 
-   SMPTE ST 2067-3:2016,
+   SMPTE ST 2067-3:2020,
 
 which is available at http://standards.smpte.org.
 
@@ -58,6 +58,7 @@ not be sufficient to ensure interoperability;
   elementFormDefault="qualified" attributeFormDefault="unqualified">
   <xs:import namespace="http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/" schemaLocation="st0433-dcmlTypes.xsd"/>
   <xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig-core-schema.xsd"/>
+
   <xs:element name="CompositionPlaylist" type="cpl:CompositionPlaylistType"/>
   <xs:complexType name="CompositionPlaylistType">
     <xs:sequence>

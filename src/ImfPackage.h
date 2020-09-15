@@ -430,6 +430,7 @@ public:
 	void SetMCAAudioContentKind(const QString &rText) {mMetadata.mcaAudioContentKind = rText;};
 	void SetMCAAudioElementKind(const QString &rText) {mMetadata.mcaAudioElementKind = rText;};
 	void SetCplEditRate(const EditRate &rCplEditRate) { mCplEditRate = rCplEditRate;};
+	void SetProfile(const QString &rText) {mMetadata.profile = rText; mMetadata.tt_profile_is_text = !mMetadata.profile.contains("image");};
 	//This method extracts the essence descriptor from rFilePath and writes it into mEssenceDescriptor
 	//Error ExtractEssenceDescriptor(const QString &filePath);
 	Error ExtractEssenceDescriptor(const QString &filePath);

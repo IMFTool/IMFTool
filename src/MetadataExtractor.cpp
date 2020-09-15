@@ -537,13 +537,17 @@ Error MetadataExtractor::ReadTimedTextMxfDescriptor(Metadata &rMetadata, const Q
 
 			//WR
 			metadata.effectiveFrameRate = tt_descriptor->SampleRate;
-			metadata.editRate = mCplEditRate;
+			metadata.editRate = tt_descriptor->SampleRate;
 			metadata.originalDuration = Duration(tt_descriptor->ContainerDuration);
+			metadata.duration = Duration(tt_descriptor->ContainerDuration);
+/*
 			if ( metadata.editRate.IsValid() ) {  // duration and editRate will be set afterwards in ImfPackage::ParseAssetMap()
 				metadata.duration = Duration(ceil(tt_descriptor->ContainerDuration / metadata.effectiveFrameRate.GetQuotient() * metadata.editRate.GetQuotient()));
 			}
+*/
 			//WR
 			metadata.profile = QString::fromStdString(tt_descriptor->NamespaceURI);
+			metadata.tt_profile_is_text = !metadata.profile.contains("image");
 			const unsigned short IdentBufferLen = 128;
 			char identbuf[IdentBufferLen];
 			if (!tt_descriptor->RFC5646LanguageTagList.empty()) {
@@ -962,7 +966,7 @@ float MetadataExtractor::DurationExtractor(DOMDocument *dom_doc, float fr, int t
 
 	float bodyduration=0, eleduration=0, divduration=0, div2duration=0, pduration=0, p2duration=0, spanduration=0, duration=0;
 
-	DOMNodeList	*bodyitems = dom_doc->getElementsByTagName(XMLString::transcode("body"));
+	DOMNodeList	*bodyitems = dom_doc->getElementsByTagNameNS(IMSC1_NS_TT, XMLString::transcode("body"));
 	DOMElement* bodyeleDom = dynamic_cast<DOMElement*>(bodyitems->item(0));
 	bodyduration = GetElementDuration(bodyeleDom, fr, tr);
 	if (bodyduration > 0) {
@@ -973,7 +977,7 @@ float MetadataExtractor::DurationExtractor(DOMDocument *dom_doc, float fr, int t
 	QString bodytime = XMLString::transcode(bodyeleDom->getAttribute(XMLString::transcode("timeContainer")));  //bodytime: par/seq
 
 	//---start with div childelements of body---
-	DOMNodeList	*divitems = dom_doc->getElementsByTagName(XMLString::transcode("div"));
+	DOMNodeList	*divitems = dom_doc->getElementsByTagNameNS(IMSC1_NS_TT, XMLString::transcode("div"));
 	divduration=0;
 	for(int i=0; i < divitems->getLength(); i++){
 
@@ -987,7 +991,7 @@ float MetadataExtractor::DurationExtractor(DOMDocument *dom_doc, float fr, int t
 			pduration = 0;
 
 			if(eleduration == 0){
-				DOMNodeList *div2items = diveleDom->getElementsByTagName(XMLString::transcode("div"));
+				DOMNodeList *div2items = diveleDom->getElementsByTagNameNS(IMSC1_NS_TT, XMLString::transcode("div"));
 				div2duration=0;
 				for(int j=0; j < div2items->getLength(); j++){
 
@@ -998,7 +1002,7 @@ float MetadataExtractor::DurationExtractor(DOMDocument *dom_doc, float fr, int t
 					p2duration = 0;
 
 					if(eleduration == 0){
-						DOMNodeList *p2items = div2eleDom->getElementsByTagName(XMLString::transcode("p"));
+						DOMNodeList *p2items = div2eleDom->getElementsByTagNameNS(IMSC1_NS_TT, XMLString::transcode("p"));
 						p2duration=0;
 						for(int k=0; k < p2items->getLength(); k++){
 
@@ -1009,7 +1013,7 @@ float MetadataExtractor::DurationExtractor(DOMDocument *dom_doc, float fr, int t
 							spanduration = 0;
 
 							if(eleduration == 0){
-								DOMNodeList *spanitems = p2eleDom->getElementsByTagName(XMLString::transcode("span"));
+								DOMNodeList *spanitems = p2eleDom->getElementsByTagNameNS(IMSC1_NS_TT, XMLString::transcode("span"));
 
 								for(int l=0; l < spanitems->getLength(); l++){
 
@@ -1051,17 +1055,17 @@ float MetadataExtractor::DurationExtractor(DOMDocument *dom_doc, float fr, int t
 				}
 				eleduration=0;
 
-				DOMNodeList *pitems = diveleDom->getElementsByTagName(XMLString::transcode("p"));
+				DOMNodeList *pitems = diveleDom->getElementsByTagNameNS(IMSC1_NS_TT, XMLString::transcode("p"));
 				for(int m=0; m < pitems->getLength(); m++){
 					DOMElement* peleDom = dynamic_cast<DOMElement*>(pitems->item(m));
 					QString comp2 = XMLString::transcode(peleDom->getParentNode()->getParentNode()->getNodeName());
-					if(comp2 == "body"){
+					if(comp2.contains("body")){
 						QString ptime = XMLString::transcode(peleDom->getAttribute(XMLString::transcode("timeContainer")));	//ptime: par/seq
 						eleduration = GetElementDuration(peleDom, fr,tr);
 						spanduration = 0;
 
 						if(eleduration == 0){
-							DOMNodeList *spanitems = peleDom->getElementsByTagName(XMLString::transcode("span"));
+							DOMNodeList *spanitems = peleDom->getElementsByTagNameNS(IMSC1_NS_TT, XMLString::transcode("span"));
 
 							for(int n=0; n < spanitems->getLength(); n++){
 
@@ -1160,7 +1164,7 @@ Error MetadataExtractor::ReadTimedTextMetadata(Metadata &rMetadata, const QFileI
 		parser->parse(xmlFile);
 		dom_doc = parser->getDocument();
 
-		DOMNodeList *ttitem = dom_doc->getElementsByTagName(XMLString::transcode("tt"));
+		DOMNodeList *ttitem = dom_doc->getElementsByTagNameNS(IMSC1_NS_TT, XMLString::transcode("tt"));
 		//Check if <tt> is present
 		if (ttitem->getLength() == 0) {
 			error = (Error::XMLSchemeError);
@@ -1170,27 +1174,45 @@ Error MetadataExtractor::ReadTimedTextMetadata(Metadata &rMetadata, const QFileI
 		DOMElement* tteleDom = dynamic_cast<DOMElement*>(ttitem->item(0));
 
 		//Profile Extractor
-		// First have a look if ttp:profile attribute is present
-		QString profile = XMLString::transcode(tteleDom->getAttributeNS(IMSC1_NS_TTP, XMLString::transcode("profile")));
+		QString profile;
 
-		//TO-DO: Checking for urn:ebu:tt:distribution:2014-01
+		// IMSC 1.1 profile signaling
+		QString profileList = XMLString::transcode(tteleDom->getAttributeNS(IMSC1_NS_TTP, XMLString::transcode("contentProfiles")));
+		if (profileList.contains(NETFLIX_IMSC11_TT)) profile = NETFLIX_IMSC11_TT;
+		else if (profileList.contains(IMSC_11_PROFILE_TEXT)) profile = IMSC_11_PROFILE_TEXT;
+		else if (profileList.contains(IMSC_11_PROFILE_IMAGE)) profile = IMSC_11_PROFILE_IMAGE;
+		else if (profileList.contains(IMSC_10_PROFILE_TEXT)) profile = IMSC_10_PROFILE_TEXT;
+		else if (profileList.contains(IMSC_10_PROFILE_IMAGE)) profile = IMSC_10_PROFILE_IMAGE;
 
+		// IMSC 1.0 profile signaling
 		if (profile.isEmpty()) {
-			profile = "http://www.w3.org/ns/ttml/profile/imsc1/text";
-			DOMNodeList	*divitems = dom_doc->getElementsByTagName(XMLString::transcode("div"));
-			//Check if <smpte:backgroundImage> is present
-			if (divitems->getLength() != 0) {
-				// Checking the first div element only
-				DOMElement* backgroundImage_eleDom = dynamic_cast<DOMElement*>(divitems->item(0));
-				QString backgroundImage = XMLString::transcode(backgroundImage_eleDom->getAttributeNS(IMSC1_NS_SMPTE, XMLString::transcode("backgroundImage")));
-				if (!backgroundImage.isEmpty()) {
-					qDebug() << "backgroundImage found, setting profile to imsc1/image.";
-					profile = "http://www.w3.org/ns/ttml/profile/imsc1/image";
+			profile = XMLString::transcode(tteleDom->getAttributeNS(IMSC1_NS_TTP, XMLString::transcode("profile")));
+		}
+		// EBU_TT_D profile signaling
+		if (profile.isEmpty()) {
+			DOMNodeList *ttitem = tteleDom->getElementsByTagNameNS(EBU_TTM, XMLString::transcode("conformsToStandard"));
+			if (ttitem->getLength() > 0) {
+				for (int i = 0; i < ttitem->getLength(); i++) {
+					DOMElement* tteleDom = dynamic_cast<DOMElement*>(ttitem->item(i));
+					QString value = XMLString::transcode(tteleDom->getFirstChild()->getNodeValue());
+					if (value.contains(EBU_TT_D)) {
+						profile = EBU_TT_D;
+						break;
+					}
 				}
 			}
 		}
-		metadata.profile = profile;
+		// ttml10-sdp-us profile signaling
+		if (profile.isEmpty()) {
+			DOMNodeList *ttitem = tteleDom->getElementsByTagNameNS(IMSC1_NS_TTP, XMLString::transcode("profile"));
+			if (ttitem->getLength() == 1) {
+				DOMElement* tteleDom = dynamic_cast<DOMElement*>(ttitem->item(0));
+				profile = XMLString::transcode(tteleDom->getAttributeNS(IMSC1_NS_TTP, XMLString::transcode("use")));
+			}
+		}
 
+		metadata.tt_profile_is_text = !profile.contains("image");
+		metadata.profile = profile;
 		//Frame Rate Multiplier Extractor
 		QString mult = XMLString::transcode(tteleDom->getAttributeNS(IMSC1_NS_TTP, XMLString::transcode("frameRateMultiplier")));
 		float num = 1;
@@ -1223,15 +1245,18 @@ Error MetadataExtractor::ReadTimedTextMetadata(Metadata &rMetadata, const QFileI
 			tickrate = ceil (framerate * subFrameRate);
 
 		//Duration Extractor
-		DOMNodeList	*bodyitem = dom_doc->getElementsByTagName(XMLString::transcode("body"));
+		DOMNodeList	*bodyitem = dom_doc->getElementsByTagNameNS(IMSC1_NS_TT, XMLString::transcode("body"));
 		//Check if <body> is present
+		float duration;
 		if (bodyitem->getLength() == 0) {
+/*
 			error = (Error::XMLSchemeError);
 			return error;
+*/
+			duration = 0; //See TTML2 8.1.1
+		} else {
+			duration = DurationExtractor(dom_doc,framerate,tickrate);
 		}
-		float duration;
-		duration = DurationExtractor(dom_doc,framerate,tickrate);
-
 		metadata.effectiveFrameRate = EditRate(editrate*num, den);  // Eff. FrameRate in IMSC1 and MXF
 		metadata.originalDuration = Duration(ceil(duration * metadata.effectiveFrameRate.GetQuotient())); // MXF Duration
 		metadata.editRate = mCplEditRate;

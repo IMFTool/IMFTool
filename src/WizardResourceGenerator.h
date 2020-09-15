@@ -23,7 +23,6 @@
 #include <QFileInfo>
 #include <QLineEdit>
 #include <QGroupBox>
-#include "EmptyTimedTextGenerator.h"
 #include "ImfPackage.h"
 
 
@@ -86,6 +85,7 @@ class WizardResourceGeneratorPage : public QWizardPage {
 		Q_PROPERTY(QString MCAAudioContentKindSelected READ GetMCAAudioContentKind WRITE SetMCAAudioContentKind NOTIFY MCAAudioContentKindChanged)
 		Q_PROPERTY(QString MCAAudioElementKindSelected READ GetMCAAudioElementKind WRITE SetMCAAudioElementKind NOTIFY MCAAudioElementKindChanged)
 		Q_PROPERTY(EditRate CplEditRateSelected READ GetCplEditRate WRITE SetCplEditRate NOTIFY CplEditRateChanged)
+		Q_PROPERTY(QString NamespaceURISelected READ GetNamespaceURI WRITE SetNamespaceURI NOTIFY NamespaceURIChanged)
 		//WR
 
 public:
@@ -104,6 +104,7 @@ public:
 	QString GetMCAAudioContentKind() const;
 	QString GetMCAAudioElementKind() const;
 	EditRate GetCplEditRate() const;
+	QString GetNamespaceURI() const;
 	//WR
 
 protected:
@@ -121,6 +122,7 @@ signals:
 	void MCAAudioContentKindChanged();
 	void MCAAudioElementKindChanged();
 	void CplEditRateChanged();
+	void NamespaceURIChanged();
 
 	//WR
 
@@ -137,6 +139,7 @@ signals:
 	void SetMCAAudioContentKind(const QString &rLanguageTag);
 	void SetMCAAudioElementKind(const QString &rLanguageTag);
 	void SetCplEditRate(const EditRate &rEditRate);
+	void SetNamespaceURI(const QString &rString);
 	//WR
 	void ChangeSoundfieldGroup(const QString &rName);
 	void ShowFileDialog();
@@ -172,6 +175,7 @@ private:
 	WidgetProxyImage *mpProxyImageWidget;
 	QStackedLayout *mpStackedLayout;
 	QComboBox	*mpComboBoxEditRate;
+	QComboBox	*mpComboBoxNamespaceURI;
 	QComboBox *mpComboBoxSoundfieldGroup;
 	//WR
 	QComboBox *mpComboBoxCplEditRate;
@@ -181,22 +185,27 @@ private:
 	QLineEdit *mpLineEditMCATitleVersion;
 	QLineEdit *mpLineEditMCAAudioContentKind;
 	QLineEdit *mpLineEditMCAAudioElementKind;
+	QLineEdit *mpLineEditNamespaceURI;
 	//WR
 	QFileDialog *mpDirDialog;
 	QLineEdit *mpLineEditDuration;
+	QLineEdit *mpLineEditDurationReadOnly;
+	QLineEdit *mpLineEditDurationEmptyTTGenerator;
+	Duration mTimedTextDuration;
 	QLineEdit *mpLineEditFileDir;
 	QLineEdit *mpLineEditFileName;
 	QPushButton *mpGenerateEmpty_button;
 	QMessageBox	*mpMsgBox;
 	MetadataExtractor *mpAs02Wrapper;
-	EmptyTimedTextGenerator *mpEmptyTt;
 	QGroupBox *mpGroupBox;
 	bool mGroupBoxCheck;
 
 	QSharedPointer<AssetMxfTrack> mAsset;
 	bool mReadOnly;
-};
 
+	QDialog *mpEditDurationDialog;
+	QDialog *mpSelectNamespaceDialog;
+};
 
 class WidgetProxyImage : public QWidget {
 
@@ -296,6 +305,8 @@ public:
 	void SetMCAAudioContentKind(const QString &rString);
 	void SetMCAAudioElementKind(const QString &rString);
 	void SetCplEditRate(const EditRate &rEditRate);
+	void SetNamespaceURI(const QString &rString);
+	void SetDuration(const Duration &Duration);
 	//WR
 
 private:

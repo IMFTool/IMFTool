@@ -19,7 +19,6 @@
 #include "MetadataExtractor.h"
 #include <QTextEdit>
 #include <QVBoxLayout>
-#include "EmptyTimedTextGenerator.h" // defines Xuni
 #include <xercesc/util/PlatformUtils.hpp>
 #include <xercesc/util/XMLString.hpp>
 #include <xercesc/dom/DOM.hpp>
@@ -32,6 +31,20 @@
 #include <xercesc/dom/DOMLSOutput.hpp>
 #include <xercesc/framework/MemBufFormatTarget.hpp>
 
+using namespace xercesc;
+
+//!this class helps to convert char* to XMLString by using X(char*) instead of XMLString::transcode(char*).
+class XStr
+{
+public :
+    XStr(const char* const toTranscode) { fUnicodeForm = XMLString::transcode(toTranscode); }
+    ~XStr() { XMLString::release(&fUnicodeForm); }
+    const XMLCh* unicodeForm() const { return fUnicodeForm; }
+
+private :
+    XMLCh*   fUnicodeForm;
+};
+#define Xuni(str) XStr(str).unicodeForm()
 
 WizardEssenceDescriptor::WizardEssenceDescriptor(QWidget *pParent /*= NULL*/, QSharedPointer<AssetMxfTrack> rAsset /* = 0 */) :
 QWizard(pParent) {

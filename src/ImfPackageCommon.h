@@ -17,8 +17,8 @@
 #include "SMPTE-429-9-2007-AM.h"
 #include "SMPTE-429-8-2006-PKL.h"
 #include "SMPTE-2067-3-2013-CPL.h"
-#include "st2067-2b-2016-PKL.h"
-#include "st2067-3a-2016-CPL.h"
+#include "st2067-2b-2020-PKL.h"
+#include "st2067-3a-2020-CPL.h"
 #include "SafeBool.h"
 #include "global.h"
 #include "ImfCommon.h"
@@ -426,10 +426,14 @@ public:
 
 		MarkerLabel ret;
 		const cpl2016::MarkerType_LabelType::ScopeType markerScope2016(WELL_KNOWN_MARKER_LABEL_SCOPE_2016);
+		const cpl2016::MarkerType_LabelType::ScopeType markerScope2020(WELL_KNOWN_MARKER_LABEL_SCOPE_2020);
 		if(rMarkerLabel.getScope().compare(rMarkerLabel.getScopeDefaultValue()) == 0) {
 			ret = MarkerLabel::GetMarker(QString(rMarkerLabel.c_str()));
 		}
 		else if(rMarkerLabel.getScope().compare(markerScope2016) == 0) {
+			ret = MarkerLabel::GetMarker(QString(rMarkerLabel.c_str()));
+		}
+		else if(rMarkerLabel.getScope().compare(markerScope2020) == 0) {
 			ret = MarkerLabel::GetMarker(QString(rMarkerLabel.c_str()));
 		}
 		else {

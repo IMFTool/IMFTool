@@ -55,7 +55,8 @@ enum eSequenceType {
 	MarkerSequence = (1u << 8),
 	IABSequence  = (1u << 9),  // SMPTE ST 2067-201
 	ISXDSequence  = (1u << 10), // SMPTE RDD 47
-	Unknown = (1u << 11)
+	ForcedNarrativeSequence = (1u << 11), // SMPTE ST 2067-2:2020
+	Unknown = (1u << 12)
 };
 
 

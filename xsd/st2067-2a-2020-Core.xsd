@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <!--
 This document is an element of
 
-   SMPTE ST 2067-2:2016,
+   SMPTE ST 2067-2:2020,
 
 which is available at http://standards.smpte.org.
 
@@ -52,15 +52,15 @@ not be sufficient to ensure interoperability;
 (d) report issues to the Director of Standards at https://www.smpte.org/about/staff.
 -->
 <xs:schema
-        targetNamespace="http://www.smpte-ra.org/schemas/2067-2/2016"
+        targetNamespace="http://www.smpte-ra.org/ns/2067-2/2020"
         xmlns:cpl="http://www.smpte-ra.org/schemas/2067-3/2016"
-        xmlns:cc="http://www.smpte-ra.org/schemas/2067-2/2016"
+        xmlns:cc="http://www.smpte-ra.org/ns/2067-2/2020"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
         xmlns:dcml="http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/"
         elementFormDefault="qualified"
         attributeFormDefault="unqualified">
 
-    <xs:import namespace="http://www.smpte-ra.org/schemas/2067-3/2016" schemaLocation="st2067-3a-2016-CPL.xsd"/> 
+    <xs:import namespace="http://www.smpte-ra.org/schemas/2067-3/2016" schemaLocation="st2067-3a-2020-CPL.xsd"/>
     <xs:import namespace="http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/" schemaLocation="st0433-dcmlTypes.xsd"/>
 
     <xs:element name="TimedTextResourceID" type="dcml:UUIDType"/>
@@ -81,6 +81,7 @@ not be sufficient to ensure interoperability;
     <xs:element name="VisuallyImpairedTextSequence" type="cpl:SequenceType"/>
     <xs:element name="CommentarySequence" type="cpl:SequenceType"/>
     <xs:element name="KaraokeSequence" type="cpl:SequenceType"/>
+    <xs:element name="ForcedNarrativeSequence" type="cpl:SequenceType"/>
     <xs:element name="AncillaryDataSequence" type="cpl:SequenceType"/>
     <xs:complexType name="StereoImageTrackFileResourceType">
         <xs:complexContent>

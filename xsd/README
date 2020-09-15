@@ -6,3 +6,6 @@ xsd cxx-tree --options-file imf.options --output-dir ../src/synthesis *.xsd
 
 Memo, please ignore:
 ~/src/xsd-4.0.0+dep/xsd/xsd/xsd cxx-tree --options-file imf.options --output-dir ../src/synthesis *.xsd
+
+~/src/xsd-4.0.0+dep/xsd/xsd/xsd cxx-tree --options-file imf.options --output-dir ../src/synthesis-2020 *.xsd
+

@@ -136,7 +136,7 @@ void WidgetCentral::InitLyout() {
 	mpTabDetailTTML->addTab(p_content_version_list_scroll_area, "ContentVersionList"); // add to layout
 	int tabNumber = mpTabDetailTTML->addTab(mpLocaleListWidget, "LocaleList"); // add to layout
 	mpTabDetailTTML->setTabToolTip(tabNumber, "Use right-click to add/delete items, double click to edit values");
-	mpTabDetailTTML->addTab(mpTTMLDetailsWidget, "TTML"); // add to layout
+	mpTabDetailTTML->addTab(mpTTMLDetailsWidget, "Timed Text"); // add to layout
 	connect(mpTTMLDetailsWidget->show_regions, SIGNAL(stateChanged(int)), mpPreview, SIGNAL(regionOptionsChanged(int)));
 
 	//p_details_widget_frame_layout->addWidget(mpTabDetailTTML);

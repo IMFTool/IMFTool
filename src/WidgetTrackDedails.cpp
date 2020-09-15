@@ -53,7 +53,7 @@ AbstractWidgetTrackDetails(pParent), mpTimecodeLabel(NULL), mpButtonGroup(NULL) 
 void WidgetTrackDetailsTimeline::InitLayout() {
 
 	mpTimecodeLabel = new QLabel(this);
-	mpTimecodeLabel->setText(Timecode().GetAsString());
+	mpTimecodeLabel->setText(Timecode().GetFramesAsString());
 	QFont font("Arial");
 	font.setFixedPitch(true);
 	if(font.pointSize() <= -1) font.setPixelSize(font.pixelSize() * 2);
@@ -68,14 +68,14 @@ void WidgetTrackDetailsTimeline::InitLayout() {
 	p_button_timecode->setFixedSize(80, 20);
 	p_button_timecode->setCheckable(true);
 	//p_button_timecode->setDown(true);
-	p_button_timecode->setChecked(true);
+	p_button_timecode->setChecked(false);
 
 	QPushButton *p_button_frames = new QPushButton(this);
 	p_button_frames->setText("Frames");
 	p_button_frames->setFlat(true);
 	p_button_frames->setFixedSize(80, 20);
 	p_button_frames->setCheckable(true);
-	p_button_frames->setChecked(false);
+	p_button_frames->setChecked(true);
 
 
 	mpButtonGroup->addButton(p_button_timecode, ButtonTimecode);
@@ -84,8 +84,8 @@ void WidgetTrackDetailsTimeline::InitLayout() {
 	QGridLayout *p_layout = new QGridLayout();
 	p_layout->setHorizontalSpacing(0);
 	p_layout->addWidget(mpTimecodeLabel, 0, 0, 1, 2);
-	p_layout->addWidget(p_button_timecode, 1, 0, 1, 1);
-	p_layout->addWidget(p_button_frames, 1, 1, 1, 1);
+	p_layout->addWidget(p_button_frames, 1, 0, 1, 1);
+	p_layout->addWidget(p_button_timecode, 1, 1, 1, 1);
 
 	setLayout(p_layout);
 
@@ -170,6 +170,10 @@ void WidgetTrackDetails::InitLayout() {
 		case VisuallyImpairedTextSequence:
 			p_label->setText(tr("VI"));
 			p_tool_button->setIcon(QIcon(":/vi_bw.png"));
+			break;
+		case ForcedNarrativeSequence:
+			p_label->setText(tr("Forced Narrative"));
+			p_tool_button->setIcon(QIcon(":/text_bw.png"));
 			break;
 		case MarkerSequence:
 			p_label->setText(tr("Marker"));

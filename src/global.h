@@ -37,6 +37,7 @@
 #define MIME_TYPE_XML "text/xml"
 #define WELL_KNOWN_MARKER_LABEL_SCOPE_2013 "http://www.smpte-ra.org/schemas/2067-3/2013#standard-markers"
 #define WELL_KNOWN_MARKER_LABEL_SCOPE_2016 "http://www.smpte-ra.org/schemas/2067-3/2016#standard-markers"
+#define WELL_KNOWN_MARKER_LABEL_SCOPE_2020 "http://www.smpte-ra.org/schemas/2067-3/2020#standard-markers"
 #define CUSTOM_MARKER_LABEL_SCOPE "http://www.hsrm.de/schemas/2015#markers"
 #define IMFTOOL
 
@@ -44,7 +45,7 @@
 #define XML_NAMESPACE_AM "http://www.smpte-ra.org/schemas/429-9/2007/AM"
 #define XML_NAMESPACE_PKL "http://www.smpte-ra.org/schemas/2067-2/2016/PKL"
 #define XML_NAMESPACE_DCML "http://www.smpte-ra.org/schemas/433/2008/dcmlTypes/"
-#define XML_NAMESPACE_CC "http://www.smpte-ra.org/schemas/2067-2/2016"
+#define XML_NAMESPACE_CC "http://www.smpte-ra.org/ns/2067-2/2020"
 #define XML_NAMESPACE_DS "http://www.w3.org/2000/09/xmldsig#"
 #define XML_NAMESPACE_XS "http://www.w3.org/2001/XMLSchema"
 #define XML_NAMESPACE_NS "http://www.w3.org/2000/xmlns/"
@@ -92,15 +93,26 @@
 #define FIELD_NAME_MCA_AUDIO_CONTENT_KIND "MCAAudioContentKind"
 #define FIELD_NAME_MCA_AUDIO_ELEMENT_KIND "MCAAudioElementKind"
 #define FIELD_NAME_CPL_EDIT_RATE "CplEditRate"
+#define FIELD_NAME_NAMESPACE_URI "NamespaceURI"
 
 #define FIELD_NAME_SCM_CPL_LIST "ScmCplList"
 
-#define IMSC1_NS_TT 		XMLString::transcode("http://www.w3.org/ns/ttml")
-#define IMSC1_NS_TTM 		XMLString::transcode("http://www.w3.org/ns/ttml#metadata")
-#define IMSC1_NS_TTP 		XMLString::transcode("http://www.w3.org/ns/ttml#parameter")
-#define IMSC1_NS_TTS 		XMLString::transcode("http://www.w3.org/ns/ttml#styling")
-#define IMSC1_NS_SMPTE 		XMLString::transcode("http://www.smpte-ra.org/schemas/2052-1/2010/smpte-tt")
-#define XML_NAMESPACE 		XMLString::transcode("http://www.w3.org/XML/1998/namespace")
+#define IMSC1_NS_TT 			XMLString::transcode("http://www.w3.org/ns/ttml")
+#define IMSC1_NS_TTM 			XMLString::transcode("http://www.w3.org/ns/ttml#metadata")
+#define IMSC1_NS_TTP 			XMLString::transcode("http://www.w3.org/ns/ttml#parameter")
+#define IMSC1_NS_TTS 			XMLString::transcode("http://www.w3.org/ns/ttml#styling")
+#define IMSC1_NS_SMPTE 			XMLString::transcode("http://www.smpte-ra.org/schemas/2052-1/2010/smpte-tt")
+#define XML_NAMESPACE 			XMLString::transcode("http://www.w3.org/XML/1998/namespace")
+#define EBU_TTM					XMLString::transcode("urn:ebu:tt:metadata")
+
+#define IMSC_10_PROFILE_TEXT	"http://www.w3.org/ns/ttml/profile/imsc1/text"
+#define IMSC_10_PROFILE_IMAGE	"http://www.w3.org/ns/ttml/profile/imsc1/image"
+#define IMSC_11_PROFILE_TEXT	"http://www.w3.org/ns/ttml/profile/imsc1.1/text"
+#define IMSC_11_PROFILE_IMAGE	"http://www.w3.org/ns/ttml/profile/imsc1.1/image"
+#define EBU_TT_D 				"urn:ebu:tt:distribution:2014-01"
+#define TTML10_DP_US			"http://www.w3.org/ns/ttml/profile/sdp-us"
+#define NETFLIX_IMSC11_TT 		"https://www.netflix.com/ns/imsc1.1/text/1"
+
 
 #define XML_NAMESPACE_SCM "http://www.smpte-ra.org/ns/2067-9/2018"
 //WR

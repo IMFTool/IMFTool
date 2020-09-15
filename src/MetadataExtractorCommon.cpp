@@ -68,7 +68,7 @@ QString Metadata::GetAsString() {
 			else if(type == Metadata::HTJ2K)										ret.append(QObject::tr("%1").arg("HTJ2K\n"));
 #endif
 			else if(type == Metadata::ProRes)						ret.append(QObject::tr("%1").arg("ProRes\n"));
-			if(duration.IsValid() && editRate.IsValid())	ret.append(QObject::tr("Duration: %1\n").arg(duration.GetAsString(editRate)));
+			if(duration.IsValid() && editRate.IsValid())	ret.append(QObject::tr("Duration: %1 frames\n").arg(duration.GetCount()));
 			if(editRate.IsValid() == true)								ret.append(QObject::tr("Frame Rate: %1\n").arg(editRate.GetQuotient()));
 			if(storedHeight != 0 || storedWidth != 0)			ret.append(QObject::tr("Stored Resolution: %1 x %2\n").arg(storedWidth).arg(storedHeight));
 			if(displayHeight != 0 || displayWidth != 0)		ret.append(QObject::tr("Displayed Resolution: %1 x %2\n").arg(displayWidth).arg(displayHeight));
@@ -85,7 +85,7 @@ QString Metadata::GetAsString() {
 			break;
 		case Metadata::Pcm:
 			ret.append(QObject::tr("%1").arg("Pcm\n"));
-			if(duration.IsValid() == false && editRate.IsValid())	ret.append(QObject::tr("Duration: %1\n").arg(duration.GetAsString(editRate)));
+			if(duration.IsValid() == false && editRate.IsValid())	ret.append(QObject::tr("Duration: %1 samples\n").arg(duration.GetAsString(editRate)));
 			if(editRate.IsValid() == true)								ret.append(QObject::tr("Sample Rate: %1 Hz\n").arg(editRate.GetQuotient()));
 			if(audioQuantization != 0)										ret.append(QObject::tr("Bit Depth: %1 bit\n").arg(audioQuantization));
 			if(audioChannelCount != 0)										ret.append(QObject::tr("Channels: %1\n").arg(audioChannelCount));
@@ -97,7 +97,7 @@ QString Metadata::GetAsString() {
 		case Metadata::TimedText:
 			ret.append(QObject::tr("%1").arg("Timed Text\n"));
 			if (editRate.IsValid()) {
-				ret.append(QObject::tr("Duration: %1\n").arg(Duration(duration.GetCount()).GetAsString(editRate)));
+				ret.append(QObject::tr("Duration: %1 frames\n").arg(duration.GetCount()));
 				ret.append(QObject::tr("Edit Rate: %1 fps\n").arg(editRate.GetQuotient()));
 			} else {
 				ret.append(QObject::tr("Duration: unknown\n"));
@@ -167,9 +167,9 @@ void Metadata::GetAsTextDocument(QTextDocument &rDoc) {
 			case Metadata::ProRes:																				table->cellAt(0, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Essence Type: %1").arg("ProRes"), Qt::ElideRight, column_text_width)); break;
 			default:																												table->cellAt(0, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Essence Type: Unknown"), Qt::ElideRight, column_text_width)); break;
 		}
-		if(duration.IsValid() && editRate.IsValid())											table->cellAt(0, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Duration: %1").arg(duration.GetAsString(editRate)), Qt::ElideRight, column_text_width));
+		if(duration.IsValid() && editRate.IsValid())											table->cellAt(0, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Duration: %1 frames").arg(duration.GetCount()), Qt::ElideRight, column_text_width));
 		else																															table->cellAt(0, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Duration: Unknown"), Qt::ElideRight, column_text_width));
-		if(editRate.IsValid())																						table->cellAt(1, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Frame Rate: %1").arg(editRate.GetQuotient()), Qt::ElideRight, column_text_width));
+		if(editRate.IsValid())																						table->cellAt(1, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Edit Rate: %1 fps").arg(editRate.GetQuotient()), Qt::ElideRight, column_text_width));
 		else																															table->cellAt(1, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Frame Rate: Unknown"), Qt::ElideRight, column_text_width));
 		if(storedHeight != 0 || storedWidth != 0)													table->cellAt(1, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Stored Resolution: %1 x %2").arg(storedWidth).arg(storedHeight), Qt::ElideRight, column_text_width));
 		else																															table->cellAt(1, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Stored Resolution: Unknown"), Qt::ElideRight, column_text_width));
@@ -203,7 +203,7 @@ void Metadata::GetAsTextDocument(QTextDocument &rDoc) {
 			case Metadata::Pcm:																							table->cellAt(0, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Essence Type: %1").arg("PCM"), Qt::ElideRight, column_text_width)); break;
 			default:																												table->cellAt(0, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Essence Type: Unknown"), Qt::ElideRight, column_text_width)); break;
 		}
-		if(duration.IsValid() && editRate.IsValid())											table->cellAt(0, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Duration: %1").arg(duration.GetAsString(editRate)), Qt::ElideRight, column_text_width));
+		if(duration.IsValid() && editRate.IsValid())											table->cellAt(0, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Duration: %1 samples").arg(duration.GetCount()), Qt::ElideRight, column_text_width));
 		else																															table->cellAt(0, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Duration: Unknown"), Qt::ElideRight, column_text_width));
 		if(editRate.IsValid())																						table->cellAt(1, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Sample Rate: %1 Hz").arg(editRate.GetQuotient()), Qt::ElideRight, column_text_width));
 		else																															table->cellAt(1, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Sample Rate: Unknown"), Qt::ElideRight, column_text_width));
@@ -222,17 +222,19 @@ void Metadata::GetAsTextDocument(QTextDocument &rDoc) {
 		if(is_ttml_file(filePath))
 			table->cellAt(0, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Source File Name: %1").arg(fileName), Qt::ElideRight, column_text_width));
 		table->cellAt(0, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Essence Type: %1").arg("Timed Text"), Qt::ElideRight, column_text_width));
-		table->cellAt(1, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Profile: %1").arg(profile.remove(0, 40)), Qt::ElideRight, column_text_width));
+		table->cellAt(1, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Profile: %1").arg(tt_profile_is_text ? "Text" : "Image"), Qt::ElideRight, column_text_width));
 
 		if (editRate.IsValid()) {
-			table->cellAt(1, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Duration: %1").arg(Duration(duration.GetCount()).GetAsString(editRate)), Qt::ElideRight, column_text_width));
+			table->cellAt(1, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Duration: %1 frames").arg(duration.GetCount()), Qt::ElideRight, column_text_width));
 			table->cellAt(2, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Edit Rate: %1 fps").arg(editRate.GetQuotient()), Qt::ElideRight, column_text_width));
 		} else {
 			table->cellAt(1, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Duration: unknown"), Qt::ElideRight, column_text_width));
 			table->cellAt(2, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Edit Rate: not set"), Qt::ElideRight, column_text_width));
 		}
+/*
 		if (effectiveFrameRate != editRate)
 			table->cellAt(2, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("TTML Frame Rate: %1 fps").arg(effectiveFrameRate.GetQuotient()), Qt::ElideRight, column_text_width));
+*/
 		//WR
 		if(!languageTag.isEmpty()) table->cellAt(3, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Language: %1").arg(languageTag), Qt::ElideRight, column_text_width));
 		//WR
@@ -245,7 +247,7 @@ void Metadata::GetAsTextDocument(QTextDocument &rDoc) {
 		table->cellAt(0, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Essence Type: %1").arg("ISXD"), Qt::ElideRight, column_text_width));
 
 		if (editRate.IsValid()) {
-			table->cellAt(1, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Duration: %1").arg(Duration(duration.GetCount()).GetAsString(editRate)), Qt::ElideRight, column_text_width));
+			table->cellAt(1, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Duration: %1 frames").arg(duration.GetCount()), Qt::ElideRight, column_text_width));
 			table->cellAt(1, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Edit Rate: %1 fps").arg(editRate.GetQuotient()), Qt::ElideRight, column_text_width));
 		} else {
 			table->cellAt(1, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Duration: unknown"), Qt::ElideRight, column_text_width));
@@ -265,7 +267,7 @@ void Metadata::GetAsTextDocument(QTextDocument &rDoc) {
 		table->cellAt(0, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Essence Type: %1").arg("IAB"), Qt::ElideRight, column_text_width));
 
 		if (editRate.IsValid()) {
-			table->cellAt(0, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Duration: %1").arg(Duration(duration.GetCount()).GetAsString(editRate)), Qt::ElideRight, column_text_width));
+			table->cellAt(0, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Duration: %1 frames").arg(duration.GetCount()), Qt::ElideRight, column_text_width));
 			table->cellAt(1, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Edit Rate: %1 fps").arg(editRate.GetQuotient()), Qt::ElideRight, column_text_width));
 		} else {
 			table->cellAt(0, 1).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Duration: unknown"), Qt::ElideRight, column_text_width));

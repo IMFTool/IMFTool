@@ -94,7 +94,6 @@ ImfError ImfPackage::Ingest() {
 	mIsIngest = true;
 	// see SMPTE ST 429-9:2014 Annex A Basic Map Profile v2
 	ImfError error; // Reset last error.
-	qDebug() << "Ingest dir: " << mRootDir.dirName();
 	if(mRootDir.exists() == false) error = ImfError(ImfError::WorkingDirNotFound);
 	else {
 		if(mRootDir.exists(ASSET_SEARCH_NAME)) {
@@ -435,7 +434,6 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 														//WR
 														mCplList << *cpl_data.get();
 														mImpEditRates.push_back(ImfXmlHelper::Convert(cpl_data->getEditRate()));
-														qDebug() << "CPL Edit Rate: " << mImpEditRates.last().GetNumerator()  << mImpEditRates.last().GetDenominator();
 														//WR
 													}
 													else if(is_opl && !is_cpl && !is_scm) {
@@ -507,19 +505,6 @@ ImfError ImfPackage::ParseAssetMap(const QFileInfo &rAssetMapFilePath) {
 									catch(...) {
 										qDebug() << "Error in qSharedPointerCast";
 										break;
-									}
-									if (!assetMxfTrack.isNull() && !mImpEditRates.isEmpty()){
-										if (assetMxfTrack->GetEssenceType() == Metadata::TimedText) {
-											if (!assetMxfTrack->GetTimedTextFrameRate().IsValid()) break;  //CPLs arbitrarily expose EssenceType == Metadata::TimedText
-											assetMxfTrack->SetCplEditRate(mImpEditRates.first());
-											assetMxfTrack->SetEditRate(mImpEditRates.first());
-											if (assetMxfTrack->GetTimedTextFrameRate() != assetMxfTrack->GetEditRate()) {
-												assetMxfTrack->SetDuration(Duration(ceil(assetMxfTrack->GetOriginalDuration().GetCount() / assetMxfTrack->GetTimedTextFrameRate().GetQuotient() * assetMxfTrack->GetEditRate().GetQuotient())));
-												qDebug() << "Warning: SampleRate of Asset" << assetMxfTrack->GetId() << "does not match CPL EditRate!";
-											} else {
-												assetMxfTrack->SetDuration(assetMxfTrack->GetOriginalDuration());
-											}
-										}
 									}
 								}
 								// Refresh list of SCMs. Note: Users may have picked SCM files, that don't belong to the IMP, as sidecar assets
@@ -1287,6 +1272,7 @@ void Asset::FileModified() {
 		assetMxfTrack->ExtractEssenceDescriptor(QString(this->GetPath().absoluteFilePath()));
 		qDebug() << "Essence Descriptor updated for " << this->GetPath().absoluteFilePath();
 	}
+/*
 	AssetScm *asset_scm = dynamic_cast<AssetScm*>(this);
 	if (asset_scm) {
 		// Per ST 2067-2, SCM Id in AM and PKL are RFC4122 Type 5 UUIDs using the entire asset as name.
@@ -1298,6 +1284,7 @@ void Asset::FileModified() {
 		asset_scm->SetAmData(new_am_data);
 		asset_scm->GetPklData()->setId(ImfXmlHelper::Convert(new_type5_uuid));
 	}
+*/
 	//WR end
 }
 

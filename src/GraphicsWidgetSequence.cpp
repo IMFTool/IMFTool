@@ -192,7 +192,8 @@ bool GraphicsWidgetSequence::ExtendGrid(QPointF &rPoint, eGridPosition which) co
 		case KaraokeSequence:
 		case CommentarySequence:
 		case HearingImpairedCaptionsSequence:
-		case VisuallyImpairedTextSequence: 
+		case VisuallyImpairedTextSequence:
+		case ForcedNarrativeSequence:
 			if(which == TimedTextHorizontal) {
 				ret.setY(boundingRect().center().y());
 			}

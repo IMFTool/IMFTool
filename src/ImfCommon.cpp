@@ -269,7 +269,7 @@ Timecode Timecode::operator+(const Duration &rRight) {
 Timecode Timecode::operator-(const Timecode &rRight) {
 
 	if(mEditRate != rRight.mEditRate) {
-		qCritical() << "Timcode values with different Edit Rates detected.";
+		qCritical() << "Timcode values with different Edit Rates detected." << mEditRate.GetName() << rRight.mEditRate.GetName();
 		return *this;
 	}
 	Timecode result(*this);
@@ -495,12 +495,21 @@ const MarkerLabel MarkerLabel::MarkerLabelLFOA("LFOA", "Audio Last Frame. Last f
 //Markers from ST 2067-3:2016
 const MarkerLabel MarkerLabel::MarkerLabelFFDC("FFDC", "First Frame of Dubbing Credits. First displayable frame of content that contains any intensity of dubbing credits.", WELL_KNOWN_MARKER_LABEL_SCOPE_2016);
 const MarkerLabel MarkerLabel::MarkerLabelLFDC("LFDC", "Last Frame of Dubbing credits: Last displayable frame of content that contains any intensity of dubbing credits.", WELL_KNOWN_MARKER_LABEL_SCOPE_2016);
+//Markers from ST 2067-3:2020
+const MarkerLabel MarkerLabel::MarkerLabelFFEI("FFEI", "First Frame of Episode Intro", WELL_KNOWN_MARKER_LABEL_SCOPE_2020);
+const MarkerLabel MarkerLabel::MarkerLabelFFER("FFER", "First Frame of Episode Recap", WELL_KNOWN_MARKER_LABEL_SCOPE_2020);
+const MarkerLabel MarkerLabel::MarkerLabelFFUN("FFUN", "First Frame of Up Next", WELL_KNOWN_MARKER_LABEL_SCOPE_2020);
+const MarkerLabel MarkerLabel::MarkerLabelLFEI("LFEI", "Last Frame of Episode Intro", WELL_KNOWN_MARKER_LABEL_SCOPE_2020);
+const MarkerLabel MarkerLabel::MarkerLabelLFER("LFER", "Last Frame of Episode Recap", WELL_KNOWN_MARKER_LABEL_SCOPE_2020);
+const MarkerLabel MarkerLabel::MarkerLabelLFUN("LFUN", "Last Frame of Up Next", WELL_KNOWN_MARKER_LABEL_SCOPE_2020);
 
 bool MarkerLabel::IsWellKnown() const {
 	bool retValue = false;
 	if (mScope.compare(WELL_KNOWN_MARKER_LABEL_SCOPE_2013) == 0 && GetMarker(this->GetLabel()).GetLabel().compare(MarkerLabel::MarkerLabelNone.GetLabel()) != 0)
 		retValue = true;
 	if (mScope.compare(WELL_KNOWN_MARKER_LABEL_SCOPE_2016) == 0 && GetMarker(this->GetLabel()).GetLabel().compare(MarkerLabel::MarkerLabelNone.GetLabel()) != 0)
+		retValue = true;
+	if (mScope.compare(WELL_KNOWN_MARKER_LABEL_SCOPE_2020) == 0 && GetMarker(this->GetLabel()).GetLabel().compare(MarkerLabel::MarkerLabelNone.GetLabel()) != 0)
 		retValue = true;
 
 	return retValue; //mScope.compare(WELL_KNOWN_MARKER_LABEL_SCOPE) == 0 && GetMarker(this->GetLabel()).GetLabel().compare(MarkerLabel::MarkerLabelNone.GetLabel()) != 0;
