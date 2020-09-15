@@ -5,6 +5,7 @@ QToolTip {
 	border-radius: 0px;
 	background-color: #F1F2F7;
   opacity: 255;
+  color: #2D2D30;
 }
 
 QWidget, QGraphicsWidget {
