@@ -32,7 +32,7 @@ Introductory videos are available on YouTube [[2]](#imf-video), [[3]](#imf-video
 -	Decoding and rendering of IMSC1 text profile subtitles in a separate window. (TTML tab, limited IMSC feature set)
 -	Overlay of IMSC1 image profile subtitles
 -	Ingest of IMF 1.0 (PKL ST 429-8 and CPL ST 2067-3:2013) and IMF 1.1 (PKL ST 2067-2:2016 and CPL ST 2067-3:2016)
--	Outgest will be IMF 2000 only
+-	Outgest will be IMF 2020 only
 -	Editing of the ContentVersionList element
 -	Edit Marker Annotations
 
