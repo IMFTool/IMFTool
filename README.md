@@ -10,10 +10,12 @@ IMF Tool supports browsing and limited editing of IMF [[1]](#imf-intro) packages
 In particular, it supports the addition and deletion of audio tracks and subtitle tracks (versioning).
 Introductory videos are available on YouTube [[2]](#imf-video), [[3]](#imf-video2).
 
-## Workflows supported:
+## Workflows and Features:
 -	Open an IMP, visualize the timeline of the CPL(s) included in the IMP
--	Supports App#2/2E and App#5 ACES
--	Track files support includes IAB (SMPTE ST 2067-201) and ISXD (SMPTE RDD 47)
+-	Create a new IMP, based on importing existing image track files
+-	Supports App#2E JPEG2000 and App#5 ACES
+-	Experimental supoprt of HTJ2K in App 2E and App4 DCDM 
+-	Track file support includes IAB (SMPTE ST 2067-201) and ISXD (SMPTE RDD 47)
 -	Add Sidecar Assets to an IMP ("Add Asset" --> Add Sidecar Assets)
 -	Create, view and edit Sidecar Composition Maps (SCMs)
 -	Add a Photon QC report as sidecar file (hint: export the sidecar QC report as a Partial IMP, this leaves the Original IMP unmodified!)
@@ -25,23 +27,18 @@ Introductory videos are available on YouTube [[2]](#imf-video), [[3]](#imf-video
 -	Delete virtual tracks
 -	Add new segments
 -	Set edit points and markers
--	Export the IMP
--	Export all new MXF files and new CPL(s) as Partial IMP 
--	JPEG 2000 playback of all profiles supported in App #2 and App #2E for preview purposes
+-	Export as Full or Partial IMP
 -	App#5 ACES support includes ACES preview and Target Frame preview and export
--	Decoding and rendering of IMSC1 text profile subtitles in a separate window. (TTML tab)
+-	Decoding and rendering of IMSC1 text profile subtitles in a separate window. (TTML tab, limited IMSC feature set)
 -	Overlay of IMSC1 image profile subtitles
 -	Ingest of IMF 1.0 (PKL ST 429-8 and CPL ST 2067-3:2013) and IMF 1.1 (PKL ST 2067-2:2016 and CPL ST 2067-3:2016)
--	Outgest will be IMF 1.1 only
+-	Outgest will be IMF 2000 only
 -	Editing of the ContentVersionList element
 -	Edit Marker Annotations
 
 ## CREDITS
 The development of this tool has kindly been sponsored by Netflix Inc.
 The App#5 extensions were supported by the Academy of Motion Picture Arts and Sciences, Sony Pictures, Warner Bros., Universal Studios and 20th Century Fox
-
-## What IMF Tool NOT is
-An IMF Authoring Tool. For creating IMF packages, please check for the wide variety of commercial solutions available on the market.
 
 ## Binary installers
 Please visit
@@ -52,7 +49,7 @@ to download the latest binary installers.
 
 
 ## Building
-IMF Tool is multi-platform and has been successfully built under Mac OS X 10.10 and 10.11, Windows 7/10 and Linux 64 bit.
+IMF Tool is multi-platform and has been successfully built under macOS version 10.12 or higher, Windows 10 and Linux 64 bit.
 The build system is based on CMake. Please use CMake to create make files and project files for eclipse or Visual Studio. Installation instructions including CMake screenshots are provided as pdf file here.
 Prerequisites:
 -	Qt Version 5.12, more recent versions may work
@@ -61,6 +58,8 @@ Prerequisites:
 -	Xerces 3.1
 -	Requires OpenJPEG 2.2 (with multi-threading support), available at https://github.com/uclouvain/openjpeg
 -	regxmllibc, available at https://github.com/sandflow/regxmllib/
+-	The ACES build option requires IlmBase, available at https://github.com/AcademySoftwareFoundation/openexr/tree/master/IlmBase
+-	The HTJ2K build option requires OpenJPH, available at https://github.com/aous72/OpenJPH
 
 ## DISCLAIMER
   THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
