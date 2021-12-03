@@ -151,6 +151,15 @@ Error JobWrapWav::Execute() {
 						  if (!mMCATitleVersion.isEmpty()) current_soundfield->MCATitleVersion = mMCATitleVersion.toStdString();
 						  if (!mMCAAudioContentKind.isEmpty()) current_soundfield->MCAAudioContentKind = mMCAAudioContentKind.toStdString();
 						  if (!mMCAAudioElementKind.isEmpty()) current_soundfield->MCAAudioElementKind = mMCAAudioElementKind.toStdString();
+						  if (mLanguageTag.isEmpty()) current_soundfield->RFC5646SpokenLanguage.set_has_value(false); // Workaround: Required because mca_config.DecodeString sets a non-empty string if mLanguageTag.isEmpty()
+						  //current_soundfield->Dump();
+					  }
+				  }
+				  else if ( (*i)->GetUL() == ASDCP::UL(dict->ul(MDD_AudioChannelLabelSubDescriptor))) {
+					  ASDCP::MXF::AudioChannelLabelSubDescriptor *current_channel;
+					  current_channel = reinterpret_cast<ASDCP::MXF::AudioChannelLabelSubDescriptor*>(*i);
+					  if (current_channel) {
+						  if (mLanguageTag.isEmpty()) current_channel->RFC5646SpokenLanguage.set_has_value(false); // Workaround: Required because mca_config.DecodeString sets a non-empty string if mLanguageTag.isEmpty()
 						  //current_soundfield->Dump();
 					  }
 				  }
@@ -538,7 +547,8 @@ Error JobExtractTargetFrames::Execute() {
 			//TODO Figure out size of ancillary resource from RIP
 			AS_02::ACES::FrameBuffer FrameBuffer(1000000000);
 			AS_02::ACES::ResourceList_t resource_list_t;
-			AS_02::ACES::MXFReader Reader;
+			Kumu::FileReaderFactory defaultFactory;
+			AS_02::ACES::MXFReader Reader(defaultFactory);
 			Result_t result = Reader.OpenRead(mAssetMxf->GetPath().absoluteFilePath().toStdString()); // open file for reading
 			if (ASDCP_SUCCESS(result)) {
 				result = Reader.FillAncillaryResourceList(resource_list_t);

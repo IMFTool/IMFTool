@@ -47,7 +47,7 @@ PreviewCommon::PreviewCommon() {
 		float input = (float)(i / max_f_); // convert input to value between 0...1
 
 		// BT.709 - OETF (Inverse of BT.1886 EOTF)
-		oetf_709[i] = (quint8)(255.0f * pow(input, 1.0f / 2.4f) + 0.5);
+		oetf_709[i] = (quint8)(255.0f * pow(input, 1.0f / 2.2f) + 0.5);
 
 		// BT.2020 - EOTF
 		if (input < (4.5 * beta)) {

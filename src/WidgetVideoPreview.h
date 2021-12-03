@@ -153,7 +153,7 @@ private:
 	bool running[2];
 	bool mACESRunning[2];
 	bool now_running = false; // false: 0, true: 1
-	int run;
+	int run = 0;
 	
 	qint64 decodingFrame = 0; // currently decoding frame
 	qint64 xSliderFrame = 0;

@@ -129,7 +129,7 @@ void HTJ2K_Preview::setAsset() {
 
 		mMxf_path = asset->GetPath().absoluteFilePath(); // get new path
 
-		reader = new AS_02::JP2K::MXFReader(); // create new reader
+		reader = new AS_02::JP2K::MXFReader(defaultFactory); // create new reader
 
 		Result_t result_o = reader->OpenRead(mMxf_path.toStdString()); // open file for reading
 		if (!ASDCP_SUCCESS(result_o)) {
@@ -345,7 +345,7 @@ bool HTJ2K::decodeImage() {
     mpMemBuf->close();
     mpCodestream->close();
     mpCodestream->~codestream();
-    buff->~FrameBuffer();
+	delete buff;
 
 
     return true;

@@ -31,7 +31,7 @@ JP2K_Decoder::JP2K_Decoder(QSharedPointer<DecodedFrames> &rdecoded_shared, QShar
 	decoded_shared = rdecoded_shared;
 	request = rRequest;
 
-	reader = new AS_02::JP2K::MXFReader();
+	reader = new AS_02::JP2K::MXFReader(defaultFactory);
 
 	pDecompressor = OPENJPEG_H::opj_create_decompress(OPJ_CODEC_J2K); // create new decompresser
 
@@ -60,7 +60,7 @@ void JP2K_Decoder::run() {
 		} // else : first reader 
 
 		// create new reader
-		reader = new AS_02::JP2K::MXFReader();
+		reader = new AS_02::JP2K::MXFReader(defaultFactory);
 
 		Result_t result_o = reader->OpenRead(request->asset->GetPath().absoluteFilePath().toStdString()); // open file for reading
 		if (!ASDCP_SUCCESS(result_o)) {
@@ -134,7 +134,7 @@ void JP2K_Decoder::run() {
 		request->errorMsg = "Failed to decode JPX image";
 		request->error = true; // an error occured processing the frame
 
-		buff->~FrameBuffer();
+		delete buff;
 		OPENJPEG_H::opj_destroy_codec(pDecompressor);
 		OPENJPEG_H::opj_stream_destroy(pStream);
 		OPENJPEG_H::opj_image_destroy(psImage);
@@ -149,7 +149,7 @@ void JP2K_Decoder::run() {
 	decoded_shared->pending_requests--;
 
 	// clean up
-	buff->~FrameBuffer();
+	delete buff;
 	OPENJPEG_H::opj_stream_destroy(pStream);
 	OPENJPEG_H::opj_destroy_codec(pDecompressor);
 	OPENJPEG_H::opj_image_destroy(psImage); // free allocated memory

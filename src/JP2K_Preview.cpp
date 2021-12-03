@@ -135,7 +135,7 @@ void JP2K_Preview::setAsset() {
 
 		mMxf_path = asset->GetPath().absoluteFilePath(); // get new path
 
-		reader = new AS_02::JP2K::MXFReader(); // create new reader
+		reader = new AS_02::JP2K::MXFReader(defaultFactory); // create new reader
 
 		Result_t result_o = reader->OpenRead(mMxf_path.toStdString()); // open file for reading
 		if (!ASDCP_SUCCESS(result_o)) {
@@ -260,7 +260,7 @@ bool JP2K_Preview::decodeImage() {
 			OPENJPEG_H::opj_stream_destroy(pStream);
 			OPENJPEG_H::opj_destroy_codec(pDecompressor);
 			OPENJPEG_H::opj_image_destroy(psImage);
-			buff->~FrameBuffer();
+			delete buff;
 
 			psImage = NULL; // reset decoded output stream
 			pDecompressor = OPENJPEG_H::opj_create_decompress(OPJ_CODEC_J2K); // create new decompresser
@@ -269,7 +269,7 @@ bool JP2K_Preview::decodeImage() {
 			return false;
 		}
 		else {
-			buff->~FrameBuffer();
+			delete buff;
 			return true;
 		}
 	}

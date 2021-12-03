@@ -100,6 +100,6 @@ private:
 			{"http://www.smpte-ra.org/ns/2067-40/2020 http://www.smpte-ra.org/ns/2067-40-DCDM/2020", ::App4DCDM},
 			{"http://www.smpte-ra.org/ns/2067-40-DCDM/2020 http://www.smpte-ra.org/ns/2067-40/2020", ::App4DCDM},
 			{"http://www.smpte-ra.org/ns/2067-40-DCDM/2020", ::App4DCDM},
-			{"http://www.smpte-ra.org/ns/2067-40/2020", ::App4},
+			{"http://www.smpte-ra.org/ns/2067-40-linear/2020", ::App4},
 	};
 };

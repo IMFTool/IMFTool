@@ -79,7 +79,7 @@ void WizardResourceGenerator::InitLayout() {
 		switch(mAsset->GetEssenceType()) {
 		case Metadata::Jpeg2000:
 		case Metadata::ProRes:
-#ifdef APP4_DCDM
+#ifdef CODEC_HTJ2K
 		case Metadata::HTJ2K:
 #endif
 			SwitchMode(eMode::Jpeg2000Mode);
@@ -184,40 +184,49 @@ void WizardResourceGeneratorPage::InitLayout() {
 	QRegExpValidator *v_lang = new QRegExpValidator(rx_lang, this);
 	mpLineEditLanguageTagWav = new QLineEdit(this);
 	mpLineEditLanguageTagWav->setAlignment(Qt::AlignRight);
-	if (!mReadOnly) mpLineEditLanguageTagWav->setPlaceholderText("en-US");
+	mpLineEditLanguageTagWav->setText("en-US");
 	mpLineEditLanguageTagWav->setValidator(v_lang);
 	if (mReadOnly) mpLineEditLanguageTagWav->setDisabled(true);
 	connect(mpLineEditLanguageTagWav, SIGNAL(textEdited(QString)), this, SLOT(languageTagWavChanged()));
 	QRegExpValidator *v_lang2 = new QRegExpValidator(rx_lang, this);
 	mpLineEditLanguageTagTT = new QLineEdit(this);
 	mpLineEditLanguageTagTT->setAlignment(Qt::AlignRight);
-	if (!mReadOnly) mpLineEditLanguageTagTT->setPlaceholderText("en-US");
+	mpLineEditLanguageTagTT->setText("en-US");
 	mpLineEditLanguageTagTT->setValidator(v_lang2);
 	if (mReadOnly) mpLineEditLanguageTagTT->setDisabled(true);
 	connect(mpLineEditLanguageTagTT, SIGNAL(textEdited(QString)), this, SLOT(languageTagTTChanged()));
-	QRegExp mca_items("[0-9a-zA-Z_]{1,15}");
+	// Allows for whitespace and slash, but not as first character
+	QRegExp mca_items("[0-9a-zA@]{1}[0-9a-zA-Z_\\s/]*");
 	QRegExpValidator *v_mca_items = new QRegExpValidator(mca_items, this);
 	mpLineEditMCATitle = new QLineEdit(this);
 	mpLineEditMCATitle->setAlignment(Qt::AlignRight);
-	mpLineEditMCATitle->setText("Default Title");
+	mpLineEditMCATitle->setText("n/a");
 	mpLineEditMCATitle->setValidator(v_mca_items);
 	if (mReadOnly) mpLineEditMCATitle->setDisabled(true);
+	//mpLineEditMCATitle->selectAll();
+	connect(mpLineEditMCATitle, SIGNAL(clicked()), mpLineEditMCATitle, SLOT(selectAll()));
 	//connect(mpLineEditMCATitle, SIGNAL(textEdited(QString)), this, SLOT(mcaTitleChanged()));
 	mpLineEditMCATitleVersion = new QLineEdit(this);
 	mpLineEditMCATitleVersion->setAlignment(Qt::AlignRight);
-	mpLineEditMCATitleVersion->setText("Domestic");
+	mpLineEditMCATitleVersion->setText("n/a");
 	mpLineEditMCATitleVersion->setValidator(v_mca_items);
 	if (mReadOnly) mpLineEditMCATitleVersion->setDisabled(true);
 	//connect(mpLineEditMCATitleVersion, SIGNAL(textEdited(QString)), this, SLOT(mcaTitleVersionChanged()));
-	mpLineEditMCAAudioContentKind = new QLineEdit(this);
-	mpLineEditMCAAudioContentKind->setAlignment(Qt::AlignRight);
-	mpLineEditMCAAudioContentKind->setText("Master");
+	mpLineEditMCAAudioContentKind = new QComboBox(this);
+	mpLineEditMCAAudioContentKind->setEditable(true);
+	mpLineEditMCAAudioContentKind->lineEdit()->setAlignment(Qt::AlignRight);
+	if (!mReadOnly) mpLineEditMCAAudioContentKind->lineEdit()->setPlaceholderText("Pick a symbol from the list");
+	mpLineEditMCAAudioContentKind->addItems(mMCAContentSymbols);
+	mpLineEditMCAAudioContentKind->setCurrentIndex(-1);
 	mpLineEditMCAAudioContentKind->setValidator(v_mca_items);
 	if (mReadOnly) mpLineEditMCAAudioContentKind->setDisabled(true);
 	//connect(mpLineEditMCAAudioContentKind, SIGNAL(textEdited(QString)), this, SLOT(mcaAudioContentKindChanged()));
-	mpLineEditMCAAudioElementKind = new QLineEdit(this);
-	mpLineEditMCAAudioElementKind->setAlignment(Qt::AlignRight);
-	mpLineEditMCAAudioElementKind->setText("Composite Mix");
+	mpLineEditMCAAudioElementKind = new QComboBox(this);
+	mpLineEditMCAAudioElementKind->setEditable(true);
+	mpLineEditMCAAudioElementKind->lineEdit()->setAlignment(Qt::AlignRight);
+	if (!mReadOnly) mpLineEditMCAAudioElementKind->lineEdit()->setPlaceholderText("Pick a symbol from the list");
+	mpLineEditMCAAudioElementKind->addItems(mMCAUseClassSymbols);
+	mpLineEditMCAAudioElementKind->setCurrentIndex(-1);
 	mpLineEditMCAAudioElementKind->setValidator(v_mca_items);
 	if (mReadOnly) mpLineEditMCAAudioElementKind->setDisabled(true);
 	//connect(mpLineEditMCAAudioElementKind, SIGNAL(textEdited(QString)), this, SLOT(mcaAudioElementKindChanged()));
@@ -324,13 +333,22 @@ void WizardResourceGeneratorPage::InitLayout() {
 	p_wrapper_layout_two->addWidget(mpComboBoxSoundfieldGroup, 0, 1, 1, 1);
 	p_wrapper_layout_two->addWidget(new QLabel(tr("RFC 5646 Language Tag (e.g. en-US):"), this), 1, 0, 1, 1);
 	p_wrapper_layout_two->addWidget(mpLineEditLanguageTagWav, 1, 1, 1, 1);
-	p_wrapper_layout_two->addWidget(new QLabel(tr("MCA Title:"), this), 2, 0, 1, 1);
+	QLabel* mca_title = new QLabel(tr("MCA Title:"), this);
+	mca_title->setToolTip("MCA Title shall be present. See https://www.imfug.com/TR/audio-track-files/ for more information.");
+	p_wrapper_layout_two->addWidget(mca_title, 2, 0, 1, 1);
 	p_wrapper_layout_two->addWidget(mpLineEditMCATitle, 2, 1, 1, 1);
-	p_wrapper_layout_two->addWidget(new QLabel(tr("MCA Title Version:"), this), 3, 0, 1, 1);
+	QLabel* mca_title_version = new QLabel(tr("MCA Title Version:"), this);
+	mca_title_version->setToolTip("MCA Title Version shall be present. See https://www.imfug.com/TR/audio-track-files/ for more information.");
+	p_wrapper_layout_two->addWidget(mca_title_version, 3, 0, 1, 1);
 	p_wrapper_layout_two->addWidget(mpLineEditMCATitleVersion, 3, 1, 1, 1);
-	p_wrapper_layout_two->addWidget(new QLabel(tr("MCA Audio Content Kind:"), this), 4, 0, 1, 1);
+	QLabel* mca_content_kind = new QLabel(tr("MCA Audio Content Kind:"), this);
+	mca_content_kind->setToolTip("MCA Audio Content Kind shall be present. See https://www.imfug.com/TR/audio-track-files/ for more information.");
+	p_wrapper_layout_two->addWidget(mca_content_kind, 4, 0, 1, 1);
 	p_wrapper_layout_two->addWidget(mpLineEditMCAAudioContentKind, 4, 1, 1, 1);
-	p_wrapper_layout_two->addWidget(new QLabel(tr("MCA Audio Element Kind:"), this), 5, 0, 1, 1);
+	p_wrapper_layout_two->addWidget(mpLineEditMCATitleVersion, 3, 1, 1, 1);
+	QLabel* mca_element_kind = new QLabel(tr("MCA Audio Element Kind:"), this);
+	mca_element_kind->setToolTip("MCA Audio Element Kind shall be present. See https://www.imfug.com/TR/audio-track-files/ for more information.");
+	p_wrapper_layout_two->addWidget(mca_element_kind, 5, 0, 1, 1);
 	p_wrapper_layout_two->addWidget(mpLineEditMCAAudioElementKind, 5, 1, 1, 1);
 	p_wrapper_layout_two->addWidget(mpTableViewWav, 6, 0, 1, 2);
 	p_wrapper_widget_two->setLayout(p_wrapper_layout_two);
@@ -846,13 +864,13 @@ void WizardResourceGeneratorPage::SetMCATitleVersion(const QString &text) {
 }
 
 void WizardResourceGeneratorPage::SetMCAAudioContentKind(const QString &text) {
-	mpLineEditMCAAudioContentKind->setText(text);
+	mpLineEditMCAAudioContentKind->setEditText(text);
 	emit MCAAudioContentKindChanged();
 	emit completeChanged();
 }
 
 void WizardResourceGeneratorPage::SetMCAAudioElementKind(const QString &text) {
-	mpLineEditMCAAudioElementKind->setText(text);
+	mpLineEditMCAAudioElementKind->setEditText(text);
 	emit MCAAudioElementKindChanged();
 	emit completeChanged();
 }
@@ -904,12 +922,12 @@ QString WizardResourceGeneratorPage::GetMCATitleVersion() const {
 
 QString WizardResourceGeneratorPage::GetMCAAudioContentKind() const {
 
-	return mpLineEditMCAAudioContentKind->text();
+	return mpLineEditMCAAudioContentKind->currentText();
 }
 
 QString WizardResourceGeneratorPage::GetMCAAudioElementKind() const {
 
-	return mpLineEditMCAAudioElementKind->text();
+	return mpLineEditMCAAudioElementKind->currentText();
 }
 //WR
 

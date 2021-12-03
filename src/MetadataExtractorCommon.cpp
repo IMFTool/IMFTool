@@ -20,8 +20,9 @@
 #include <QAbstractTextDocumentLayout>
 #include "SMPTE_Labels.h"
 
-Metadata::Metadata(eEssenceType type /*= Unknown_Type*/) :
-type(type),
+Metadata::Metadata(eEssenceType rType /*= Unknown_Type*/, eEssenceSubType rSubType /*= Unknown_Type*/) :
+type(rType),
+subType(rSubType),
 editRate(), // frame rate for video and sampling rate for audio milliseconds for timed text
 aspectRatio(),
 storedWidth(0),
@@ -60,7 +61,7 @@ QString Metadata::GetAsString() {
 #endif
 		case Metadata::Jpeg2000:
 		case Metadata::ProRes:
-			if(type == Metadata::Jpeg2000)						ret.append(QObject::tr("%1").arg("JPEG2000\n"));
+			if(type == Metadata::Jpeg2000)	{ if(subType == Metadata::eEssenceSubType::HTJ2K)		ret.append(QObject::tr("%1").arg("HTJ2K\n")); else ret.append(QObject::tr("%1").arg("JPEG2000\n")); }
 #ifdef APP5_ACES
 			else if(type == Metadata::Aces)										ret.append(QObject::tr("%1").arg("ACES\n"));
 #endif
@@ -163,7 +164,12 @@ void Metadata::GetAsTextDocument(QTextDocument &rDoc) {
 #ifdef CODEC_HTJ2K
 			case Metadata::HTJ2K:																						table->cellAt(0, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Essence Type: %1").arg("HTJ2K"), Qt::ElideRight, column_text_width)); break;
 #endif
-			case Metadata::Jpeg2000:																				table->cellAt(0, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Essence Type: %1").arg("JPEG2000"), Qt::ElideRight, column_text_width)); break;
+			case Metadata::Jpeg2000:
+				if (subType == Metadata::eEssenceSubType::HTJ2K)
+					table->cellAt(0, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Essence Type: %1").arg("HTJ2K"), Qt::ElideRight, column_text_width));
+				else
+					table->cellAt(0, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Essence Type: %1").arg("JPEG2000"), Qt::ElideRight, column_text_width));
+			break;
 			case Metadata::ProRes:																				table->cellAt(0, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Essence Type: %1").arg("ProRes"), Qt::ElideRight, column_text_width)); break;
 			default:																												table->cellAt(0, 0).firstCursorPosition().insertText(font_metrics.elidedText(QObject::tr("Essence Type: Unknown"), Qt::ElideRight, column_text_width)); break;
 		}

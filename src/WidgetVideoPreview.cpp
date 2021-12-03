@@ -352,7 +352,7 @@ void WidgetVideoPreview::forwardPlayerPosition(qint64 frameNr, bool decode_at_ne
 // stop playback
 void WidgetVideoPreview::stopPlayback(bool clicked) {
 
-	if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4))
+	if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4) || (mImfApplication == ::App4DCDM))
 		player->clean(); // reset player
 #ifdef APP5_ACES
 	else if (mImfApplication == ::App5)
@@ -364,7 +364,7 @@ void WidgetVideoPreview::stopPlayback(bool clicked) {
 #endif
 	if (currentPlaylist.length() > 0) player->setPos(currentPlaylist[0].in, 0, 0);
 
-	if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4)) {
+	if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4) || (mImfApplication == ::App4DCDM)) {
 		if (playerThread->isRunning()) playerThread->quit();
 	}
 #ifdef APP5_ACES
@@ -381,7 +381,7 @@ void WidgetVideoPreview::stopPlayback(bool clicked) {
 	mpPlayPauseButton->setIcon(QIcon(":/play.png"));
 	
 	// reset preview decoder
-	if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4)) {
+	if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4) || (mImfApplication == ::App4DCDM)) {
 		if (decodingThreads[0]->isRunning()) decodingThreads[0]->quit();
 		if (decodingThreads[1]->isRunning()) decodingThreads[1]->quit();
 	}
@@ -432,7 +432,7 @@ void WidgetVideoPreview::rShowMsgBox(const QString &msg, int new_fps) {
 		speeds[decode_speed]->setChecked(false); // uncheck old value
 		decode_speed = new_fps;
 		speeds[new_fps]->setChecked(true); // check new value
-		if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4)) {
+		if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4) || (mImfApplication == ::App4DCDM)) {
 			player->setFps(new_fps); // set new framreate in player
 			playerThread->start(QThread::TimeCriticalPriority); // resume playback
 		}
@@ -454,7 +454,7 @@ void WidgetVideoPreview::rShowMsgBox(const QString &msg, int new_fps) {
 
 void WidgetVideoPreview::rPlaybackEnded() {
 	mpPlayPauseButton->setIcon(QIcon(":/play.png"));
-	if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4)) {
+	if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4) || (mImfApplication == ::App4DCDM)) {
 		if(playerThread->isRunning()) playerThread->quit();
 	}
 #ifdef APP5_ACES
@@ -510,7 +510,7 @@ void WidgetVideoPreview::xPosChanged(const QSharedPointer<AssetMxfTrack> &rAsset
 
 	if (decodingFrame != xSliderTotal) {
 
-		if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4)) {
+		if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4) || (mImfApplication == ::App4DCDM)) {
 			player->setPos(xSliderFrame, xSliderTotal, playlist_index); // set current frame in player
 			// Terminate running decodes
 			if (decodingThreads[run]->isRunning()) decodingThreads[run]->quit();
@@ -639,7 +639,7 @@ void WidgetVideoPreview::decodingStatus(qint64 frameNr,QString status) {
 #endif
 		//TODO
 		VideoResource vr = currentPlaylist[current_playlist_index];
-		if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4)) {
+		if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4) || (mImfApplication == ::App4DCDM)) {
 			decoders[run]->asset = currentAsset; // set new asset in current decoder
 			//decoders[run]->frameNr = xSliderFrame; // set frame number in decoder
 			decoders[run]->mFrameNr = vr.in + (xSliderFrame - vr.in) % vr.Duration; // set current frame number in decoder
@@ -681,7 +681,7 @@ void WidgetVideoPreview::rPlayPauseButtonClicked(bool checked) {
 	
 	mpImagePreview->ttml_regions.clear();
 
-	if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4)) {
+	if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4) || (mImfApplication == ::App4DCDM)) {
 		if (playerThread->isRunning() && player->playing) { // pause playback
 
 			player->playing = false;
@@ -826,24 +826,35 @@ void WidgetVideoPreview::setPlaylist(QVector<VideoResource> &rPlayList, QVector<
 	ttmls = &rTTMLs; // set timed text elements
 	currentPlaylist = rPlayList; // set playlist
 	if (! currentPlaylist.isEmpty() && !currentPlaylist.first().asset.isNull()) {
-		if (currentPlaylist.first().asset->GetEssenceType() == Metadata::Jpeg2000) {
-			if (currentPlaylist.first().asset->GetMetadata().colorPrimaries == SMPTE::ColorPrimaries_CinemaMezzanine) mImfApplication = ::App4DCDM;
+		SMPTE::eColorPrimaries color_primaries = currentPlaylist.first().asset->GetMetadata().colorPrimaries;
+		SMPTE::eTransferCharacteristic transfer_characteristics = currentPlaylist.first().asset->GetMetadata().transferCharcteristics;
+		Metadata::eEssenceType essence_type = currentPlaylist.first().asset->GetEssenceType();
+		if (essence_type == Metadata::Jpeg2000) {
+			if (color_primaries == SMPTE::ColorPrimaries_CinemaMezzanine) {
+				if ( (transfer_characteristics == SMPTE::TransferCharacteristic_CinemaMezzanineDCDM) ||
+						(transfer_characteristics == SMPTE::TransferCharacteristic_CinemaMezzanineDCDM_Wrong)) mImfApplication = ::App4DCDM;
+				else mImfApplication = ::App4;
+			}
 			else mImfApplication = ::App2e;
 		}
 #ifdef CODEC_HTJ2K
-		if (currentPlaylist.first().asset->GetEssenceType() == Metadata::HTJ2K) {
-			if (currentPlaylist.first().asset->GetMetadata().colorPrimaries == SMPTE::ColorPrimaries_CinemaMezzanine) mImfApplication = ::App4DCDM_HTJ2K;
+		if (essence_type == Metadata::HTJ2K) {
+			if (color_primaries == SMPTE::ColorPrimaries_CinemaMezzanine) {
+				if ( (transfer_characteristics == SMPTE::TransferCharacteristic_CinemaMezzanineDCDM) ||
+						(transfer_characteristics == SMPTE::TransferCharacteristic_CinemaMezzanineDCDM_Wrong)) mImfApplication = ::App4DCDM_HTJ2K;
+				else return; // HTJ2K  in App4_linear is not supported.
+			}
 			else mImfApplication = ::App2e_HTJ2K;
 		}
 #endif
 #ifdef APP5_ACES
-		if (currentPlaylist.first().asset->GetEssenceType() == Metadata::Aces) {
+		if (essence_type == Metadata::Aces) {
 			mImfApplication = ::App5;
 		}
 #endif
 	}
 
-	if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4))
+	if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4) || (mImfApplication == ::App4DCDM))
 		player->setPlaylist(rPlayList); // set playlist in player
 #ifdef APP5_ACES
 	else if (mImfApplication == ::App5)
@@ -896,7 +907,7 @@ void WidgetVideoPreview::setPlaylist(QVector<VideoResource> &rPlayList, QVector<
 		decoding_time->setText("loading...");
 		currentAsset = rPlayList[0].asset;
 		now_running = !now_running; // use same decoder (relevant frame is still set)
-		if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4)) {
+		if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4) || (mImfApplication == ::App4DCDM)) {
 			decoders[0]->asset = currentAsset; // set new asset in decoder 1
 			decoders[1]->asset = currentAsset; // set new asset in decoder 2
 			decoders[(int)(now_running)]->mFrameNr = rPlayList[0].in; // set first frame
@@ -923,7 +934,7 @@ void WidgetVideoPreview::setPlaylist(QVector<VideoResource> &rPlayList, QVector<
 #ifdef DEBUG_JP2K
 		qDebug() << "setPos(rPlayList.at(0).in, xSliderTotal, current_playlist_index)" << rPlayList.at(0).in <<  xSliderTotal;
 #endif
-		if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4))
+		if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4) || (mImfApplication == ::App4DCDM))
 			player->setPos(rPlayList.at(0).in, xSliderTotal, current_playlist_index); // set current frame in player
 #ifdef APP5_ACES
 		else if (mImfApplication == ::App5)
@@ -1012,7 +1023,7 @@ void WidgetVideoPreview::rChangeQuality(QAction *action) {
 		qualities[decode_layer]->setChecked(false); // uncheck 'old' layer
 
 		decode_layer = action->data().value<int>();
-		if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4)) {
+		if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4) || (mImfApplication == ::App4DCDM)) {
 			player->setLayer(decode_layer);
 			decoders[0]->setLayer(decode_layer);
 			decoders[1]->setLayer(decode_layer);
@@ -1059,7 +1070,7 @@ void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 	
 	int nr = action->data().value<int>();
 	bool player_playing;
-	if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4))
+	if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4) || (mImfApplication == ::App4DCDM))
 		player_playing = player->playing;
 #ifdef APP5_ACES
 	else if (mImfApplication == ::App5)
@@ -1128,7 +1139,7 @@ void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 		}
 		break;
 	case 4: // Show subtitles
-		if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4)) {
+		if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4) || (mImfApplication == ::App4DCDM)) {
 			player->show_subtitles = action->isChecked();
 			this->showTTML = action->isChecked();
 			if (!player->show_subtitles) {
@@ -1160,7 +1171,7 @@ void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 		break;
 	case 5: // real speed
 
-		if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4)) {
+		if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4) || (mImfApplication == ::App4DCDM)) {
 			if(playerThread->isRunning()) playerThread->quit();
 			player->realspeed = action->isChecked();
 			player->clean();
@@ -1197,7 +1208,7 @@ void WidgetVideoPreview::rChangeProcessing(QAction *action) {
 		break;
 	case 6: // color space conversion
 		if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4) || (mImfApplication == ::App4DCDM_HTJ2K) || (mImfApplication == ::App2e_HTJ2K)) {
-			if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4)) {
+			if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4) || (mImfApplication == ::App4DCDM)) {
 				decoders[0]->convert_to_709 = action->isChecked(); // set in decoder 0
 				decoders[1]->convert_to_709 = action->isChecked(); // set in decoder 1
 				player->convert_to_709(action->isChecked()); // set in player

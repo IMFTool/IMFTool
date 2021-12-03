@@ -1,7 +1,5 @@
 # Force decision if App#5 ACES support should be built
 set(BUILD_APP5_SUPPORT true CACHE BOOL "Build App#5 ACES support? Run Generate again, if this option is being changed") 
-# Force decision if App#4 DCDM support should be built
-set(BUILD_APP4DCDM_SUPPORT true CACHE BOOL "Build App#4 DCDM support? Run Generate again, if this option is being changed") 
 
 find_file(asdcplib_Targets_PATH NAMES asdcplibtargets.cmake PATHS "$ENV{CMAKE_HINT}/asdcplib" ENV CMAKE_HINT PATH_SUFFIXES "targets")
 #find_file(OpenJPEG_Targets_PATH NAMES OpenJPEGTargets.cmake ENV CMAKE_HINT PATH_SUFFIXES "targets")
@@ -43,14 +41,6 @@ unset(IlmBaseLib_Half_Debug_PATH CACHE)
 unset(IlmBaseLib_include_DIR CACHE)
 endif(BUILD_APP5_SUPPORT)
 
-if(BUILD_APP4DCDM_SUPPORT)
-find_library(OpenJPH_lib_PATH NAMES openjph PATHS ENV CMAKE_HINT PATH_SUFFIXES "lib")
-find_path(OpenJPH_include_DIR NAMES openjph/ojph_base.h PATHS  ENV CMAKE_HINT PATH_SUFFIXES "include")
-else(BUILD_APP4DCDM_SUPPORT)
-unset(OpenJPH_lib_PATH CACHE)
-unset(OpenJPH_include_DIR CACHE)
-endif(BUILD_APP4DCDM_SUPPORT)
-
 include("${asdcplib_Targets_PATH}") # Import asdcplib targets.
 #include("${OpenJPEG_Targets_PATH}") # Import OpenJPEG targets
 
@@ -88,11 +78,6 @@ if(BUILD_APP5_SUPPORT)
 set(tool_src ${tool_src} As02AcesIStream.cpp ACES_Preview.cpp ACES_Decoder.cpp
 	)
 endif(BUILD_APP5_SUPPORT)
-if(BUILD_APP4DCDM_SUPPORT)
-set(tool_src ${tool_src} HTJ2K_Decoder.cpp HTJ2K_Preview.cpp
-	)
-endif(BUILD_APP4DCDM_SUPPORT)
-
 
 # header
 set(tool_src ${tool_src} global.h MainWindow.h KMQtLogSink.h QtWaitingSpinner.h 
@@ -110,10 +95,6 @@ if(BUILD_APP5_SUPPORT)
 set(tool_src ${tool_src} As02AcesIStream.h ACES_Preview.h ACES_Decoder.h
 	)
 endif(BUILD_APP5_SUPPORT)
-if(BUILD_APP4DCDM_SUPPORT)
-set(tool_src ${tool_src} HTJ2K_Decoder.h HTJ2K_Preview.h
-	)
-endif(BUILD_APP4DCDM_SUPPORT)
 
 set(synthesis_src synthesis/st0433-dcmlTypes.cpp synthesis/SMPTE-429-8-2006-PKL.cpp synthesis/SMPTE-429-9-2007-AM.cpp synthesis/SMPTE-2067-2-2013-Core.cpp 
 	synthesis/SMPTE-2067-3-2013-CPL.cpp synthesis/SMPTE-2067-100a-2014-OPL.cpp synthesis/xml.cpp synthesis/xmldsig-core-schema.cpp
@@ -131,11 +112,6 @@ if(BUILD_APP5_SUPPORT)
 include_directories("${OpenEXRLib_include_DIR}/OpenEXR")
 endif(BUILD_APP5_SUPPORT)
 
-if(BUILD_APP4DCDM_SUPPORT)
-include_directories("${OpenJPH_include_DIR}/openjph")
-endif(BUILD_APP4DCDM_SUPPORT)
-
-
 if(WIN32)
 	add_definitions(/D_CRT_SECURE_NO_WARNINGS /DUNICODE /DKM_WIN32 /DASDCP_PLATFORM=\"win32\" /DNOMINMAX /DOPENEXR_DLL)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
@@ -146,10 +122,6 @@ endif(WIN32)
 if(BUILD_APP5_SUPPORT)
 add_definitions(/DAPP5_ACES)
 endif(BUILD_APP5_SUPPORT)
-
-if(BUILD_APP4DCDM_SUPPORT)
-add_definitions(/DAPP4_DCDM /DCODEC_HTJ2K)
-endif(BUILD_APP4DCDM_SUPPORT)
 
 add_executable(${EXE_NAME} WIN32 ${tool_src} ${resSources} ${win_resources} ${synthesis_src})
 target_link_libraries(${EXE_NAME} general Qt5::Widgets
@@ -162,11 +134,6 @@ target_link_libraries(${EXE_NAME}
 	 debug "${IlmBaseLib_Imath_Debug_PATH}" optimized "${IlmBaseLib_Imath_PATH}" debug "${OpenEXRLib_IlmImf_Debug_PATH}" optimized "${OpenEXRLib_IlmImf_PATH}"
 	 )
 endif(BUILD_APP5_SUPPORT)
-if(BUILD_APP4DCDM_SUPPORT)
-target_link_libraries(${EXE_NAME} 
-	 general "${OpenJPH_lib_PATH}"
-	 )
-endif(BUILD_APP4DCDM_SUPPORT)
 
 # add the install target
 install(TARGETS ${EXE_NAME} RUNTIME DESTINATION bin ARCHIVE DESTINATION lib)

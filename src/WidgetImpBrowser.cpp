@@ -1173,7 +1173,8 @@ void WidgetImpBrowser::SetMxfFile(const QStringList &rFiles) {
 			if(is_mxf_file(rFiles.at(0))) {
 				QFileInfo source_file(rFiles.at(0));
 				ASDCP::EssenceType_t EssenceType;
-				ASDCP::Result_t result = ASDCP::EssenceType(QDir(rFiles.at(0)).absolutePath().toStdString(), EssenceType);
+				Kumu::FileReaderFactory defaultFactory;
+				ASDCP::Result_t result = ASDCP::EssenceType(QDir(rFiles.at(0)).absolutePath().toStdString(), EssenceType, defaultFactory);
 				if ( ASDCP_FAILURE(result) )
 					qDebug() << "ASDCP_FAILURE";
 
@@ -1361,10 +1362,19 @@ void WidgetImpBrowser::slotCurrentChanged(const QModelIndex &selected, const QMo
 }
 
 void WidgetImpBrowser::rLoadRequest() {
-	QFileDialog* pFileDialog = new QFileDialog(this, QString("Select MXF file"));
-	//pFileDialog->setOption(QFileDialog::DontUseNativeDialog);
+	QFileDialog* pFileDialog = new QFileDialog(this, QString("Select OV location"));
+	pFileDialog->setOption(QFileDialog::DontUseNativeDialog);
 	pFileDialog->setFileMode(QFileDialog::DirectoryOnly);
 	pFileDialog->setViewMode(QFileDialog::Detail);
+    QList<QUrl> urls;
+    if (QDir("/Volumes").exists()) urls << QUrl::fromLocalFile("/Volumes");
+    if (QDir(QDir::homePath()).exists()) urls << QUrl::fromLocalFile(QDir::homePath());
+	for (int i = 0; i < QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation).size(); i++) {
+		QUrl::fromLocalFile(QStandardPaths::standardLocations(QStandardPaths::DocumentsLocation).at(i));
+	}
+
+    pFileDialog->setSidebarUrls(urls);
+
 
 	if(pFileDialog->exec()) {
 		QStringList dir_list = pFileDialog->selectedFiles();

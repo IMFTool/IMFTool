@@ -102,4 +102,7 @@
         <file>down_arrow_hover.png</file>
         <file>indeterminate.png</file>
     </qresource>
+    <qresource prefix="/manual">
+        <file>IMF-Tool_Users-Manual.pdf</file>
+    </qresource>
 </RCC>

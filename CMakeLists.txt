@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.1.0)
 
 # Name of target executable
 set(EXE_NAME "IMF-Tool")
+# Helps Eclipse finding include paths:
+set(CMAKE_VERBOSE_MAKEFILE ON)
+set_property(GLOBAL PROPERTY CMAKE_CXX_USE_RESPONSE_FILE_FOR_INCLUDES ON)
 project(${EXE_NAME})
 # Get the SVN revision number if an svn command line client is
 # available.  This version will run at build time rather than only
@@ -59,7 +62,8 @@ set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "Default Targets")
 set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER "Generated Files")
 set_property(GLOBAL PROPERTY AUTOMOC_TARGETS_FOLDER "Generated Files")
 # Helps Eclipse finding include paths:
-set(CMAKE_VERBOSE_MAKEFILE ON)
+#set(CMAKE_VERBOSE_MAKEFILE ON)
+#set_property(GLOBAL PROPERTY CMAKE_CXX_USE_RESPONSE_FILE_FOR_INCLUDES ON)
 # use, i.e. don't skip the full RPATH for the build tree
 set(CMAKE_SKIP_BUILD_RPATH  OFF)
 # when building, don't use the install RPATH already

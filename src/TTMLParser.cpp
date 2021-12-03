@@ -467,7 +467,7 @@ QString elem::serializeTT(DOMElement *rEl) {
 
 // --------------------------------------------------------------------------------------------
 
-TTMLParser::TTMLParser() : framerate(0.0), is_wrapped(false), tickrate(0), timeline_in(0.0), timeline_out(0.0), mpTTMLtimelineResource(NULL) {}
+TTMLParser::TTMLParser() : reader(defaultFactory), framerate(0.0), is_wrapped(false), tickrate(0), timeline_in(0.0), timeline_out(0.0), mpTTMLtimelineResource(NULL) {}
 
 Error TTMLParser::open(const QString &rSourceFile, TTMLtimelineResource &ttml_segment, bool rIsWrapped) {
 

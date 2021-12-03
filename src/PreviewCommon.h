@@ -70,5 +70,6 @@ protected:
 	static void error_callback(const char *msg, void *data);
 
 	bool err = false; // error in the decoding process?
+	Kumu::FileReaderFactory defaultFactory;
 
 };

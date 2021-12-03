@@ -21,7 +21,6 @@
 #include "JP2K_Preview.h"
 
 class FrameRequest;
-class JP2Ktest;
 
 class JP2K_Decoder : public QObject, public QRunnable, public JP2 {
 

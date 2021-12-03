@@ -49,19 +49,26 @@ public:
 		ProRes,
 	};
 
+enum eEssenceSubType {
+		Unknown_SubType = 0,
+		HTJ2K,
+	};
+
+
 	enum eColorEncoding {
 		Unknown_Color_Encoding = 0,
 		CDCI,
 		RGBA
 	};
 
-	Metadata(Metadata::eEssenceType type = Metadata::Unknown_Type);
+	Metadata(Metadata::eEssenceType rType = Metadata::Unknown_Type, Metadata::eEssenceSubType rSubType = Metadata::Unknown_SubType);
 	~Metadata() {}
 	bool IsWellKnownType() { return type; }
 	QString GetAsString();
 	void GetAsTextDocument(QTextDocument &rDoc);
 
 	Metadata::eEssenceType					type;
+	Metadata::eEssenceSubType				subType;
 	EditRate								editRate; // EditRate to appear in the CPL
 	ASDCP::Rational							aspectRatio;
 	quint32									storedWidth;

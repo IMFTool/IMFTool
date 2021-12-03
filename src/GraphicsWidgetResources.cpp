@@ -758,7 +758,11 @@ void GraphicsWidgetVideoResource::restartThread(QSharedPointer<AssetMxfTrack> rA
 	if (!rAsset.isNull()) {
 		switch (mAssset->GetEssenceType()) {
 		case Metadata::Jpeg2000:
-			if (mAssset->GetMetadata().colorPrimaries == SMPTE::ColorPrimaries_CinemaMezzanine) mImfApplication = ::App4DCDM;
+			if (mAssset->GetMetadata().colorPrimaries == SMPTE::ColorPrimaries_CinemaMezzanine) {
+				if ( (mAssset->GetMetadata().transferCharcteristics == SMPTE::TransferCharacteristic_CinemaMezzanineDCDM) ||
+						(mAssset->GetMetadata().transferCharcteristics == SMPTE::TransferCharacteristic_CinemaMezzanineDCDM_Wrong)) mImfApplication = ::App4DCDM;
+				else mImfApplication = ::App4;
+			}
 			else mImfApplication = ::App2e;
 			break;
 
@@ -780,9 +784,7 @@ void GraphicsWidgetVideoResource::restartThread(QSharedPointer<AssetMxfTrack> rA
 
 	}
 	if ((mImfApplication == ::App2) || (mImfApplication == ::App2e)
-#ifdef APP4_DCDM
 			|| (mImfApplication == ::App4) || (mImfApplication == ::App4DCDM)
-#endif
 	) {
 		mpJP2K = new JP2K_Preview(); // (k)
 		mpJP2K->asset = rAsset; // (k)
@@ -1026,7 +1028,7 @@ void GraphicsWidgetVideoResource::rEntryPointChanged() {
 void GraphicsWidgetVideoResource::RefreshProxy() {
 	if (decodeProxyThread->isRunning()) decodeProxyThread->quit();
 
-	if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4)) {
+	if ((mImfApplication == ::App2) || (mImfApplication == ::App2e) || (mImfApplication == ::App4) || (mImfApplication == ::App4DCDM)) {
 		// first proxy
 		Timecode first_frame = GetFirstVisibleFrame();
 		mpJP2K->mFirst_proxy = first_frame.GetTargetFrame(); // set frame number
@@ -1709,7 +1711,8 @@ void GraphicsWidgetMarkerResource::MoveMarker(GraphicsWidgetMarker *pMarker, qin
 
 		//WR
 		// We don't allow to change the intrinsic duration of marker segments
-		if(local_pos.x() > boundingRect().right()) local_pos.setX(boundingRect().right());
+		// Max. position is (source duration - 1 )
+		if(local_pos.x() >= boundingRect().right()) local_pos.setX(boundingRect().right() - 1.0);
 		//WR
 		qint64 max_offset = local_pos.x();
 		QList<QGraphicsItem*> items = childItems();

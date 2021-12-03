@@ -402,9 +402,10 @@ typedef struct {
 	int RepeatCount;
 } TTMLtimelineResource;
 
-typedef struct {
-	int decoded_total = 0;
-	int pending_requests = 0;
+typedef struct DecodedFrames{
+	DecodedFrames() : decoded_total(0), pending_requests(0) {}
+	int decoded_total;
+	int pending_requests;
 } DecodedFrames;
 
 typedef struct {

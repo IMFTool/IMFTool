@@ -59,6 +59,8 @@ public slots:
 	void WritePackage();
 	void showStatusMessage(const QString &text, const int &timeout, const QString &color);
 	void rJobQueueFinished();
+	void ShowManualPdf();
+	void ShowManualGitHub();
 
 
 private slots:
@@ -79,6 +81,7 @@ private slots:
 	void rCallPhoton();
 	void rAutoInstallImp(const bool rOpenAllCpls = false);
 	void informIsSupplementalImp();
+	void rSetOutgestEnabled(bool);
 	//WR
 
 private:
@@ -91,6 +94,8 @@ private:
 	void SetUnwrittenCPL(QString FilePath);
 	//returns 0 if undostack is empty
 	bool checkUndoStack();
+	bool rGetOutgestEnabled() {return mOutgestEnabled;};
+	bool rKeepUnsavedChangesDialog();
 
 	QMessageBox	*mpMsgBox;
 	QDockWidget *mpDockWidgetImagePreview;
@@ -107,6 +112,7 @@ private:
 	QProgressDialog *mpProgressDialog;
 	JobQueue *mpJobQueue;
 	QString mQcReport;
+	bool mOutgestEnabled = false;
 	//WR
 
 };

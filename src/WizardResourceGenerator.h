@@ -134,10 +134,10 @@ signals:
 	//WR
 	void SetLanguageTagWav(const QString &rLanguageTag);
 	void SetLanguageTagTT(const QString &rLanguageTag);
-	void SetMCATitle(const QString &rLanguageTag);
-	void SetMCATitleVersion(const QString &rLanguageTag);
-	void SetMCAAudioContentKind(const QString &rLanguageTag);
-	void SetMCAAudioElementKind(const QString &rLanguageTag);
+	void SetMCATitle(const QString &rString);
+	void SetMCATitleVersion(const QString &rString);
+	void SetMCAAudioContentKind(const QString &rString);
+	void SetMCAAudioElementKind(const QString &rString);
 	void SetCplEditRate(const EditRate &rEditRate);
 	void SetNamespaceURI(const QString &rString);
 	//WR
@@ -162,6 +162,35 @@ private:
 		Jpeg2000Index,
 		ISXDIndex,
 	};
+	const QStringList mMCAContentSymbols {
+		"PRM",
+		"SAP",
+		"HI",
+		"DV",
+		"DX",
+		"MX",
+		"FX",
+		"FFX",
+		"ME",
+		"OP",
+		"MESP",
+		"DME",
+		"NDME",
+		"PNAR",
+		"ONAR",
+		"VO",
+		"VI",
+		"CM",
+		"LCM",
+		"x-PrivateTag(x- plus four characters maximum)",
+	};
+
+	const QStringList mMCAUseClassSymbols {
+		"FCMP",
+		"ICMP",
+		"SMPL",
+		"SING",
+	};
 	Q_DISABLE_COPY(WizardResourceGeneratorPage);
 	QVector<EditRate> mEditRates;
 	void InitLayout();
@@ -183,8 +212,8 @@ private:
 	QLineEdit *mpLineEditLanguageTagTT;
 	QLineEdit *mpLineEditMCATitle;
 	QLineEdit *mpLineEditMCATitleVersion;
-	QLineEdit *mpLineEditMCAAudioContentKind;
-	QLineEdit *mpLineEditMCAAudioElementKind;
+	QComboBox *mpLineEditMCAAudioContentKind;
+	QComboBox *mpLineEditMCAAudioElementKind;
 	QLineEdit *mpLineEditNamespaceURI;
 	//WR
 	QFileDialog *mpDirDialog;
@@ -264,9 +293,6 @@ public:
 	virtual QVariant data(const QModelIndex &rIndex, int role = Qt::DisplayRole) const;
 	virtual bool setData(const QModelIndex &rIndex, const QVariant &rValue, int role = Qt::EditRole);
 	void ChangeSoundfieldGroup(const QString &rName);
-	//WR
-	//void SetLanguageTagWav(const QString &rLanguageTag);
-	//WR
 
 private:
 	Q_DISABLE_COPY(SoundFieldGroupModel);

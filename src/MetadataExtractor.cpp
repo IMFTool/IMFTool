@@ -17,6 +17,7 @@
 #include "MetadataExtractor.h"
 #include "AS_DCP_internal.h"
 #include "AS_02.h"
+#include "AS_02_IAB.h"
 #include "PCMParserList.h"
 #include "SMPTE_Labels.h" // (k)
 #include <KM_fileio.h>
@@ -50,6 +51,7 @@
 
 using namespace xercesc;
 
+#include <QByteArray>
 
 
 MetadataExtractor::MetadataExtractor(QObject *pParent /*= NULL*/) :
@@ -64,7 +66,7 @@ Error MetadataExtractor::ReadMetadata(Metadata &rMetadata, const QString &rSourc
 	if(source_file.exists() && source_file.isFile() && !source_file.isSymLink()) {
 		EssenceType_t essence_type = ESS_UNKNOWN;
 		if(is_mxf_file(rSourceFile)) {
-			Result_t result = ASDCP::EssenceType(source_file.absoluteFilePath().toStdString(), essence_type);
+			Result_t result = ASDCP::EssenceType(source_file.absoluteFilePath().toStdString(), essence_type, defaultFactory);
 			if(ASDCP_SUCCESS(result)) {
 				switch(essence_type) {
 #ifdef APP5_ACES
@@ -122,7 +124,7 @@ Error MetadataExtractor::ReadAcesMxfDescriptor(Metadata &rMetadata, const QFileI
 	metadata.filePath = rSourceFile.filePath();
 	AESDecContext* p_context = NULL;
 	HMACContext* p_hmac = NULL;
-	AS_02::ACES::MXFReader reader;
+	AS_02::ACES::MXFReader reader(defaultFactory);
 	AS_02::ACES::FrameBuffer frame_buffer;
 	quint32 frame_count = 0;
 
@@ -208,7 +210,7 @@ Error MetadataExtractor::ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileI
 	metadata.filePath = rSourceFile.filePath();
 	AESDecContext*     p_context = NULL;
 	HMACContext*       p_hmac = NULL;
-	AS_02::JP2K::MXFReader    reader;
+	AS_02::JP2K::MXFReader    reader(defaultFactory);
 	JP2K::FrameBuffer  frame_buffer;
 	ui32_t             frame_count = 0;
 
@@ -317,10 +319,8 @@ Error MetadataExtractor::ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileI
 			TransferCharacteristic = cdci_descriptor->TransferCharacteristic; // (k)
 			ColorPrimaries = cdci_descriptor->ColorPrimaries; // (k)
 		}
-#ifdef CODEC_HTJ2K
 		if (metadata.pictureEssenceCoding.contains(SMPTE::J2K_ProfilesMapInverse[SMPTE::HTJ2KPictureCodingSchemeGeneric]))
-			metadata.type = Metadata::HTJ2K;
-#endif
+			metadata.subType = Metadata::eEssenceSubType::HTJ2K;
 		// (k) - start
 		char buf[64];
 
@@ -361,7 +361,7 @@ Error MetadataExtractor::ReadPcmMxfDescriptor(Metadata &rMetadata, const QFileIn
 	metadata.filePath = rSourceFile.filePath();
 	AESDecContext* p_context = NULL;
 	HMACContext* p_hmac = NULL;
-	AS_02::PCM::MXFReader reader;
+	AS_02::PCM::MXFReader reader(defaultFactory);
 	PCM::FrameBuffer frame_buffer;
 	ui32_t duration = 0;
 
@@ -424,7 +424,7 @@ Error MetadataExtractor::ReadPcmMxfDescriptor(Metadata &rMetadata, const QFileIn
 					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_60)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup60;
 					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_70)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup70;
 					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_LtRt)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupLtRt;
-					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_51Ex)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup51EX;
+					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_51EX)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup51EX;
 					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_HI)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupHA;
 					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_VIN)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupVA;
 					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_51)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup51;
@@ -448,7 +448,9 @@ Error MetadataExtractor::ReadPcmMxfDescriptor(Metadata &rMetadata, const QFileIn
 					if (!soundfield_group->MCAAudioElementKind.empty()) {
 						metadata.mcaAudioElementKind = QString(soundfield_group->MCAAudioElementKind.get().EncodeString(identbuf, IdentBufferLen));
 					}
-					//WR
+					if (!soundfield_group->RFC5646SpokenLanguage.empty()) {
+						metadata.languageTag = QString(soundfield_group->RFC5646SpokenLanguage.get().EncodeString(identbuf, IdentBufferLen));
+					}
 					if(metadata.soundfieldGroup.IsWellKnown()) {
 						std::list<InterchangeObject*> object_list;
 						result = reader.OP1aHeader().GetMDObjectsByType(DefaultCompositeDict().ul(MDD_AudioChannelLabelSubDescriptor), object_list);
@@ -477,13 +479,6 @@ Error MetadataExtractor::ReadPcmMxfDescriptor(Metadata &rMetadata, const QFileIn
 									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_Cs)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelCs);
 									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_HI)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelHI);
 									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_VIN)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelVIN);
-									//WR
-									const unsigned short IdentBufferLen = 128;
-									char identbuf[IdentBufferLen];
-									if (!p_channel_descriptor->RFC5646SpokenLanguage.empty()) {
-										metadata.languageTag = QString(p_channel_descriptor->RFC5646SpokenLanguage.get().EncodeString(identbuf, IdentBufferLen));
-									}
-									//WR
 								}
 							}
 						}
@@ -511,7 +506,7 @@ Error MetadataExtractor::ReadTimedTextMxfDescriptor(Metadata &rMetadata, const Q
 	metadata.fileName = rSourceFile.fileName();
 	metadata.filePath = rSourceFile.filePath();
 
-	AS_02::TimedText::MXFReader reader;
+	AS_02::TimedText::MXFReader reader(defaultFactory);
 	//AS_02::TimedText::TimedTextDescriptor TDesc;
 	//WR: Only ASDCP::MXF::TimedTextDescriptor exposes RFC5646LanguageTagList:
 	ASDCP::MXF::TimedTextDescriptor *tt_descriptor = NULL;
@@ -574,7 +569,7 @@ Error MetadataExtractor::ReadISXDDescriptor(Metadata &rMetadata, const QFileInfo
 	metadata.fileName = rSourceFile.fileName();
 	metadata.filePath = rSourceFile.filePath();
 
-	AS_02::ISXD::MXFReader reader;
+	AS_02::ISXD::MXFReader reader(defaultFactory);
 	//AS_02::TimedText::TimedTextDescriptor TDesc;
 	//WR: Only ASDCP::MXF::TimedTextDescriptor exposes RFC5646LanguageTagList:
 	ASDCP::MXF::ISXDDataEssenceDescriptor *isxd_descriptor = NULL;
@@ -621,7 +616,7 @@ Error MetadataExtractor::ReadIABDescriptor(Metadata &rMetadata, const QFileInfo 
 	metadata.fileName = rSourceFile.fileName();
 	metadata.filePath = rSourceFile.filePath();
 
-	AS_02::IAB::MXFReader reader;
+	AS_02::IAB::MXFReader reader(defaultFactory);
 	ASDCP::MXF::IABEssenceDescriptor *iab_descriptor = NULL;
 
 	AS_02::Result_t result = reader.OpenRead(rSourceFile.absoluteFilePath().toStdString());
@@ -670,7 +665,7 @@ Error MetadataExtractor::ReadIABDescriptor(Metadata &rMetadata, const QFileInfo 
 					else if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_60)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup60;
 					else if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_70)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup70;
 					else if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_LtRt)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupLtRt;
-					else if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_51Ex)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup51EX;
+					else if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_51EX)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup51EX;
 					else if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_HI)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupHA;
 					else if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_VIN)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupVA;
 					else if(p_iab_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_51)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup51;
@@ -724,7 +719,7 @@ Error MetadataExtractor::ReadProResMxfDescriptor(Metadata &rMetadata, const QFil
 	metadata.filePath = rSourceFile.filePath();
 	AESDecContext*     p_context = NULL;
 	HMACContext*       p_hmac = NULL;
-	AS_02::ProRes::MXFReader    reader;
+	AS_02::ProRes::MXFReader    reader(defaultFactory);
 	//JP2K::FrameBuffer  frame_buffer;
 	ui32_t             frame_count = 0;
 

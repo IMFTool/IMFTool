@@ -57,9 +57,7 @@ private:
 #ifdef APP5_ACES
 			{"http://www.smpte-ra.org/ns/2067-50/2017", "App #5 ACES"},
 #endif
-#ifdef APP4_DCDM
-			{"http://www.smpte-ra.org/ns/2067-40/2020 http://www.smpte-ra.org/ns/2067-40-DCDM/2020", "App #4 DCDM"},
-#endif
+			{"http://www.smpte-ra.org/ns/2067-40-DCDM/2020", "App #4 DCDM"},
 	};
 	const QStringList mContentKindList {
 		"advertisement",
@@ -122,8 +120,13 @@ private:
 			{"http://www.smpte-ra.org/ns/2067-50/2017", "App #5 ACES"},
 			{"tag:apple.com,2017:imf:rdd45:2017", "App ProRes"},
 			{"http://www.digitalproductionpartnership.co.uk/schema/imf/TSP2121-1/2018", "Application DPP (ProRes)"},
-			{"http://www.smpte-ra.org/ns/2067-40/2020 http://www.smpte-ra.org/ns/2067-40-DCDM/2020", "App #4 DCDM"},
-			{"http://www.smpte-ra.org/ns/2067-40-DCDM/2020 http://www.smpte-ra.org/ns/2067-40/2020", "App #4 DCDM"},
-			{"http://www.smpte-ra.org/ns/2067-40/2020", "App #4"},
+			{"http://schema.thedpp.com/imf/RDD59-1/2021", "Application DPP (ProRes)"},
+			{"http://schema.thedpp.com/imf/RDD59-2/2021", "App 2E (DPP Constraints)"},
+			{"http://schema.thedpp.com/imf/RDD59-2/2021 http://www.smpte-ra.org/ns/2067-21/2020", "App 2E (DPP Constraints)"},
+			{"http://www.smpte-ra.org/ns/2067-21/2020 http://schema.thedpp.com/imf/RDD59-2/2021", "App 2E (DPP Constraints)"},
+			{"http://www.smpte-ra.org/ns/2067-40/2020 http://www.smpte-ra.org/ns/2067-40-DCDM/2020", "App #4 DCDM"}, //Legacy from draft standard
+			{"http://www.smpte-ra.org/ns/2067-40-DCDM/2020 http://www.smpte-ra.org/ns/2067-40/2020", "App #4 DCDM"}, //Legacy from draft standard
+			{"http://www.smpte-ra.org/ns/2067-40-DCDM/2020", "App #4 DCDM"},
+			{"http://www.smpte-ra.org/ns/2067-40-linear/2020", "App #4"},
 	};
 };

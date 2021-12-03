@@ -110,7 +110,7 @@ void ACES_Preview::setAsset() {
 
 		mMxf_path = asset->GetPath().absoluteFilePath(); // get new path
 
-		reader = new AS_02::ACES::MXFReader(); // create new reader
+		reader = new AS_02::ACES::MXFReader(defaultFactory); // create new reader
 
 		Result_t result_o = reader->OpenRead(mMxf_path.toStdString()); // open file for reading
 		if (!ASDCP_SUCCESS(result_o)) {
@@ -211,7 +211,7 @@ bool ACES_Preview::extractFrame(qint64 frameNr) {
 		mMsg = "Error reading frame!"; // ERROR
 		err = true;
 	}
-	buff->~FrameBuffer();
+	delete buff;
 
 	return retValue;
 }

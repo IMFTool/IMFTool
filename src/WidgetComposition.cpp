@@ -1312,7 +1312,7 @@ XmlSerializationError WidgetComposition::WriteMinimal(const QString &rDestinatio
 	cpl2016::CompositionPlaylistType cpl(ImfXmlHelper::Convert(rId), ImfXmlHelper::Convert(QDateTime::currentDateTimeUtc()), ImfXmlHelper::Convert(rContentTitle), ImfXmlHelper::Convert(rEditRate), segment_list);
 	cpl.setCreator(ImfXmlHelper::Convert(UserText(CREATOR_STRING)));
 	if(rIssuer.IsEmpty() == false) cpl.setIssuer(ImfXmlHelper::Convert(rIssuer));
-	if(rContentOriginator.IsEmpty() == false) cpl.setContentOriginator(ImfXmlHelper::Convert(rIssuer));
+	if(rContentOriginator.IsEmpty() == false) cpl.setContentOriginator(ImfXmlHelper::Convert(rContentOriginator));
 
 	if (!rApplicationIdentification.isNull()) {
 		cpl2016::CompositionPlaylistType_ExtensionPropertiesType exProp;

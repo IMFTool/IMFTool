@@ -34,7 +34,7 @@ ACES_Decoder::ACES_Decoder(QSharedPointer<DecodedFrames> &rdecoded_shared, QShar
 	decoded_shared = rdecoded_shared;
 	request = rRequest;
 
-	reader = new AS_02::ACES::MXFReader();
+	reader = new AS_02::ACES::MXFReader(defaultFactory);
 
 }
 
@@ -57,7 +57,7 @@ void ACES_Decoder::run() {
 		} // else : first reader 
 
 		// create new reader
-		reader = new AS_02::ACES::MXFReader();
+		reader = new AS_02::ACES::MXFReader(defaultFactory);
 
 		Result_t result_o = reader->OpenRead(request->asset->GetPath().absoluteFilePath().toStdString()); // open file for reading
 		if (!ASDCP_SUCCESS(result_o)) {
@@ -107,5 +107,5 @@ void ACES_Decoder::run() {
 	decoded_shared->pending_requests--;
 
 	// clean up
-	buff->~FrameBuffer();
+	delete buff;
 }

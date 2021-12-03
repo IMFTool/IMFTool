@@ -26,7 +26,7 @@ HTJ2K_Decoder::HTJ2K_Decoder(QSharedPointer<DecodedFrames> &rdecoded_shared, QSh
 
 	decoded_shared = rdecoded_shared;
 	request = rRequest;
-	reader = new AS_02::JP2K::MXFReader();
+	reader = new AS_02::JP2K::MXFReader(defaultFactory);
 
 }
 
@@ -39,7 +39,7 @@ void HTJ2K_Decoder::run() {
 			reader->~MXFReader();
 		} // else : first reader 
 		// create new reader
-		reader = new AS_02::JP2K::MXFReader();
+		reader = new AS_02::JP2K::MXFReader(defaultFactory);
 
 		Result_t result_o = reader->OpenRead(request->asset->GetPath().absoluteFilePath().toStdString()); // open file for reading
 		if (!ASDCP_SUCCESS(result_o)) {

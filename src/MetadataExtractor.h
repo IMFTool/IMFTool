@@ -57,6 +57,7 @@ private:
 	//WR
 	EditRate mCplEditRate;  // for creating TT files
 	QString mNamespaceURI;
+	Kumu::FileReaderFactory defaultFactory;
 	//WR
 };
 

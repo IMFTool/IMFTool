@@ -44,6 +44,8 @@
 #include <QProgressDialog>
 #include <QTextEdit>
 #include <QClipboard>
+#include <QTemporaryDir>
+#include <QDesktopServices>
 //WR
 
 
@@ -129,10 +131,18 @@ void MainWindow::InitMenuAndToolbar() {
 	QAction *p_action_redo = mpUndoGroup->createRedoAction(this, tr("Redo"));
 	p_action_redo->setIcon(QIcon(":/redo.png"));
 	p_action_redo->setShortcut(QKeySequence::Redo);
-	QMenu *p_menu_about = new QMenu(tr("&HELP"), menuBar());
+	QMenu *p_menu_help = new QMenu(tr("&HELP"), menuBar());
 	QAction *p_action_about = new QAction(QIcon(":/information.png"), tr("&About"), menuBar());
 	connect(p_action_about, SIGNAL(triggered(bool)), this, SLOT(ShowWidgetAbout()));
-	p_menu_about->addAction(p_action_about);
+	QAction *p_action_manual = new QAction(QIcon(":/information.png"), tr("&Open Manual (pdf)"), menuBar());
+	connect(p_action_manual, SIGNAL(triggered(bool)), this, SLOT(ShowManualPdf()));
+	QAction *p_action_github = new QAction(QIcon(":/information.png"), tr("&Open Documentation (on GitHub)"), menuBar());
+	connect(p_action_github, SIGNAL(triggered(bool)), this, SLOT(ShowManualGitHub()));
+
+	p_menu_help->addAction(p_action_about);
+	p_menu_help->addAction(p_action_manual);
+	p_menu_help->addAction(p_action_github);
+
 	QMenu *p_menu_file = new QMenu(tr("&FILE"), menuBar());
 	QAction *p_action_open = new QAction(QIcon(":/folder.png"), tr("&Open IMF Package"), menuBar());
 	connect(p_action_open, SIGNAL(triggered(bool)), this, SLOT(rOpenImpRequest()));
@@ -149,6 +159,7 @@ void MainWindow::InitMenuAndToolbar() {
 	p_action_writePartial->setDisabled(true);
 	connect(p_action_writePartial, SIGNAL(triggered(bool)), this, SLOT(ShowWorkspaceLauncherPartialImp()));
 	connect(mpWidgetImpBrowser, SIGNAL(ImpSaveStateChanged(bool)), p_action_writePartial, SLOT(setEnabled(bool)));
+	connect(mpWidgetImpBrowser, SIGNAL(ImpSaveStateChanged(bool)), this, SLOT(rSetOutgestEnabled(bool)));
 
 	QAction *p_action_close = new QAction(QIcon(":/close.png"), tr("&Close IMF Package"), menuBar());
 	connect(p_action_close, SIGNAL(triggered(bool)), this, SLOT(rCloseImpRequest()));
@@ -186,7 +197,7 @@ void MainWindow::InitMenuAndToolbar() {
 
 	menuBar()->addMenu(p_menu_file);
 	menuBar()->addMenu(p_menu_tools);
-	menuBar()->addMenu(p_menu_about);
+	menuBar()->addMenu(p_menu_help);
 
 	QToolBar *p_tool_bar = addToolBar(tr("Main Window Toolbar"));
 	p_tool_bar->setIconSize(QSize(20, 20));
@@ -227,34 +238,36 @@ void MainWindow::rSaveCPLRequest() {
 //Check unsaved changes when closing application
 void MainWindow::closeEvent (QCloseEvent *event)
 {
-	if (checkUndoStack() == 1)
-		event->ignore();
-	else
-		event->accept();
+	bool accept = true;
+	if (checkUndoStack() == true) {
+		if (rKeepUnsavedChangesDialog()) accept = false;
+	}
+	if (accept) event->accept();
+	else event->ignore();
 }
 
 //Check unsaved changes when opening new IMP
 void MainWindow::rOpenImpRequest() {
-	if (checkUndoStack() == 1)
-		return;
-	else
-		ShowWorkspaceLauncher();
+	if (checkUndoStack() == true) {
+		if (rKeepUnsavedChangesDialog()) return;
+	}
+	ShowWorkspaceLauncher();
 }
 
 //Check unsaved changes when opening new IMP
 void MainWindow::rNewImpRequest() {
-	if (checkUndoStack() == 1)
-		return;
-	else
-		ShowWorkspaceLauncherNewImp();
+	if (checkUndoStack() == true) {
+		if (rKeepUnsavedChangesDialog()) return;
+	}
+	ShowWorkspaceLauncherNewImp();
 }
 
 //Check unsaved changes when closing IMP
 void MainWindow::rCloseImpRequest() {
-	if (checkUndoStack() == 1)
-		return;
-	else
-		CloseImfPackage();
+	if (checkUndoStack() == true) {
+		if (rKeepUnsavedChangesDialog()) return;
+	}
+	CloseImfPackage();
 }
 //WR
 
@@ -355,12 +368,18 @@ bool MainWindow::checkUndoStack() {
 	if (mpWidgetImpBrowser->GetUndoStack()->isClean() == false)
 		changes = true;
 
-	if(changes == true) {
+	// Also check if Write is enabled. This can happen when overwriting existing CPLs, UndoStack will be empty in this case
+	if (rGetOutgestEnabled())
+		changes = true;
+
+	return changes;
+
+/*	if(changes == true) {
 		mpMsgBox->setText(tr("There are unsaved changes in the current IMP!"));
 		mpMsgBox->setInformativeText(tr("Do you want to proceed?"));
-/* TODO - does not work properly
+ TODO - does not work properly
 		mpMsgBox->setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel | QMessageBox::SaveAll);
-*/
+
 		mpMsgBox->setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
 		mpMsgBox->setDefaultButton(QMessageBox::Cancel);
 		mpMsgBox->setIcon(QMessageBox::Warning);
@@ -368,21 +387,22 @@ bool MainWindow::checkUndoStack() {
 
 		if(ret == QMessageBox::Cancel)
 			return 1;
-/* TODO - does not work properly
+ TODO - does not work properly
 		else if(ret == QMessageBox::SaveAll) {
 			WritePackage();
 			return 0;
 		}
-*/
+
 		else {
 			for(int i=0; i<mpUnwrittenCPLs.size(); i++){
 				QFile::remove(mpUnwrittenCPLs.at(i));
 			}
 			return 0;
 		}
+
 	}
 	else
-		return 0;
+		return 0;*/
 }
 
 			/* -----Denis Manthey End----- */
@@ -394,6 +414,63 @@ void MainWindow::ShowWidgetAbout() {
 	CenterWidget(p_about, true);
 	p_about->show();
 }
+
+void MainWindow::ShowManualPdf() {
+	Error error = Error::None;
+	QString file_path;
+	try {
+		QTemporaryDir dir;
+		if (dir.isValid()) {
+			file_path = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+			QFileInfo file_info = QFileInfo(file_path);
+			if (!file_info.isDir() || !file_info.isWritable()) {
+				  error = Error::Unknown;
+			}
+			if (!error.IsError()) {
+				file_path += tr("/manual-V").append(VERSION_MAJOR"." VERSION_MINOR"." VERSION_PATCH".pdf");
+				QFile::copy(":/manual/IMF-Tool_Users-Manual.pdf", file_path);
+				if (!QDesktopServices::openUrl(QUrl::fromLocalFile(file_path))) {
+					error = Error::SourceFileOpenError;
+				}
+			}
+		}
+	}
+	catch(...) {
+		error = Error::Unknown;
+	}
+
+	if (error.IsError()) {
+		mpMsgBox->setText(tr("Error"));
+		mpMsgBox->setIcon(QMessageBox::Warning);
+		mpMsgBox->setInformativeText("Error opening manual!\n Temporary file: \n" + file_path);
+		mpMsgBox->setStandardButtons(QMessageBox::Ok);
+		mpMsgBox->setDefaultButton(QMessageBox::Ok);
+		mpMsgBox->exec();
+	}
+}
+
+void MainWindow::ShowManualGitHub() {
+	Error error = Error::None;
+	QString url = "https://github.com/IMFTool/IMFTool/tree/master/documentation";
+	try {
+		if (!QDesktopServices::openUrl(url)) {
+			error = Error::SourceFileOpenError;
+		}
+	}
+	catch(...) {
+		error = Error::Unknown;
+	}
+
+	if (error.IsError()) {
+		mpMsgBox->setText(tr("Error"));
+		mpMsgBox->setIcon(QMessageBox::Warning);
+		mpMsgBox->setInformativeText("Error opening IMFTool web site!\n" + url);
+		mpMsgBox->setStandardButtons(QMessageBox::Ok);
+		mpMsgBox->setDefaultButton(QMessageBox::Ok);
+		mpMsgBox->exec();
+	}
+}
+
 
 void MainWindow::ShowWorkspaceLauncher() {
 
@@ -735,6 +812,28 @@ void MainWindow::informIsSupplementalImp() {
 
 }
 
-//WR
+void MainWindow::rSetOutgestEnabled(bool rOutgestEnabled) {
+	mOutgestEnabled = rOutgestEnabled;
+}
+
+bool MainWindow::rKeepUnsavedChangesDialog() {
+
+	mpMsgBox->setText(tr("There are unsaved changes in the current IMP!"));
+	mpMsgBox->setInformativeText(tr("Do you want to proceed?"));
+	mpMsgBox->setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+	mpMsgBox->setDefaultButton(QMessageBox::Cancel);
+	mpMsgBox->setIcon(QMessageBox::Warning);
+	int ret = mpMsgBox->exec();
+
+	if(ret == QMessageBox::Cancel)
+		return true;
+	else {
+		for(int i=0; i<mpUnwrittenCPLs.size(); i++){
+			QFile::remove(mpUnwrittenCPLs.at(i));
+		}
+		return false;
+	}
+
+}
 
 
