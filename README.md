@@ -59,7 +59,6 @@ Prerequisites:
 -	Requires OpenJPEG 2.2 (with multi-threading support), available at https://github.com/uclouvain/openjpeg
 -	regxmllibc, available at https://github.com/sandflow/regxmllib/
 -	The ACES build option requires IlmBase, available at https://github.com/AcademySoftwareFoundation/openexr/tree/master/IlmBase
--	The HTJ2K build option requires OpenJPH, available at https://github.com/aous72/OpenJPH
 
 ## DISCLAIMER
   THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
