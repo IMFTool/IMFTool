@@ -47,9 +47,12 @@ private:
 	Error ReadPcmMxfDescriptor(Metadata &rMetadata, const QFileInfo &rSourceFile);
 	Error ReadWavHeader(Metadata &rMetadata, const QFileInfo &rSourceFile);
 	Error ReadTimedTextMetadata(Metadata &rMetadata, const QFileInfo &rSourceFile);
+	Error ReadISXDMetadata(Metadata &rMetadata, const QFileInfo &rSourceFile);
     Error ReadTimedTextMxfDescriptor(Metadata &rMetadata, const QFileInfo &rSourceFile);
     Error ReadIABDescriptor(Metadata &rMetadata, const QFileInfo &rSourceFile);
     Error ReadISXDDescriptor(Metadata &rMetadata, const QFileInfo &rSourceFile);
+    Error ReadMGADescriptor(Metadata &rMetadata, const QFileInfo &rSourceFile);
+    Error ReadADMDescriptor(Metadata &rMetadata, const QFileInfo &rSourceFile);
     Error ReadProResMxfDescriptor(Metadata &rMetadata, const QFileInfo &rSourceFile);
 	float DurationExtractor(xercesc::DOMDocument *dom_doc, float fr, int tr);
 	float GetElementDuration(xercesc::DOMElement* eleDom, float fr, int tr);

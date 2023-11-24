@@ -180,12 +180,20 @@ void WidgetTrackDetails::InitLayout() {
 			p_tool_button->setIcon(QIcon(":/marker_bw.png"));
 			break;
 		case IABSequence:
-			p_label->setText(tr("Immersive Audio"));
+			p_label->setText(tr("IAB Audio"));
 			p_tool_button->setIcon(QIcon(":/sound_bw.png"));
 			break;
 		case ISXDSequence:
 			p_label->setText(tr("ISXD RDD47"));
 			p_tool_button->setIcon(QIcon(":/xml-icon.png"));
+			break;
+		case MGASADMSignalSequence:
+			p_label->setText(tr("MGA S-ADM"));
+			p_tool_button->setIcon(QIcon(":/sound_bw.png"));
+			break;
+		case ADMAudioSequence:
+			p_label->setText(tr("ADM Audio"));
+			p_tool_button->setIcon(QIcon(":/sound_bw.png"));
 			break;
 		case  Unknown:
 		default:

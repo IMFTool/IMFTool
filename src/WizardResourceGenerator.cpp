@@ -98,6 +98,12 @@ void WizardResourceGenerator::InitLayout() {
 		case Metadata::ISXD:
 			SwitchMode(eMode::ISXDMode);
 			break;
+		case Metadata::SADM:
+			SwitchMode(eMode::MGAMode);
+			break;
+		case Metadata::ADM:
+			SwitchMode(eMode::ADMMode);
+			break;
 		default:
 			break;
 		}
@@ -114,7 +120,7 @@ void WizardResourceGenerator::SwitchMode(eMode mode) {
 
 WizardResourceGeneratorPage::WizardResourceGeneratorPage(QWidget *pParent /*= NULL*/, QVector<EditRate> rEditRates /* = QVector<EditRate>()*/, bool rReadOnly, QSharedPointer<AssetMxfTrack> rAsset ) :
 QWizardPage(pParent), mpFileDialog(NULL), mpSoundFieldGroupModel(NULL), mpTimedTextModel(NULL), mpTableViewExr(NULL), mpTableViewWav(NULL), mpTableViewTimedText(NULL), mpProxyImageWidget(NULL), mpStackedLayout(NULL), mpComboBoxEditRate(NULL),
-mpComboBoxSoundfieldGroup(NULL), mpMsgBox(NULL), mpAs02Wrapper(NULL), mpLineEditDuration(NULL), mpComboBoxCplEditRate(NULL), mpComboBoxNamespaceURI(NULL) {
+mpComboBoxSoundfieldGroup(NULL), mpMsgBox(NULL), mpAs02Wrapper(NULL), mpLineEditDuration(NULL), mpComboBoxCplEditRateTT(NULL),mpComboBoxCplEditRateISXD(NULL), mpComboBoxNamespaceURI(NULL) {
 	mpAs02Wrapper = new MetadataExtractor(this);
 	mReadOnly = rReadOnly;
 	mAsset = rAsset;
@@ -220,7 +226,15 @@ void WizardResourceGeneratorPage::InitLayout() {
 	mpLineEditMCAAudioContentKind->setCurrentIndex(-1);
 	mpLineEditMCAAudioContentKind->setValidator(v_mca_items);
 	if (mReadOnly) mpLineEditMCAAudioContentKind->setDisabled(true);
-	//connect(mpLineEditMCAAudioContentKind, SIGNAL(textEdited(QString)), this, SLOT(mcaAudioContentKindChanged()));
+	mpLineEditMCAContent = new QComboBox(this);
+	mpLineEditMCAContent->setEditable(true);
+	mpLineEditMCAContent->lineEdit()->setAlignment(Qt::AlignRight);
+	if (!mReadOnly) mpLineEditMCAContent->lineEdit()->setPlaceholderText("Pick a symbol from the list");
+	mpLineEditMCAContent->addItems(mMCAContentSymbols);
+	mpLineEditMCAContent->setCurrentIndex(-1);
+	mpLineEditMCAContent->setValidator(v_mca_items);
+	if (mReadOnly) mpLineEditMCAContent->setDisabled(true);
+	//connect(mpLineEditMCAContent, SIGNAL(textEdited(QString)), this, SLOT(mcaAudioContentKindChanged()));
 	mpLineEditMCAAudioElementKind = new QComboBox(this);
 	mpLineEditMCAAudioElementKind->setEditable(true);
 	mpLineEditMCAAudioElementKind->lineEdit()->setAlignment(Qt::AlignRight);
@@ -230,8 +244,10 @@ void WizardResourceGeneratorPage::InitLayout() {
 	mpLineEditMCAAudioElementKind->setValidator(v_mca_items);
 	if (mReadOnly) mpLineEditMCAAudioElementKind->setDisabled(true);
 	//connect(mpLineEditMCAAudioElementKind, SIGNAL(textEdited(QString)), this, SLOT(mcaAudioElementKindChanged()));
-	mpComboBoxCplEditRate = new QComboBox(this);
-	mpComboBoxCplEditRate->setWhatsThis(tr("Select a frame rate. It shall match the CPL Edit Rate"));
+	mpComboBoxCplEditRateTT = new QComboBox(this);
+	mpComboBoxCplEditRateTT->setWhatsThis(tr("Select a frame rate. It shall match the CPL Edit Rate"));
+	mpComboBoxCplEditRateISXD = new QComboBox(this);
+	mpComboBoxCplEditRateISXD->setWhatsThis(tr("Select a frame rate. It shall match the CPL Edit Rate"));
 	QStringListModel *p_edit_rate_group_model = new QStringListModel(this);
 	QStringList p_edit_rate_string_list;
 	if (mReadOnly) {
@@ -247,14 +263,22 @@ void WizardResourceGeneratorPage::InitLayout() {
 		}
 	}
 	p_edit_rate_group_model->setStringList(p_edit_rate_string_list);
-	mpComboBoxCplEditRate->setModel(p_edit_rate_group_model);
-	if (mReadOnly) mpComboBoxCplEditRate->setDisabled(true);
-	mpLineEditNamespaceURI = new QLineEdit(this);
-	mpLineEditNamespaceURI->setDisabled(true);
-	mpLineEditNamespaceURI->setStyleSheet("QLineEdit {color: #b1b1b1;}");
-	mpLineEditDurationReadOnly = new QLineEdit(this);
-	mpLineEditDurationReadOnly->setDisabled(true);
-	mpLineEditDurationReadOnly->setStyleSheet("QLineEdit {color: #b1b1b1;}");
+	mpComboBoxCplEditRateTT->setModel(p_edit_rate_group_model);
+	if (mReadOnly) mpComboBoxCplEditRateTT->setDisabled(true);
+	mpComboBoxCplEditRateISXD->setModel(p_edit_rate_group_model);
+	if (mReadOnly) mpComboBoxCplEditRateISXD->setDisabled(true);
+	mpLineEditNamespaceURITT = new QLineEdit(this);
+	mpLineEditNamespaceURITT->setDisabled(true);
+	mpLineEditNamespaceURITT->setStyleSheet("QLineEdit {color: #b1b1b1;}");
+	mpLineEditNamespaceURIISXD = new QLineEdit(this);
+	mpLineEditNamespaceURIISXD->setDisabled(true);
+	mpLineEditNamespaceURIISXD->setStyleSheet("QLineEdit {color: #b1b1b1;}");
+	mpLineEditDurationReadOnlyTT = new QLineEdit(this);
+	mpLineEditDurationReadOnlyTT->setDisabled(true);
+	mpLineEditDurationReadOnlyTT->setStyleSheet("QLineEdit {color: #b1b1b1;}");
+	mpLineEditDurationReadOnlyISXD = new QLineEdit(this);
+	mpLineEditDurationReadOnlyISXD->setDisabled(true);
+	mpLineEditDurationReadOnlyISXD->setStyleSheet("QLineEdit {color: #b1b1b1;}");
 
 	//connect(mpLineEditNamespaceURI, SIGNAL(textEdited(QString)), this, SLOT(languageTagTTChanged()));
 
@@ -345,7 +369,6 @@ void WizardResourceGeneratorPage::InitLayout() {
 	mca_content_kind->setToolTip("MCA Audio Content Kind shall be present. See https://www.imfug.com/TR/audio-track-files/ for more information.");
 	p_wrapper_layout_two->addWidget(mca_content_kind, 4, 0, 1, 1);
 	p_wrapper_layout_two->addWidget(mpLineEditMCAAudioContentKind, 4, 1, 1, 1);
-	p_wrapper_layout_two->addWidget(mpLineEditMCATitleVersion, 3, 1, 1, 1);
 	QLabel* mca_element_kind = new QLabel(tr("MCA Audio Element Kind:"), this);
 	mca_element_kind->setToolTip("MCA Audio Element Kind shall be present. See https://www.imfug.com/TR/audio-track-files/ for more information.");
 	p_wrapper_layout_two->addWidget(mca_element_kind, 5, 0, 1, 1);
@@ -362,13 +385,13 @@ void WizardResourceGeneratorPage::InitLayout() {
 	p_wrapper_layout_three->setContentsMargins(0, 0, 0, 0);
 	if (!mReadOnly) p_wrapper_layout_three->addWidget(new QLabel(tr("Select a Timed Text Resource (.xml) compliant to IMSC1.1"), this), 0, 0, 1, 3);
 	p_wrapper_layout_three->addWidget(new QLabel(tr("Edit Rate:"), this), 1, 0, 1, 2);
-	p_wrapper_layout_three->addWidget(mpComboBoxCplEditRate, 1, 2, 1, 1);
+	p_wrapper_layout_three->addWidget(mpComboBoxCplEditRateTT, 1, 2, 1, 1);
 	p_wrapper_layout_three->addWidget(new QLabel(tr("RFC 5646 Language Tag (e.g. en-US):"), this), 2, 0, 1, 2);
 	p_wrapper_layout_three->addWidget(mpLineEditLanguageTagTT, 2, 2, 1, 1);
 	p_wrapper_layout_three->addWidget(new QLabel(tr("Duration (frames):"), this), 3, 0, 1, 2);
-	p_wrapper_layout_three->addWidget(mpLineEditDurationReadOnly, 3, 2, 1, 1);
+	p_wrapper_layout_three->addWidget(mpLineEditDurationReadOnlyTT, 3, 2, 1, 1);
 	p_wrapper_layout_three->addWidget(new QLabel(tr("NamespaceURI:"), this), 4, 0, 1, 2);
-	p_wrapper_layout_three->addWidget(mpLineEditNamespaceURI, 4, 2, 1, 1);
+	p_wrapper_layout_three->addWidget(mpLineEditNamespaceURITT, 4, 2, 1, 1);
 	p_wrapper_layout_three->addWidget(mpTableViewTimedText, 5, 0, 1, 3);
 	if (!mReadOnly) p_wrapper_layout_three->addWidget(pGenNew, 6, 0, 1, 3);
 
@@ -501,28 +524,134 @@ void WizardResourceGeneratorPage::InitLayout() {
 	QGridLayout *p_wrapper_layout_five = new QGridLayout();
 	p_wrapper_layout_five->setContentsMargins(0, 0, 0, 0);
 
+	int i = -1;
 	if (mReadOnly && mAsset) {
-		int i = -1;
 		Metadata metadata = mAsset->GetMetadata();
 		QLabel* label = new QLabel();
 		label->setTextInteractionFlags(Qt::TextSelectableByMouse);
 		label->setText(metadata.assetId.toString());
 		p_wrapper_layout_five->addWidget(new QLabel(tr("Track File ID:")), ++i, 0, 1, 1);
 		p_wrapper_layout_five->addWidget(label, i, 1, 1, 1);
-		p_wrapper_layout_five->addWidget(new QLabel(tr("Edit Rate:")), ++i, 0, 1, 1);
-		p_wrapper_layout_five->addWidget(new QLabel(metadata.editRate.GetName()), i, 1, 1, 1);
-		p_wrapper_layout_five->addWidget(new QLabel(tr("Duration:")), ++i, 0, 1, 1);
-		p_wrapper_layout_five->addWidget(new QLabel(QString::number(metadata.duration.GetCount())+ " frames"), i, 1, 1, 1);
-		p_wrapper_layout_five->addWidget(new QLabel(tr("Namespace URI:")), ++i, 0, 1, 1);
-		p_wrapper_layout_five->addWidget(new QLabel(metadata.namespaceURI), i, 1, 1, 1);
+		mpComboBoxCplEditRateISXD->setCurrentText(metadata.editRate.GetName());
+		mpComboBoxCplEditRateISXD->setDisabled(true);
+	} else {
+		p_wrapper_layout_five->addWidget(new QLabel(tr("Select a Folder with ISXD XML (.xml) documents"), this), ++i, 0, 1, 3);
+	}
+	p_wrapper_layout_five->addWidget(new QLabel(tr("Edit Rate:"), this), ++i, 0, 1, 2);
+	p_wrapper_layout_five->addWidget(mpComboBoxCplEditRateISXD, i, 2, 1, 1);
+	p_wrapper_layout_five->addWidget(new QLabel(tr("Duration (frames):"), this), ++i, 0, 1, 2);
+	p_wrapper_layout_five->addWidget(mpLineEditDurationReadOnlyISXD, i, 2, 1, 1);
+	p_wrapper_layout_five->addWidget(new QLabel(tr("NamespaceURI:"), this), ++i, 0, 1, 2);
+	p_wrapper_layout_five->addWidget(mpLineEditNamespaceURIISXD, i, 2, 1, 1);
+	//p_wrapper_layout_five->addWidget(mpTableViewTimedText, 5, 0, 1, 3);
+
+	QWidget* empty = new QWidget();
+	empty->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+	p_wrapper_layout_five->addWidget(empty);
+
+	p_wrapper_widget_five->setLayout(p_wrapper_layout_five);
+
+
+	// MGA S-ADM
+	QWidget *p_wrapper_widget_six = new QWidget(this);
+	QGridLayout *p_wrapper_layout_six = new QGridLayout();
+	p_wrapper_layout_six->setContentsMargins(0, 0, 0, 0);
+
+	if (mReadOnly && mAsset) {
+		int i = -1;
+		Metadata metadata = mAsset->GetMetadata();
+		p_wrapper_layout_six->addWidget(new QLabel(tr("Duration:")), ++i, 0, 1, 1);
+		if(metadata.duration.IsValid() && metadata.editRate.IsValid())
+			p_wrapper_layout_six->addWidget(new QLabel(QString::number(metadata.duration.GetCount())+ " frames"), i, 1, 1, 1);
+		p_wrapper_layout_six->addWidget(new QLabel(tr("Frame Rate:")), ++i, 0, 1, 1);
+		if(metadata.editRate.IsValid() == true)
+			p_wrapper_layout_six->addWidget(new QLabel(metadata.editRate.GetName()), i, 1, 1, 1);
+		p_wrapper_layout_six->addWidget(new QLabel(tr("Average Bytes per Second:")), ++i, 0, 1, 1);
+		p_wrapper_layout_six->addWidget(new QLabel(QString::number(metadata.mgaAverageBytesPerSecond)), i, 1, 1, 1);
+		Q_FOREACH (const Metadata::MGASoundfieldGroup& mgaSoundFieldGroup, metadata.mgaSoundFieldGroupList) {
+			//p_wrapper_layout_six->setVerticalSpacing(50);
+			QFrame* line = new QFrame;
+			line->setFrameShape(QFrame::HLine);
+			p_wrapper_layout_six->addWidget(line, ++i, 0, 1, 2);
+			p_wrapper_layout_six->addWidget(new QLabel(tr("Soundfield:")), ++i, 0, 1, 1);
+			p_wrapper_layout_six->addWidget(new QLabel(mgaSoundFieldGroup.soundfieldGroup.GetName()), i, 1, 1, 1);
+			p_wrapper_layout_six->addWidget(new QLabel(tr("Metadata Section Link ID:")), ++i, 0, 1, 1);
+			p_wrapper_layout_six->addWidget(new QLabel(mgaSoundFieldGroup.mgaMetadataSectionLinkId), i, 1, 1, 1);
+			p_wrapper_layout_six->addWidget(new QLabel(tr("ADM Audio Programme ID:")), ++i, 0, 1, 1);
+			p_wrapper_layout_six->addWidget(new QLabel(mgaSoundFieldGroup.admAudioProgrammeID), i, 1, 1, 1);
+			p_wrapper_layout_six->addWidget(new QLabel(tr("MCA Tag Symbol:")), ++i, 0, 1, 1);
+			p_wrapper_layout_six->addWidget(new QLabel(mgaSoundFieldGroup.mcaTagSymbol), i, 1, 1, 1);
+			p_wrapper_layout_six->addWidget(new QLabel(tr("MCA Tag Name:")), ++i, 0, 1, 1);
+			p_wrapper_layout_six->addWidget(new QLabel(mgaSoundFieldGroup.mcaTagName), i, 1, 1, 1);
+			p_wrapper_layout_six->addWidget(new QLabel(tr("Language:")), ++i, 0, 1, 1);
+			p_wrapper_layout_six->addWidget(new QLabel(mgaSoundFieldGroup.mcaSpokenLanguage), i, 1, 1, 1);
+			p_wrapper_layout_six->addWidget(new QLabel(tr("MCA Content:")), ++i, 0, 1, 1);
+			p_wrapper_layout_six->addWidget(new QLabel(mgaSoundFieldGroup.mcaContent), i, 1, 1, 1);
+			p_wrapper_layout_six->addWidget(new QLabel(tr("MCA Use Class:")), ++i, 0, 1, 1);
+			p_wrapper_layout_six->addWidget(new QLabel(mgaSoundFieldGroup.mcaUseClass), i, 1, 1, 1);
+			p_wrapper_layout_six->addWidget(new QLabel(tr("MCA Title:")), ++i, 0, 1, 1);
+			p_wrapper_layout_six->addWidget(new QLabel(mgaSoundFieldGroup.mcaTitle), i, 1, 1, 1);
+			p_wrapper_layout_six->addWidget(new QLabel(tr("MCA Title Version:")), ++i, 0, 1, 1);
+			p_wrapper_layout_six->addWidget(new QLabel(mgaSoundFieldGroup.mcaTitleVersion), i, 1, 1, 1);
+		}
 
 		QWidget* empty = new QWidget();
 		empty->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-		p_wrapper_layout_five->addWidget(empty);
+		p_wrapper_layout_six->addWidget(empty);
 
 	}
 
-	p_wrapper_widget_five->setLayout(p_wrapper_layout_five);
+	p_wrapper_widget_six->setLayout(p_wrapper_layout_six);
+
+	// ADM Audio
+	QWidget *p_wrapper_widget_seven = new QWidget(this);
+	QGridLayout *p_wrapper_layout_seven = new QGridLayout();
+	p_wrapper_layout_seven->setContentsMargins(0, 0, 0, 0);
+
+	if (mReadOnly && mAsset) {
+		int i = -1;
+		Metadata metadata = mAsset->GetMetadata();
+		p_wrapper_layout_seven->addWidget(new QLabel(tr("Duration:")), ++i, 0, 1, 1);
+		if(metadata.duration.IsValid() && metadata.editRate.IsValid())
+			p_wrapper_layout_seven->addWidget(new QLabel(QString::number(metadata.duration.GetCount())+ " frames"), i, 1, 1, 1);
+		p_wrapper_layout_seven->addWidget(new QLabel(tr("Frame Rate:")), ++i, 0, 1, 1);
+		if(metadata.editRate.IsValid() == true)
+			p_wrapper_layout_seven->addWidget(new QLabel(metadata.editRate.GetName()), i, 1, 1, 1);
+		p_wrapper_layout_seven->addWidget(new QLabel(tr("Average Bytes per Second:")), ++i, 0, 1, 1);
+		p_wrapper_layout_seven->addWidget(new QLabel(QString::number(metadata.mgaAverageBytesPerSecond)), i, 1, 1, 1);
+		Q_FOREACH (const Metadata::ADMSoundfieldGroup& admSoundFieldGroup, metadata.admSoundFieldGroupList) {
+			QFrame* line = new QFrame;
+			line->setFrameShape(QFrame::HLine);
+			p_wrapper_layout_seven->addWidget(line, ++i, 0, 1, 2);
+			p_wrapper_layout_seven->addWidget(new QLabel(tr("Soundfield:")), ++i, 0, 1, 1);
+			p_wrapper_layout_seven->addWidget(new QLabel(admSoundFieldGroup.soundfieldGroup.GetName()), i, 1, 1, 1);
+			p_wrapper_layout_seven->addWidget(new QLabel(tr("RIFF Chunk Stream ID_link2:")), ++i, 0, 1, 1);
+			p_wrapper_layout_seven->addWidget(new QLabel(admSoundFieldGroup.mgaMetadataSectionLinkId), i, 1, 1, 1);
+			p_wrapper_layout_seven->addWidget(new QLabel(tr("ADM Audio Programme ID:")), ++i, 0, 1, 1);
+			p_wrapper_layout_seven->addWidget(new QLabel(admSoundFieldGroup.admAudioProgrammeID), i, 1, 1, 1);
+			p_wrapper_layout_seven->addWidget(new QLabel(tr("MCA Tag Symbol:")), ++i, 0, 1, 1);
+			p_wrapper_layout_seven->addWidget(new QLabel(admSoundFieldGroup.mcaTagSymbol), i, 1, 1, 1);
+			p_wrapper_layout_seven->addWidget(new QLabel(tr("MCA Tag Name:")), ++i, 0, 1, 1);
+			p_wrapper_layout_seven->addWidget(new QLabel(admSoundFieldGroup.mcaTagName), i, 1, 1, 1);
+			p_wrapper_layout_seven->addWidget(new QLabel(tr("Language:")), ++i, 0, 1, 1);
+			p_wrapper_layout_seven->addWidget(new QLabel(admSoundFieldGroup.mcaSpokenLanguage), i, 1, 1, 1);
+			p_wrapper_layout_seven->addWidget(new QLabel(tr("MCA Content:")), ++i, 0, 1, 1);
+			p_wrapper_layout_seven->addWidget(new QLabel(admSoundFieldGroup.mcaContent), i, 1, 1, 1);
+			p_wrapper_layout_seven->addWidget(new QLabel(tr("MCA Use Class:")), ++i, 0, 1, 1);
+			p_wrapper_layout_seven->addWidget(new QLabel(admSoundFieldGroup.mcaUseClass), i, 1, 1, 1);
+			p_wrapper_layout_seven->addWidget(new QLabel(tr("MCA Title:")), ++i, 0, 1, 1);
+			p_wrapper_layout_seven->addWidget(new QLabel(admSoundFieldGroup.mcaTitle), i, 1, 1, 1);
+			p_wrapper_layout_seven->addWidget(new QLabel(tr("MCA Title Version:")), ++i, 0, 1, 1);
+			p_wrapper_layout_seven->addWidget(new QLabel(admSoundFieldGroup.mcaTitleVersion), i, 1, 1, 1);
+		}
+
+		QWidget* empty = new QWidget();
+		empty->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+		p_wrapper_layout_seven->addWidget(empty);
+
+	}
+
+	p_wrapper_widget_seven->setLayout(p_wrapper_layout_seven);
 
 	mpStackedLayout = new QStackedLayout();
 	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::WavIndex, p_wrapper_widget_two);
@@ -530,6 +659,8 @@ void WizardResourceGeneratorPage::InitLayout() {
 	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::Jpeg2000Index, p_wrapper_widget_four);
 	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::ExrIndex, p_wrapper_widget_four);
 	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::ISXDIndex, p_wrapper_widget_five);
+	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::MGAIndex, p_wrapper_widget_six);
+	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::ADMIndex, p_wrapper_widget_seven);
 	setLayout(mpStackedLayout);
 
 	registerField(FIELD_NAME_SELECTED_FILES"*", this, "FilesSelected", SIGNAL(FilesListChanged()));
@@ -763,7 +894,73 @@ void WizardResourceGeneratorPage::SetSourceFiles(const QStringList &rFiles) {
 			emit FilesListChanged();
 		}
 		/* -----Denis Manthey----- */
+		else if(is_xml_directory(rFiles.at(0))) {
+			Metadata metadata;
+			Error error;
 
+			mpAs02Wrapper->SetCplEditRate(GetCplEditRate());
+			error = mpAs02Wrapper->ReadMetadata(metadata, rFiles.at(0)); //QDir(rFiles.at(0)).entryList(QStringList("*.xml")).first());
+
+			if (!field(FIELD_NAME_NAMESPACE_URI).toString().isEmpty()) {
+				metadata.profile = field(FIELD_NAME_NAMESPACE_URI).toString();
+			}
+			this->SetNamespaceURI(metadata.profile);
+			//qvariant_cast<Duration>(p_resource_generator->field(FIELD_NAME_DURATION))
+			if (mTimedTextDuration.GetCount() > 0) {
+				metadata.duration = mTimedTextDuration;
+				this->SetDuration(metadata.duration);
+			}
+
+			if(error.IsError()){
+				mpMsgBox->setText(error.GetErrorDescription());
+				mpMsgBox->setInformativeText(error.GetErrorMsg());
+				mpMsgBox->setStandardButtons(QMessageBox::Ok);
+				mpMsgBox->setDefaultButton(QMessageBox::Ok);
+				mpMsgBox->exec();
+				return;
+			}
+
+			if(!metadata.editRate.IsValid()) {
+				mpMsgBox->setText(tr("No Edit Rate selected"));
+				mpMsgBox->setInformativeText(tr("Select an Edit Rate for the Track File.\nIt is usually set to the Composition Edit Rate"));
+				mpMsgBox->setStandardButtons(QMessageBox::Ok);
+				mpMsgBox->setDefaultButton(QMessageBox::Ok);
+				mpMsgBox->exec();
+				//return;
+			}
+
+			while(metadata.duration.GetCount() == 0) {
+
+				int ret = mpEditDurationDialog->exec();
+				switch (ret) {
+					case QDialog::Accepted:
+						metadata.duration = Duration(mpLineEditDuration->text().toInt());
+						break;
+					case QDialog::Rejected:
+						return;
+				}
+			}
+			SetDuration(metadata.duration);
+
+			while(metadata.profile.isEmpty()) {
+
+				int ret = mpSelectNamespaceDialog->exec();
+				switch (ret) {
+					case QDialog::Accepted:
+						metadata.profile = mpComboBoxNamespaceURI->currentText();
+						this->SetNamespaceURI(metadata.profile);
+						break;
+					case QDialog::Rejected:
+						return;
+				}
+			}
+
+			SwitchMode(WizardResourceGenerator::ISXDMode);
+			mpTimedTextModel->SetFile(rFiles);
+			mpTableViewTimedText->resizeRowsToContents();
+			mpTableViewTimedText->resizeColumnsToContents();
+			emit FilesListChanged();
+		}
 
 	}
 }
@@ -833,7 +1030,8 @@ void WizardResourceGeneratorPage::SetEditRate(const EditRate &rEditRate) {
 
 void WizardResourceGeneratorPage::SetDuration(const Duration &rDuration) {
 	mTimedTextDuration = rDuration;
-	mpLineEditDurationReadOnly->setText(QString::number(rDuration.GetCount()));
+	mpLineEditDurationReadOnlyTT->setText(QString::number(rDuration.GetCount()));
+	mpLineEditDurationReadOnlyISXD->setText(QString::number(rDuration.GetCount()));
 	emit DurationChanged();
 	emit completeChanged();
 }
@@ -876,13 +1074,15 @@ void WizardResourceGeneratorPage::SetMCAAudioElementKind(const QString &text) {
 }
 
 void WizardResourceGeneratorPage::SetCplEditRate(const EditRate &rEditRate) {
-	mpComboBoxCplEditRate->setCurrentText(rEditRate.GetName());
+	mpComboBoxCplEditRateTT->setCurrentText(rEditRate.GetName());
+	mpComboBoxCplEditRateISXD->setCurrentText(rEditRate.GetName());
 	emit CplEditRateChanged();
 	emit completeChanged();
 }
 
 void WizardResourceGeneratorPage::SetNamespaceURI(const QString &text) {
-	mpLineEditNamespaceURI->setText(text);
+	mpLineEditNamespaceURITT->setText(text);
+	mpLineEditNamespaceURIISXD->setText(text);
 	emit NamespaceURIChanged();
 	emit completeChanged();
 }
@@ -896,7 +1096,7 @@ EditRate WizardResourceGeneratorPage::GetEditRate() const {
 
 Duration WizardResourceGeneratorPage::GetDuration() const {
 
-	return Duration(mpLineEditDurationReadOnly->text().toInt());
+	return Duration(mpLineEditDurationReadOnlyTT->text().toInt());
 }
 
 //WR
@@ -933,12 +1133,12 @@ QString WizardResourceGeneratorPage::GetMCAAudioElementKind() const {
 
 EditRate WizardResourceGeneratorPage::GetCplEditRate() const {
 
-	return EditRate::GetEditRate(mpComboBoxCplEditRate->currentText());
+	return EditRate::GetEditRate(mpComboBoxCplEditRateTT->currentText());
 }
 
 QString WizardResourceGeneratorPage::GetNamespaceURI() const {
 
-	return mpLineEditNamespaceURI->text();
+	return mpLineEditNamespaceURITT->text();
 }
 
 
@@ -966,6 +1166,7 @@ void WizardResourceGeneratorPage::SwitchMode(WizardResourceGenerator::eMode mode
 			break;
 		case WizardResourceGenerator::WavMode:
 			mpStackedLayout->setCurrentIndex(WavIndex);
+			mpFileDialog->setOption(QFileDialog::ShowDirsOnly, false);
 			mpFileDialog->setNameFilters(QStringList() << "*.wav" );
 			mpFileDialog->setFileMode(QFileDialog::ExistingFiles);
 			break;
@@ -973,6 +1174,7 @@ void WizardResourceGeneratorPage::SwitchMode(WizardResourceGenerator::eMode mode
 				/* -----Denis Manthey----- */
 		case WizardResourceGenerator::TTMLMode:
 			mpStackedLayout->setCurrentIndex(TTMLIndex);
+			mpFileDialog->setOption(QFileDialog::ShowDirsOnly, false);
 			mpFileDialog->setNameFilters(QStringList() << "*.ttml *.xml");
 			mpFileDialog->setFileMode(QFileDialog::ExistingFile);
 			break;
@@ -984,6 +1186,16 @@ void WizardResourceGeneratorPage::SwitchMode(WizardResourceGenerator::eMode mode
 
 		case WizardResourceGenerator::ISXDMode:
 			mpStackedLayout->setCurrentIndex(ISXDIndex);
+			mpFileDialog->setOption(QFileDialog::ShowDirsOnly, true);
+			mpFileDialog->setFileMode(QFileDialog::DirectoryOnly);
+			break;
+
+		case WizardResourceGenerator::MGAMode:
+			mpStackedLayout->setCurrentIndex(MGAIndex);
+			break;
+
+		case WizardResourceGenerator::ADMMode:
+			mpStackedLayout->setCurrentIndex(ADMIndex);
 			break;
 
 		default:

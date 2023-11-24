@@ -54,6 +54,8 @@ public:
 		TTMLMode,
 		Jpeg2000Mode,
 		ISXDMode,
+		MGAMode,
+		ADMMode,
 	};
 	WizardResourceGenerator(QWidget *pParent = NULL, QVector<EditRate> rEditRates = QVector<EditRate>(), QSharedPointer<AssetMxfTrack> rAsset = QSharedPointer<AssetMxfTrack>());
 	virtual ~WizardResourceGenerator() {}
@@ -161,6 +163,8 @@ private:
 		TTMLIndex,
 		Jpeg2000Index,
 		ISXDIndex,
+		MGAIndex,
+		ADMIndex,
 	};
 	const QStringList mMCAContentSymbols {
 		"PRM",
@@ -207,18 +211,22 @@ private:
 	QComboBox	*mpComboBoxNamespaceURI;
 	QComboBox *mpComboBoxSoundfieldGroup;
 	//WR
-	QComboBox *mpComboBoxCplEditRate;
+	QComboBox *mpComboBoxCplEditRateTT;
+	QComboBox *mpComboBoxCplEditRateISXD;
 	QLineEdit *mpLineEditLanguageTagWav;
 	QLineEdit *mpLineEditLanguageTagTT;
 	QLineEdit *mpLineEditMCATitle;
 	QLineEdit *mpLineEditMCATitleVersion;
 	QComboBox *mpLineEditMCAAudioContentKind;
 	QComboBox *mpLineEditMCAAudioElementKind;
-	QLineEdit *mpLineEditNamespaceURI;
+	QComboBox *mpLineEditMCAContent;
+	QLineEdit *mpLineEditNamespaceURITT;
+	QLineEdit *mpLineEditNamespaceURIISXD;
 	//WR
 	QFileDialog *mpDirDialog;
 	QLineEdit *mpLineEditDuration;
-	QLineEdit *mpLineEditDurationReadOnly;
+	QLineEdit *mpLineEditDurationReadOnlyTT;
+	QLineEdit *mpLineEditDurationReadOnlyISXD;
 	QLineEdit *mpLineEditDurationEmptyTTGenerator;
 	Duration mTimedTextDuration;
 	QLineEdit *mpLineEditFileDir;

@@ -386,6 +386,48 @@ private:
 	Q_DISABLE_COPY(GraphicsWidgetISXDResource);
 };
 
+class GraphicsWidgetSADMResource : public GraphicsWidgetFileResource {
+
+public:
+	//! Import existing Resource. pResource is owned by this.
+	GraphicsWidgetSADMResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL), int unused_index = 0,
+			const QSharedPointer<ImfPackage> rImfPackage = QSharedPointer<ImfPackage>());
+	//! Creates new Resource.
+	GraphicsWidgetSADMResource(GraphicsWidgetSequence *pParent, const QSharedPointer<AssetMxfTrack> &rAsset);
+	virtual ~GraphicsWidgetSADMResource() {}
+	virtual int type() const { return GraphicsWidgetSADMResourceType; }
+	virtual void paint(QPainter *pPainter, const QStyleOptionGraphicsItem *pOption, QWidget *pWidget = NULL);
+	virtual GraphicsWidgetSADMResource* Clone() const;
+
+protected:
+	virtual double ResourceErPerCompositionEr(const EditRate &rCompositionEditRate) const;
+
+private:
+	Q_DISABLE_COPY(GraphicsWidgetSADMResource);
+};
+
+
+class GraphicsWidgetADMResource : public GraphicsWidgetFileResource {
+
+public:
+	//! Import existing Resource. pResource is owned by this.
+	GraphicsWidgetADMResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL), int unused_index = 0,
+			const QSharedPointer<ImfPackage> rImfPackage = QSharedPointer<ImfPackage>());
+	//! Creates new Resource.
+	GraphicsWidgetADMResource(GraphicsWidgetSequence *pParent, const QSharedPointer<AssetMxfTrack> &rAsset);
+	virtual ~GraphicsWidgetADMResource() {}
+	virtual int type() const { return GraphicsWidgetADMResourceType; }
+	virtual void paint(QPainter *pPainter, const QStyleOptionGraphicsItem *pOption, QWidget *pWidget = NULL);
+	virtual GraphicsWidgetADMResource* Clone() const;
+
+protected:
+	virtual double ResourceErPerCompositionEr(const EditRate &rCompositionEditRate) const;
+
+private:
+	Q_DISABLE_COPY(GraphicsWidgetADMResource);
+};
+
+
 class GraphicsWidgetMarkerResource : public AbstractGraphicsWidgetResource {
 
 	Q_OBJECT

@@ -469,7 +469,7 @@ Error JobCallPhoton::Execute() {
 	}
 	emit Progress(80);
 	try {
-		qresult = myProcess->readAllStandardOutput();
+		qresult = myProcess->readAllStandardError(); //->readAllStandardOutput();
 	}
 	catch (...) {
 		return error = Error(Error::PhotonQcReport);

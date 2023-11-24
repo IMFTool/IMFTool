@@ -25,6 +25,8 @@
 #include "GraphicsWidgetResources.h"
 #include "WidgetVideoPreview.h" // (k)
 #include "CompositionPlaylistCommands.h"
+#include "st2067-203a-20XX.h"
+#include "st2067-204a-20XX.h"
 
 #include <QMessageBox>
 #include <QToolBar>
@@ -37,8 +39,12 @@
 #include <QPropertyAnimation>
 #include <QTemporaryFile>
 #include <QMap>
+#include <xercesc/dom/DOM.hpp>
+#include <xercesc/util/PlatformUtils.hpp>
+#include <xercesc/framework/LocalFileFormatTarget.hpp>
+#include <xercesc/parsers/XercesDOMParser.hpp>
 
-
+XERCES_CPP_NAMESPACE_USE
 
 WidgetComposition::WidgetComposition(const QSharedPointer<ImfPackage> &rImp, const QUuid &rCplAssetId, QWidget *pParent /*= NULL*/) :
 QFrame(pParent), mpCompositionView(NULL), mpCompositionScene(NULL), mpTimelineView(NULL), mpTimelineScene(NULL), mpCompositionTracksWidget(NULL),
@@ -54,6 +60,9 @@ mData(ImfXmlHelper::Convert(QUuid::createUuid()), ImfXmlHelper::Convert(QDateTim
 	cpl_namespace["xs"].name = XML_NAMESPACE_XS;
 	cpl_namespace["iab"].name = XML_NAMESPACE_IAB;
 	cpl_namespace["rdd47"].name = XML_NAMESPACE_RDD47;
+	cpl_namespace["imfsadm"].name = XML_NAMESPACE_SADM;
+	cpl_namespace["imfadm"].name = XML_NAMESPACE_ADM;
+	cpl_namespace["isxd"].name = XML_NAMESPACE_ISXD;
 
 	mpUndoStack = new QUndoStack(this);
 	InitLayout();
@@ -202,6 +211,13 @@ void WidgetComposition::AddNewTrackRequest(eSequenceType type) {
 		else track_index = GetTrackDetailCount();
 	}
 
+	if(type == MGASADMSignalSequence) {
+		AddMGASADMVirtualTrackParameterSet(track_id, "http://www.smpte-ra.org/ns/2067-203/2022#Operational-Mode-A");
+	}
+	if(type == ADMAudioSequence) {
+		AddADMAudioVirtualTrackParameterSet(track_id, "http://www.smpte-ra.org/ns/2067-204/2022#Operational-Mode-A");
+	}
+
 	for(int i = 0; i < mpCompositionGraphicsWidget->GetSegmentCount(); i++) {
 		GraphicsWidgetSegment *p_segment = mpCompositionGraphicsWidget->GetSegment(i);
 		if(p_segment) {
@@ -258,6 +274,11 @@ bool WidgetComposition::DoesTrackExist(eSequenceType type) const {
 		AbstractWidgetTrackDetails *p_track_detail = qobject_cast<AbstractWidgetTrackDetails*>(mpTrackSplitter->widget(i));
 		if(p_track_detail && p_track_detail->GetType() == type) return true;
 	}
+	return false;
+}
+
+bool WidgetComposition::DoesTrackExist(const cpl2016::CompositionPlaylistType &rCpl, const QUuid &rId) const {
+
 	return false;
 }
 
@@ -319,6 +340,8 @@ ImfError WidgetComposition::Write(const QString &rDestination /*= QString()*/) {
 	essence_descriptor_sequence.clear();
 	//List of UUIDs of resources with essence descriptor
 	QStringList resourceIDs;
+	QList<QUuid> sAdmTrackIds;
+	QList<QUuid> admTrackIds;
 	//WR end
 	for(int i = 0; i < mpCompositionGraphicsWidget->GetSegmentCount(); i++) {
 		GraphicsWidgetSegment *p_segment = mpCompositionGraphicsWidget->GetSegment(i);
@@ -419,6 +442,14 @@ ImfError WidgetComposition::Write(const QString &rDestination /*= QString()*/) {
 							case ISXDSequence:
 								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("rdd47")->second.name).c_str(), (xsd::cxx::xml::string("rdd47:ISXDSequence").c_str()));
 								break;
+							case MGASADMSignalSequence:
+								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("imfsadm")->second.name).c_str(), (xsd::cxx::xml::string("imfsadm:MGASADMSignalSequence").c_str()));
+								sAdmTrackIds << p_sequence->GetTrackId();
+								break;
+							case ADMAudioSequence:
+								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("imfadm")->second.name).c_str(), (xsd::cxx::xml::string("imfadm:ADMAudioSequence").c_str()));
+								admTrackIds << p_sequence->GetTrackId();
+								break;
 							case Unknown:
 								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(p_sequence->property("namespace").toString().toStdString()).c_str(), (xsd::cxx::xml::string(p_sequence->property("localName").toString().toStdString()).c_str()));
 								break;
@@ -452,6 +483,8 @@ ImfError WidgetComposition::Write(const QString &rDestination /*= QString()*/) {
 	//WR begin
 	cpl.setEssenceDescriptorList(essence_descriptor_list);
 	//WR end
+	ModifyMGASADMVirtualTrackParameterSet(cpl, sAdmTrackIds);
+	ModifyADMAudioVirtualTrackParameterSet(cpl, admTrackIds);
 	QString destination(rDestination);
 	if(destination.isEmpty() && mAssetCpl) {
 		destination = mAssetCpl->GetPath().absoluteFilePath();
@@ -605,6 +638,14 @@ ImfError WidgetComposition::WriteNew(const QString &rDestination /*= QString()*/
 								break;
 							case ISXDSequence:
 								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("rdd47")->second.name).c_str(), (xsd::cxx::xml::string("rdd47:ISXDSequence").c_str()));
+								break;
+							case MGASADMSignalSequence:
+								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("imfsadm")->second.name).c_str(), (xsd::cxx::xml::string("imfsadm:MGASADMSignalSequence").c_str()));
+								ModifyMGASADMVirtualTrackParameterSet(cpl, p_sequence->GetTrackId(), newTrackIDs.at(oldTrackIDs.indexOf(p_sequence->GetTrackId().toString())));
+								break;
+							case ADMAudioSequence:
+								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("imfadm")->second.name).c_str(), (xsd::cxx::xml::string("imfadm:ADMAudioSequence").c_str()));
+								ModifyADMAudioVirtualTrackParameterSet(cpl, p_sequence->GetTrackId(), newTrackIDs.at(oldTrackIDs.indexOf(p_sequence->GetTrackId().toString())));
 								break;
 							case Unknown:
 								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(p_sequence->property("namespace").toString().toStdString()).c_str(), (xsd::cxx::xml::string(p_sequence->property("localName").toString().toStdString()).c_str()));
@@ -871,6 +912,14 @@ ImfError WidgetComposition::ParseCpl() {
 					if(p_track_detail == NULL) p_track_detail = new WidgetTrackDetails(ImfXmlHelper::Convert(sequence.getTrackId()), ISXDSequence, mpCompositionTracksWidget);
 					p_graphics_sequence = new GraphicsWidgetSequence(p_graphics_segment, ISXDSequence, ImfXmlHelper::Convert(sequence.getTrackId()), ImfXmlHelper::Convert(sequence.getId()));
 				}
+				else if(name == "MGASADMSignalSequence") {
+					if(p_track_detail == NULL) p_track_detail = new WidgetTrackDetails(ImfXmlHelper::Convert(sequence.getTrackId()), MGASADMSignalSequence, mpCompositionTracksWidget);
+					p_graphics_sequence = new GraphicsWidgetSequence(p_graphics_segment, MGASADMSignalSequence, ImfXmlHelper::Convert(sequence.getTrackId()), ImfXmlHelper::Convert(sequence.getId()));
+				}
+				else if(name == "ADMAudioSequence") {
+					if(p_track_detail == NULL) p_track_detail = new WidgetTrackDetails(ImfXmlHelper::Convert(sequence.getTrackId()), ADMAudioSequence, mpCompositionTracksWidget);
+					p_graphics_sequence = new GraphicsWidgetSequence(p_graphics_segment, ADMAudioSequence, ImfXmlHelper::Convert(sequence.getTrackId()), ImfXmlHelper::Convert(sequence.getId()));
+				}
 				else {
 					if(p_track_detail == NULL) p_track_detail = new WidgetTrackDetails(ImfXmlHelper::Convert(sequence.getTrackId()), Unknown, mpCompositionTracksWidget);
 					p_graphics_sequence = new GraphicsWidgetSequence(p_graphics_segment, Unknown, ImfXmlHelper::Convert(sequence.getTrackId()), ImfXmlHelper::Convert(sequence.getId()));
@@ -918,6 +967,14 @@ ImfError WidgetComposition::ParseCpl() {
 							case ISXDSequence:
 								if(mImp) p_graphics_sequence->AddResource(new GraphicsWidgetISXDResource(p_graphics_sequence, p_file_resource->_clone(), mImp->GetAsset(ImfXmlHelper::Convert(p_file_resource->getTrackFileId())).objectCast<AssetMxfTrack>(), 0, mImp), p_graphics_sequence->GetResourceCount());
 								else p_graphics_sequence->AddResource(new GraphicsWidgetISXDResource(p_graphics_sequence, p_file_resource->_clone()), p_graphics_sequence->GetResourceCount());
+								break;
+							case MGASADMSignalSequence:
+								if(mImp) p_graphics_sequence->AddResource(new GraphicsWidgetSADMResource(p_graphics_sequence, p_file_resource->_clone(), mImp->GetAsset(ImfXmlHelper::Convert(p_file_resource->getTrackFileId())).objectCast<AssetMxfTrack>(), 0, mImp), p_graphics_sequence->GetResourceCount());
+								else p_graphics_sequence->AddResource(new GraphicsWidgetSADMResource(p_graphics_sequence, p_file_resource->_clone()), p_graphics_sequence->GetResourceCount());
+								break;
+							case ADMAudioSequence:
+								if(mImp) p_graphics_sequence->AddResource(new GraphicsWidgetADMResource(p_graphics_sequence, p_file_resource->_clone(), mImp->GetAsset(ImfXmlHelper::Convert(p_file_resource->getTrackFileId())).objectCast<AssetMxfTrack>(), 0, mImp), p_graphics_sequence->GetResourceCount());
+								else p_graphics_sequence->AddResource(new GraphicsWidgetADMResource(p_graphics_sequence, p_file_resource->_clone()), p_graphics_sequence->GetResourceCount());
 								break;
 							case Unknown:
 								qDebug() << "A generic file resource will be added to unknown sequence.";
@@ -1093,8 +1150,10 @@ void WidgetComposition::InitToolbar() {
 	mpAddKaraokeTrackAction = submenuTimedTextTrack->addAction(QIcon(":/microphone.png"), tr("karaoke track"));
 	p_add_track_menu->addSeparator();
 	mpAddMarkerTrackAction = p_add_track_menu->addAction(QIcon(":/marker.png"), tr("marker track"));
-	mpAddIABTrackAction = p_add_track_menu->addAction(QIcon(":/sound.png"), tr("Immersive Audio track"));
+	mpAddIABTrackAction = p_add_track_menu->addAction(QIcon(":/sound.png"), tr("IAB Audio track"));
 	mpAddISXDTrackAction = p_add_track_menu->addAction(QIcon(":/xml-icon.png"), tr("Isochronous stream of XML documents track"));
+	mpAddSADMTrackAction = p_add_track_menu->addAction(QIcon(":/sound.png"), tr("MGA S-ADM track"));
+	mpAddADMTrackAction = p_add_track_menu->addAction(QIcon(":/sound.png"), tr("ADM track"));
 	p_button_add_track->setMenu(p_add_track_menu);
 	mpToolBar->addWidget(p_button_add_track);
 	QAction *p_action = mpToolBar->addAction(QIcon(":/cutter.png"), tr("Edit"), mpCompositionScene, SLOT(SetEditRequest()));
@@ -1203,6 +1262,8 @@ void WidgetComposition::rAddTrackMenuActionTriggered(QAction *pAction) {
 	else if(pAction == mpAddVisuallyImpairedTextTrackAction) AddNewTrackRequest(VisuallyImpairedTextSequence);
 	else if(pAction == mpAddIABTrackAction) AddNewTrackRequest(IABSequence);
 	else if(pAction == mpAddISXDTrackAction) AddNewTrackRequest(ISXDSequence);
+	else if(pAction == mpAddSADMTrackAction) AddNewTrackRequest(MGASADMSignalSequence);
+	else if(pAction == mpAddADMTrackAction) AddNewTrackRequest(ADMAudioSequence);
 	else AddNewTrackRequest(Unknown);
 }
 
@@ -1282,6 +1343,9 @@ XmlSerializationError WidgetComposition::WriteMinimal(const QString &rDestinatio
 	cpl_namespace["xs"].name = XML_NAMESPACE_XS;
 	cpl_namespace["iab"].name = XML_NAMESPACE_IAB;
 	cpl_namespace["rdd47"].name = XML_NAMESPACE_RDD47;
+	cpl_namespace["imfsadm"].name = XML_NAMESPACE_SADM;
+	cpl_namespace["imfadm"].name = XML_NAMESPACE_ADM;
+	cpl_namespace["isxd"].name = XML_NAMESPACE_ISXD;
 
 	cpl2016::CompositionPlaylistType_SegmentListType segment_list;
 	cpl2016::CompositionPlaylistType_SegmentListType::SegmentSequence &segment_sequence = segment_list.getSegment();
@@ -1396,6 +1460,222 @@ void WidgetComposition::SetApplicationIdentification(const UserText &rApplicatio
 		} catch (...) {
 			qDebug() << "Error setting ApplicationIdentification!";
 		}
+	}
+
+}
+
+void WidgetComposition::AddMGASADMVirtualTrackParameterSet(const QUuid &rTrackId, const QString rMGASADMOperationalMode /* = "http://www.smpte-ra.org/ns/2067-203/2022#Operational-Mode-A" */) {
+
+	const imfsadm::MGASADMVirtualTrackParameterSet rVps(ImfXmlHelper::Convert(QUuid::createUuid()), ImfXmlHelper::Convert(rTrackId), ImfXmlHelper::Convert(rMGASADMOperationalMode));
+
+	if (!mData.getExtensionProperties().present()) {
+		cpl2016::CompositionPlaylistType_ExtensionPropertiesType exProp;
+		mData.setExtensionProperties(exProp);
+	}
+	cpl2016::CompositionPlaylistType_ExtensionPropertiesType properties_list = mData.getExtensionProperties().get();
+	cpl2016::CompositionPlaylistType_ExtensionPropertiesType::AnySequence &r_any_sequence(properties_list.getAny());
+	try {
+		xercesc::DOMDocument &doc = properties_list.getDomDocument();
+		xercesc::DOMElement* p_dom_element = NULL;
+		xercesc::DOMNode * node = NULL;
+
+		p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("imfsadm")->second.name).c_str(),
+				(xsd::cxx::xml::string("imfsadm:MGASADMVirtualTrackParameterSet").c_str())
+				);
+		QString ns("xmlns:");
+		ns.append(cpl_namespace.find("imfsadm")->first.c_str());
+		p_dom_element->setAttributeNS(xsd::cxx::xml::string(XML_NAMESPACE_NS).c_str(), xsd::cxx::xml::string(ns.toStdString()).c_str(), xsd::cxx::xml::string(cpl_namespace.find("imfsadm")->second.name).c_str());
+
+		if (p_dom_element) {
+			*p_dom_element << rVps;
+			node = doc.importNode(p_dom_element, true);
+			if (node) {
+				doc.appendChild(node);
+			}
+			r_any_sequence.push_back(p_dom_element);
+		}
+
+		properties_list.setAny(r_any_sequence);
+		mData.setExtensionProperties(properties_list);
+	} catch (...) {
+		qDebug() << "Error setting MGASADMVirtualTrackParameterSet!";
+	}
+
+}
+
+void WidgetComposition::ModifyMGASADMVirtualTrackParameterSet(cpl2016::CompositionPlaylistType &rCpl, const QUuid &rTrackId, const QUuid &rNewTrackId) {
+	cpl2016::CompositionPlaylistType_ExtensionPropertiesType properties_list = rCpl.getExtensionProperties().get();
+	cpl2016::CompositionPlaylistType_ExtensionPropertiesType::AnySequence &r_any_sequence(properties_list.getAny());
+	try {
+		if (!r_any_sequence.empty()) { int i=0;
+			for (cpl2016::CompositionPlaylistType_ExtensionPropertiesType::AnyIterator any_iterator(r_any_sequence.begin()); any_iterator != r_any_sequence.end(); ++any_iterator) {
+				xercesc::DOMElement& element(*any_iterator);
+				if(QString(xsd::cxx::xml::transcode<char>(any_iterator->getLocalName()).c_str()) == "MGASADMVirtualTrackParameterSet") {
+					imfsadm::MGASADMVirtualTrackParameterSet rVps(element);
+					if (ImfXmlHelper::Convert(rVps.getTrackId()) == rTrackId) {
+						rVps.setTrackId(ImfXmlHelper::Convert(rNewTrackId));
+						r_any_sequence.erase(any_iterator);
+						xercesc::DOMDocument &doc = properties_list.getDomDocument();
+						xercesc::DOMElement* p_dom_element = NULL;
+						xercesc::DOMNode * node = NULL;
+						p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("imfsadm")->second.name).c_str(),
+								(xsd::cxx::xml::string("imfsadm:MGASADMVirtualTrackParameterSet").c_str())
+								);
+						QString ns("xmlns:");
+						ns.append(cpl_namespace.find("imfsadm")->first.c_str());
+						p_dom_element->setAttributeNS(xsd::cxx::xml::string(XML_NAMESPACE_NS).c_str(), xsd::cxx::xml::string(ns.toStdString()).c_str(), xsd::cxx::xml::string(cpl_namespace.find("imfsadm")->second.name).c_str());
+
+						if (p_dom_element) {
+							*p_dom_element << rVps;
+							node = doc.importNode(p_dom_element, true);
+							if (node) {
+								doc.appendChild(node);
+							}
+							r_any_sequence.push_back(p_dom_element);
+						}
+						properties_list.setAny(r_any_sequence);
+						rCpl.setExtensionProperties(properties_list);
+						break;
+					}
+				}
+			}
+		}
+	} catch (...) {
+		qDebug() << "Error modifying MGASADMVirtualTrackParameterSet!";
+	}
+}
+
+void WidgetComposition::ModifyMGASADMVirtualTrackParameterSet(cpl2016::CompositionPlaylistType &rCpl, const QList<QUuid> rSadmTrackIds) {
+	cpl2016::CompositionPlaylistType_ExtensionPropertiesType properties_list = rCpl.getExtensionProperties().get();
+	cpl2016::CompositionPlaylistType_ExtensionPropertiesType::AnySequence &r_any_sequence(properties_list.getAny());
+	QList<qint8> erase_index_qlist;
+	try {
+		if (!r_any_sequence.empty()) { int i=0;
+			cpl2016::CompositionPlaylistType_ExtensionPropertiesType::AnyIterator any_iterator(r_any_sequence.begin());
+			while (any_iterator < r_any_sequence.end()){
+				xercesc::DOMElement& element(*any_iterator);
+				if(QString(xsd::cxx::xml::transcode<char>(any_iterator->getLocalName()).c_str()) == "MGASADMVirtualTrackParameterSet") {
+					imfsadm::MGASADMVirtualTrackParameterSet rVps(element);
+					if (!rSadmTrackIds.contains(ImfXmlHelper::Convert(rVps.getTrackId()))) {
+						any_iterator = r_any_sequence.erase(any_iterator);
+						properties_list.setAny(r_any_sequence);
+						rCpl.setExtensionProperties(properties_list);
+					} else any_iterator++;
+				} else any_iterator++;
+		}
+			properties_list.setAny(r_any_sequence);
+			rCpl.setExtensionProperties(properties_list);
+		}
+	} catch (...) {
+		qDebug() << "Error modifying MGASADMVirtualTrackParameterSet!";
+	}
+
+}
+
+void WidgetComposition::AddADMAudioVirtualTrackParameterSet(const QUuid &rTrackId, const QString rADMOperationalMode /* = "http://www.smpte-ra.org/ns/2067-203/2022#Operational-Mode-A" */) {
+
+	const imfadm::ADMAudioVirtualTrackParameterSet rVps(ImfXmlHelper::Convert(QUuid::createUuid()), ImfXmlHelper::Convert(rTrackId), ImfXmlHelper::Convert(rADMOperationalMode));
+
+	if (!mData.getExtensionProperties().present()) {
+		cpl2016::CompositionPlaylistType_ExtensionPropertiesType exProp;
+		mData.setExtensionProperties(exProp);
+	}
+	cpl2016::CompositionPlaylistType_ExtensionPropertiesType properties_list = mData.getExtensionProperties().get();
+	cpl2016::CompositionPlaylistType_ExtensionPropertiesType::AnySequence &r_any_sequence(properties_list.getAny());
+	try {
+		xercesc::DOMDocument &doc = properties_list.getDomDocument();
+		xercesc::DOMElement* p_dom_element = NULL;
+		xercesc::DOMNode * node = NULL;
+
+		p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("imfadm")->second.name).c_str(),
+				(xsd::cxx::xml::string("imfadm:ADMAudioVirtualTrackParameterSet").c_str())
+				);
+		QString ns("xmlns:");
+		ns.append(cpl_namespace.find("imfadm")->first.c_str());
+		p_dom_element->setAttributeNS(xsd::cxx::xml::string(XML_NAMESPACE_NS).c_str(), xsd::cxx::xml::string(ns.toStdString()).c_str(), xsd::cxx::xml::string(cpl_namespace.find("imfadm")->second.name).c_str());
+
+		if (p_dom_element) {
+			*p_dom_element << rVps;
+			node = doc.importNode(p_dom_element, true);
+			if (node) {
+				doc.appendChild(node);
+			}
+			r_any_sequence.push_back(p_dom_element);
+		}
+
+		properties_list.setAny(r_any_sequence);
+		mData.setExtensionProperties(properties_list);
+	} catch (...) {
+		qDebug() << "Error setting ADMAudioVirtualTrackParameterSet!";
+	}
+
+}
+
+void WidgetComposition::ModifyADMAudioVirtualTrackParameterSet(cpl2016::CompositionPlaylistType &rCpl, const QUuid &rTrackId, const QUuid &rNewTrackId) {
+	cpl2016::CompositionPlaylistType_ExtensionPropertiesType properties_list = rCpl.getExtensionProperties().get();
+	cpl2016::CompositionPlaylistType_ExtensionPropertiesType::AnySequence &r_any_sequence(properties_list.getAny());
+	try {
+		if (!r_any_sequence.empty()) { int i=0;
+			for (cpl2016::CompositionPlaylistType_ExtensionPropertiesType::AnyIterator any_iterator(r_any_sequence.begin()); any_iterator != r_any_sequence.end(); ++any_iterator) {
+				xercesc::DOMElement& element(*any_iterator);
+				if(QString(xsd::cxx::xml::transcode<char>(any_iterator->getLocalName()).c_str()) == "ADMAudioVirtualTrackParameterSet") {
+					imfadm::ADMAudioVirtualTrackParameterSet rVps(element);
+					if (ImfXmlHelper::Convert(rVps.getTrackId()) == rTrackId) {
+						rVps.setTrackId(ImfXmlHelper::Convert(rNewTrackId));
+						r_any_sequence.erase(any_iterator);
+						xercesc::DOMDocument &doc = properties_list.getDomDocument();
+						xercesc::DOMElement* p_dom_element = NULL;
+						xercesc::DOMNode * node = NULL;
+						p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("imfadm")->second.name).c_str(),
+								(xsd::cxx::xml::string("imfadm:ADMAudioVirtualTrackParameterSet").c_str())
+								);
+						QString ns("xmlns:");
+						ns.append(cpl_namespace.find("imfadm")->first.c_str());
+						p_dom_element->setAttributeNS(xsd::cxx::xml::string(XML_NAMESPACE_NS).c_str(), xsd::cxx::xml::string(ns.toStdString()).c_str(), xsd::cxx::xml::string(cpl_namespace.find("imfadm")->second.name).c_str());
+
+						if (p_dom_element) {
+							*p_dom_element << rVps;
+							node = doc.importNode(p_dom_element, true);
+							if (node) {
+								doc.appendChild(node);
+							}
+							r_any_sequence.push_back(p_dom_element);
+						}
+						properties_list.setAny(r_any_sequence);
+						rCpl.setExtensionProperties(properties_list);
+						break;
+					}
+				}
+			}
+		}
+	} catch (...) {
+		qDebug() << "Error modifying ADMAudioVirtualTrackParameterSet!";
+	}
+}
+
+void WidgetComposition::ModifyADMAudioVirtualTrackParameterSet(cpl2016::CompositionPlaylistType &rCpl, const QList<QUuid> rSadmTrackIds) {
+	cpl2016::CompositionPlaylistType_ExtensionPropertiesType properties_list = rCpl.getExtensionProperties().get();
+	cpl2016::CompositionPlaylistType_ExtensionPropertiesType::AnySequence &r_any_sequence(properties_list.getAny());
+	QList<qint8> erase_index_qlist;
+	try {
+		if (!r_any_sequence.empty()) { int i=0;
+			cpl2016::CompositionPlaylistType_ExtensionPropertiesType::AnyIterator any_iterator(r_any_sequence.begin());
+			while (any_iterator < r_any_sequence.end()){
+				xercesc::DOMElement& element(*any_iterator);
+				if(QString(xsd::cxx::xml::transcode<char>(any_iterator->getLocalName()).c_str()) == "ADMAudioVirtualTrackParameterSet") {
+					imfadm::ADMAudioVirtualTrackParameterSet rVps(element);
+					if (!rSadmTrackIds.contains(ImfXmlHelper::Convert(rVps.getTrackId()))) {
+						any_iterator = r_any_sequence.erase(any_iterator);
+						properties_list.setAny(r_any_sequence);
+						rCpl.setExtensionProperties(properties_list);
+					} else any_iterator++;
+				} else any_iterator++;
+		}
+			properties_list.setAny(r_any_sequence);
+			rCpl.setExtensionProperties(properties_list);
+		}
+	} catch (...) {
+		qDebug() << "Error modifying ADMAudioVirtualTrackParameterSet!";
 	}
 
 }

@@ -57,6 +57,8 @@ public:
 	static const SoundfieldGroup SoundFieldGroup61;
 	static const SoundfieldGroup SoundFieldGroupM;
 	static const SoundfieldGroup SoundFieldGroupIAB;
+	static const SoundfieldGroup SoundFieldGroupMGA;
+	static const SoundfieldGroup SoundFieldGroupADM;
 
 	enum eChannel {
 		ChannelUndefined = 0,
@@ -287,8 +289,9 @@ class Duration {
 
 public:
 	//! Generates Null duration.
-	Duration() : mSamplesFrames(0) {}
-	Duration(qint64 samplesOrFrames) : mSamplesFrames(samplesOrFrames) {}
+	Duration() : mSamplesFrames(0), mAdditionalAudioSamples(0) {}
+	Duration(qint64 samplesOrFrames) : mSamplesFrames(samplesOrFrames), mAdditionalAudioSamples(0) {}
+	Duration(qint64 samplesOrFrames, qint16 additionalAudioSamples) : mSamplesFrames(samplesOrFrames), mAdditionalAudioSamples(additionalAudioSamples) {}
 	~Duration() {}
 	bool IsValid() const { return (mSamplesFrames >= 0 ? true : false); }
 	bool IsNull() const { return (mSamplesFrames == 0 ? true : false); }
@@ -308,6 +311,8 @@ public:
 
 private:
 	qint64 mSamplesFrames;
+	//! mAdditionalAudioSamples holds the number of audio samples of an audio duration or entry point beyond an integer number of video frames
+	qint16 mAdditionalAudioSamples;
 };
 
 Duration operator*(int i, const Duration &rOther);

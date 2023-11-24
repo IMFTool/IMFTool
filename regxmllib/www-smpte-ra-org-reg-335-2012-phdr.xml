@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--Created: Fri Apr 24 11:36:50 CEST 2020--><!--By: regxmllib build 51d295b54f74f6c0d89838614e53de6aed41013b--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
+<!--Created: Mon Nov 20 16:46:02 CET 2023--><!--By: regxmllib build 8f1fc70fa6af1bcb82804272241d6a2ad4057424--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
 <SchemeID>urn:uuid:e9ad45b5-abdb-5f16-7ffc-ff560e475a87</SchemeID>
 <SchemeURI>http://www.smpte-ra.org/reg/335/2012</SchemeURI>
 <MetaDefinitions>
@@ -859,6 +859,28 @@
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.01010000</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010d.04200202.02000000</Identification>
+<Symbol>FocusPositionFromImagePlane</Symbol>
+<Description>Distance in meters between the image plane and the object in focus</Description>
+<Name>Focus Position From Image Plane</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01020400.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>32769</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.01010000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010d.04200202.03000000</Identification>
+<Symbol>FocusPositionFromFrontLensVertex</Symbol>
+<Description>Distance in meters between the front of the lens and the object in focus</Description>
+<Name>Focus Position From Front Lens Vertex</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01020400.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>32770</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.01010000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010e.04200202.0a000000</Identification>
 <Symbol>FocusRingPosition</Symbol>
 <Description>Focus ring rotation angle in unsigned integer. 0 is for near-end, FFFFh for infinity</Description>
@@ -881,6 +903,28 @@
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.01010000</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010d.04200202.05000000</Identification>
+<Symbol>LensZoom35mmStillCameraEquivalent</Symbol>
+<Description>35-mm still camera equivalent focal length in meters</Description>
+<Name>Lens Zoom 35mm Still Camera Equivalent</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01020400.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>32772</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.01010000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010d.04200202.06000000</Identification>
+<Symbol>LensZoomActualFocalLength</Symbol>
+<Description>Length in meters between the lens optical center and the image sensor</Description>
+<Name>Lens Zoom Actual Focal Length</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01020400.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>32773</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.01010000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010e.04200202.0b000000</Identification>
 <Symbol>ZoomRingPosition</Symbol>
 <Description>Zooming ring rotation angle in unsigned integer. 0 is for wide-end, and FFFFh is for tele-end</Description>
@@ -889,6 +933,28 @@
 <IsOptional>true</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>32779</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.01010000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04200202.0c000000</Identification>
+<Symbol>AnamorphicLensSqueezeRatio</Symbol>
+<Description>Anamorphic aspect ratio with a special lens for widescreen movie. 100 is for normal lens</Description>
+<Name>Anamorphic Lens Squeeze Ratio</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>32780</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.01010000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04200202.0d000000</Identification>
+<Symbol>OpticalInversion</Symbol>
+<Description>Upside-down and/or right-side-left imaging depending on the lens system</Description>
+<Name>Optical Inversion</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.02010128.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>32781</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.01010000</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
@@ -936,6 +1002,17 @@
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04200103.010c0100</Identification>
+<Symbol>ExposureIndexOfPhotoMeterLongInteger</Symbol>
+<Description>Setting of the photo meter in ISO number  for high sensitivity camera</Description>
+<Name>Exposure Index of Photo Meter in Long Integer</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>33049</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010d.04200103.01020000</Identification>
 <Symbol>AutoFocusSensingAreaSetting</Symbol>
 <Description>Auto Focus Sensing Area setting defined as a registered code</Description>
@@ -966,6 +1043,28 @@
 <IsOptional>true</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>33027</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04200103.010e0000</Identification>
+<Symbol>RotaryShutter</Symbol>
+<Description>Use of the mechanical shutter function</Description>
+<Name>Rotary Shutter</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01040100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>33050</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04200103.010f0000</Identification>
+<Symbol>OpticalAntiAliasingFilter</Symbol>
+<Description>Roll off frequency of the optical filter placed before the image sensor</Description>
+<Name>Optical Anti-Aliasing Filter</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>33051</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
@@ -1013,6 +1112,28 @@
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04200103.01100000</Identification>
+<Symbol>ImageSensorDecimationRatio</Symbol>
+<Description>Vertical/horizontal decimation ratio of the reading out of pixels on the image sensor</Description>
+<Name>Image Sensor Decimation Ratio</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>33052</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04200103.01110000</Identification>
+<Symbol>ImageScanDirection</Symbol>
+<Description>Direction of scanning for line/point-symmetric picture transformation</Description>
+<Name>Image Scan Direction</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.02010128.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>33053</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010d.04200103.01080000</Identification>
 <Symbol>ShutterSpeedAngle</Symbol>
 <Description>Shutter speed as an angle defining the shutter speed (angle) in minutes relative to a completely open shutter angle of 360 degrees.</Description>
@@ -1057,6 +1178,17 @@
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04200103.010a0100</Identification>
+<Symbol>ISOSensitivityLongInteger</Symbol>
+<Description>Sensitivity to light  for high sensitivity camera</Description>
+<Name>ISO Sensitivity in Long Integer</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>33054</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010e.04200103.010d0000</Identification>
 <Symbol>ColorMatrix</Symbol>
 <Description>Specifies the setting of the color balance of the camera with the ordered elements (R to R, G to R, B to R, R to G, G to G, B to G, R to B, G to B, B to B).</Description>
@@ -1098,6 +1230,17 @@
 <IsOptional>true</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>33038</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04200103.02090000</Identification>
+<Symbol>TintCorrection</Symbol>
+<Description>Color tone adjustment of green-ward or magenta-ward shift in 0.00001 of delta-uv unit</Description>
+<Name>Tint Correction</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010600.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>33055</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
@@ -1168,6 +1311,63 @@
 <OriginalProperty>urn:smpte:ul:060e2b34.01010102.04010201.01010200</OriginalProperty>
 </PropertyAliasDefinition>
 <PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.01010109.04010201.01060100</Identification>
+<Symbol>ColorPrimaries</Symbol>
+<Description>The set of color primaries used</Description>
+<Name>Color Primaries</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.02020105.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>12825</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
+</PropertyDefinition>
+<PropertyAliasDefinition>
+<Identification>urn:smpte:ul:060e2b34.01010109.04010201.01060100</Identification>
+<Symbol>ColorPrimaries</Symbol>
+<Description>The set of color primaries used</Description>
+<Name>Color Primaries</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.02020105.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>12825</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01012700</MemberOf>
+<OriginalProperty>urn:smpte:ul:060e2b34.01010109.04010201.01060100</OriginalProperty>
+</PropertyAliasDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.01010102.04010201.01030100</Identification>
+<Symbol>CodingEquations</Symbol>
+<Description>The fundamental color coding that relates the scene CIE tri-stimulus values (X, Y, Z) to the linear video levels (R, G, B).</Description>
+<Name>Coding Equations</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.02020106.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>12826</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
+</PropertyDefinition>
+<PropertyAliasDefinition>
+<Identification>urn:smpte:ul:060e2b34.01010102.04010201.01030100</Identification>
+<Symbol>CodingEquations</Symbol>
+<Description>The fundamental color coding that relates the scene CIE tri-stimulus values (X, Y, Z) to the linear video levels (R, G, B).</Description>
+<Name>Coding Equations</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.02020106.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>12826</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01012700</MemberOf>
+<OriginalProperty>urn:smpte:ul:060e2b34.01010102.04010201.01030100</OriginalProperty>
+</PropertyAliasDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04200103.01120000</Identification>
+<Symbol>LuminanceCodeRange</Symbol>
+<Description>Video level limitation and scaling</Description>
+<Name>Luminance Code Range</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.02010134.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>33056</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010e.04200103.02070000</Identification>
 <Symbol>GammaForCDL</Symbol>
 <Description>Enumerated code that represents the gamma characteristic applied at the input to the ASC CDL.</Description>
@@ -1176,6 +1376,39 @@
 <IsOptional>true</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>33046</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04200103.020a0000</Identification>
+<Symbol>ColorForCDL</Symbol>
+<Description>Enumerated code that represents the color primaries applied at the input to the ASC CDL.</Description>
+<Name>Color for CDL</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>33057</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04200103.02080000</Identification>
+<Symbol>ASCCDLV12</Symbol>
+<Description>10 parameters of ASC Color Decision List V1.2.</Description>
+<Name>ASC CDL V1.2</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04011600.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>33047</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04200103.01130000</Identification>
+<Symbol>AcquisitionSettingProcedure</Symbol>
+<Description>Explanation of acquisition setting procedure for retaking or for post production</Description>
+<Name>Acquisition Setting Procedure</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100600.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>33058</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.02010000</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
@@ -1206,10 +1439,32 @@
 <Description>The immutable ID of the instance of this user-defined acquisition metadata set</Description>
 <Name>UDAM Set Identifier</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.01030100.00000000</Type>
-<IsOptional>true</IsOptional>
+<IsOptional>false</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>57344</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.7f010000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060807.00000000</Identification>
+<Symbol>UDAMSetVersion</Symbol>
+<Description>The version number of the instance of this user-defined acquisition metadata set</Description>
+<Name>UDAM Set Version</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>57360</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c020101.7f010000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0103040b.00000000</Identification>
+<Symbol>DataStreamID</Symbol>
+<Description>Unique identifier for this Data Stream</Description>
+<Name>Data Stream ID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0c050101.00000000</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.01010102.06010104.01010000</Identification>
@@ -2346,6 +2601,17 @@
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01012200</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060601.0b000000</Identification>
+<Symbol>DescriptiveSchemeDefinitions</Symbol>
+<Description>Descriptive Scheme Definitions</Description>
+<Name>DescriptiveSchemeDefinitions</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.05051600.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01012200</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.01010102.06010106.01000000</Identification>
 <Symbol>LinkedPackageID</Symbol>
 <Description>Specifes a reference to a package associated with Essence Data</Description>
@@ -2731,28 +2997,6 @@
 <IsOptional>true</IsOptional>
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>12815</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01012700</MemberOf>
-</PropertyDefinition>
-<PropertyDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010109.04010201.01060100</Identification>
-<Symbol>ColorPrimaries</Symbol>
-<Description>The set of color primaries used</Description>
-<Name>Color Primaries</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.02020105.00000000</Type>
-<IsOptional>true</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>12825</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01012700</MemberOf>
-</PropertyDefinition>
-<PropertyDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010102.04010201.01030100</Identification>
-<Symbol>CodingEquations</Symbol>
-<Description>The fundamental color coding that relates the scene CIE tri-stimulus values (X, Y, Z) to the linear video levels (R, G, B).</Description>
-<Name>Coding Equations</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.02020106.00000000</Type>
-<IsOptional>true</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>12826</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01012700</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
@@ -5652,7 +5896,7 @@
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010e.03020102.28000000</Identification>
 <Symbol>MCAAdditionalLanguageAttributes</Symbol>
-<Description>Indication of whether each RFC 5646 language tag in MCA Additional Languages references original audio or dubbed audio</Description>
+<Description>Indication of whether each RFC 5646 language tag in RFC 5646 Additional Spoken Languages references original audio or dubbed audio</Description>
 <Name>MCA Additional Language Attributes</Name>
 <Type>urn:smpte:ul:060e2b34.01040101.01100400.00000000</Type>
 <IsOptional>true</IsOptional>
@@ -6342,6 +6586,985 @@
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017a00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010606.02030000</Identification>
+<Symbol>HEVCConstantBPictureFlag</Symbol>
+<Description>TRUE if the number of B Pictures is always constant</Description>
+<Name>HEVC Constant B Picture Flag</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01040100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010606.02040000</Identification>
+<Symbol>HEVCCodedContentKind</Symbol>
+<Description>Enumerated value specifying Picture type and Coding type</Description>
+<Name>HEVC Coded Content Kind</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.02010133.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010606.02060000</Identification>
+<Symbol>HEVCClosedGOPIndicator</Symbol>
+<Description>TRUE if all GOPs are started with IDR Picture.</Description>
+<Name>HEVC Closed GOP Indicator</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01040100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010606.02070000</Identification>
+<Symbol>HEVCIdenticalGOPIndicator</Symbol>
+<Description>TRUE if every GOP in the sequence has the same number of pictures and the same types of pictures in  the same order.</Description>
+<Name>HEVC Identical GOP Indicator</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01040100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010606.02080000</Identification>
+<Symbol>HEVCMaximumGOPSize</Symbol>
+<Description>Specifies the maximum occurring spacing between I Pictures</Description>
+<Name>HEVC Maximum GOP Size</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010606.02090000</Identification>
+<Symbol>HEVCMaximumBPictureCount</Symbol>
+<Description>Specifies the maximum number of B Pictures between P or I Pictures</Description>
+<Name>HEVC Maximum B-Picture Count</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010606.020a0000</Identification>
+<Symbol>HEVCProfile</Symbol>
+<Description>Specifies the HEVC video profile</Description>
+<Name>HEVC Profile</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010606.020b0000</Identification>
+<Symbol>HEVCMaximumBitRate</Symbol>
+<Description>Maximum bit rate of the HEVC stream in bit/s</Description>
+<Name>HEVC Maximum Bit Rate</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010606.020c0000</Identification>
+<Symbol>HEVCProfileConstraint</Symbol>
+<Description>Specifies the HEVC video profile constraint flags</Description>
+<Name>HEVC Profile Constraint</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010606.020d0000</Identification>
+<Symbol>HEVCLevel</Symbol>
+<Description>Specifies the HEVC level</Description>
+<Name>HEVC Level</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010606.020e0000</Identification>
+<Symbol>HEVCDecodingDelay</Symbol>
+<Description>Specifies the delay required for decoded pictures in number of access units</Description>
+<Name>HEVC Decoding Delay</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010606.020f0000</Identification>
+<Symbol>HEVCMaximumRefFrames</Symbol>
+<Description>Specifies the maximum number of reference frames</Description>
+<Name>HEVC Maximum Ref Frames</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010606.02100000</Identification>
+<Symbol>HEVCSequenceParameterSetFlag</Symbol>
+<Description>Specifies the location and the constancy of sequence parameter sets</Description>
+<Name>HEVC Sequence Parameter Set Flag</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010606.02110000</Identification>
+<Symbol>HEVCPictureParameterSetFlag</Symbol>
+<Description>Specifies the location and the constancy of picture parameter sets</Description>
+<Name>HEVC Picture Parameter Set Flag</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010606.02120000</Identification>
+<Symbol>HEVCTier</Symbol>
+<Description>Specifies the HEVC tier</Description>
+<Name>HEVC Tier</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010606.02130000</Identification>
+<Symbol>HEVCVideoParameterSetFlag</Symbol>
+<Description>Specifies the location and the constancy of video parameter sets</Description>
+<Name>HEVC Video Parameter Set Flag</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010606.02140000</Identification>
+<Symbol>HEVCAverageBitRate</Symbol>
+<Description>Average bit rate of the HEVC stream in bit/s</Description>
+<Name>HEVC Average Bit Rate</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010606.02150000</Identification>
+<Symbol>HEVCCTUSize</Symbol>
+<Description>Specifies the size of CTU</Description>
+<Name>HEVC CTU Size</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010606.02160000</Identification>
+<Symbol>HEVCTileUniformSpacingFlag</Symbol>
+<Description>TRUE if tile column boundaries and tile row boundaries are distributed uniformly</Description>
+<Name>HEVC Tile Uniform Spacing Flag</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01040100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010606.02170000</Identification>
+<Symbol>HEVCTileColumnsMinus1</Symbol>
+<Description>Specifies the number of tile columns minus 1</Description>
+<Name>HEVC Tile Columns Minus 1</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010606.02180000</Identification>
+<Symbol>HEVCTileRowsMinus1</Symbol>
+<Description>Specifies the number of tile rows minus 1</Description>
+<Name>HEVC Tile Rows Minus 1</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010606.02190000</Identification>
+<Symbol>HEVCTileWidthMinus1</Symbol>
+<Description>Specifies the width minus 1 of tiles in units of CTBs</Description>
+<Name>HEVC Tile Width Minus 1</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04011200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010606.021a0000</Identification>
+<Symbol>HEVCTileHeightMinus1</Symbol>
+<Description>Specifies the height minus 1 of tiles in units of CTBs</Description>
+<Name>HEVC Tile Height Minus 1</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04011200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04010606.021b0000</Identification>
+<Symbol>HEVCNumberOfPPSs</Symbol>
+<Description>Spefifies the maximum number of picture parameter sets that have different pps_pic_parameter_set_id in each GOP</Description>
+<Name>HEVC Number of PPSs</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060b.01000000</Identification>
+<Symbol>JPEGXSPpih</Symbol>
+<Description>Specifies the JPEG XS Profile</Description>
+<Name>JPEG XS Ppih</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018102</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060b.02000000</Identification>
+<Symbol>JPEGXSPlev</Symbol>
+<Description>Specifies the JPEG XS Level</Description>
+<Name>JPEG XS Plev</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018102</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060b.03000000</Identification>
+<Symbol>JPEGXSWf</Symbol>
+<Description>Specifies the width of the image</Description>
+<Name>JPEG XS Wf</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018102</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060b.04000000</Identification>
+<Symbol>JPEGXSHf</Symbol>
+<Description>Specifies the height of the image</Description>
+<Name>JPEG XS Hf</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018102</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060b.05000000</Identification>
+<Symbol>JPEGXSNc</Symbol>
+<Description>Specifies the number of components in the image</Description>
+<Name>JPEG XS Nc</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018102</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060b.06000000</Identification>
+<Symbol>JPEGXSComponentTable</Symbol>
+<Description>A byte-wise copy of the component_table Marker Segment in the codestream</Description>
+<Name>JPEG XS Component Table</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018102</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060b.07000000</Identification>
+<Symbol>JPEGXSCw</Symbol>
+<Description>Specifies the width of a precinct</Description>
+<Name>JPEG XS Cw</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018102</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060b.08000000</Identification>
+<Symbol>JPEGXSHsl</Symbol>
+<Description>Specifies the height of a slice</Description>
+<Name>JPEG XS Hsl</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018102</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060b.09000000</Identification>
+<Symbol>JPEGXSMaximumBitrate</Symbol>
+<Description>Specifies the maximum bit rate in Mbit/s</Description>
+<Name>JPEG XS Maximum Bit Rate</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018102</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060c.01000000</Identification>
+<Symbol>FFV1InitializationMetadata</Symbol>
+<Description>FFV1 Initialization Metadata, required for Version 3 streams, UInt8Array</Description>
+<Name>FFV1InitializationMetadata</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018103</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060c.02000000</Identification>
+<Symbol>FFV1IdenticalGOP</Symbol>
+<Description>TRUE if every GOP in the sequence is constructed the same, Boolean</Description>
+<Name>FFV1IdenticalGOP</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01040100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018103</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060c.03000000</Identification>
+<Symbol>FFV1MaxGOP</Symbol>
+<Description>Specifies the maximum occurring spacing between key frames. A value of 0 or the absence of this property implies no limit to the maximum GOP, UInt16</Description>
+<Name>FFV1MaxGOP</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018103</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060c.04000000</Identification>
+<Symbol>FFV1MaximumBitRate</Symbol>
+<Description>Maximum bit rate of FFV1 video elementary stream in bits per second, UInt32</Description>
+<Name>FFV1MaximumBitRate</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018103</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060c.05000000</Identification>
+<Symbol>FFV1Version</Symbol>
+<Description>Specifies the FFV1 video version. Coded as per IETF RFC (to be defined), UInt16</Description>
+<Name>FFV1Version</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018103</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060c.06000000</Identification>
+<Symbol>FFV1MicroVersion</Symbol>
+<Description>Specifies the FFV1 video microversion. Coded as per IETF RFC (to be defined), UInt16</Description>
+<Name>FFV1MicroVersion</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018103</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060d.01000000</Identification>
+<Symbol>VC6GCUpsamplersBatch</Symbol>
+<Description>Unordered Batch of UInt8 Upsampler Indices used in the Generic Container</Description>
+<Name>VC-6 GC Upsamplers Batch</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018104</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060d.02000000</Identification>
+<Symbol>VC6ShortcutBitvectorBatch</Symbol>
+<Description>Unordered Batch of unique UInt16 ShortcutBitvector values used in the Generic Container</Description>
+<Name>VC-6 Shortcut Bitvector Batch</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04011200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018104</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060d.03000000</Identification>
+<Symbol>VC6Lossless</Symbol>
+<Description>Non-zero if the encoder created a lossless bitstream</Description>
+<Name>VC-6 Lossless</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018104</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060d.04000000</Identification>
+<Symbol>VC6CBR</Symbol>
+<Description>Non-zero if the encoder intended a constant bitrate stream</Description>
+<Name>VC-6 CBR</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018104</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060d.05000000</Identification>
+<Symbol>VC6Bitrate</Symbol>
+<Description>Target CBR bitrate or Maximum VBR bitrate in bits per second</Description>
+<Name>VC-6 Bitrate</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010400.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018104</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060d.06000000</Identification>
+<Symbol>VC6CompressedFrameMax</Symbol>
+<Description>Maximum Size in bits of a Compressed Frame in the Generic Container</Description>
+<Name>VC-6 Compressed Frame Max</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010400.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018104</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060d.07000000</Identification>
+<Symbol>VC6CompressedFrameAvg</Symbol>
+<Description>Average Size in bits of a Compressed Frame in the Generic Container</Description>
+<Name>VC-6 Compressed Frame Avg</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010400.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018104</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060d.08000000</Identification>
+<Symbol>VC6MaxNoOfEchelons</Symbol>
+<Description>Maximum Number of Echelons in any Frame in the Generic Container</Description>
+<Name>VC-6 Max No Of Echelons</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018104</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060d.09000000</Identification>
+<Symbol>VC6EchelonsArray</Symbol>
+<Description>An ordered set (lowest to highest resolution) of Strong references to VC6EchelonProperties sets</Description>
+<Name>VC-6 Echelons Array</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.05061000.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018104</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060d.0a000000</Identification>
+<Symbol>VC6EchelonIndex</Symbol>
+<Description>Signed Index of this Echelon as identified in ST 2117-1:2020 §4.8.9</Description>
+<Name>VC-6 Echelon Index</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018105</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060d.0b000000</Identification>
+<Symbol>VC6SampledHeight</Symbol>
+<Description>Sampled Height of the reconstructed pixel grid for the echelon</Description>
+<Name>VC-6 Sampled Height</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018105</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0401060d.0c000000</Identification>
+<Symbol>VC6SampledWidth</Symbol>
+<Description>Sampled Width of the reconstructed pixel grid for the echelon</Description>
+<Name>VC-6 Sampled Width</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018105</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020304.01000000</Identification>
+<Symbol>MGASoundEssenceBlockAlign</Symbol>
+<Description>Specifies the block alignment of the data in Bytes</Description>
+<Name>MGA Sound Essence Block Align</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018106</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020304.02000000</Identification>
+<Symbol>MGASoundEssenceAverageBytesPerSecond</Symbol>
+<Description>Specifies the average data rate in Bytes per Second</Description>
+<Name>MGA Sound Essence Average Bytes Per Second</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018106</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020304.03000000</Identification>
+<Symbol>MGASoundEssenceSequenceOffset</Symbol>
+<Description>Specifies the Sequence Offset</Description>
+<Name>MGA Sound Essence Sequence Offset</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018106</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020305.01000000</Identification>
+<Symbol>MGALinkID</Symbol>
+<Description>Specifies the MGA Link ID</Description>
+<Name>MGA Link ID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018107</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020305.02000000</Identification>
+<Symbol>MGAAudioMetadataIndex</Symbol>
+<Description>Specifies the MGA Audio Metadata Index</Description>
+<Name>MGA Audio Metadata Index</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018107</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020305.03000000</Identification>
+<Symbol>MGAAudioMetadataIdentifier</Symbol>
+<Description>Specifies the MGA Audio Metadata Identifier</Description>
+<Name>MGA Audio Metadata Identifier</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018107</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020305.04000000</Identification>
+<Symbol>MGAAudioMetadataPayloadULArray</Symbol>
+<Description>Specifies an Array of MGA Audio Metadata Payload ULs</Description>
+<Name>MGA Audio Metadata Payload UL Array</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04010600.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018107</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020306.01000000</Identification>
+<Symbol>MGAMetadataSectionLinkID</Symbol>
+<Description>Specifies the MGA Metadata Section Link ID</Description>
+<Name>MGA Metadata Section Link ID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018108</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020306.02000000</Identification>
+<Symbol>ADMAudioProgrammeID</Symbol>
+<Description>Specifies the ADM Audio Programme ID</Description>
+<Name>ADM Audio Programme ID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018108</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020306.03000000</Identification>
+<Symbol>ADMAudioContentID</Symbol>
+<Description>Specifies the ADM Audio Content ID</Description>
+<Name>ADM Audio Content ID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018108</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020306.04000000</Identification>
+<Symbol>ADMAudioObjectID</Symbol>
+<Description>Specifies the ADM Audio Object ID</Description>
+<Name>ADM Audio Object ID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018108</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020307.01000000</Identification>
+<Symbol>SADMMetadataSectionLinkID</Symbol>
+<Description>Specifies the S-ADM Metadata Section Link ID</Description>
+<Name>S-ADM Metadata Section Link ID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018109</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020307.02000000</Identification>
+<Symbol>SADMProfileLevelULBatch</Symbol>
+<Description>Batch of S-ADM Profile and Level UL entries</Description>
+<Name>S-ADM Profile Level UL Batch</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04030100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018109</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04061003.00000000</Identification>
+<Symbol>DataStreamSchemeURI</Symbol>
+<Description>URI identifying application of Data Stream</Description>
+<Name>Data Stream Scheme URI</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810b</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.06010102.07000000</Identification>
+<Symbol>LinkedDataStreamID</Symbol>
+<Description>Unique identifer of Data Stream described by this SubDescriptor</Description>
+<Name>Linked Data Stream ID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810b</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060103.00000000</Identification>
+<Symbol>DataStreamSampleRate</Symbol>
+<Description>Rate at which creator samples data conveyed on the Data Stream, per second</Description>
+<Name>Data Stream Sample Rate</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810b</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05010206.01000000</Identification>
+<Symbol>DeviceCreatorName</Symbol>
+<Description>Name of creator of device creating a Data Stream</Description>
+<Name>Device Creator Name</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810c</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05010206.02000000</Identification>
+<Symbol>DeviceProductName</Symbol>
+<Description>Name identifying product creating a Data Stream</Description>
+<Name>Device Product Name</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810c</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05010206.03000000</Identification>
+<Symbol>DeviceVersion</Symbol>
+<Description>Version identifier for device creating a Data Stream</Description>
+<Name>Device Version</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810c</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.05010206.04000000</Identification>
+<Symbol>DeviceInstanceIdentifier</Symbol>
+<Description>Unambiguous identifier for device creating a Data Stream, in the context of the application</Description>
+<Name>Device Instance Identifier</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810c</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020308.01000000</Identification>
+<Symbol>RIFFChunkStreamID</Symbol>
+<Description>The Stream ID of the Generic Stream carrying the ckData bytes of the RIFF Chunk</Description>
+<Name>RIFF Chunk Stream ID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810d</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020308.02000000</Identification>
+<Symbol>RIFFChunkID</Symbol>
+<Description>The ckID value of the RIFF Chunk</Description>
+<Name>RIFF Chunk ID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100400.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810d</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020308.03000000</Identification>
+<Symbol>RIFFChunkUUID</Symbol>
+<Description>A globally unique identifier for the RIFF Chunk</Description>
+<Name>RIFF Chunk UUID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810d</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020308.04000000</Identification>
+<Symbol>RIFFChunkHashSHA1</Symbol>
+<Description>The SHA-1 digest of the ckData bytes of the RIFF Chunk</Description>
+<Name>RIFF Chunk Hash SHA-1</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04100100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810d</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020309.01000000</Identification>
+<Symbol>NumLocalChannels</Symbol>
+<Description>The number of MXF Sound Track channels referenced in ADMChannelMappingsArray</Description>
+<Name>Num Local Channels</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810e</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020309.02000000</Identification>
+<Symbol>NumADMAudioTrackUIDs</Symbol>
+<Description>The number of ADM audioTrackUID entities referenced in ADMChannelMappingsArray</Description>
+<Name>Num ADM audioTrackUIDs</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810e</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020309.03000000</Identification>
+<Symbol>ADMChannelMappingsArray</Symbol>
+<Description>Array of ADMChannelMapping instances</Description>
+<Name>ADM Channel Mappings Array</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.05061100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810e</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020309.04000000</Identification>
+<Symbol>LocalChannelID</Symbol>
+<Description>The ID of the MXF Sound Track channel containing essence identified by the associated ADM audioTrackUID</Description>
+<Name>Local Channel ID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810f</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020309.05000000</Identification>
+<Symbol>ADMAudioTrackUID</Symbol>
+<Description>The UID of the associated ADM audioTrackUID, as defined in Rec. ITU-R BS.2076</Description>
+<Name>ADM audioTrackUID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810f</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020309.06000000</Identification>
+<Symbol>ADMAudioTrackChannelFormatID</Symbol>
+<Description>The linked ADM audioTrackFormatID or ADM audioChannelFormatID value, as defined in Rec. ITU-R BS.2076</Description>
+<Name>ADM audioTrackChannelFormatID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810f</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020309.07000000</Identification>
+<Symbol>ADMAudioPackFormatID</Symbol>
+<Description>The linked ADM audioPackFormatID value, as defined in Rec. ITU-R BS.2076</Description>
+<Name>ADM audioPackFormatID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810f</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04020308.06000000</Identification>
+<Symbol>RIFFChunkStreamIDsArray</Symbol>
+<Description>The Stream IDs for the applicable RIFF Chunks</Description>
+<Name>RIFF Chunk Stream IDs Array</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04010900.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018110</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0402030a.01000000</Identification>
+<Symbol>RIFFChunkStreamID_link1</Symbol>
+<Description>The Stream ID for the RIFF Chunk carrying the associated ADM metadata</Description>
+<Name>RIFF Chunk Stream ID (link 1)</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018111</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0402030a.02000000</Identification>
+<Symbol>ADMProfileLevelULBatch</Symbol>
+<Description>Batch of ULs, each representing a Profile and Level to which the associated ADM metadata complies</Description>
+<Name>ADM Profile and Level UL Batch</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04030100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018111</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0402030b.01000000</Identification>
+<Symbol>RIFFChunkStreamID_link2</Symbol>
+<Description>The Stream ID for the RIFF Chunk carrying the associated ADM metadata</Description>
+<Name>RIFF Chunk Stream ID (link 2)</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018112</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0402030b.02000000</Identification>
+<Symbol>ADMAudioProgrammeID_ST2131</Symbol>
+<Description>audioProgrammeID of the associated ADM audioProgramme, as defined in Rec. ITU-R BS.2076</Description>
+<Name>ADM audioProgrammeID (SMPTE ST 2131)</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018112</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0402030b.03000000</Identification>
+<Symbol>ADMAudioContentID_ST2131</Symbol>
+<Description>audioContentID of the associated ADM audioContent, as defined in Rec. ITU-R BS.2076</Description>
+<Name>ADM audioContentID (SMPTE ST 2131)</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018112</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.0402030b.04000000</Identification>
+<Symbol>ADMAudioObjectID_ST2131</Symbol>
+<Description>audioObjectID of the associated ADM audioObject, as defined in Rec. ITU-R BS.2076</Description>
+<Name>ADM audioObjectID (SMPTE ST 2131)</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018112</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.01010102.06010107.01000000</Identification>
@@ -9235,6 +10458,501 @@
 <IsUniqueIdentifier>false</IsUniqueIdentifier>
 <LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.05010000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060601.01000000</Identification>
+<Symbol>DescriptiveFrameworkDefinitions</Symbol>
+<Description>Descriptive Framework Definitions</Description>
+<Name>DescriptiveFrameworkDefinitions</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.05051400.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06010100</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060601.02000000</Identification>
+<Symbol>DescriptiveApplicationURI</Symbol>
+<Description>Descriptive Application URI</Description>
+<Name>DescriptiveApplicationURI</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06010100</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060601.03000000</Identification>
+<Symbol>TrackAllowedClass</Symbol>
+<Description>Track Allowed Class</Description>
+<Name>TrackAllowedClass</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01030100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06010200</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060601.04000000</Identification>
+<Symbol>FrameworkAllowedClass</Symbol>
+<Description>Framework Allowed Class</Description>
+<Name>FrameworkAllowedClass</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01030100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06010200</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060601.05000000</Identification>
+<Symbol>FrameworkIsRequired</Symbol>
+<Description>Framework Is Required</Description>
+<Name>FrameworkIsRequired</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01040100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06010200</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060601.06000000</Identification>
+<Symbol>FrameworkMaxOccurs</Symbol>
+<Description>Framework Max Occurs</Description>
+<Name>FrameworkMaxOccurs</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06010200</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060601.07000000</Identification>
+<Symbol>ObjectConstraintDefinitions</Symbol>
+<Description>Object Constraint Definitions</Description>
+<Name>ObjectConstraintDefinitions</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.05051500.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06010200</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060601.08000000</Identification>
+<Symbol>ObjectAllowedClass</Symbol>
+<Description>Object Allowed Class</Description>
+<Name>ObjectAllowedClass</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01030100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06010300</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060601.09000000</Identification>
+<Symbol>ObjectIsRequired</Symbol>
+<Description>Object Is Required</Description>
+<Name>ObjectIsRequired</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01040100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06010300</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060601.0a000000</Identification>
+<Symbol>ObjectMaxOccurs</Symbol>
+<Description>Object Max Occurs</Description>
+<Name>ObjectMaxOccurs</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06010300</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060602.02000000</Identification>
+<Symbol>CopiedComponent</Symbol>
+<Description>Copied Component</Description>
+<Name>CopiedComponent</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.05020b00.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06020300</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060602.01000000</Identification>
+<Symbol>TLCItems</Symbol>
+<Description>TLC Items</Description>
+<Name>TLCItems</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.05050f00.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06020600</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.01000000</Identification>
+<Symbol>TLCName</Symbol>
+<Description>TLC Name</Description>
+<Name>TLCName</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030200</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.02000000</Identification>
+<Symbol>TLCIdentifier</Symbol>
+<Description>TLC Identifier</Description>
+<Name>TLCIdentifier</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030300</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.03000000</Identification>
+<Symbol>TLCIdentifierKind</Symbol>
+<Description>TLC Identifier Kind</Description>
+<Name>TLCIdentifierKind</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030300</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.04000000</Identification>
+<Symbol>TLC_UMID</Symbol>
+<Description>TLC UMID</Description>
+<Name>TLC_UMID</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01300100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030400</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.05000000</Identification>
+<Symbol>ItemRate</Symbol>
+<Description>Item Rate</Description>
+<Name>ItemRate</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030500</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.06000000</Identification>
+<Symbol>ItemDuration</Symbol>
+<Description>Item Duration</Description>
+<Name>ItemDuration</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01012002.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030500</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.07000000</Identification>
+<Symbol>TLCCount</Symbol>
+<Description>TLC Count</Description>
+<Name>TLCCount</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01012001.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030600</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.08000000</Identification>
+<Symbol>IntervalIncrement</Symbol>
+<Description>Interval Increment</Description>
+<Name>IntervalIncrement</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.05023700.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030700</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.09000000</Identification>
+<Symbol>IntervalTimeScale</Symbol>
+<Description>Interval Time Scale</Description>
+<Name>IntervalTimeScale</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.05023800.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030700</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.0a000000</Identification>
+<Symbol>IntervalTimeZone</Symbol>
+<Description>Interval Time Zone</Description>
+<Name>IntervalTimeZone</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.05023900.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030700</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.0b000000</Identification>
+<Symbol>IntervalCalendar</Symbol>
+<Description>Interval Calendar</Description>
+<Name>IntervalCalendar</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.05023a00.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030700</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.1c000000</Identification>
+<Symbol>BasicTimecodeStart</Symbol>
+<Description>Basic Timecode Start</Description>
+<Name>BasicTimecodeStart</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03011100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030800</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.1d000000</Identification>
+<Symbol>BasicTimecodeRoundedBase</Symbol>
+<Description>Basic Timecode Rounded Base</Description>
+<Name>BasicTimecodeRoundedBase</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030800</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.1e000000</Identification>
+<Symbol>BasicTimecodeDropFrame</Symbol>
+<Description>Basic Timecode Drop Frame</Description>
+<Name>BasicTimecodeDropFrame</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01040100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030800</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.1f000000</Identification>
+<Symbol>BasicTimecodeTrackNumber</Symbol>
+<Description>Basic Timecode Track Number</Description>
+<Name>BasicTimecodeTrackNumber</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030800</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.21000000</Identification>
+<Symbol>TLCEdgeStart</Symbol>
+<Description>TLC Edge Start</Description>
+<Name>TLCEdgeStart</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01012001.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030900</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.22000000</Identification>
+<Symbol>TLCEdgeFilmKind</Symbol>
+<Description>TLC Edge Film Kind</Description>
+<Name>TLCEdgeFilmKind</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.0201010d.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030900</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.23000000</Identification>
+<Symbol>TLCEdgeCodeFormat</Symbol>
+<Description>TLC Edge Code Format</Description>
+<Name>TLCEdgeCodeFormat</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.0201010c.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030900</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.24000000</Identification>
+<Symbol>TLCEdgeHeader</Symbol>
+<Description>TLC Edge Header</Description>
+<Name>TLCEdgeHeader</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04100100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030900</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.0c000000</Identification>
+<Symbol>IncrementProperty</Symbol>
+<Description>Increment Property</Description>
+<Name>IncrementProperty</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01030100.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030d00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.0d000000</Identification>
+<Symbol>IncrementAmounts</Symbol>
+<Description>Increment Amounts</Description>
+<Name>IncrementAmounts</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04010400.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030d00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.0e000000</Identification>
+<Symbol>IncrementModuli</Symbol>
+<Description>Increment Moduli</Description>
+<Name>IncrementModuli</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04010400.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030d00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.0f000000</Identification>
+<Symbol>IncrementFlags</Symbol>
+<Description>Increment Flags</Description>
+<Name>IncrementFlags</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04010900.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030d00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.11000000</Identification>
+<Symbol>TimeScaleOffset</Symbol>
+<Description>Time Scale Offset measured in ItemRate</Description>
+<Name>TimeScaleOffset</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01012001.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030e00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.13000000</Identification>
+<Symbol>TimeScaleResolution</Symbol>
+<Description>Time Scale Resolution</Description>
+<Name>TimeScaleResolution</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030e00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.14000000</Identification>
+<Symbol>TimeScalePrecision</Symbol>
+<Description>Time Scale Precision</Description>
+<Name>TimeScalePrecision</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03010100.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030e00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.15000000</Identification>
+<Symbol>TimeScaleLeapSeconds</Symbol>
+<Description>Leap second count measured in seconds</Description>
+<Name>TimeScaleLeapSeconds</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010500.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030e00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.17000000</Identification>
+<Symbol>TimeZoneOffset</Symbol>
+<Description>Time Zone Offset measured in Minutes</Description>
+<Name>TimeZoneOffset</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010700.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06030f00</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.1a000000</Identification>
+<Symbol>CalendarOffset</Symbol>
+<Description>Calendar Offset measured in Days</Description>
+<Name>CalendarOffset</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010700.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06031000</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.26000000</Identification>
+<Symbol>TimeBits</Symbol>
+<Description>Time Address Bits</Description>
+<Name>TimeBits</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04010900.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06031100</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.27000000</Identification>
+<Symbol>UserBits</Symbol>
+<Description>Binary Groups</Description>
+<Name>UserBits</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04010900.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06031100</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.28000000</Identification>
+<Symbol>DBBPairs</Symbol>
+<Description>Distributed Binary Bits DBB1 and DBB2</Description>
+<Name>DBBPairs</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.04011200.00000000</Type>
+<IsOptional>true</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06031100</MemberOf>
+</PropertyDefinition>
+<PropertyDefinition>
+<Identification>urn:smpte:ul:060e2b34.0101010e.04060603.29000000</Identification>
+<Symbol>NTP_Time</Symbol>
+<Description>NTP Time</Description>
+<Name>NTP_Time</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.03011300.00000000</Type>
+<IsOptional>false</IsOptional>
+<IsUniqueIdentifier>false</IsUniqueIdentifier>
+<LocalIdentification>0</LocalIdentification>
+<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.06031300</MemberOf>
 </PropertyDefinition>
 <PropertyDefinition>
 <Identification>urn:smpte:ul:060e2b34.0101010e.04020301.0f000000</Identification>

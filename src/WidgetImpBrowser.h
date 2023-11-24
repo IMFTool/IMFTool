@@ -92,6 +92,7 @@ public slots:
 	void slotPreviewClicked(int);
 	//WR end
 	void ShowSidecarCompositionMapGenerator(QSharedPointer<AssetScm> rAssetScm = QSharedPointer<AssetScm>(), WizardSidecarCompositionMapGenerator::eMode rMode = WizardSidecarCompositionMapGenerator::NewScm);
+	void ShowResourceGeneratorIsxdMode();
 
 private slots :
 	void rRemoveSelectedRow();

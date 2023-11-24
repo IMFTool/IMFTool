@@ -68,6 +68,7 @@ private:
 	QComboBox *mpComboBoxApp;
 	const QMap<QString, QString> mApplicationIdentificationMap {
 //			{"http://www.smpte-ra.org/schemas/2067-20/2016", "App #2"},
+			{"http://www.smpte-ra.org/ns/2067-21/2021", "App #2E"},
 			{"http://www.smpte-ra.org/ns/2067-21/2020", "App #2E"},
 //			{"http://www.smpte-ra.org/schemas/2067-20/2013", "App #2 2013"},
 //			{"http://www.smpte-ra.org/schemas/2067-21/2014", "App #2E 2014"},

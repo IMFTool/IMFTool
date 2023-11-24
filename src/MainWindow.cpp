@@ -756,9 +756,9 @@ void MainWindow::ShowQcReport(const QString &rQcResult, const QVariant &rIdentif
 	qc_report_view->setReadOnly(true);
 	// Set colors for errors and warnings
 	foreach (const QString &line, report_as_list) {
-		if (line.contains("[ERROR]") || line.contains("[FATAL]"))
+		if (line.contains("ERROR") || line.contains("FATAL"))
 			qc_report_view->setTextColor(Qt::red);
-		else if (line.contains("[WARN ]"))
+		else if (line.contains("WARNING"))
 			qc_report_view->setTextColor(Qt::yellow);
 		else
 			qc_report_view->setTextColor(QColor("#b1b1b1"));
