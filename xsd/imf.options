@@ -18,7 +18,8 @@
 --namespace-map "http://www.smpte-ra.org/schemas/434/2006/properties/S335M=s335mElements"
 --namespace-map "http://www.smpte-ra.org/schemas/400/2012=lr"
 --namespace-map "http://www.smpte-ra.org/ns/2067-9/2018=scm"
-
+--namespace-map "http://www.smpte-ra.org/ns/2067-203/2022=imfsadm"
+--namespace-map "http://www.smpte-ra.org/ns/2067-204/2022=imfadm"
 
 --anonymous-regex %.* .* (.+)/(.+)%$1_$2Type%
 --anonymous-regex-trace

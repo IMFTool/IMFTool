@@ -80,6 +80,12 @@ public:
 	void SetAnnotation(const UserText &rAnnotation) { mData.setAnnotation(ImfXmlHelper::Convert(rAnnotation)); }
 	void SetID(QUuid rID) { mData.setId(ImfXmlHelper::Convert(rID)); }
 	void SetApplicationIdentification(const UserText &rApplicationIdentification);
+	void AddMGASADMVirtualTrackParameterSet(const QUuid &rTrackId, const QString rMGASADMOperationalMode = "http://www.smpte-ra.org/ns/2067-203/2022#Operational-Mode-A");
+	void ModifyMGASADMVirtualTrackParameterSet(cpl2016::CompositionPlaylistType &rCpl, const QUuid &rTrackId, const QUuid &rNewTrackId);
+	void ModifyMGASADMVirtualTrackParameterSet(cpl2016::CompositionPlaylistType &rCpl, const QList<QUuid> rSadmTrackIds);
+	void AddADMAudioVirtualTrackParameterSet(const QUuid &rTrackId, const QString rADMOperationalMode = "http://www.smpte-ra.org/ns/2067-204/2022#Operational-Mode-A");
+	void ModifyADMAudioVirtualTrackParameterSet(cpl2016::CompositionPlaylistType &rCpl, const QUuid &rTrackId, const QUuid &rNewTrackId);
+	void ModifyADMAudioVirtualTrackParameterSet(cpl2016::CompositionPlaylistType &rCpl, const QList<QUuid> rAdmTrackIds);
 	const cpl2016::CompositionPlaylistType::ContentKindOptional contentKind;
 	void SetContentKind(const UserText &rContentKind) { rContentKind.IsEmpty() ? mData.setContentKind(contentKind) : mData.setContentKind(ImfXmlHelper::Convert(rContentKind)); }
 
@@ -95,6 +101,7 @@ public:
 	bool eventFilter(QObject *pObj, QEvent *pEvt);
 	bool DoesTrackExist(const QUuid &rId) const;
 	bool DoesTrackExist(eSequenceType type) const;
+	bool DoesTrackExist(const cpl2016::CompositionPlaylistType &rCpl, const QUuid &rId) const;
 	int GetTrackCount(eSequenceType type) const;
 
 	QVector<VideoResource> *playlist; // (k)
@@ -192,6 +199,8 @@ private:
 	QAction *mpAddMainImageTrackAction;
 	QAction *mpAddIABTrackAction;
 	QAction *mpAddISXDTrackAction;
+	QAction *mpAddSADMTrackAction;
+	QAction *mpAddADMTrackAction;
 
 };
 

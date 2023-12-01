@@ -18,6 +18,7 @@
 #include "AS_DCP_internal.h"
 #include "AS_02.h"
 #include "AS_02_IAB.h"
+#include "AS_02_MGASADM.h"
 #include "PCMParserList.h"
 #include "SMPTE_Labels.h" // (k)
 #include <KM_fileio.h>
@@ -95,6 +96,9 @@ Error MetadataExtractor::ReadMetadata(Metadata &rMetadata, const QString &rSourc
 					case ASDCP::ESS_AS02_ProRes:
 						error = ReadProResMxfDescriptor(rMetadata, source_file);
 						break;
+					case ASDCP::ESS_AS02_MGASADM:
+						error = ReadMGADescriptor(rMetadata, source_file);
+						break;
 					default:
 						break;
 				}
@@ -110,6 +114,10 @@ Error MetadataExtractor::ReadMetadata(Metadata &rMetadata, const QString &rSourc
 
 
 		else error = Error(Error::UnsupportedEssence, source_file.fileName());
+	}
+	else if(source_file.exists() && source_file.isDir() && !source_file.isSymLink() && is_xml_directory(rSourceFile)) {
+		//source_file = QDir(rFiles.at(0)).entryList(QStringList("*.xml")).first();
+		error = ReadISXDMetadata(rMetadata, source_file);
 	}
 	else error = Error(Error::SourceFilesMissing, tr("Expected file: %1").arg(source_file.absoluteFilePath()));
 	return error;
@@ -411,74 +419,140 @@ Error MetadataExtractor::ReadPcmMxfDescriptor(Metadata &rMetadata, const QFileIn
 				qDebug() << "Error: " << error;
 			}
 			ASDCP::MXF::InterchangeObject* tmp_obj = NULL;
-			result = reader.OP1aHeader().GetMDObjectByType(DefaultCompositeDict().ul(MDD_SoundfieldGroupLabelSubDescriptor), &tmp_obj);
-			if(KM_SUCCESS(result)) {
-				ASDCP::MXF::SoundfieldGroupLabelSubDescriptor *soundfield_group = NULL;
-				soundfield_group = dynamic_cast<ASDCP::MXF::SoundfieldGroupLabelSubDescriptor*>(tmp_obj);
-				if(soundfield_group) {
-					if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_ST)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupST;
-					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_DM)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupDM;
-					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_30)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup30;
-					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_40)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup40;
-					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_50)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup50;
-					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_60)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup60;
-					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_70)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup70;
-					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_LtRt)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupLtRt;
-					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_51EX)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup51EX;
-					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_HI)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupHA;
-					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_VIN)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupVA;
-					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_51)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup51;
-					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_71)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup71;
-					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_SDS)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupSDS;
-					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_61)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup61;
-					else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_M)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupM;
-					else metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupNone;
-					//WR
-					const unsigned short IdentBufferLen = 256;
-					char identbuf[IdentBufferLen];
-					if (!soundfield_group->MCATitle.empty()) {
-						metadata.mcaTitle = QString(soundfield_group->MCATitle.get().EncodeString(identbuf, IdentBufferLen));
+			result = reader.OP1aHeader().GetMDObjectByType(DefaultCompositeDict().ul(MDD_ADMAudioMetadataSubDescriptor), &tmp_obj);
+			if(KM_SUCCESS(result)) {  /// ************************** ADM Audio Track File
+				metadata.type = Metadata::ADM;
+
+				std::list<ASDCP::MXF::InterchangeObject*> tmp_obj = std::list<ASDCP::MXF::InterchangeObject*>();
+				result = reader.OP1aHeader().GetMDObjectsByType(DefaultCompositeDict().ul(MDD_ADMSoundfieldGroupLabelSubDescriptor), tmp_obj);
+				if(KM_SUCCESS(result)) {
+					ASDCP::MXF::ADMSoundfieldGroupLabelSubDescriptor *p_adm_soundfield_subdescriptor = NULL;
+
+					for (std::list<InterchangeObject*>::iterator it=tmp_obj.begin(); it != tmp_obj.end(); ++it) {
+						p_adm_soundfield_subdescriptor = dynamic_cast<ASDCP::MXF::ADMSoundfieldGroupLabelSubDescriptor*>(*it);
+						if(p_adm_soundfield_subdescriptor) {
+							Metadata::ADMSoundfieldGroup adm_soundfield_group;
+							if(p_adm_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_ADMSoundfield)) adm_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroupADM;
+							else if(p_adm_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_ST)) adm_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroupST;
+							else if(p_adm_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_DM)) adm_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroupDM;
+							else if(p_adm_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_30)) adm_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroup30;
+							else if(p_adm_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_40)) adm_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroup40;
+							else if(p_adm_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_50)) adm_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroup50;
+							else if(p_adm_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_60)) adm_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroup60;
+							else if(p_adm_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_70)) adm_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroup70;
+							else if(p_adm_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_LtRt)) adm_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroupLtRt;
+							else if(p_adm_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_51EX)) adm_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroup51EX;
+							else if(p_adm_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_HI)) adm_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroupHA;
+							else if(p_adm_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_VIN)) adm_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroupVA;
+							else if(p_adm_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_51)) adm_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroup51;
+							else if(p_adm_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_71)) adm_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroup71;
+							else if(p_adm_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_SDS)) adm_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroupSDS;
+							else if(p_adm_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_61)) adm_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroup61;
+							else if(p_adm_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_M)) adm_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroupM;
+							else adm_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroupNone;
+							const unsigned short IdentBufferLen = 128;
+							char identbuf[IdentBufferLen];
+							adm_soundfield_group.mcaTagSymbol = QString(p_adm_soundfield_subdescriptor->MCATagSymbol.EncodeString(identbuf, IdentBufferLen));
+							if (!p_adm_soundfield_subdescriptor->MCATagName.empty()) {
+								adm_soundfield_group.mcaTagName = QString(p_adm_soundfield_subdescriptor->MCATagName.get().EncodeString(identbuf, IdentBufferLen));
+							}
+							if (!p_adm_soundfield_subdescriptor->RFC5646SpokenLanguage.empty()) {
+								adm_soundfield_group.mcaSpokenLanguage = QString(p_adm_soundfield_subdescriptor->RFC5646SpokenLanguage.get().EncodeString(identbuf, IdentBufferLen));
+							}
+							if (!p_adm_soundfield_subdescriptor->MCAContent.empty()) {
+								adm_soundfield_group.mcaContent = QString(p_adm_soundfield_subdescriptor->MCAContent.get().EncodeString(identbuf, IdentBufferLen));
+							}
+							if (!p_adm_soundfield_subdescriptor->MCAUseClass.empty()) {
+								adm_soundfield_group.mcaUseClass = QString(p_adm_soundfield_subdescriptor->MCAUseClass.get().EncodeString(identbuf, IdentBufferLen));
+							}
+							if (!p_adm_soundfield_subdescriptor->MCATitle.empty()) {
+								adm_soundfield_group.mcaTitle = QString(p_adm_soundfield_subdescriptor->MCATitle.get().EncodeString(identbuf, IdentBufferLen));
+							}
+							if (!p_adm_soundfield_subdescriptor->MCATitleVersion.empty()) {
+								adm_soundfield_group.mcaTitleVersion = QString(p_adm_soundfield_subdescriptor->MCATitleVersion.get().EncodeString(identbuf, IdentBufferLen));
+							}
+							if (p_adm_soundfield_subdescriptor->RIFFChunkStreamID_link2) {
+								adm_soundfield_group.mgaMetadataSectionLinkId = QString::number(p_adm_soundfield_subdescriptor->RIFFChunkStreamID_link2);
+							}
+							if (!p_adm_soundfield_subdescriptor->ADMAudioProgrammeID_ST2131.empty()) {
+								adm_soundfield_group.admAudioProgrammeID = QString(p_adm_soundfield_subdescriptor->ADMAudioProgrammeID_ST2131.get().EncodeString(identbuf, IdentBufferLen));
+							}
+							metadata.admSoundFieldGroupList.append(adm_soundfield_group);
+							//WR
+						}
 					}
-					if (!soundfield_group->MCATitleVersion.empty()) {
-						metadata.mcaTitleVersion = QString(soundfield_group->MCATitleVersion.get().EncodeString(identbuf, IdentBufferLen));
-					}
-					if (!soundfield_group->MCAAudioContentKind.empty()) {
-						metadata.mcaAudioContentKind = QString(soundfield_group->MCAAudioContentKind.get().EncodeString(identbuf, IdentBufferLen));
-					}
-					if (!soundfield_group->MCAAudioElementKind.empty()) {
-						metadata.mcaAudioElementKind = QString(soundfield_group->MCAAudioElementKind.get().EncodeString(identbuf, IdentBufferLen));
-					}
-					if (!soundfield_group->RFC5646SpokenLanguage.empty()) {
-						metadata.languageTag = QString(soundfield_group->RFC5646SpokenLanguage.get().EncodeString(identbuf, IdentBufferLen));
-					}
-					if(metadata.soundfieldGroup.IsWellKnown()) {
-						std::list<InterchangeObject*> object_list;
-						result = reader.OP1aHeader().GetMDObjectsByType(DefaultCompositeDict().ul(MDD_AudioChannelLabelSubDescriptor), object_list);
-						if(KM_SUCCESS(result)) {
-							for(std::list<InterchangeObject*>::iterator it = object_list.begin(); it != object_list.end(); ++it) {
-								if(ASDCP::MXF::AudioChannelLabelSubDescriptor *p_channel_descriptor = dynamic_cast<ASDCP::MXF::AudioChannelLabelSubDescriptor*>(*it)) {
-									if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioChannel_M1)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelM1);
-									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioChannel_M2)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelM2);
-									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioChannel_Lt)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelLt);
-									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioChannel_Rt)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelRt);
-									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioChannel_Lst)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelLst);
-									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioChannel_Rst)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelRst);
-									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioChannel_S)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelS);
-									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_L)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelL);
-									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_R)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelR);
-									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_C)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelC);
-									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_LFE)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelLFE);
-									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_Ls)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelLs);
-									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_Rs)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelRs);
-									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_Lss)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelLss);
-									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_Rss)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelRss);
-									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_Lrs)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelLrs);
-									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_Rrs)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelRrs);
-									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_Lc)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelLc);
-									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_Rc)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelRc);
-									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_Cs)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelCs);
-									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_HI)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelHI);
-									else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_VIN)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelVIN);
+				}
+			} else { /// ************************** PCM Track File
+				result = reader.OP1aHeader().GetMDObjectByType(DefaultCompositeDict().ul(MDD_SoundfieldGroupLabelSubDescriptor), &tmp_obj);
+				if(KM_SUCCESS(result)) {
+					ASDCP::MXF::SoundfieldGroupLabelSubDescriptor *soundfield_group = NULL;
+					soundfield_group = dynamic_cast<ASDCP::MXF::SoundfieldGroupLabelSubDescriptor*>(tmp_obj);
+					if(soundfield_group) {
+						if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_ST)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupST;
+						else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_DM)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupDM;
+						else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_30)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup30;
+						else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_40)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup40;
+						else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_50)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup50;
+						else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_60)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup60;
+						else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_70)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup70;
+						else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_LtRt)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupLtRt;
+						else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_51EX)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup51EX;
+						else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_HI)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupHA;
+						else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_VIN)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupVA;
+						else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_51)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup51;
+						else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_71)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup71;
+						else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_SDS)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupSDS;
+						else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_61)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroup61;
+						else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_M)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupM;
+						else if(soundfield_group->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_ADMSoundfield)) metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupADM;
+						else metadata.soundfieldGroup = SoundfieldGroup::SoundFieldGroupNone;
+						//WR
+						const unsigned short IdentBufferLen = 256;
+						char identbuf[IdentBufferLen];
+						if (!soundfield_group->MCATitle.empty()) {
+							metadata.mcaTitle = QString(soundfield_group->MCATitle.get().EncodeString(identbuf, IdentBufferLen));
+						}
+						if (!soundfield_group->MCATitleVersion.empty()) {
+							metadata.mcaTitleVersion = QString(soundfield_group->MCATitleVersion.get().EncodeString(identbuf, IdentBufferLen));
+						}
+						if (!soundfield_group->MCAAudioContentKind.empty()) {
+							metadata.mcaAudioContentKind = QString(soundfield_group->MCAAudioContentKind.get().EncodeString(identbuf, IdentBufferLen));
+						}
+						if (!soundfield_group->MCAAudioElementKind.empty()) {
+							metadata.mcaAudioElementKind = QString(soundfield_group->MCAAudioElementKind.get().EncodeString(identbuf, IdentBufferLen));
+						}
+						if (!soundfield_group->RFC5646SpokenLanguage.empty()) {
+							metadata.languageTag = QString(soundfield_group->RFC5646SpokenLanguage.get().EncodeString(identbuf, IdentBufferLen));
+						}
+						if(metadata.soundfieldGroup.IsWellKnown()) {
+							std::list<InterchangeObject*> object_list;
+							result = reader.OP1aHeader().GetMDObjectsByType(DefaultCompositeDict().ul(MDD_AudioChannelLabelSubDescriptor), object_list);
+							if(KM_SUCCESS(result)) {
+								for(std::list<InterchangeObject*>::iterator it = object_list.begin(); it != object_list.end(); ++it) {
+									if(ASDCP::MXF::AudioChannelLabelSubDescriptor *p_channel_descriptor = dynamic_cast<ASDCP::MXF::AudioChannelLabelSubDescriptor*>(*it)) {
+										if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioChannel_M1)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelM1);
+										else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioChannel_M2)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelM2);
+										else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioChannel_Lt)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelLt);
+										else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioChannel_Rt)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelRt);
+										else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioChannel_Lst)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelLst);
+										else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioChannel_Rst)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelRst);
+										else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioChannel_S)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelS);
+										else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_L)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelL);
+										else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_R)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelR);
+										else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_C)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelC);
+										else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_LFE)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelLFE);
+										else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_Ls)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelLs);
+										else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_Rs)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelRs);
+										else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_Lss)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelLss);
+										else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_Rss)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelRss);
+										else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_Lrs)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelLrs);
+										else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_Rrs)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelRrs);
+										else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_Lc)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelLc);
+										else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_Rc)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelRc);
+										else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_Cs)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelCs);
+										else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_HI)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelHI);
+										else if(p_channel_descriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioChannel_VIN)) metadata.soundfieldGroup.AddChannel(p_channel_descriptor->MCAChannelID - 1, SoundfieldGroup::ChannelVIN);
+									}
 								}
 							}
 						}
@@ -487,6 +561,7 @@ Error MetadataExtractor::ReadPcmMxfDescriptor(Metadata &rMetadata, const QFileIn
 			}
 			metadata.duration = Duration(duration);
 			metadata.editRate = wave_descriptor->SampleRate;
+			metadata.audioSamplingRate = wave_descriptor->AudioSamplingRate;
 			metadata.audioChannelCount = wave_descriptor->ChannelCount;
 			metadata.audioQuantization = wave_descriptor->QuantizationBits;
 		}
@@ -839,6 +914,126 @@ Error MetadataExtractor::ReadProResMxfDescriptor(Metadata &rMetadata, const QFil
 
 		}
 		// (k) - end
+	}
+	else {
+		error = Error(result);
+		return error;
+	}
+	rMetadata = metadata;
+	return error;
+}
+
+Error MetadataExtractor::ReadMGADescriptor(Metadata &rMetadata, const QFileInfo &rSourceFile){
+
+	Error error;
+	Metadata metadata(Metadata::SADM);
+	metadata.fileName = rSourceFile.fileName();
+	metadata.filePath = rSourceFile.filePath();
+
+	AS_02::MGASADM::MXFReader reader(defaultFactory);
+	ASDCP::MXF::MGASoundEssenceDescriptor *mga_descriptor = NULL;
+
+	AS_02::Result_t result = reader.OpenRead(rSourceFile.absoluteFilePath().toStdString());
+	if(ASDCP_SUCCESS(result)) {
+		//WR
+		WriterInfo writerinfo;
+		result = reader.FillWriterInfo(writerinfo);
+		if(KM_SUCCESS(result)) {
+			metadata.assetId = convert_uuid((unsigned char*)writerinfo.AssetUUID);
+		}
+		ASDCP::MXF::InterchangeObject* tmp_obj = NULL;
+
+		result = reader.OP1aHeader().GetMDObjectByType(DefaultCompositeDict().ul(MDD_MGASoundEssenceDescriptor), &tmp_obj);
+
+		if(ASDCP_SUCCESS(result)) {
+			mga_descriptor = dynamic_cast<ASDCP::MXF::MGASoundEssenceDescriptor*>(tmp_obj);
+			if(mga_descriptor == NULL) {
+				error = Error(Error::UnsupportedEssence);
+				return error;
+			}
+			mga_descriptor->AudioRefLevel.empty();
+			char buf[64];
+			metadata.essenceContainer = QString(mga_descriptor->EssenceContainer.EncodeString(buf, 64));
+			const ASDCP::Dictionary*& dict = reader.OP1aHeader().m_Dict;
+			if (!mga_descriptor->EssenceContainer.MatchExact(dict->ul(MDD_MXFGCClipWrappedMGA))) {
+				error = Error(Error::UnsupportedWrapping);
+				return error;
+			}
+			metadata.essenceCoding = QString(mga_descriptor->SoundEssenceCoding.EncodeString(buf, 64));
+			metadata.editRate = mga_descriptor->SampleRate;
+			if (!mga_descriptor->ContainerDuration.empty())
+				metadata.duration = mga_descriptor->ContainerDuration.get();
+			mga_descriptor->ElectroSpatialFormulation.empty();//If present shall be set to a value of 15 (multi-channel mode default).
+			metadata.audioQuantization = mga_descriptor->QuantizationBits;
+			if (!mga_descriptor->ReferenceImageEditRate.empty())
+				metadata.referenceImageEditRate = mga_descriptor->ReferenceImageEditRate.get(); // Should be present
+			mga_descriptor->ReferenceAudioAlignmentLevel.empty(); // Should be present
+			metadata.audioSamplingRate = mga_descriptor->AudioSamplingRate;
+			metadata.mgaAverageBytesPerSecond = mga_descriptor->MGASoundEssenceAverageBytesPerSecond;
+
+			std::list<ASDCP::MXF::InterchangeObject*> tmp_obj = std::list<ASDCP::MXF::InterchangeObject*>();
+			result = reader.OP1aHeader().GetMDObjectsByType(DefaultCompositeDict().ul(MDD_MGASoundfieldGroupLabelSubDescriptor), tmp_obj);
+			if(KM_SUCCESS(result)) {
+				ASDCP::MXF::MGASoundfieldGroupLabelSubDescriptor *p_mga_soundfield_subdescriptor = NULL;
+
+				for (std::list<InterchangeObject*>::iterator it=tmp_obj.begin(); it != tmp_obj.end(); ++it) {
+					p_mga_soundfield_subdescriptor = dynamic_cast<ASDCP::MXF::MGASoundfieldGroupLabelSubDescriptor*>(*it);
+					if(p_mga_soundfield_subdescriptor) {
+						Metadata::MGASoundfieldGroup mga_soundfield_group;// = new Metadata::MGASoundfieldGroup();
+						if(p_mga_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_MGASoundfield)) mga_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroupMGA;
+						else if(p_mga_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_ST)) mga_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroupST;
+						else if(p_mga_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_DM)) mga_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroupDM;
+						else if(p_mga_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_30)) mga_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroup30;
+						else if(p_mga_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_40)) mga_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroup40;
+						else if(p_mga_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_50)) mga_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroup50;
+						else if(p_mga_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_60)) mga_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroup60;
+						else if(p_mga_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_70)) mga_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroup70;
+						else if(p_mga_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_LtRt)) mga_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroupLtRt;
+						else if(p_mga_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_51EX)) mga_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroup51EX;
+						else if(p_mga_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_HI)) mga_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroupHA;
+						else if(p_mga_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_IMFAudioSoundfield_VIN)) mga_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroupVA;
+						else if(p_mga_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_51)) mga_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroup51;
+						else if(p_mga_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_71)) mga_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroup71;
+						else if(p_mga_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_SDS)) mga_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroupSDS;
+						else if(p_mga_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_61)) mga_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroup61;
+						else if(p_mga_soundfield_subdescriptor->MCALabelDictionaryID == DefaultCompositeDict().ul(MDD_DCAudioSoundfield_M)) mga_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroupM;
+						else mga_soundfield_group.soundfieldGroup = SoundfieldGroup::SoundFieldGroupNone;
+						const unsigned short IdentBufferLen = 128;
+						char identbuf[IdentBufferLen];
+						mga_soundfield_group.mcaTagSymbol = QString(p_mga_soundfield_subdescriptor->MCATagSymbol.EncodeString(identbuf, IdentBufferLen));
+						if (!p_mga_soundfield_subdescriptor->MCATagName.empty()) {
+							mga_soundfield_group.mcaTagName = QString(p_mga_soundfield_subdescriptor->MCATagName.get().EncodeString(identbuf, IdentBufferLen));
+						}
+						if (!p_mga_soundfield_subdescriptor->RFC5646SpokenLanguage.empty()) {
+							mga_soundfield_group.mcaSpokenLanguage = QString(p_mga_soundfield_subdescriptor->RFC5646SpokenLanguage.get().EncodeString(identbuf, IdentBufferLen));
+						}
+						if (!p_mga_soundfield_subdescriptor->MCAContent.empty()) {
+							mga_soundfield_group.mcaContent = QString(p_mga_soundfield_subdescriptor->MCAContent.get().EncodeString(identbuf, IdentBufferLen));
+						}
+						if (!p_mga_soundfield_subdescriptor->MCAUseClass.empty()) {
+							mga_soundfield_group.mcaUseClass = QString(p_mga_soundfield_subdescriptor->MCAUseClass.get().EncodeString(identbuf, IdentBufferLen));
+						}
+						if (!p_mga_soundfield_subdescriptor->MCATitle.empty()) {
+							mga_soundfield_group.mcaTitle = QString(p_mga_soundfield_subdescriptor->MCATitle.get().EncodeString(identbuf, IdentBufferLen));
+						}
+						if (!p_mga_soundfield_subdescriptor->MCATitleVersion.empty()) {
+							mga_soundfield_group.mcaTitleVersion = QString(p_mga_soundfield_subdescriptor->MCATitleVersion.get().EncodeString(identbuf, IdentBufferLen));
+						}
+						if (p_mga_soundfield_subdescriptor->MGAMetadataSectionLinkID.HasValue()) {
+							mga_soundfield_group.mgaMetadataSectionLinkId = QString(p_mga_soundfield_subdescriptor->MGAMetadataSectionLinkID.EncodeString(buf, 64));
+						}
+						if (!p_mga_soundfield_subdescriptor->ADMAudioProgrammeID.empty()) {
+							mga_soundfield_group.admAudioProgrammeID = QString(p_mga_soundfield_subdescriptor->ADMAudioProgrammeID.get().EncodeString(identbuf, IdentBufferLen));
+						}
+						metadata.mgaSoundFieldGroupList.append(mga_soundfield_group);
+						//WR
+					}
+				}
+			}
+		} else {
+			error = Error(result);
+			return error;
+		}
 	}
 	else {
 		error = Error(result);
@@ -1297,4 +1492,26 @@ Error MetadataExtractor::ReadTimedTextMetadata(Metadata &rMetadata, const QFileI
 }
 			/* -----Denis Manthey----- */
 
+Error MetadataExtractor::ReadISXDMetadata(Metadata &rMetadata, const QFileInfo &rSourceFile) {
+
+	Metadata metadata(Metadata::ISXD);
+	Error error;
+
+	metadata.fileName = rSourceFile.fileName();
+	metadata.filePath = rSourceFile.filePath();
+
+	try {
+		XMLPlatformUtils::Initialize();
+	}
+	catch (const XMLException& toCatch) {
+		char* message = XMLString::transcode(toCatch.getMessage());
+		qDebug() << "Error during initialization! :\n" << message << "\n";
+		XMLString::release(&message);
+		error = (Error::Unknown);
+		error.AppendErrorDescription(XMLString::transcode(toCatch.getMessage()));
+		return error;
+	}
+	return error;
+
+}
 

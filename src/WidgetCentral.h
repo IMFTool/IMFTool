@@ -25,6 +25,8 @@ class WidgetTimedTextPreview;
 class TimelineParser;
 class WidgetContentVersionList; //WR
 class WidgetLocaleList; //WR
+//TODO ISXD browser
+class WidgetXmlTree;
 
 class WidgetCentral : public QWidget {
 
@@ -79,17 +81,22 @@ private:
 	QMessageBox *mpMsgBox;
 	QTabWidget *mpTabWidget;
 	WidgetVideoPreview *mpPreview;
-	QTabWidget *mpTabDetailTTML; // (k)
-	WidgetTimedTextPreview *mpTTMLDetailsWidget; // (k)
+	QTabWidget *mpTopTabWidget; // (k)
+	WidgetTimedTextPreview *mpTTMLPreviewWidget; // (k)
 	WidgetCompositionInfo *mpDetailsWidget;
 	WidgetContentVersionList *mpContentVersionListWidget; //WR
 	WidgetLocaleList *mpLocaleListWidget;
+	//TODO ISXD browser
+	//WidgetXmlTree *mpIsxdWidget;
+	//S-ADM browser
+	WidgetXmlTree *mpSadmWidget;
 	QThread *tpThread; // (k)
 	TimelineParser *timelineParser; // (k)
 	bool playListUpdateSuccess = true; // (k)
 	bool uninstalling_imp = false;
 	QTime *timelineParserTime;
 	const QMap<QString, eImfApplications> mApplicationIdentificationIntegerMap {
+			{"http://www.smpte-ra.org/ns/2067-21/2021", ::App2e},
 			{"http://www.smpte-ra.org/ns/2067-21/2020", ::App2e},
 			{"http://www.smpte-ra.org/schemas/2067-20/2016", ::App2},
 			{"http://www.smpte-ra.org/schemas/2067-21/2016", ::App2e},

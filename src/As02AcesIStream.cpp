@@ -35,14 +35,14 @@ bool As02AcesIStream::read(char c[], int n) {
 	return true;
 }
 
-Imf::Int64 As02AcesIStream::tellg() {
+uint64_t As02AcesIStream::tellg() {
 
 	return (d->mpReadPosition - d->mpData);
 }
 
-void As02AcesIStream::seekg(Imf::Int64 pos) {
+void As02AcesIStream::seekg(uint64_t pos) {
 
-	if(pos > (Imf::Int64)d->mSize) return;
+	if(pos > (uint64_t)d->mSize) return;
 	d->mpReadPosition = d->mpData + pos;
 }
 

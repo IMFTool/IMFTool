@@ -199,6 +199,9 @@ const SoundfieldGroup SoundfieldGroup::SoundFieldGroup61("61", "6.1", 7, Channel
 const SoundfieldGroup SoundfieldGroup::SoundFieldGroupM("M", "1.0 Monaural", 1, ChannelC);
 //IAB
 const SoundfieldGroup SoundfieldGroup::SoundFieldGroupIAB("IAB", "Immersive Audio ST2067-201", 1, ChannelUndefined);
+//MGA
+const SoundfieldGroup SoundfieldGroup::SoundFieldGroupMGA("MGA", "MGA Soundfield ST 2127-1", 0, ChannelUndefined);
+const SoundfieldGroup SoundfieldGroup::SoundFieldGroupADM("ADM", "ADM Soundfield ST 2131", 0, ChannelUndefined);
 
 
 

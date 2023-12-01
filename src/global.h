@@ -51,6 +51,9 @@
 #define XML_NAMESPACE_NS "http://www.w3.org/2000/xmlns/"
 #define XML_NAMESPACE_IAB "http://www.smpte-ra.org/ns/2067-201/2019"
 #define XML_NAMESPACE_RDD47 "http://www.dolby.com/schemas/RDD-47/2018"
+#define XML_NAMESPACE_SADM "http://www.smpte-ra.org/ns/2067-203/2022"
+#define XML_NAMESPACE_ADM "http://www.smpte-ra.org/ns/2067-204/2022"
+#define XML_NAMESPACE_ISXD "http://www.smpte-ra.org/ns/2067-202/2022"
 
 #define SETTINGS_AUDIO_DEVICE "audio/audioDevice"
 #define SETTINGS_AUDIO_CHANNEL_CONFIGURATION "audio/audioChannelConfiguration"
@@ -231,6 +234,13 @@ inline bool is_mxf_file(const QString &rFilePath) {
 
 	if(QFileInfo(rFilePath).suffix().compare("mxf", Qt::CaseInsensitive) == 0) return true;
 	return false;
+}
+
+
+inline bool is_xml_directory(const QString &rFilePath) {
+
+	if(QDir(rFilePath).entryList(QStringList("*.xml")).empty()) return false;
+	return true;
 }
 
 

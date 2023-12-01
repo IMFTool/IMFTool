@@ -47,6 +47,8 @@ public:
 		IAB,
 		ISXD,
 		ProRes,
+		SADM,
+		ADM,
 	};
 
 enum eEssenceSubType {
@@ -60,6 +62,21 @@ enum eEssenceSubType {
 		CDCI,
 		RGBA
 	};
+
+struct MGASoundfieldGroup {
+		SoundfieldGroup						soundfieldGroup;
+		QString								mcaTagSymbol;
+		QString								mcaTagName;
+		QString								mcaSpokenLanguage;
+		QString								mcaContent;
+		QString								mcaUseClass;
+		QString								mgaMetadataSectionLinkId;
+		QString								mcaTitle;
+		QString								mcaTitleVersion;
+		QString								admAudioProgrammeID;
+	};
+
+typedef MGASoundfieldGroup ADMSoundfieldGroup;
 
 	Metadata(Metadata::eEssenceType rType = Metadata::Unknown_Type, Metadata::eEssenceSubType rSubType = Metadata::Unknown_SubType);
 	~Metadata() {}
@@ -110,6 +127,9 @@ enum eEssenceSubType {
 	QString									pixelLayout; // J2K RGB only
 	QString									namespaceURI; // ISXD only
 	bool									isPHDR = false; // For J2K with PHDRMetadataTrackSubDescriptor
+	QList<MGASoundfieldGroup>				mgaSoundFieldGroupList;
+	QList<ADMSoundfieldGroup>				admSoundFieldGroupList;
+	qint32									mgaAverageBytesPerSecond;
 	//WR
 #ifdef APP5_ACES
 	AS_02::ACES::ResourceList_t AncillaryResources;

@@ -24,6 +24,8 @@
 #include "ImfCommon.h"
 #include "WidgetContentVersionList.h" //WR
 #include "WidgetLocaleList.h" //WR
+//TODO ISXD browser
+#include "WidgetXmlTree.h"
 #include "GraphicsWidgetComposition.h"
 #include <QHBoxLayout>
 #include <QSplitter>
@@ -101,12 +103,26 @@ void WidgetCentral::InitLyout() {
 
 	mpLocaleListWidget = new WidgetLocaleList(this);
 	mpLocaleListWidget->setDisabled(true);
+	//TODO ISXD browser
+	//mpIsxdWidget = new WidgetXmlTree(this);
+	//mpIsxdWidget->setDisabled(true);
 	/*QFrame *p_locale_widget_frame = new QFrame(this);
 	p_locale_widget_frame->setFrameStyle(QFrame::StyledPanel);
 	QHBoxLayout *p_locale_widget_frame_layout = new QHBoxLayout();
 	p_locale_widget_frame_layout->setContentsMargins(0, 0, 0, 0);
 	p_locale_widget_frame_layout->addWidget(mpLocaleListWidget);
 	p_locale_widget_frame->setLayout(p_locale_widget_frame_layout);*/
+	//p_details_widget_frame_layout->addWidget(mpLocaleListWidget);
+
+	//S-ADM browser
+	mpSadmWidget = new WidgetXmlTree(this);
+	mpSadmWidget->setDisabled(true);
+	QFrame *p_locale_widget_frame = new QFrame(this);
+	p_locale_widget_frame->setFrameStyle(QFrame::StyledPanel);
+	QHBoxLayout *p_locale_widget_frame_layout = new QHBoxLayout();
+	p_locale_widget_frame_layout->setContentsMargins(0, 0, 0, 0);
+	p_locale_widget_frame_layout->addWidget(mpLocaleListWidget);
+	p_locale_widget_frame->setLayout(p_locale_widget_frame_layout);
 	//p_details_widget_frame_layout->addWidget(mpLocaleListWidget);
 
 	//WR
@@ -121,35 +137,38 @@ void WidgetCentral::InitLyout() {
 	connect(timelineParser, SIGNAL(PlaylistFinished()), this, SLOT(rPlaylistFinished()));
 
 	// create tabs
-	mpTabDetailTTML = new QTabWidget(this);
-	mpTabDetailTTML->setTabsClosable(false);
-	mpTabDetailTTML->setMovable(false);
+	mpTopTabWidget = new QTabWidget(this);
+	mpTopTabWidget->setTabsClosable(false);
+	mpTopTabWidget->setMovable(false);
 	QFrame *p_tab_detail_widget_frame = new QFrame(this);
 	p_tab_detail_widget_frame->setFrameStyle(QFrame::StyledPanel);
 	QHBoxLayout *p_tab_detail_widget_frame_layout = new QHBoxLayout();
 	p_tab_detail_widget_frame_layout->setContentsMargins(0, 0, 0, 0);
-	p_tab_detail_widget_frame_layout->addWidget(mpTabDetailTTML);
+	p_tab_detail_widget_frame_layout->addWidget(mpTopTabWidget);
 	p_tab_detail_widget_frame->setLayout(p_tab_detail_widget_frame_layout);
 
-	mpTabDetailTTML->addTab(mpDetailsWidget, "Details"); // add to layout
-	mpTTMLDetailsWidget = new WidgetTimedTextPreview(this);
-	mpTabDetailTTML->addTab(p_content_version_list_scroll_area, "ContentVersionList"); // add to layout
-	int tabNumber = mpTabDetailTTML->addTab(mpLocaleListWidget, "LocaleList"); // add to layout
-	mpTabDetailTTML->setTabToolTip(tabNumber, "Use right-click to add/delete items, double click to edit values");
-	mpTabDetailTTML->addTab(mpTTMLDetailsWidget, "Timed Text"); // add to layout
-	connect(mpTTMLDetailsWidget->show_regions, SIGNAL(stateChanged(int)), mpPreview, SIGNAL(regionOptionsChanged(int)));
+	mpTopTabWidget->addTab(mpDetailsWidget, "Details"); // add to layout
+	mpTTMLPreviewWidget = new WidgetTimedTextPreview(this);
+	mpTopTabWidget->addTab(p_content_version_list_scroll_area, "ContentVersionList"); // add to layout
+	int tabNumber = mpTopTabWidget->addTab(mpLocaleListWidget, "LocaleList"); // add to layout
+	mpTopTabWidget->setTabToolTip(tabNumber, "Use right-click to add/delete items, double click to edit values");
+	mpTopTabWidget->addTab(mpTTMLPreviewWidget, "Timed Text"); // add to layout
+	connect(mpTTMLPreviewWidget->show_regions, SIGNAL(stateChanged(int)), mpPreview, SIGNAL(regionOptionsChanged(int)));
+	//TODO ISXD browser
+	//mpTopTabWidget->addTab(mpIsxdWidget, "ISXD"); // add to layout
+	mpTopTabWidget->addTab(mpSadmWidget, "S-ADM"); // add to layout
 
-	//p_details_widget_frame_layout->addWidget(mpTabDetailTTML);
-	connect(mpTabDetailTTML, SIGNAL(currentChanged(int)), this, SLOT(rToggleTTML(int)));
-	connect(mpPreview, SIGNAL(ttmlChanged(const QVector<visibleTTtrack>&,int)), mpTTMLDetailsWidget, SLOT(rShowTTML(const QVector<visibleTTtrack>&,int)));
-	connect(mpTTMLDetailsWidget, SIGNAL(PrevNextSubClicked(bool)), mpPreview, SLOT(rPrevNextSubClicked(bool)));
+	//p_details_widget_frame_layout->addWidget(mpTopTabWidget);
+	connect(mpTopTabWidget, SIGNAL(currentChanged(int)), this, SLOT(rToggleTTML(int)));
+	connect(mpPreview, SIGNAL(ttmlChanged(const QVector<visibleTTtrack>&,int)), mpTTMLPreviewWidget, SLOT(rShowTTML(const QVector<visibleTTtrack>&,int)));
+	connect(mpTTMLPreviewWidget, SIGNAL(PrevNextSubClicked(bool)), mpPreview, SLOT(rPrevNextSubClicked(bool)));
 	// (k) - end
 
 	QSplitter *p_inner_splitter = new QSplitter(this);
 	p_inner_splitter->setOrientation(Qt::Horizontal);
 	p_inner_splitter->setChildrenCollapsible(false);
 	p_inner_splitter->setOpaqueResize(true);
-	p_inner_splitter->addWidget(mpTabDetailTTML);
+	p_inner_splitter->addWidget(mpTopTabWidget);
 	p_inner_splitter->addWidget(p_preview_widget_frame);
 
 	QSplitter *p_outer_splitter = new QSplitter(this);
@@ -185,7 +204,7 @@ void WidgetCentral::rUpdatePlaylist() {
 		}
 		else {
 			mpPreview->Clear(); // (k) - clear preview
-			mpTTMLDetailsWidget->ClearTTML(); // (k) - clear ttml
+			mpTTMLPreviewWidget->ClearTTML(); // (k) - clear ttml
 
 			playListUpdateSuccess = true;
 			ttmls = QVector<TTMLtimelineResource>(); // clear ttml list
@@ -297,7 +316,7 @@ void WidgetCentral::rTabCloseRequested(int index) {
 			mpDetailsWidget->Clear();
 			mpContentVersionListWidget->Clear();
 			mpLocaleListWidget->Clear();
-			mpTTMLDetailsWidget->ClearTTML(); // (k) - clear ttml view
+			mpTTMLPreviewWidget->ClearTTML(); // (k) - clear ttml view
 			ttmls = QVector<TTMLtimelineResource>(); // (k) - clear ttml list
 			playlist = QVector<VideoResource>(); // (k) - clear video playlist
 			mpPreview->setPlaylist(playlist, ttmls); // (k) - clear playlist
@@ -373,7 +392,7 @@ void WidgetCentral::UninstallImp() {
 	mpContentVersionListWidget->Clear();
 	mpLocaleListWidget->setDisabled(true);
 	mpLocaleListWidget->Clear();
-	mpTTMLDetailsWidget->ClearTTML(); // (k) - clear ttml
+	mpTTMLPreviewWidget->ClearTTML(); // (k) - clear ttml
 	this->mpPreview->Reset();
 
 	for(int i = 0; i < mpTabWidget->count(); i++) {

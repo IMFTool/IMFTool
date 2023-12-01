@@ -2,11 +2,7 @@
 set(BUILD_APP5_SUPPORT true CACHE BOOL "Build App#5 ACES support? Run Generate again, if this option is being changed") 
 
 find_file(asdcplib_Targets_PATH NAMES asdcplibtargets.cmake PATHS "$ENV{CMAKE_HINT}/asdcplib" ENV CMAKE_HINT PATH_SUFFIXES "targets")
-#find_file(OpenJPEG_Targets_PATH NAMES OpenJPEGTargets.cmake ENV CMAKE_HINT PATH_SUFFIXES "targets")
 find_path(asdcplib_include_DIR NAMES AS_02.h PATHS "$ENV{CMAKE_HINT}/asdcplib" ENV CMAKE_HINT PATH_SUFFIXES "include")
-#find_path(OpenJPEG_include_DIR NAMES openjpeg.h)
-#find_library(OpenJPEGLib_Path NAMES openjp2 PATHS ENV CMAKE_HINT PATH_SUFFIXES "lib")
-#find_library(OpenJPEGLib_Debug_Path NAMES openjp2 PATHS ENV CMAKE_HINT PATH_SUFFIXES "lib")
 find_library(XercescppLib_PATH NAMES xerces-c xerces-c_3 PATHS "${PROJECT_SOURCE_DIR}/../xercescpp" "${PROJECT_SOURCE_DIR}/../lib/xercescpp" "$ENV{CMAKE_HINT}/xercescpp" ENV CMAKE_HINT PATH_SUFFIXES "lib")
 find_library(XercescppLib_Debug_PATH NAMES xerces-cD xerces-c_3D xerces-c PATHS "${PROJECT_SOURCE_DIR}/../xercescpp" "${PROJECT_SOURCE_DIR}/../lib/xercescpp" "$ENV{CMAKE_HINT}/xercescpp" ENV CMAKE_HINT PATH_SUFFIXES "lib")
 find_path(XercescppLib_include_DIR NAMES xercesc/dom/DOM.hpp PATHS "${PROJECT_SOURCE_DIR}/../xercescpp" "${PROJECT_SOURCE_DIR}/../lib/xercescpp" "$ENV{CMAKE_HINT}/xercescpp" ENV CMAKE_HINT PATH_SUFFIXES "include")
@@ -14,35 +10,32 @@ find_package(OpenJPEG)
 find_package(regxmllibc)
 
 if(BUILD_APP5_SUPPORT)
-find_library(OpenEXRLib_IlmImf_PATH NAMES IlmImf IlmImf-2_2 PATHS "${PROJECT_SOURCE_DIR}/../openexr" "${PROJECT_SOURCE_DIR}/../lib/openexr" "$ENV{CMAKE_HINT}/openexr" ENV CMAKE_HINT PATH_SUFFIXES "lib")
-find_library(OpenEXRLib_IlmImf_Debug_PATH NAMES IlmImf IlmImf-2_2 PATHS "${PROJECT_SOURCE_DIR}/../openexr" "${PROJECT_SOURCE_DIR}/../lib/openexr" "$ENV{CMAKE_HINT}/openexr" ENV CMAKE_HINT PATH_SUFFIXES "lib")
+find_package(Imath CONFIG)
+find_package(OpenEXR CONFIG)
+find_library(OpenEXRLib_OpenEXR_PATH NAMES OpenEXR  PATHS "$ENV{CMAKE_HINT}/openexr" ENV CMAKE_HINT PATH_SUFFIXES "lib")
+find_library(OpenEXRLib_OpenEXR_Debug_PATH NAMES OpenEXR  PATHS  "$ENV{CMAKE_HINT}/openexr" ENV CMAKE_HINT PATH_SUFFIXES "lib")
 find_path(OpenEXRLib_include_DIR NAMES OpenEXR/ImfAttribute.h PATHS "${PROJECT_SOURCE_DIR}/../openexr" "${PROJECT_SOURCE_DIR}/../lib/openexr" "$ENV{CMAKE_HINT}/openexr" ENV CMAKE_HINT PATH_SUFFIXES "include")
+find_path(ImathLib_include_DIR NAMES Imath/ImathVec.h PATHS "$ENV{CMAKE_HINT}/imath" ENV CMAKE_HINT PATH_SUFFIXES "include")
 find_library(IlmBaseLib_Imath_PATH NAMES Imath Imath-2_2 PATHS "${PROJECT_SOURCE_DIR}/../ilmbase" "${PROJECT_SOURCE_DIR}/../lib/ilmbase" "$ENV{CMAKE_HINT}/ilmbase" ENV CMAKE_HINT PATH_SUFFIXES "lib")
 find_library(IlmBaseLib_Imath_Debug_PATH NAMES Imath Imath-2_2 PATHS "${PROJECT_SOURCE_DIR}/../ilmbase" "${PROJECT_SOURCE_DIR}/../lib/ilmbase" "$ENV{CMAKE_HINT}/ilmbase" ENV CMAKE_HINT PATH_SUFFIXES "lib")
 find_library(IlmBaseLib_IlmThread_PATH NAMES IlmThread IlmThread-2_2 PATHS "${PROJECT_SOURCE_DIR}/../ilmbase" "${PROJECT_SOURCE_DIR}/../lib/ilmbase" "$ENV{CMAKE_HINT}/ilmbase" ENV CMAKE_HINT PATH_SUFFIXES "lib")
 find_library(IlmBaseLib_IlmThread_Debug_PATH NAMES IlmThread IlmThread-2_2 PATHS "${PROJECT_SOURCE_DIR}/../ilmbase" "${PROJECT_SOURCE_DIR}/../lib/ilmbase" "$ENV{CMAKE_HINT}/ilmbase" ENV CMAKE_HINT PATH_SUFFIXES "lib")
 find_library(IlmBaseLib_Iex_PATH NAMES Iex Iex-2_2 PATHS "${PROJECT_SOURCE_DIR}/../ilmbase" "${PROJECT_SOURCE_DIR}/../lib/ilmbase" "$ENV{CMAKE_HINT}/ilmbase" ENV CMAKE_HINT PATH_SUFFIXES "lib")
 find_library(IlmBaseLib_Iex_Debug_PATH NAMES Iex Iex-2_2 PATHS "${PROJECT_SOURCE_DIR}/../ilmbase" "${PROJECT_SOURCE_DIR}/../lib/ilmbase" "$ENV{CMAKE_HINT}/ilmbase" ENV CMAKE_HINT PATH_SUFFIXES "lib")
-find_library(IlmBaseLib_Half_PATH NAMES Half PATHS "${PROJECT_SOURCE_DIR}/../ilmbase" "${PROJECT_SOURCE_DIR}/../lib/ilmbase" "$ENV{CMAKE_HINT}/ilmbase" ENV CMAKE_HINT PATH_SUFFIXES "lib")
-find_library(IlmBaseLib_Half_Debug_PATH NAMES Half PATHS "${PROJECT_SOURCE_DIR}/../ilmbase" "${PROJECT_SOURCE_DIR}/../lib/ilmbase" "$ENV{CMAKE_HINT}/ilmbase" ENV CMAKE_HINT PATH_SUFFIXES "lib")
-find_path(IlmBaseLib_include_DIR NAMES OpenEXR/half.h PATHS "${PROJECT_SOURCE_DIR}/../ilmbase" "${PROJECT_SOURCE_DIR}/../lib/ilmbase" "$ENV{CMAKE_HINT}/ilmbase" ENV CMAKE_HINT PATH_SUFFIXES "include")
 else(BUILD_APP5_SUPPORT)
-unset(OpenEXRLib_IlmImf_PATH CACHE)
-unset(OpenEXRLib_IlmImf_Debug_PATH CACHE)
+unset(OpenEXRLib_OpenEXR_PATH CACHE)
+unset(OpenEXRLib_OpenEXR_Debug_PATH CACHE)
 unset(OpenEXRLib_include_DIR CACHE)
+unset(ImathLib_include_DIR CACHE)
 unset(IlmBaseLib_Imath_PATH CACHE)
 unset(IlmBaseLib_Imath_Debug_PATH CACHE)
 unset(IlmBaseLib_IlmThread_PATH CACHE)
 unset(IlmBaseLib_IlmThread_Debug_PATH CACHE)
 unset(IlmBaseLib_Iex_PATH CACHE)
 unset(IlmBaseLib_Iex_Debug_PATH CACHE)
-unset(IlmBaseLib_Half_PATH CACHE)
-unset(IlmBaseLib_Half_Debug_PATH CACHE)
-unset(IlmBaseLib_include_DIR CACHE)
 endif(BUILD_APP5_SUPPORT)
 
 include("${asdcplib_Targets_PATH}") # Import asdcplib targets.
-#include("${OpenJPEG_Targets_PATH}") # Import OpenJPEG targets
 
 set (qt5_modules Core Gui Widgets)
 find_package (Qt5 COMPONENTS ${qt5_modules})
@@ -72,7 +65,7 @@ set(tool_src main.cpp MainWindow.cpp KMQtLogSink.cpp QtWaitingSpinner.cpp Widget
 	WidgetCompositionInfo.cpp UndoProxyModel.cpp JobQueue.cpp Jobs.cpp Error.cpp WizardPartialImpGenerator.cpp
 	WidgetVideoPreview.cpp WidgetImagePreview.cpp JP2K_Preview.cpp JP2K_Decoder.cpp TTMLParser.cpp WidgetTimedTextPreview.cpp TimelineParser.cpp # (k)
 	WidgetContentVersionList.cpp WidgetContentVersionListCommands.cpp WidgetLocaleList.cpp WidgetLocaleListCommands.cpp WizardEssenceDescriptor.cpp#WR
-	WizardSidecarCompositionMapGenerator.cpp WizardCompositionGenerator.cpp PreviewCommon.cpp Player.cpp
+	WizardSidecarCompositionMapGenerator.cpp WizardCompositionGenerator.cpp PreviewCommon.cpp Player.cpp WidgetXmlTree.cpp
 	)
 if(BUILD_APP5_SUPPORT)
 set(tool_src ${tool_src} As02AcesIStream.cpp ACES_Preview.cpp ACES_Decoder.cpp
@@ -89,7 +82,7 @@ set(tool_src ${tool_src} global.h MainWindow.h KMQtLogSink.h QtWaitingSpinner.h
 	WidgetCompositionInfo.h UndoProxyModel.h SafeBool.h JobQueue.h Jobs.h Error.h WizardPartialImpGenerator.h
 	WidgetVideoPreview.h WidgetImagePreview.h JP2K_Preview.h JP2K_Decoder.h TTMLParser.h WidgetTimedTextPreview.h TimelineParser.h SMPTE_Labels.h # (k)
 	WidgetContentVersionList.h WidgetContentVersionListCommands.h WidgetLocaleList.h WidgetLocaleListCommands.h WizardEssenceDescriptor.h# WR
-	WizardSidecarCompositionMapGenerator.h WizardCompositionGenerator.h PreviewCommon.h Player.h
+	WizardSidecarCompositionMapGenerator.h WizardCompositionGenerator.h PreviewCommon.h Player.h WidgetXmlTree.h
 	)
 if(BUILD_APP5_SUPPORT)
 set(tool_src ${tool_src} As02AcesIStream.h ACES_Preview.h ACES_Decoder.h
@@ -99,6 +92,7 @@ endif(BUILD_APP5_SUPPORT)
 set(synthesis_src synthesis/st0433-dcmlTypes.cpp synthesis/SMPTE-429-8-2006-PKL.cpp synthesis/SMPTE-429-9-2007-AM.cpp synthesis/SMPTE-2067-2-2013-Core.cpp 
 	synthesis/SMPTE-2067-3-2013-CPL.cpp synthesis/SMPTE-2067-100a-2014-OPL.cpp synthesis/xml.cpp synthesis/xmldsig-core-schema.cpp
 	synthesis/st2067-2a-2020-Core.cpp synthesis/st2067-2b-2020-PKL.cpp synthesis/st2067-3a-2020-CPL.cpp synthesis/SMPTE-2067-9a-2018-Sidecar.cpp
+	synthesis/st2067-203a-20XX.cpp synthesis/st2067-204a-20XX.cpp
 	)
 
 source_group("Resource Files" FILES ${qt_rcc_resources} ${win_resources} ${open_cl_src})
@@ -109,7 +103,7 @@ include_directories("${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/synth
 	"${asdcplib_include_DIR}" "${OPENJPEG_INCLUDE_DIRS}" "${REGXMLLIBC_INCLUDE_DIRS}")
 
 if(BUILD_APP5_SUPPORT)
-include_directories("${OpenEXRLib_include_DIR}/OpenEXR")
+include_directories("${OpenEXRLib_include_DIR}/OpenEXR" "${ImathLib_include_DIR}/Imath")
 endif(BUILD_APP5_SUPPORT)
 
 if(WIN32)
@@ -130,8 +124,8 @@ target_link_libraries(${EXE_NAME} general Qt5::Widgets
 	 )
 if(BUILD_APP5_SUPPORT)
 target_link_libraries(${EXE_NAME} 
-	 debug "${IlmBaseLib_Half_Debug_PATH}" optimized "${IlmBaseLib_Half_PATH}" debug "${IlmBaseLib_IlmThread_Debug_PATH}" optimized "${IlmBaseLib_IlmThread_PATH}" debug "${IlmBaseLib_Iex_Debug_PATH}" optimized "${IlmBaseLib_Iex_PATH}"
-	 debug "${IlmBaseLib_Imath_Debug_PATH}" optimized "${IlmBaseLib_Imath_PATH}" debug "${OpenEXRLib_IlmImf_Debug_PATH}" optimized "${OpenEXRLib_IlmImf_PATH}"
+	 debug "${IlmBaseLib_IlmThread_Debug_PATH}" optimized "${IlmBaseLib_IlmThread_PATH}" debug "${IlmBaseLib_Iex_Debug_PATH}" optimized "${IlmBaseLib_Iex_PATH}"
+	 debug "${IlmBaseLib_Imath_Debug_PATH}" optimized "${IlmBaseLib_Imath_PATH}" debug "${OpenEXRLib_OpenEXR_Debug_PATH}" optimized "${OpenEXRLib_OpenEXR_PATH}"
 	 )
 endif(BUILD_APP5_SUPPORT)
 

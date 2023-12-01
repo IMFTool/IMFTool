@@ -45,6 +45,7 @@ public:
 		ExitStatusError,
 		MetaDictionaryOpenError,
 		PhotonQcReport,
+		UnsupportedWrapping,
 		Unknown
 	};
 	//! Constructs empty error (IsError returns false).
@@ -97,6 +98,8 @@ public:
 				ret = QObject::tr("Couldn't open Meta Dictionary - CPLs will not contain proper Essence Descriptors!"); break;
 			case PhotonQcReport:
 				ret = QObject::tr("Error creating Photon QC report"); break;
+			case UnsupportedWrapping:
+				ret = QObject::tr("Unsupported MXF Wrapping"); break;
 			case Unknown:
 				ret = QObject::tr("Unknown error"); break;
 			default:

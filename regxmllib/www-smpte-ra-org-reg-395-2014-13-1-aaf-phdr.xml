@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--Created: Fri Apr 24 11:36:50 CEST 2020--><!--By: regxmllib build 51d295b54f74f6c0d89838614e53de6aed41013b--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
+<!--Created: Mon Nov 20 16:46:02 CET 2023--><!--By: regxmllib build 8f1fc70fa6af1bcb82804272241d6a2ad4057424--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
 <SchemeID>urn:uuid:21177fc2-e9cd-5fb5-7f18-50a997da0981</SchemeID>
 <SchemeURI>http://www.smpte-ra.org/reg/395/2014/13/1/aaf</SchemeURI>
 <MetaDefinitions>
@@ -1018,6 +1018,150 @@
 <IsConcrete>false</IsConcrete>
 </ClassDefinition>
 <ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01018101</Identification>
+<Symbol>HEVCSubDescriptor</Symbol>
+<Description>HEVC Sub-Descriptor</Description>
+<Name>HEVC Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01018102</Identification>
+<Symbol>JPEGXSSubDescriptor</Symbol>
+<Description>JPEG XS SubDescriptor</Description>
+<Name>JPEG XS SubDescriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01018103</Identification>
+<Symbol>FFV1PictureSubDescriptor</Symbol>
+<Description>FFV1 Picture Essence Descriptor</Description>
+<Name>FFV1PictureSubDescriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01018104</Identification>
+<Symbol>VC6SubDescriptor</Symbol>
+<Description>VC-6 Sub-Descriptor</Description>
+<Name>VC-6 Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01018105</Identification>
+<Symbol>VC6EchelonProperties</Symbol>
+<Description>Properties that describe an Echelon in a VC-6 bitstream</Description>
+<Name>VC-6 Echelon Properties</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01018106</Identification>
+<Symbol>MGASoundEssenceDescriptor</Symbol>
+<Description>MGA Sound Essence Descriptor</Description>
+<Name>MGA Sound Essence Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01014200</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01018107</Identification>
+<Symbol>MGAAudioMetadataSubDescriptor</Symbol>
+<Description>MGA Audio Metadata SubDescriptor</Description>
+<Name>MGA Audio Metadata SubDescriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01018108</Identification>
+<Symbol>MGASoundfieldGroupLabelSubDescriptor</Symbol>
+<Description>MGA Soundfield Group Label SubDescriptor</Description>
+<Name>MGA Soundfield Group Label SubDescriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01016c00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01018109</Identification>
+<Symbol>SADMAudioMetadataSubDescriptor</Symbol>
+<Description>S-ADM Audio Metadata SubDescriptor</Description>
+<Name>S-ADM Audio Metadata SubDescriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810a</Identification>
+<Symbol>SupplementalDataEssenceDescriptor</Symbol>
+<Description>Defines a Supplemental Data Descriptor</Description>
+<Name>Supplemental Data Essence Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01014300</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810b</Identification>
+<Symbol>DataStreamSubDescriptor</Symbol>
+<Description>Defines an Data Stream SubDescriptor</Description>
+<Name>Data Stream SubDescriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810c</Identification>
+<Symbol>DataStreamDeviceSubDescriptor</Symbol>
+<Description>Defines a Data Stream Device SubDescriptor</Description>
+<Name>Data Stream Device SubDescriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810b</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810d</Identification>
+<Symbol>RIFFChunkDefinitionSubDescriptor</Symbol>
+<Description>RIFF Chunk Definition Sub-Descriptor</Description>
+<Name>RIFF Chunk Definition Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810e</Identification>
+<Symbol>ADM_CHNASubDescriptor</Symbol>
+<Description>ADM CHNA Sub-Descriptor</Description>
+<Name>ADM CHNA Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810f</Identification>
+<Symbol>ADMChannelMapping</Symbol>
+<Description>ADM Channel Mapping</Description>
+<Name>ADM Channel Mapping</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01018110</Identification>
+<Symbol>RIFFChunkReferencesSubDescriptor</Symbol>
+<Description>RIFF Chunk References Sub-Descriptor</Description>
+<Name>RIFF Chunk References Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01018111</Identification>
+<Symbol>ADMAudioMetadataSubDescriptor</Symbol>
+<Description>ADM Audio Metadata Sub-Descriptor</Description>
+<Name>ADM Audio Metadata Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.01018112</Identification>
+<Symbol>ADMSoundfieldGroupLabelSubDescriptor</Symbol>
+<Description>ADM Soundfield Group Label Sub-Descriptor</Description>
+<Name>ADM Soundfield Group Label Sub-Descriptor</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01016c00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
 <Identification>urn:smpte:ul:060e2b34.027f0101.0d010101.02010000</Identification>
 <Symbol>ClassDefinition</Symbol>
 <Description>Class Definition</Description>
@@ -1599,6 +1743,244 @@
 <Description>EIDR Descriptive Metadata Framework</Description>
 <Name>EIDR Framework</Name>
 <ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.00000000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06010100</Identification>
+<Symbol>DescriptiveSchemeDefinition</Symbol>
+<Description>Descriptive Scheme Definition</Description>
+<Name>DescriptiveSchemeDefinition</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01011a00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06010200</Identification>
+<Symbol>DescriptiveFrameworkDefinition</Symbol>
+<Description>Descriptive Framework Definition</Description>
+<Name>DescriptiveFrameworkDefinition</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01011a00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06010300</Identification>
+<Symbol>ObjectConstraintDefinition</Symbol>
+<Description>Object Constraint Definition</Description>
+<Name>ObjectConstraintDefinition</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01011a00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06010400</Identification>
+<Symbol>TLCSchemeDefinition</Symbol>
+<Description>TLC Scheme Definition</Description>
+<Name>TLCSchemeDefinition</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.06010100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06020100</Identification>
+<Symbol>TLCTrack</Symbol>
+<Description>TLC Track</Description>
+<Name>TLCTrack</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01013900</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06020200</Identification>
+<Symbol>TLCSequence</Symbol>
+<Description>TLC Sequence</Description>
+<Name>TLCSequence</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010f00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06020300</Identification>
+<Symbol>DescriptiveDerivedComponent</Symbol>
+<Description>Descriptive Derived Component</Description>
+<Name>DescriptiveDerivedComponent</Name>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06020400</Identification>
+<Symbol>TLCDerivedComponent</Symbol>
+<Description>TLC Derived Component</Description>
+<Name>TLCDerivedComponent</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.06020300</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06020500</Identification>
+<Symbol>TLCSegment</Symbol>
+<Description>TLC Segment</Description>
+<Name>TLCSegment</Name>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06020600</Identification>
+<Symbol>TLCLabel</Symbol>
+<Description>TLC Label</Description>
+<Name>TLCLabel</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.00000000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06020700</Identification>
+<Symbol>TLCItem</Symbol>
+<Description>TLC Item</Description>
+<Name>TLCItem</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010400.00000000</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06030100</Identification>
+<Symbol>TLCFixedItem</Symbol>
+<Description>TLC Fixed Item</Description>
+<Name>TLCFixedItem</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.06020700</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06030200</Identification>
+<Symbol>TLCSourceName</Symbol>
+<Description>TLC Source Name</Description>
+<Name>TLCSourceName</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.06030100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06030300</Identification>
+<Symbol>TLCSourceIdentifier</Symbol>
+<Description>TLC Source Identifier</Description>
+<Name>TLCSourceIdentifier</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.06030100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06030400</Identification>
+<Symbol>TLC_BasicUMID</Symbol>
+<Description>TLC Basic UMID</Description>
+<Name>TLC_BasicUMID</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.06030100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06030500</Identification>
+<Symbol>TLCDynamicItem</Symbol>
+<Description>TLC Dynamic  Item</Description>
+<Name>TLCDynamicItem</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.06020700</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06030600</Identification>
+<Symbol>TLCMediaCount</Symbol>
+<Description>TLC Media Count</Description>
+<Name>TLCMediaCount</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.06030500</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06030700</Identification>
+<Symbol>TLCIntervalItem</Symbol>
+<Description>TLC Interval Item</Description>
+<Name>TLCIntervalItem</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.06030500</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06030800</Identification>
+<Symbol>TLCBasicTimecode</Symbol>
+<Description>TLC Basic Timecode</Description>
+<Name>TLCBasicTimecode</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.06030700</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06030900</Identification>
+<Symbol>TLCEdgeCode</Symbol>
+<Description>TLC Edge Code</Description>
+<Name>TLCEdgeCode</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.06030500</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06030a00</Identification>
+<Symbol>TLCAugmentedTimecode</Symbol>
+<Description>TLC Augmented Timecode</Description>
+<Name>TLCAugmentedTimecode</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.06030800</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06030b00</Identification>
+<Symbol>TLC_ST2059_1</Symbol>
+<Description>TLC ST12</Description>
+<Name>TLC_ST2059_1</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.06030800</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06030c00</Identification>
+<Symbol>TLC_IEEE1588</Symbol>
+<Description>TLC IEEE1588</Description>
+<Name>TLC_IEEE1588</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.06030700</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06030d00</Identification>
+<Symbol>TLCIncrement</Symbol>
+<Description>TLC Increment</Description>
+<Name>TLCIncrement</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06030e00</Identification>
+<Symbol>TLCTimeScale</Symbol>
+<Description>TLC Time Scale</Description>
+<Name>TLCTimeScale</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06030f00</Identification>
+<Symbol>TLCTimeZone</Symbol>
+<Description>TLC Time Zone</Description>
+<Name>TLCTimeZone</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06031000</Identification>
+<Symbol>TLCCalendar</Symbol>
+<Description>TLC Calendar</Description>
+<Name>TLCCalendar</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01010100</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06031100</Identification>
+<Symbol>TLC_ST12</Symbol>
+<Description>TLC ST12</Description>
+<Name>TLC_ST12</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.06030b00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06031200</Identification>
+<Symbol>TLC_ST2059_2</Symbol>
+<Description>TLC ST2059-2</Description>
+<Name>TLC_ST2059_2</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.06030c00</ParentClass>
+<IsConcrete>true</IsConcrete>
+</ClassDefinition>
+<ClassDefinition>
+<Identification>urn:smpte:ul:060e2b34.027f0101.0d010401.06031300</Identification>
+<Symbol>TLC_NTP</Symbol>
+<Description>TLC NTP</Description>
+<Name>TLC_NTP</Name>
+<ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010401.06030700</ParentClass>
 <IsConcrete>true</IsConcrete>
 </ClassDefinition>
 <ClassDefinition>

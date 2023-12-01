@@ -217,6 +217,18 @@ bool GraphicsWidgetSequence::ExtendGrid(QPointF &rPoint, eGridPosition which) co
 			}
 			else return false;
 			break;
+		case MGASADMSignalSequence:
+			if(which == SADMHorizontal) {
+				ret.setY(boundingRect().center().y());
+			}
+			else return false;
+			break;
+		case ADMAudioSequence:
+			if(which == ADMHorizontal) {
+				ret.setY(boundingRect().center().y());
+			}
+			else return false;
+			break;
 		case MarkerSequence:
 			if(which == MarkerHorizontal) {
 				ret.setY(boundingRect().center().y());

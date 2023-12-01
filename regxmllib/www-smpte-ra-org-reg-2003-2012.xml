@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--Created: Fri Apr 24 11:36:50 CEST 2020--><!--By: regxmllib build 51d295b54f74f6c0d89838614e53de6aed41013b--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
+<!--Created: Mon Nov 20 16:46:02 CET 2023--><!--By: regxmllib build 8f1fc70fa6af1bcb82804272241d6a2ad4057424--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
 <SchemeID>urn:uuid:eb4c6bf8-c197-5ffe-7f01-2123ea606f17</SchemeID>
 <SchemeURI>http://www.smpte-ra.org/reg/2003/2012</SchemeURI>
 <MetaDefinitions>
@@ -115,6 +115,12 @@
 <RenamedType>urn:smpte:ul:060e2b34.01040101.01010300.00000000</RenamedType>
 </TypeDefinitionRename>
 <TypeDefinitionRename>
+<Identification>urn:smpte:ul:060e2b34.01040101.0101200a.00000000</Identification>
+<Symbol>ST12_3</Symbol>
+<Name>ST12-3</Name>
+<RenamedType>urn:smpte:ul:060e2b34.01040101.01010400.00000000</RenamedType>
+</TypeDefinitionRename>
+<TypeDefinitionRename>
 <Identification>urn:smpte:ul:060e2b34.01040101.01012300.00000000</Identification>
 <Symbol>PhaseFrameType</Symbol>
 <Name>PhaseFrameType</Name>
@@ -127,18 +133,29 @@
 <Size>4</Size>
 <IsSigned>true</IsSigned>
 </TypeDefinitionInteger>
-<TypeDefinitionFloat>
-<Identification>urn:smpte:ul:060e2b34.01040101.01020200.00000000</Identification>
-<Symbol>Double</Symbol>
-<Name>Double</Name>
-<Size>8</Size>
-</TypeDefinitionFloat>
-<TypeDefinitionFloat>
+<TypeDefinitionInteger>
 <Identification>urn:smpte:ul:060e2b34.01040101.01020300.00000000</Identification>
 <Symbol>HalfFloat</Symbol>
+<Description>binary16 of IEEE 754</Description>
 <Name>HalfFloat</Name>
 <Size>2</Size>
-</TypeDefinitionFloat>
+<IsSigned>true</IsSigned>
+</TypeDefinitionInteger>
+<TypeDefinitionInteger>
+<Identification>urn:smpte:ul:060e2b34.01040101.01020400.00000000</Identification>
+<Symbol>LensSerialHalfFloat</Symbol>
+<Description>Section 5.5.1 of SMPTE RP 215:2009</Description>
+<Name>LensSerialHalfFloat</Name>
+<Size>2</Size>
+<IsSigned>false</IsSigned>
+</TypeDefinitionInteger>
+<TypeDefinitionInteger>
+<Identification>urn:smpte:ul:060e2b34.01040101.01020500.00000000</Identification>
+<Symbol>SingleFloat</Symbol>
+<Name>SingleFloat</Name>
+<Size>4</Size>
+<IsSigned>true</IsSigned>
+</TypeDefinitionInteger>
 <TypeDefinitionRecord>
 <Identification>urn:smpte:ul:060e2b34.01040101.01030100.00000000</Identification>
 <Symbol>AUID</Symbol>
@@ -951,6 +968,8 @@
 <Value>3</Value>
 <Name>ColorCorrectionFilterWheelSetting_CCFilter5600K</Name>
 <Value>4</Value>
+<Name>ColorCorrectionFilterWheelSetting_Undefined</Name>
+<Value>255</Value>
 </Elements>
 </TypeDefinitionEnumeration>
 <TypeDefinitionEnumeration>
@@ -965,6 +984,8 @@
 <Value>1</Value>
 <Name>ImageSensorReadoutMode_ProgressiveFrame</Name>
 <Value>2</Value>
+<Name>ImageSensorReadoutMode_Undefined</Name>
+<Value>255</Value>
 </Elements>
 </TypeDefinitionEnumeration>
 <TypeDefinitionEnumeration>
@@ -981,6 +1002,8 @@
 <Value>2</Value>
 <Name>AutoWhiteBalanceMode_OnePushWhiteBalanceSetup</Name>
 <Value>3</Value>
+<Name>AutoWhiteBalanceMode_Undefined</Name>
+<Value>255</Value>
 </Elements>
 </TypeDefinitionEnumeration>
 <TypeDefinitionEnumeration>
@@ -999,6 +1022,8 @@
 <Value>3</Value>
 <Name>AutoFocusSensingAreaSetting_SingleSpotSensingAutoFocusMode</Name>
 <Value>4</Value>
+<Name>AutoFocusSensingAreaSetting_Undefined</Name>
+<Value>255</Value>
 </Elements>
 </TypeDefinitionEnumeration>
 <TypeDefinitionEnumeration>
@@ -1013,6 +1038,28 @@
 <Value>1</Value>
 <Name>HEVCCodedContent_InterlacedFieldPicture</Name>
 <Value>2</Value>
+</Elements>
+</TypeDefinitionEnumeration>
+<TypeDefinitionEnumeration>
+<Identification>urn:smpte:ul:060e2b34.01040101.02010134.00000000</Identification>
+<Symbol>LuminanceCodeRangeType</Symbol>
+<Name>LuminanceCodeRangeType</Name>
+<ElementType>urn:smpte:ul:060e2b34.01040101.01010100.00000000</ElementType>
+<Elements>
+<Name>LuminanceCodeRange_UnknownCode</Name>
+<Value>0</Value>
+<Name>LuminanceCodeRange_UnknownPicture</Name>
+<Value>1</Value>
+<Name>LuminanceCodeRange_FullScaledCode</Name>
+<Value>2</Value>
+<Name>LuminanceCodeRange_FullScaledPicture</Name>
+<Value>3</Value>
+<Name>LuminanceCodeRange_NormalVideo</Name>
+<Value>5</Value>
+<Name>LuminanceCodeRange_VideoRangedCode</Name>
+<Value>6</Value>
+<Name>LuminanceCodeRange_LimitedRangeVideo</Name>
+<Value>7</Value>
 </Elements>
 </TypeDefinitionEnumeration>
 <TypeDefinitionEnumeration>
@@ -1055,6 +1102,11 @@
 <Identification>urn:smpte:ul:060e2b34.01040101.02020101.00000000</Identification>
 <Symbol>OperationCategoryType</Symbol>
 <Name>OperationCategoryType</Name>
+</TypeDefinitionExtendibleEnumeration>
+<TypeDefinitionExtendibleEnumeration>
+<Identification>urn:smpte:ul:060e2b34.01040101.02020102.00000000</Identification>
+<Symbol>TransferCharacteristicType</Symbol>
+<Name>Transfer Characteristic Type</Name>
 </TypeDefinitionExtendibleEnumeration>
 <TypeDefinitionExtendibleEnumeration>
 <Identification>urn:smpte:ul:060e2b34.01040101.02020103.00000000</Identification>
@@ -1273,6 +1325,26 @@
 <Type>urn:smpte:ul:060e2b34.01040101.01010800.00000000</Type>
 </Members>
 </TypeDefinitionRecord>
+<TypeDefinitionRecord>
+<Identification>urn:smpte:ul:060e2b34.01040101.03011100.00000000</Identification>
+<Symbol>BasicTimecode_Count</Symbol>
+<Description>Basic Timecode Record</Description>
+<Name>BasicTimecode_Count</Name>
+<Members>
+<Name>Frames</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01012001.00000000</Type>
+</Members>
+</TypeDefinitionRecord>
+<TypeDefinitionRecord>
+<Identification>urn:smpte:ul:060e2b34.01040101.03011300.00000000</Identification>
+<Symbol>TLC_time64_t</Symbol>
+<Description>NTP Record</Description>
+<Name>TLC_time64_t</Name>
+<Members>
+<Name>Seconds</Name>
+<Type>urn:smpte:ul:060e2b34.01040101.01010800.00000000</Type>
+</Members>
+</TypeDefinitionRecord>
 <TypeDefinitionVariableArray>
 <Identification>urn:smpte:ul:060e2b34.01040101.04010100.00000000</Identification>
 <Symbol>UInt8Array</Symbol>
@@ -1390,12 +1462,6 @@
 <ElementType>urn:smpte:ul:060e2b34.01040101.01010200.00000000</ElementType>
 </TypeDefinitionVariableArray>
 <TypeDefinitionVariableArray>
-<Identification>urn:smpte:ul:060e2b34.01040101.04011300.00000000</Identification>
-<Symbol>HalfFloatArray</Symbol>
-<Name>HalfFloatArray</Name>
-<ElementType>urn:smpte:ul:060e2b34.01040101.01020300.00000000</ElementType>
-</TypeDefinitionVariableArray>
-<TypeDefinitionVariableArray>
 <Identification>urn:smpte:ul:060e2b34.01040101.04011400.00000000</Identification>
 <Symbol>VC2WaveletArray</Symbol>
 <Name>VC2 Wavelet Array</Name>
@@ -1406,6 +1472,18 @@
 <Symbol>UUIDArray</Symbol>
 <Name>UUIDArray</Name>
 <ElementType>urn:smpte:ul:060e2b34.01040101.01030300.00000000</ElementType>
+</TypeDefinitionVariableArray>
+<TypeDefinitionVariableArray>
+<Identification>urn:smpte:ul:060e2b34.01040101.04011600.00000000</Identification>
+<Symbol>HalfFloatArray</Symbol>
+<Name>HalfFloatArray</Name>
+<ElementType>urn:smpte:ul:060e2b34.01040101.01020300.00000000</ElementType>
+</TypeDefinitionVariableArray>
+<TypeDefinitionVariableArray>
+<Identification>urn:smpte:ul:060e2b34.01040101.04011700.00000000</Identification>
+<Symbol>SingleFloatArray</Symbol>
+<Name>SingleFloatArray</Name>
+<ElementType>urn:smpte:ul:060e2b34.01040101.01020500.00000000</ElementType>
 </TypeDefinitionVariableArray>
 <TypeDefinitionFixedArray>
 <Identification>urn:smpte:ul:060e2b34.01040101.04020100.00000000</Identification>
@@ -1977,6 +2055,67 @@
 <Name>MetaDefinitionStrongReference</Name>
 <ReferencedType>urn:smpte:ul:060e2b34.027f0101.0d010101.02240000</ReferencedType>
 </TypeDefinitionStrongObjectReference>
+<TypeDefinitionStrongObjectReference>
+<Identification>urn:smpte:ul:060e2b34.01040101.05023200.00000000</Identification>
+<Symbol>VC6EchelonPropertiesStrongReference</Symbol>
+<Name>VC-6 Echelon Properties Strong Reference</Name>
+<ReferencedType>urn:smpte:ul:060e2b34.027f0101.0d010101.01018105</ReferencedType>
+</TypeDefinitionStrongObjectReference>
+<TypeDefinitionStrongObjectReference>
+<Identification>urn:smpte:ul:060e2b34.01040101.05023300.00000000</Identification>
+<Symbol>ADMChannelMappingStrongReference</Symbol>
+<Name>ADMChannelMappingStrongReference</Name>
+<ReferencedType>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810f</ReferencedType>
+</TypeDefinitionStrongObjectReference>
+<TypeDefinitionStrongObjectReference>
+<Identification>urn:smpte:ul:060e2b34.01040101.05023400.00000000</Identification>
+<Symbol>DescriptiveFrameworkDefinitionStrongReference</Symbol>
+<Description>DescriptiveFrameworkDefinitionStrongReference</Description>
+<Name>DescriptiveFrameworkDefinitionStrongReference</Name>
+<ReferencedType>urn:smpte:ul:060e2b34.027f0101.0d010401.06010200</ReferencedType>
+</TypeDefinitionStrongObjectReference>
+<TypeDefinitionStrongObjectReference>
+<Identification>urn:smpte:ul:060e2b34.01040101.05023500.00000000</Identification>
+<Symbol>ObjectConstraintDefinitionStrongReference</Symbol>
+<Description>ObjectConstraintDefinitionStrongReference</Description>
+<Name>ObjectConstraintDefinitionStrongReference</Name>
+<ReferencedType>urn:smpte:ul:060e2b34.027f0101.0d010401.06010300</ReferencedType>
+</TypeDefinitionStrongObjectReference>
+<TypeDefinitionStrongObjectReference>
+<Identification>urn:smpte:ul:060e2b34.01040101.05023600.00000000</Identification>
+<Symbol>DescriptiveSchemeDefinitionStrongReference</Symbol>
+<Description>DescriptiveSchemeDefinitionStrongReference</Description>
+<Name>DescriptiveSchemeDefinitionStrongReference</Name>
+<ReferencedType>urn:smpte:ul:060e2b34.027f0101.0d010401.06010100</ReferencedType>
+</TypeDefinitionStrongObjectReference>
+<TypeDefinitionStrongObjectReference>
+<Identification>urn:smpte:ul:060e2b34.01040101.05023700.00000000</Identification>
+<Symbol>TLCIncrementStrongReference</Symbol>
+<Description>StrongReference to TLCIncrement</Description>
+<Name>TLCIncrementStrongReference</Name>
+<ReferencedType>urn:smpte:ul:060e2b34.027f0101.0d010401.06030d00</ReferencedType>
+</TypeDefinitionStrongObjectReference>
+<TypeDefinitionStrongObjectReference>
+<Identification>urn:smpte:ul:060e2b34.01040101.05023800.00000000</Identification>
+<Symbol>TLCTimeScaleStrongReference</Symbol>
+<Description>StrongReference to TLCTimeScale</Description>
+<Name>TLCTimeScaleStrongReference</Name>
+<ReferencedType>urn:smpte:ul:060e2b34.027f0101.0d010401.06030e00</ReferencedType>
+</TypeDefinitionStrongObjectReference>
+<TypeDefinitionStrongObjectReference>
+<Identification>urn:smpte:ul:060e2b34.01040101.05023900.00000000</Identification>
+<Symbol>TLCTimeZoneStrongReference</Symbol>
+<Description>StrongReference to TLCTimeZone</Description>
+<Name>TLCTimeZoneStrongReference</Name>
+<ReferencedType>urn:smpte:ul:060e2b34.027f0101.0d010401.06030f00</ReferencedType>
+</TypeDefinitionStrongObjectReference>
+<TypeDefinitionStrongObjectReference>
+<Identification>urn:smpte:ul:060e2b34.01040101.05023a00.00000000</Identification>
+<Symbol>TLCCalendarStrongReference</Symbol>
+<Description>StrongReference to TLCCalendar</Description>
+<Name>TLCCalendarStrongReference</Name>
+<ReferencedType>urn:smpte:ul:060e2b34.027f0101.0d010401.06031000</ReferencedType>
+</TypeDefinitionStrongObjectReference>
 <TypeDefinitionSet>
 <Identification>urn:smpte:ul:060e2b34.01040101.05030d00.00000000</Identification>
 <Symbol>DataDefinitionWeakReferenceSet</Symbol>
@@ -2139,6 +2278,27 @@
 <Name>MetaDefinitionStrongReferenceSet</Name>
 <ElementType>urn:smpte:ul:060e2b34.01040101.05023100.00000000</ElementType>
 </TypeDefinitionSet>
+<TypeDefinitionSet>
+<Identification>urn:smpte:ul:060e2b34.01040101.05051400.00000000</Identification>
+<Symbol>DescriptiveFrameworkDefinitionStrongReferenceSet</Symbol>
+<Description>Descriptive Framework Definition StrongReferenceSet</Description>
+<Name>DescriptiveFrameworkDefinitionStrongReferenceSet</Name>
+<ElementType>urn:smpte:ul:060e2b34.01040101.05023400.00000000</ElementType>
+</TypeDefinitionSet>
+<TypeDefinitionSet>
+<Identification>urn:smpte:ul:060e2b34.01040101.05051500.00000000</Identification>
+<Symbol>ObjectConstraintDefinitionStrongReferenceSet</Symbol>
+<Description>Object Constraint Definition StrongReferenceSet</Description>
+<Name>ObjectConstraintDefinitionStrongReferenceSet</Name>
+<ElementType>urn:smpte:ul:060e2b34.01040101.05023500.00000000</ElementType>
+</TypeDefinitionSet>
+<TypeDefinitionSet>
+<Identification>urn:smpte:ul:060e2b34.01040101.05051600.00000000</Identification>
+<Symbol>DescriptiveSchemeDefinitionStrongReferenceSet</Symbol>
+<Description>Descriptive Scheme Definition StrongReferenceSet</Description>
+<Name>DescriptiveSchemeDefinitionStrongReferenceSet</Name>
+<ElementType>urn:smpte:ul:060e2b34.01040101.05023600.00000000</ElementType>
+</TypeDefinitionSet>
 <TypeDefinitionVariableArray>
 <Identification>urn:smpte:ul:060e2b34.01040101.05060100.00000000</Identification>
 <Symbol>ComponentStrongReferenceVector</Symbol>
@@ -2223,6 +2383,18 @@
 <Name>SubDescriptorStrongReferenceVector</Name>
 <ElementType>urn:smpte:ul:060e2b34.01040101.05022600.00000000</ElementType>
 </TypeDefinitionVariableArray>
+<TypeDefinitionVariableArray>
+<Identification>urn:smpte:ul:060e2b34.01040101.05061000.00000000</Identification>
+<Symbol>VC6EchelonPropertiesStrongReferenceArray</Symbol>
+<Name>VC-6 Echelon Properties Strong Reference in an ordered Array</Name>
+<ElementType>urn:smpte:ul:060e2b34.01040101.05023200.00000000</ElementType>
+</TypeDefinitionVariableArray>
+<TypeDefinitionVariableArray>
+<Identification>urn:smpte:ul:060e2b34.01040101.05061100.00000000</Identification>
+<Symbol>ADMChannelMappingStrongReferenceVector</Symbol>
+<Name>ADMChannelMappingStrongReferenceVector</Name>
+<ElementType>urn:smpte:ul:060e2b34.01040101.05023300.00000000</ElementType>
+</TypeDefinitionVariableArray>
 <TypeDefinitionSet>
 <Identification>urn:smpte:ul:060e2b34.01040101.05070100.00000000</Identification>
 <Symbol>ParticipantGlobalReferenceSet</Symbol>
@@ -2294,10 +2466,5 @@
 <ReferencedType>urn:smpte:ul:060e2b34.027f0101.0d010101.01014100</ReferencedType>
 <TargetSet/>
 </TypeDefinitionWeakObjectReference>
-<TypeDefinitionExtendibleEnumeration>
-<Identification>urn:smpte:ul:060e2b34.01040101.02020102.00000000</Identification>
-<Symbol>TransferCharacteristicType</Symbol>
-<Name>Transfer Characteristic Type</Name>
-</TypeDefinitionExtendibleEnumeration>
 </MetaDefinitions>
 </Extension>

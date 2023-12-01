@@ -19,15 +19,15 @@
 #include "Error.h"
 #include "ImfPackage.h"
 
+#if defined WIN32
+//Caused by a persisting linking error in Imath: https://github.com/AcademySoftwareFoundation/Imath/issues/212
+#define IMATH_HALF_NO_LOOKUP_TABLE
+#endif
 #include "ACES.h"
 #include "AS_02_ACES.h"
 #include "ImfRgbaFile.h"
-#include "ImfFrameBuffer.h"
-#include "ImfStandardAttributes.h"
 #include "ImfChromaticities.h"
-#include "ImfRgba.h"
 #include "ImfArray.h"
-#include "ImathMatrix.h"
 #include "As02AcesIStream.h"
 #include "PreviewCommon.h"
 

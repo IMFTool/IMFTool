@@ -42,8 +42,8 @@ public:
 	virtual ~As02AcesIStream() {}
 	As02AcesIStream(const As02AcesIStream &rOther);
 	virtual bool read(char c[], int n);
-	virtual Imf::Int64 tellg();
-	virtual void seekg(Imf::Int64 pos);
+	virtual uint64_t tellg();
+	virtual void seekg(uint64_t pos);
 	virtual void clear();
 	void InitBuffer(const AS_02::ACES::FrameBuffer &rBuffer);
 

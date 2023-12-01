@@ -98,6 +98,16 @@ GraphicsSceneBase::GridInfo GraphicsSceneBase::SnapToGrid(const QPointF &rPoint,
 				use = p_base_graphics_widget->ExtendGrid(proposed_point, IABHorizontal);
 				if(use && snap_rect.contains(proposed_point)) horizontal_sigularities.push_back(QPair<qreal, AbstractGridExtension*>(proposed_point.y(), p_base_graphics_widget));
 			}
+			if(which & SADMHorizontal) {
+				QPointF proposed_point(rPoint);
+				use = p_base_graphics_widget->ExtendGrid(proposed_point, SADMHorizontal);
+				if(use && snap_rect.contains(proposed_point)) horizontal_sigularities.push_back(QPair<qreal, AbstractGridExtension*>(proposed_point.y(), p_base_graphics_widget));
+			}
+			if(which & ADMHorizontal) {
+				QPointF proposed_point(rPoint);
+				use = p_base_graphics_widget->ExtendGrid(proposed_point, ADMHorizontal);
+				if(use && snap_rect.contains(proposed_point)) horizontal_sigularities.push_back(QPair<qreal, AbstractGridExtension*>(proposed_point.y(), p_base_graphics_widget));
+			}
 		}
 	}
 	AbstractGridExtension *p_final_snap_item_vertical = NULL;
@@ -313,6 +323,12 @@ void GraphicsSceneComposition::ProcessDragMove(DragDropInfo &rInfo, const QPoint
 					break;
 				case GraphicsWidgetIABResourceType:
 					grid_type |= IABHorizontal;
+					break;
+				case GraphicsWidgetSADMResourceType:
+					grid_type |= SADMHorizontal;
+					break;
+				case GraphicsWidgetADMResourceType:
+					grid_type |= ADMHorizontal;
 					break;
 			}
 			GraphicsSceneComposition::GridInfo grid_info_left = SnapToGrid(QPointF(scene_pos.x() - offset_left, rScenePos.y()), grid_type, QRectF(), mpGhost);
@@ -581,6 +597,24 @@ void GraphicsSceneComposition::ProcessDragMove(DragDropInfo &rInfo, const QPoint
 					}
 				}
 
+				else if(p_origin_resource->type() == GraphicsWidgetSADMResourceType) {
+					// Per 2067-203, The Edit Rate shall be an integer multiple of the Edit Rate of the Main Image Virtual Track
+					if(p_origin_resource->GetAsset() &&
+							( p_origin_resource->GetAsset()->GetEditRate().GetNumerator() % GetCplEditRate().GetNumerator() == 0)
+								&& (p_origin_resource->GetAsset()->GetEditRate().GetDenominator() == GetCplEditRate().GetDenominator())) {
+						rInfo.isDropable = true;
+					}
+					else {
+						get_main_window()->statusBar()->setStyleSheet("QStatusBar{color:red}");
+						get_main_window()->statusBar()->showMessage(tr("S-ADM sample rate mismatch: %1 expected.").arg(GetCplEditRate().GetQuotient(), 0, 'f', 2), 5000);
+					}
+				}
+
+				else if(p_origin_resource->type() == GraphicsWidgetADMResourceType) {
+					// TODO 2067-204 edit rate
+					rInfo.isDropable = true;
+				}
+
 				if((dummy_right != NULL && dummy_right == dummy_left) || (rInfo.pSegment && dummy_left != NULL && rInfo.pSegment->isAncestorOf(dummy_left))) {
 					if(rInfo.isDropable == true) {
 						get_main_window()->statusBar()->setStyleSheet("QStatusBar{color:red}");
@@ -781,6 +815,8 @@ void GraphicsSceneComposition::keyPressEvent(QKeyEvent *pEvent) {
 				case	GraphicsWidgetTimedTextResourceType:
 				case 	GraphicsWidgetISXDResourceType:
 				case 	GraphicsWidgetIABResourceType:
+				case 	GraphicsWidgetSADMResourceType:
+				case 	GraphicsWidgetADMResourceType:
 					emit PushCommand(new RemoveResourceCommand(static_cast<AbstractGraphicsWidgetResource*>(p_item), static_cast<AbstractGraphicsWidgetResource*>(p_item)->GetSequence()));
 					break;
 				case GraphicsWidgetMarkerType:
@@ -947,6 +983,22 @@ void GraphicsSceneComposition::dragEnterEvent(QGraphicsSceneDragDropEvent *pEven
 
 					case Metadata::IAB:
 						p_resource = new GraphicsWidgetIABResource(NULL, asset);
+						p_resource->hide();
+						addItem(p_resource);
+						ProcessInitDrag(mDropInfo, p_resource, pEvent->scenePos().toPoint(), QPoint(p_resource->boundingRect().center().toPoint()));
+						accept = true;
+						break;
+
+					case Metadata::SADM:
+						p_resource = new GraphicsWidgetSADMResource(NULL, asset);
+						p_resource->hide();
+						addItem(p_resource);
+						ProcessInitDrag(mDropInfo, p_resource, pEvent->scenePos().toPoint(), QPoint(p_resource->boundingRect().center().toPoint()));
+						accept = true;
+						break;
+
+					case Metadata::ADM:
+						p_resource = new GraphicsWidgetADMResource(NULL, asset);
 						p_resource->hide();
 						addItem(p_resource);
 						ProcessInitDrag(mDropInfo, p_resource, pEvent->scenePos().toPoint(), QPoint(p_resource->boundingRect().center().toPoint()));

@@ -1443,6 +1443,12 @@ void AssetMxfTrack::SetDefaultProxyImages() {
 		case Metadata::ISXD:
 			mFirstProxyImage = QImage(":/proxy_xml.png");
 			break;
+		case Metadata::SADM:
+			mFirstProxyImage = QImage(":/proxy_iab_sound.png");
+			break;
+		case Metadata::ADM:
+			mFirstProxyImage = QImage(":/proxy_iab_sound.png");
+			break;
 		case Metadata::Unknown_Type:
 		default:
 			mFirstProxyImage = QImage(":/proxy_unknown.png");
@@ -1537,9 +1543,33 @@ Error AssetMxfTrack::ExtractEssenceDescriptor(const QString &filePath) {
 		error = Error(Error::EssenceDescriptorExtraction);
 
 	}
+	class MyEventHandler : public rxml::EventHandler {
+	public:
+		virtual bool info(const std::string &code, const std::string &reason, const std::string &where) {
+			std::cerr << code << ": " << reason << " at " << where << std::endl;
+			return true;
+		}
+
+		virtual bool warn(const std::string &code, const std::string &reason, const std::string &where) {
+			std::cerr << code << ": " << reason << " at " << where << std::endl;
+			return true;
+		}
+
+		virtual bool error(const std::string &code, const std::string &reason, const std::string &where) {
+			std::cerr << code << ": " << reason << " at " << where << std::endl;
+			return true;
+		}
+
+		virtual bool fatal(const std::string &code, const std::string &reason, const std::string &where) {
+			std::cerr << code << ": " << reason << " at " << where << std::endl;
+			return true;
+		}
+
+	};
 	static const rxml::UL ESSENCE_DESCRIPTOR_KEY = "urn:smpte:ul:060e2b34.02010101.0d010101.01012400";
 	const rxml::AUID* ed_auid = new rxml::AUID(ESSENCE_DESCRIPTOR_KEY);
-	DOMDocumentFragment* frag = MXFFragmentBuilder::fromInputStream(f, mds, NULL, ed_auid, *doc);
+	MyEventHandler ev;
+	DOMDocumentFragment* frag = MXFFragmentBuilder::fromInputStream(f, mds, NULL, ed_auid, *doc, &ev);
 
 	doc->appendChild(frag);
 

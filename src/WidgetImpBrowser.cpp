@@ -162,7 +162,8 @@ void WidgetImpBrowser::InitToolbar() {
 	connect(p_add_pcm_resource, SIGNAL(triggered(bool)), this, SLOT(ShowResourceGeneratorWavMode()));
 	QAction *p_add_ttml_resource = p_add_track_menu->addAction(QIcon(":/text.png"), tr("Wrap Timed Text Essence"));
 	connect(p_add_ttml_resource, SIGNAL(triggered(bool)), this, SLOT(ShowResourceGeneratorTimedTextMode()));
-	//p_add_ttml_resource->setDisabled(true);
+	QAction *p_add_isxd_resource = p_add_track_menu->addAction(QIcon(":/text.png"), tr("Wrap ISXD"));
+	connect(p_add_isxd_resource, SIGNAL(triggered(bool)), this, SLOT(ShowResourceGeneratorIsxdMode()));
 	p_add_track_menu->addSeparator();
 	QAction *p_add_cpl_asset = p_add_track_menu->addAction(QIcon(":/asset_cpl.png"), tr("Composition Playlist"));
 	connect(p_add_cpl_asset, SIGNAL(triggered(bool)), this, SLOT(ShowCompositionGenerator()));
@@ -449,6 +450,15 @@ void WidgetImpBrowser::ShowResourceGeneratorTimedTextMode() {
 }
 		/* -----Denis Manthey End----- */
 
+void WidgetImpBrowser::ShowResourceGeneratorIsxdMode() {
+
+	WizardResourceGenerator *p_wizard_resource_generator = new WizardResourceGenerator(this, mpImfPackage->GetImpEditRates());
+	p_wizard_resource_generator->setAttribute(Qt::WA_DeleteOnClose, true);
+	p_wizard_resource_generator->SwitchMode(WizardResourceGenerator::ISXDMode);
+	p_wizard_resource_generator->resize( QSize(600, 500).expandedTo(minimumSizeHint()) );
+	p_wizard_resource_generator->show();
+	connect(p_wizard_resource_generator, SIGNAL(accepted()), this, SLOT(rResourceGeneratorAccepted()));
+}
 		/* -----Sidecar Composition Map----- */
 void WidgetImpBrowser::ShowSidecarCompositionMapGenerator(QSharedPointer<AssetScm> rAssetScm /* = QSharedPointer<AssetScm>() */,
 		WizardSidecarCompositionMapGenerator::eMode rMode /*= WizardSidecarCompositionMapGenerator::eMode::NewScm*/) {
@@ -1149,8 +1159,18 @@ void WidgetImpBrowser::SetMxfFile(const QStringList &rFiles) {
 		MetadataExtractor extractor;
 		Metadata metadata;
 		Error error(Error::None);
-		extractor.ReadMetadata(metadata, QDir(rFiles.at(0)).absolutePath());
+		error = extractor.ReadMetadata(metadata, QDir(rFiles.at(0)).absolutePath());
 		QFileInfo path = QFileInfo(QDir(rFiles.at(0)).absolutePath());
+		if (error.IsError()) {
+			QString error_msg = QString("%1\n%2").arg(error.GetErrorMsg()).arg(error.GetErrorDescription());
+			mpMsgBox->setText(tr("MXF Error"));
+			mpMsgBox->setIcon(QMessageBox::Critical);
+			mpMsgBox->setInformativeText(error_msg);
+			mpMsgBox->setStandardButtons(QMessageBox::Ok);
+			mpMsgBox->setDefaultButton(QMessageBox::Ok);
+			mpMsgBox->exec();
+			return;
+		}
 		if (metadata.assetId.isNull()) {
 			mpMsgBox->setText(tr("MXF Error"));
 			mpMsgBox->setInformativeText("Cannot determine Asset ID");
@@ -1186,6 +1206,7 @@ void WidgetImpBrowser::SetMxfFile(const QStringList &rFiles) {
 					case ASDCP::ESS_AS02_ISXD:
 					case ASDCP::ESS_AS02_IAB:
 					case ASDCP::ESS_AS02_ProRes:
+					case ASDCP::ESS_AS02_MGASADM:
 						break;
 
 					case ASDCP::ESS_AS02_TIMED_TEXT:
