@@ -1153,7 +1153,7 @@ void WidgetComposition::InitToolbar() {
 	mpAddIABTrackAction = p_add_track_menu->addAction(QIcon(":/sound.png"), tr("IAB Audio track"));
 	mpAddISXDTrackAction = p_add_track_menu->addAction(QIcon(":/xml-icon.png"), tr("Isochronous stream of XML documents track"));
 	mpAddSADMTrackAction = p_add_track_menu->addAction(QIcon(":/sound.png"), tr("MGA S-ADM track"));
-	mpAddADMTrackAction = p_add_track_menu->addAction(QIcon(":/sound.png"), tr("ADM track"));
+	mpAddADMTrackAction = p_add_track_menu->addAction(QIcon(":/sound.png"), tr("ADM Audio track"));
 	p_button_add_track->setMenu(p_add_track_menu);
 	mpToolBar->addWidget(p_button_add_track);
 	QAction *p_action = mpToolBar->addAction(QIcon(":/cutter.png"), tr("Edit"), mpCompositionScene, SLOT(SetEditRequest()));
