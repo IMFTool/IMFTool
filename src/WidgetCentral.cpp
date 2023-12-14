@@ -156,7 +156,7 @@ void WidgetCentral::InitLyout() {
 	connect(mpTTMLPreviewWidget->show_regions, SIGNAL(stateChanged(int)), mpPreview, SIGNAL(regionOptionsChanged(int)));
 	//TODO ISXD browser
 	//mpTopTabWidget->addTab(mpIsxdWidget, "ISXD"); // add to layout
-	mpTopTabWidget->addTab(mpSadmWidget, "S-ADM"); // add to layout
+	//mpTopTabWidget->addTab(mpSadmWidget, "S-ADM"); // add to layout
 
 	//p_details_widget_frame_layout->addWidget(mpTopTabWidget);
 	connect(mpTopTabWidget, SIGNAL(currentChanged(int)), this, SLOT(rToggleTTML(int)));
