@@ -421,18 +421,29 @@ JobCallPhoton::JobCallPhoton(const QString &rWorkingDirectory, WidgetImpBrowser*
 AbstractJob("Generating Photon IMP QC Report"), mWorkingDirectory(rWorkingDirectory),  mWidgetImpBrowser(rWidgetImpBrowser){
 
 }
-//#define NO_UNIVERSAL_PHOTON
+#define NO_UNIVERSAL_PHOTON
 Error JobCallPhoton::Execute() {
 
 	Error error;
 	QString qresult;
 
 #ifdef NO_UNIVERSAL_PHOTON
-	//Figure out IMF App
-	QString appString = "app2or2E";
+	//Figure out if ADM/S-ADM Track Files are present
+//	QString appString = "app2or2E";
+	bool is_adm_sadm = false;
 	if (mWidgetImpBrowser && mWidgetImpBrowser->GetImfPackage()) {
-		QVector<QString> appList = mWidgetImpBrowser->GetImfPackage().data()->GetApplicationIdentificationList();
-		if ( appList.contains("http://www.smpte-ra.org/ns/2067-50/2017") ) appString = "app5";
+		int asset_count = mWidgetImpBrowser->GetImfPackage().data()->GetAssetCount();
+		for (int i=0; i< asset_count; i++) {
+			QSharedPointer<Asset> asset = mWidgetImpBrowser->GetImfPackage().data()->GetAsset(i);
+			if (asset && (asset.data()->GetType() == Asset::eAssetType::mxf)) {
+				QSharedPointer <AssetMxfTrack> assetMxfTrack = qSharedPointerCast<AssetMxfTrack>(asset);
+				if ((assetMxfTrack->GetEssenceType() == Metadata::ADM) || (assetMxfTrack->GetEssenceType() == Metadata::SADM)) {
+					is_adm_sadm = true;
+				}
+			}
+		}
+//		QVector<QString> appList = mWidgetImpBrowser->GetImfPackage().data()->GetApplicationIdentificationList();
+//		if ( appList.contains("http://www.smpte-ra.org/ns/2067-50/2017") ) appString = "app5";
 	}
 #endif
 	QProcess *myProcess = new QProcess();
@@ -441,8 +452,8 @@ Error JobCallPhoton::Execute() {
 	arg << "-cp";
 	QString lib_dir = QString("/photon/build/libs/*");
 #ifdef NO_UNIVERSAL_PHOTON
-	if (appString == "app5") {
-		lib_dir = QString("/photon/build/libs-app5/*");
+	if (is_adm_sadm) {
+		lib_dir = QString("/photon/build/libs-admsadm/*");
 	}
 #endif
 #ifdef WIN32
