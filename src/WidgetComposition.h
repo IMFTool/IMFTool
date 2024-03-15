@@ -122,11 +122,14 @@ public:
 	static XmlSerializationError WriteMinimal(const QString &rDestination, const QUuid &rId, const EditRate &rEditRate, const UserText &rContentTitle,
 			const UserText &rIssuer = UserText(), const UserText &rContentOriginator = UserText(), const QString &rApplicationIdentification = QString());
 	qint64 GetTotalDuration();
+	ImfError CheckAudioAlignment(cpl2016::TrackFileResourceType *pFileResource, ImfError &rError);
 
 signals:
 	void FrameInicatorActive(bool active);
 	void CurrentAudioChanged(const QSharedPointer<AssetMxfTrack> &rAsset, const Duration &rOffset, const Timecode &rTimecode);
 	void CurrentVideoChanged(const QSharedPointer<AssetMxfTrack> &rAsset, const qint64 &rOffset, const Timecode &rTimecode, const int &playlist_index);
+	void CurrentSadmChanged(const QSharedPointer<AssetMxfTrack> &rAsset, const qint64 &rOffset, const Timecode &rTimecode, const QUuid &track_id, const quint8& track_no);
+	void OutOfTimeline(const qint64 &rPosition);
 	void PlaylistFinished();
 
 	public slots:

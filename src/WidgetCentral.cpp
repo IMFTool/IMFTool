@@ -17,6 +17,7 @@
 #include "WidgetComposition.h"
 #include "WidgetVideoPreview.h" // (k)
 #include "WidgetTimedTextPreview.h" // (k)
+#include "WidgetSADMPreview.h"
 #include "TimelineParser.h" // (k)
 #include "SMPTE_Labels.h" // (k)
 #include "WidgetCompositionInfo.h"
@@ -114,9 +115,6 @@ void WidgetCentral::InitLyout() {
 	p_locale_widget_frame->setLayout(p_locale_widget_frame_layout);*/
 	//p_details_widget_frame_layout->addWidget(mpLocaleListWidget);
 
-	//S-ADM browser
-	mpSadmWidget = new WidgetXmlTree(this);
-	mpSadmWidget->setDisabled(true);
 	QFrame *p_locale_widget_frame = new QFrame(this);
 	p_locale_widget_frame->setFrameStyle(QFrame::StyledPanel);
 	QHBoxLayout *p_locale_widget_frame_layout = new QHBoxLayout();
@@ -156,13 +154,18 @@ void WidgetCentral::InitLyout() {
 	connect(mpTTMLPreviewWidget->show_regions, SIGNAL(stateChanged(int)), mpPreview, SIGNAL(regionOptionsChanged(int)));
 	//TODO ISXD browser
 	//mpTopTabWidget->addTab(mpIsxdWidget, "ISXD"); // add to layout
-	//mpTopTabWidget->addTab(mpSadmWidget, "S-ADM"); // add to layout
+
+	//S-ADM browser
+	mpSADMPreviewWidget = new WidgetSADMPreview(this);
+	mpTopTabWidget->addTab(mpSADMPreviewWidget, "S-ADM"); // add to layout
 
 	//p_details_widget_frame_layout->addWidget(mpTopTabWidget);
 	connect(mpTopTabWidget, SIGNAL(currentChanged(int)), this, SLOT(rToggleTTML(int)));
 	connect(mpPreview, SIGNAL(ttmlChanged(const QVector<visibleTTtrack>&,int)), mpTTMLPreviewWidget, SLOT(rShowTTML(const QVector<visibleTTtrack>&,int)));
 	connect(mpTTMLPreviewWidget, SIGNAL(PrevNextSubClicked(bool)), mpPreview, SLOT(rPrevNextSubClicked(bool)));
 	// (k) - end
+	connect(mpSADMPreviewWidget, SIGNAL(PrevClicked()), this, SLOT(rPrevFrame()));
+	connect(mpSADMPreviewWidget, SIGNAL(NextClicked()), this, SLOT(rNextFrame()));
 
 	QSplitter *p_inner_splitter = new QSplitter(this);
 	p_inner_splitter->setOrientation(Qt::Horizontal);
@@ -205,14 +208,17 @@ void WidgetCentral::rUpdatePlaylist() {
 		else {
 			mpPreview->Clear(); // (k) - clear preview
 			mpTTMLPreviewWidget->ClearTTML(); // (k) - clear ttml
+			mpSADMPreviewWidget->ClearSADM();
 
 			playListUpdateSuccess = true;
 			ttmls = QVector<TTMLtimelineResource>(); // clear ttml list
 			playlist = QVector<VideoResource>(); // clear video playlist
+			mMgaSadmTracks = QMap<quint8, QUuid>(); // clear S-ADM track list
 
 			timelineParser->composition = p_composition->GetComposition();
 			timelineParser->ttmls = &ttmls;
 			timelineParser->playlist = &playlist;
+			timelineParser->mMGASADMTracks = &mMgaSadmTracks;
 			timelineParserTime->restart();
 			tpThread->start();
 		}
@@ -232,6 +238,7 @@ void WidgetCentral::rPlaylistFinished() {
 	WidgetComposition *p_composition = qobject_cast<WidgetComposition*>(mpTabWidget->currentWidget());
 	if (p_composition) {
 		mpPreview->setPlaylist(playlist, ttmls); // forward playlist to mpPreview
+		mpSADMPreviewWidget->rSetSadmTimeline(mMgaSadmTracks);
 		p_composition->getVerticalIndicator();
 		//emit UpdateStatusBar(QString("updating took %1 ms").arg(timelineParserTime->elapsed()), 2000, "QStatusBar{color:white}");
 	}
@@ -267,6 +274,8 @@ void WidgetCentral::rCurrentChanged(int tabWidgetIndex) {
 		// (k) - start
 		disconnect(p_composition->GetUndoStack(), SIGNAL(indexChanged(int)), 0, 0); // (k)
 		disconnect(p_composition, SIGNAL(CurrentVideoChanged(const QSharedPointer<AssetMxfTrack>&, const qint64&, const Timecode&, const int&)), 0, 0);
+		disconnect(p_composition, SIGNAL(CurrentSadmChanged(const QSharedPointer<AssetMxfTrack>&, const qint64& , const Timecode&, const QUuid&, const quint8&)), 0, 0);
+		disconnect(p_composition, SIGNAL(OutOfTimeline(const qint64&)), 0, 0);
 		disconnect(mpPreview, SIGNAL(currentPlayerPosition(qint64)), 0, 0); // (k)
 		// (k) - end
 	}
@@ -292,6 +301,8 @@ void WidgetCentral::rCurrentChanged(int tabWidgetIndex) {
 		connect(p_composition, SIGNAL(CurrentVideoChanged(const QSharedPointer<AssetMxfTrack>&, const qint64&, const Timecode&, const int&)), mpPreview, SLOT(xPosChanged(const QSharedPointer<AssetMxfTrack>&, const qint64&, const Timecode&, const int&)));
 		connect(mpPreview, SIGNAL(currentPlayerPosition(qint64)), p_composition, SLOT(setVerticalIndicator(qint64)));
 		// (k) - end
+		connect(p_composition, SIGNAL(CurrentSadmChanged(const QSharedPointer<AssetMxfTrack>&, const qint64& , const Timecode&, const QUuid&, const quint8&)), mpSADMPreviewWidget, SLOT(rXPosChanged(const QSharedPointer<AssetMxfTrack>&, const qint64&, const Timecode&, const QUuid&, const quint8&)));
+		connect(p_composition, SIGNAL(OutOfTimeline(const qint64&)), mpSADMPreviewWidget, SLOT(rOutOfTimeline(const qint64&)));
 	}
 }
 
@@ -317,6 +328,7 @@ void WidgetCentral::rTabCloseRequested(int index) {
 			mpContentVersionListWidget->Clear();
 			mpLocaleListWidget->Clear();
 			mpTTMLPreviewWidget->ClearTTML(); // (k) - clear ttml view
+			mpSADMPreviewWidget->ClearSADM();
 			ttmls = QVector<TTMLtimelineResource>(); // (k) - clear ttml list
 			playlist = QVector<VideoResource>(); // (k) - clear video playlist
 			mpPreview->setPlaylist(playlist, ttmls); // (k) - clear playlist
@@ -344,7 +356,7 @@ int WidgetCentral::ShowCplEditor(const QUuid &rCplAssetId) {
 	if(error.IsError() == false) {
 		if(error.IsRecoverableError() == true) {
 			QString error_msg = QString("%1\n%2").arg(error.GetErrorMsg()).arg(error.GetErrorDescription());
-			mpMsgBox->setText(tr("CPL Warning?"));
+			mpMsgBox->setText(tr("CPL Warning"));
 			mpMsgBox->setInformativeText(error_msg);
 			mpMsgBox->setIcon(QMessageBox::Warning);
 			mpMsgBox->setStandardButtons(QMessageBox::Ok);
@@ -357,7 +369,7 @@ int WidgetCentral::ShowCplEditor(const QUuid &rCplAssetId) {
 	}
 	else {
 		QString error_msg = QString("%1\n%2").arg(error.GetErrorMsg()).arg(error.GetErrorDescription());
-		mpMsgBox->setText(tr("CPL Critical?"));
+		mpMsgBox->setText(tr("CPL Critical"));
 		mpMsgBox->setInformativeText(error_msg);
 		mpMsgBox->setIcon(QMessageBox::Critical);
 		mpMsgBox->setStandardButtons(QMessageBox::Ok);
@@ -393,6 +405,7 @@ void WidgetCentral::UninstallImp() {
 	mpLocaleListWidget->setDisabled(true);
 	mpLocaleListWidget->Clear();
 	mpTTMLPreviewWidget->ClearTTML(); // (k) - clear ttml
+	mpSADMPreviewWidget->ClearSADM();
 	this->mpPreview->Reset();
 
 	for(int i = 0; i < mpTabWidget->count(); i++) {
@@ -471,7 +484,7 @@ void WidgetCentral::SaveCpl(int index) const {
 		if(error.IsError() == false) {
 			if(error.IsRecoverableError() == true) {
 				QString error_msg = QString("%1\n%2").arg(error.GetErrorMsg()).arg(error.GetErrorDescription());
-				mpMsgBox->setText(tr("CPL Warning?"));
+				mpMsgBox->setText(tr("CPL Warning"));
 				mpMsgBox->setInformativeText(error_msg);
 				mpMsgBox->setIcon(QMessageBox::Warning);
 				mpMsgBox->setStandardButtons(QMessageBox::Ok);
@@ -481,7 +494,7 @@ void WidgetCentral::SaveCpl(int index) const {
 		}
 		else {
 			QString error_msg = QString("%1\n%2").arg(error.GetErrorMsg()).arg(error.GetErrorDescription());
-			mpMsgBox->setText(tr("CPL Critical?"));
+			mpMsgBox->setText(tr("CPL Critical"));
 			mpMsgBox->setInformativeText(error_msg);
 			mpMsgBox->setIcon(QMessageBox::Critical);
 			mpMsgBox->setStandardButtons(QMessageBox::Ok);
@@ -509,7 +522,7 @@ void WidgetCentral::CopyCPL(const QSharedPointer<AssetCpl> &rDestination) {
 		if(error.IsError() == false) {
 			if(error.IsRecoverableError() == true) {
 				QString error_msg = QString("%1\n%2").arg(error.GetErrorMsg()).arg(error.GetErrorDescription());
-				mpMsgBox->setText(tr("CPL Warning?"));
+				mpMsgBox->setText(tr("CPL Warning"));
 				mpMsgBox->setInformativeText(error_msg);
 				mpMsgBox->setIcon(QMessageBox::Warning);
 				mpMsgBox->setStandardButtons(QMessageBox::Ok);
@@ -519,7 +532,7 @@ void WidgetCentral::CopyCPL(const QSharedPointer<AssetCpl> &rDestination) {
 		}
 		else {
 			QString error_msg = QString("%1\n%2").arg(error.GetErrorMsg()).arg(error.GetErrorDescription());
-			mpMsgBox->setText(tr("CPL Critical?"));
+			mpMsgBox->setText(tr("CPL Critical"));
 			mpMsgBox->setInformativeText(error_msg);
 			mpMsgBox->setIcon(QMessageBox::Critical);
 			mpMsgBox->setStandardButtons(QMessageBox::Ok);

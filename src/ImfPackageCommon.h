@@ -247,6 +247,7 @@ public:
 		XMLParsing,
 		XMLSerialization,
 		MissingSidecarAsset,
+		MisalignedAudio,
 		Unknown
 	};
 	//! Constructs empty error (IsError returns false).
@@ -291,6 +292,8 @@ public:
 				ret = QObject::tr("The XML serialization failed."); break;
 			case  MissingSidecarAsset:
 				ret = QObject::tr("Sidecar Asset referenced is not present in IMP. Sidecar Asset will be deleted from SCM:"); break;
+			case  MisalignedAudio:
+				ret = QObject::tr("Audio representation warning:"); break;
 			case Unknown:
 				ret = QObject::tr("Unknown error"); break;
 			default:

@@ -619,3 +619,34 @@ Error JobExtractTargetFrames::Execute() {
 	return error;
 }
 #endif
+
+JobExtractAdmMetadata::JobExtractAdmMetadata(const QSharedPointer<AssetMxfTrack> rAssetMxf) :
+AbstractJob("Extracting ADM Metadata"), mAssetMxf(rAssetMxf) {
+
+}
+
+Error JobExtractAdmMetadata::Execute() {
+	QString adm_text = "No ADM Metadata found";
+	Error error = Error::None;
+
+	try {
+			//TODO Figure out size of ancillary resource from RIP
+			ASDCP::PCM::FrameBuffer FrameBuffer(10000000);
+			Kumu::FileReaderFactory defaultFactory;
+			AS_02::PCM::MXFReader Reader(defaultFactory);
+			Result_t result = Reader.OpenRead(mAssetMxf->GetPath().absoluteFilePath().toStdString(), ASDCP::Rational(24, 1)); // open file for reading
+			if (ASDCP_SUCCESS(result)) {
+				result = Reader.ReadAncillaryResource(mAssetMxf->GetMetadata().admRIFFChunkStreamID_link1, FrameBuffer, 0, 0);
+			}
+			if (ASDCP_SUCCESS(result)) {
+				adm_text = QString(QByteArray(reinterpret_cast<const char*>(FrameBuffer.Data()), FrameBuffer.Size()));
+
+			}
+			Reader.Close();
+	}
+	catch(...) { return Error::XMLSchemeError; }
+
+	emit Result(adm_text, GetIdentifier());
+
+	return error;
+}

@@ -271,6 +271,9 @@ public:
 	static EditRate GetEditRate(const QString &rEditRateName);
 	//! Convenience function: Returns the names of all well known frame rates.
 	static QStringList GetFrameRateNames();
+	bool HasFractionalNumberOfAudioSamplesPerImageFrame() {
+		return ((*this == EditRate29_97) || (*this == EditRate59_94) || (*this == EditRate119_88));
+	}
 
 private:
 	EditRate(qint32 n, qint32 d, const QString &rName) : mNumerator(n), mDenominator(d), mName(rName) {

@@ -17,6 +17,7 @@
 #include "ImfCommon.h"
 #include "GraphicsCommon.h"
 #include <QFrame>
+#include <QMessageBox>
 
 
 class QLabel;
@@ -97,6 +98,7 @@ public:
 
 	private slots:
 	void DeleteAction() { if(mType != MainImageSequence) emit DeleteClicked(mTrackId); }
+	void ShowTrackId();
 	void EnableDeleteAction();
 
 private:
@@ -106,6 +108,8 @@ private:
 	QAction *mpDelete;
 	QUuid mTrackId;
 	eSequenceType mType;
+	QMessageBox* mpMsgBox;
+	QAction *mShowTrackId;
 };
 
 
@@ -121,6 +125,7 @@ public:
 	virtual eSequenceType GetType() const { return MainAudioSequence; }
 
 	private slots:
+	void ShowTrackId();
 	void DeleteAction() { emit DeleteClicked(mTrackId); }
 
 private:
@@ -129,4 +134,6 @@ private:
 
 	QUuid mTrackId;
 	eSequenceType mType;
+	QMessageBox* mpMsgBox;
+	QAction *mShowTrackId;
 };

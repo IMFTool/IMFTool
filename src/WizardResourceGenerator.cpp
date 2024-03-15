@@ -210,7 +210,7 @@ void WizardResourceGeneratorPage::InitLayout() {
 	mpLineEditMCATitle->setValidator(v_mca_items);
 	if (mReadOnly) mpLineEditMCATitle->setDisabled(true);
 	//mpLineEditMCATitle->selectAll();
-	connect(mpLineEditMCATitle, SIGNAL(clicked()), mpLineEditMCATitle, SLOT(selectAll()));
+	//connect(mpLineEditMCATitle, SIGNAL(clicked()), mpLineEditMCATitle, SLOT(selectAll()));
 	//connect(mpLineEditMCATitle, SIGNAL(textEdited(QString)), this, SLOT(mcaTitleChanged()));
 	mpLineEditMCATitleVersion = new QLineEdit(this);
 	mpLineEditMCATitleVersion->setAlignment(Qt::AlignRight);
@@ -626,7 +626,7 @@ void WizardResourceGeneratorPage::InitLayout() {
 			p_wrapper_layout_seven->addWidget(new QLabel(tr("Soundfield:")), ++i, 0, 1, 1);
 			p_wrapper_layout_seven->addWidget(new QLabel(admSoundFieldGroup.soundfieldGroup.GetName()), i, 1, 1, 1);
 			p_wrapper_layout_seven->addWidget(new QLabel(tr("RIFF Chunk Stream ID_link2:")), ++i, 0, 1, 1);
-			p_wrapper_layout_seven->addWidget(new QLabel(admSoundFieldGroup.mgaMetadataSectionLinkId), i, 1, 1, 1);
+			p_wrapper_layout_seven->addWidget(new QLabel(QString::number(admSoundFieldGroup.admRIFFChunkStreamID_link2)), i, 1, 1, 1);
 			p_wrapper_layout_seven->addWidget(new QLabel(tr("ADM Audio Programme ID:")), ++i, 0, 1, 1);
 			p_wrapper_layout_seven->addWidget(new QLabel(admSoundFieldGroup.admAudioProgrammeID), i, 1, 1, 1);
 			p_wrapper_layout_seven->addWidget(new QLabel(tr("MCA Tag Symbol:")), ++i, 0, 1, 1);

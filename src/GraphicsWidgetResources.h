@@ -166,6 +166,9 @@ protected:
 	cpl2016::BaseResourceType* mpData;
 	QSharedPointer<AssetMxfTrack> mAssset;
 	QUuid mTrackFileId = QUuid(0); // Required to hold a reference if mAsset does not exist when creating a AbstractGraphicsWidgetResource (Partial IMP)
+	GraphicsItemDurationIndicator *mpDurationIndicator;
+	JobQueue *mpJobQueue;
+	QMessageBox *mpMsgBox;
 
 private:
 	Q_DISABLE_COPY(AbstractGraphicsWidgetResource);
@@ -177,7 +180,7 @@ private:
 	Duration mOldSourceDuration; // Backup: Is set if Trim Handle is clicked.
 	TrimHandle *mpLeftTrimHandle;
 	TrimHandle *mpRightTrimHandle;
-	GraphicsItemDurationIndicator *mpDurationIndicator;
+	//GraphicsItemDurationIndicator *mpDurationIndicator;
 	GraphicsObjectVerticalIndicator *mpVerticalIndicator;
 };
 
@@ -283,6 +286,8 @@ private:
 
 class GraphicsWidgetAudioResource : public GraphicsWidgetFileResource {
 
+Q_OBJECT
+
 public:
 	//! Import existing Resource. pResource is owned by this.
 	GraphicsWidgetAudioResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset = QSharedPointer<AssetMxfTrack>(NULL), int unused_index = 0,
@@ -294,9 +299,13 @@ public:
 	virtual void paint(QPainter *pPainter, const QStyleOptionGraphicsItem *pOption, QWidget *pWidget = NULL);
 	virtual GraphicsWidgetAudioResource* Clone() const;
 	SoundfieldGroup GetSoundfieldGroup() const;
+	virtual void SetEntryPointSamples(const Duration &rEntryPoint);
+	virtual void SetSourceDurationSamples(const Duration &rSourceDuration);
 
 protected:
 	virtual double ResourceErPerCompositionEr(const EditRate &rCompositionEditRate) const;
+	virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *pEvent);
+	virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &rConstraint = QSizeF()) const;
 
 private:
 	Q_DISABLE_COPY(GraphicsWidgetAudioResource);
@@ -401,6 +410,7 @@ public:
 
 protected:
 	virtual double ResourceErPerCompositionEr(const EditRate &rCompositionEditRate) const;
+	virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *pEvent);
 
 private:
 	Q_DISABLE_COPY(GraphicsWidgetSADMResource);
@@ -408,6 +418,8 @@ private:
 
 
 class GraphicsWidgetADMResource : public GraphicsWidgetFileResource {
+
+Q_OBJECT
 
 public:
 	//! Import existing Resource. pResource is owned by this.
@@ -422,8 +434,15 @@ public:
 
 protected:
 	virtual double ResourceErPerCompositionEr(const EditRate &rCompositionEditRate) const;
+	virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent *pEvent);
+
+private slots:
+	void rExtractAdmMetadataWidget(const QString, const QVariant &rIdentifier);
+	void rJobQueueFinishedExtractAdmMetadata();
+	void CopyToClipBoard();
 
 private:
+	QString mAdmText;
 	Q_DISABLE_COPY(GraphicsWidgetADMResource);
 };
 

@@ -19,14 +19,22 @@
 #include "CompositionPlaylistCommands.h"
 #include "GraphicsWidgetComposition.h"
 #include "MetadataExtractor.h"
+#include "JobQueue.h"
+#include "Jobs.h"
 #include <QGraphicsSceneResizeEvent>
 #include <QStyleOptionGraphicsItem>
 #include <QMenu>
 #include <QToolTip>
 #include <QInputDialog>
+#include <QMessageBox>
+#include <QWizard>
+#include <QTextEdit>
+#include <QVBoxLayout>
+#include <QList>
+#include <QClipboard>
 
 AbstractGraphicsWidgetResource::AbstractGraphicsWidgetResource(GraphicsWidgetSequence *pParent, cpl2016::BaseResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/, const QColor &rColor /*= QColor(Qt::white)*/) :
-GraphicsWidgetBase(pParent), mpData(pResource), mAssset(rAsset), mColor(rColor), mOldEntryPoint(), mOldSourceDuration(-1), mpLeftTrimHandle(NULL), mpRightTrimHandle(NULL), mpDurationIndicator(NULL), mpVerticalIndicator(NULL) {
+GraphicsWidgetBase(pParent), mpData(pResource), mAssset(rAsset), mColor(rColor), mOldEntryPoint(), mOldSourceDuration(-1), mpLeftTrimHandle(NULL), mpRightTrimHandle(NULL), mpDurationIndicator(NULL), mpVerticalIndicator(NULL), mpJobQueue(NULL), mpMsgBox(NULL) {
 
 	mpLeftTrimHandle = new TrimHandle(this, Left);
 	mpLeftTrimHandle->hide();
@@ -40,6 +48,10 @@ GraphicsWidgetBase(pParent), mpData(pResource), mAssset(rAsset), mColor(rColor),
 	setFlags(QGraphicsItem::ItemUsesExtendedStyleOption | QGraphicsItem::ItemIsSelectable); // enables pOption::exposedRect in GraphicsWidgetTimeline::paint()
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
 	if(mAssset) connect(mAssset.data(), SIGNAL(AssetModified(Asset*)), this, SLOT(rAssetModified()));
+	mpJobQueue = new JobQueue(this);
+	mpJobQueue->SetInterruptIfError(true);
+	mpMsgBox = new QMessageBox(NULL);
+	mpMsgBox->setIcon(QMessageBox::Warning);
 }
 
 void AbstractGraphicsWidgetResource::resizeEvent(QGraphicsSceneResizeEvent *pEvent) {
@@ -109,7 +121,14 @@ void AbstractGraphicsWidgetResource::SetEntryPoint(const Duration &rEntryPoint) 
 	Duration current_entry_point(GetEntryPoint());
 	if(rEntryPoint < 0) new_entry_point = 0;
 	else if(rEntryPoint > GetEntryPoint() + current_source_duration - samples_factor) new_entry_point = GetEntryPoint() + current_source_duration - samples_factor;
-	mpData->setSourceDuration(xml_schema::NonNegativeInteger(current_source_duration.GetCount() - (new_entry_point.GetCount() - GetEntryPoint().GetCount())));
+	GraphicsWidgetAudioResource *p_audio_resource = qobject_cast<GraphicsWidgetAudioResource *>(this);
+	if (p_audio_resource && GetCplEditRate().HasFractionalNumberOfAudioSamplesPerImageFrame()) {
+		int five_frames_as_samples = 5 * samples_factor;
+		new_entry_point = (new_entry_point.GetCount()/five_frames_as_samples)*five_frames_as_samples;
+	} else {
+		new_entry_point = (new_entry_point.GetCount()/(int)samples_factor)*(int)samples_factor;
+	}
+	SetSourceDuration(xml_schema::NonNegativeInteger(current_source_duration.GetCount() - (new_entry_point.GetCount() - GetEntryPoint().GetCount())));
 	mpData->setEntryPoint(xml_schema::NonNegativeInteger(new_entry_point.GetCount()));
 	if (current_entry_point != new_entry_point) emit EntryPointChanged(current_entry_point, new_entry_point); InOutChanged = true;
 	if(current_source_duration != GetSourceDuration()) emit SourceDurationChanged(current_source_duration, GetSourceDuration());
@@ -123,14 +142,17 @@ void AbstractGraphicsWidgetResource::SetEntryPoint(const Duration &rEntryPoint) 
 void AbstractGraphicsWidgetResource::SetSourceDuration(const Duration &rSourceDuration) {
 
 	double samples_factor = ResourceErPerCompositionEr(GetCplEditRate());
-	int rounded_samples_factor = (int)(samples_factor + .5); // TODO: What about samples_factor with fraction.
 	Duration new_source_duration(rSourceDuration);
 	Duration current_source_duration(GetSourceDuration());
-	if(new_source_duration < rounded_samples_factor) new_source_duration = rounded_samples_factor;
-	else if(new_source_duration > GetIntrinsicDuration() - GetEntryPoint()) new_source_duration = GetIntrinsicDuration() - GetEntryPoint();
-	//Make sure new_source_duration is an integer multiple of rounded_samples_factor
-	//TODO: For 30 fps and 60 fps fractional, make sure new_source_duration is a multiple of 5 x samples_factor
-	new_source_duration = (new_source_duration.GetCount()/rounded_samples_factor)*rounded_samples_factor;
+	if(new_source_duration > GetIntrinsicDuration() - GetEntryPoint()) new_source_duration = GetIntrinsicDuration() - GetEntryPoint();
+	GraphicsWidgetAudioResource *p_audio_resource = qobject_cast<GraphicsWidgetAudioResource *>(this);
+	if (p_audio_resource && GetCplEditRate().HasFractionalNumberOfAudioSamplesPerImageFrame()) {
+		int five_frames_as_samples = 5 * samples_factor;
+		if(new_source_duration < five_frames_as_samples) new_source_duration = five_frames_as_samples;
+		new_source_duration = (new_source_duration.GetCount()/five_frames_as_samples)*five_frames_as_samples;
+	} else {
+		new_source_duration = (new_source_duration.GetCount()/(int)samples_factor)*(int)samples_factor;
+	}
 	mpData->setSourceDuration(xml_schema::NonNegativeInteger(new_source_duration.GetCount()));
 	if (new_source_duration != current_source_duration) emit SourceDurationChanged(current_source_duration, new_source_duration); InOutChanged = true;
 	updateGeometry();
@@ -1120,7 +1142,7 @@ void GraphicsWidgetAudioResource::paint(QPainter *pPainter, const QStyleOptionGr
 
 		if(writable_rect.isEmpty() == false) {
 
-			QString duration(font_metrics.elidedText(tr("Dur.: %1").arg(MapToCplTimeline(GetSourceDuration()).GetCount()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
+			QString duration(font_metrics.elidedText(tr("Dur.: %L1").arg(GetSourceDuration().GetCount()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
 			QString file_name;
 			if((mAssset) && mAssset->HasAffinity()) {
 				if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
@@ -1138,8 +1160,10 @@ void GraphicsWidgetAudioResource::paint(QPainter *pPainter, const QStyleOptionGr
 			QString cpl_out_point(font_metrics.elidedText(tr("Cpl Out: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i + 1) * (MapToCplTimeline(GetSourceDuration()).GetCount()*GetEditRate().GetQuotient()/GetCplEditRate().GetQuotient()/*this is necessary to prevent rounding error*/) - 1)).GetAsString()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
 			QString cpl_in_point(font_metrics.elidedText(tr("Cpl In: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i * (GetSourceDuration())))).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(cpl_out_point)));
 
-			QString resource_out_point(font_metrics.elidedText(tr("Out: %1").arg(Timecode(GetCplEditRate(), Duration((qint64)ceil((long double)GetEntryPoint().GetCount() * GetCplEditRate().GetQuotient() / GetEditRate().GetQuotient())) + (GetSourceDuration().GetCount() * GetCplEditRate().GetQuotient() / GetEditRate().GetQuotient()) - 1).GetAsString()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
-			QString resource_in_point(font_metrics.elidedText(tr("In: %1").arg(Timecode(GetCplEditRate(), Duration((qint64)ceil((long double)GetEntryPoint().GetCount() * GetCplEditRate().GetQuotient() / GetEditRate().GetQuotient()))).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(cpl_out_point)));
+			//QString resource_out_point(font_metrics.elidedText(tr("Out: %1").arg(Timecode(GetCplEditRate(), Duration((qint64)ceil((long double)GetEntryPoint().GetCount() * GetCplEditRate().GetQuotient() / GetEditRate().GetQuotient())) + (GetSourceDuration().GetCount() * GetCplEditRate().GetQuotient() / GetEditRate().GetQuotient()) - 1).GetAsString()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
+			//QString resource_in_point(font_metrics.elidedText(tr("In: %1").arg(Timecode(GetCplEditRate(), Duration((qint64)ceil((long double)GetEntryPoint().GetCount() * GetCplEditRate().GetQuotient() / GetEditRate().GetQuotient()))).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(cpl_out_point)));
+			QString resource_out_point(font_metrics.elidedText(tr("Out: %L1").arg(GetEntryPoint().GetCount() + GetSourceDuration().GetCount()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
+			QString resource_in_point(font_metrics.elidedText(tr("In: %L1").arg(GetEntryPoint().GetCount()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(cpl_out_point)));
 
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.top() + font_metrics.height())); // We have to use QTransform::translate() because of bug 192573.
 			pPainter->drawText(QPointF(0, 0), file_name);
@@ -1150,7 +1174,20 @@ void GraphicsWidgetAudioResource::paint(QPainter *pPainter, const QStyleOptionGr
 			pPainter->drawText(QPointF(0, 0), cpl_in_point);
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(cpl_out_point)), writable_rect.bottom()));
 			pPainter->drawText(QPointF(0, 0), cpl_out_point);
-
+			if (mAssset) {
+				QPen pen2 = pen;
+				QString label = mAssset->GetMetadata().soundfieldGroup.GetName() + ": " + mAssset->GetMetadata().languageTag;
+				QBrush brush2(QColor(CPL_FONT_COLOR), Qt::SolidPattern);
+				QRect qrect(-font_metrics.width(label)*0.1, 5, font_metrics.width(label)*1.2, font_metrics.height()*1.1);
+				pen2.setColor(QColor(CPL_FONT_COLOR));
+				pPainter->setPen(pen2);
+				pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.center().rx()* transf.m11() - font_metrics.width(label)/2.0 ), writable_rect.center().ry()));
+				pPainter->fillRect(qrect, brush2);
+				pen2.setColor(Qt::white);
+				pPainter->setPen(pen2);
+				pPainter->drawText(QPointF(0, 5+0.85*font_metrics.height()), label);
+				pPainter->setPen(pen);
+			}
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.top()));
 			pPainter->drawText(QPointF(0, 35), resource_in_point);
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(resource_out_point)), writable_rect.top()));
@@ -1159,6 +1196,39 @@ void GraphicsWidgetAudioResource::paint(QPainter *pPainter, const QStyleOptionGr
 			pPainter->setTransform(transf);
 		}
 	}
+}
+
+QSizeF GraphicsWidgetAudioResource::sizeHint(Qt::SizeHint which, const QSizeF &rConstraint /*= QSizeF()*/) const {
+
+	QSizeF size;
+	qreal duration_to_width = GetRepeatCount() * (GetSourceDuration().GetCount() / ResourceErPerCompositionEr(GetCplEditRate()));
+	if(rConstraint.isValid() == false) {
+		switch(which) {
+			case Qt::MinimumSize:
+				size = QSizeF(duration_to_width, -1);
+				break;
+			case Qt::PreferredSize:
+				size = QSizeF(duration_to_width, -1);
+				break;
+			case Qt::MaximumSize:
+				size = QSizeF(duration_to_width, -1);
+				break;
+			case Qt::MinimumDescent:
+				size = QSizeF(-1, -1);
+				break;
+			case Qt::NSizeHints:
+				size = QSizeF(-1, -1);
+				break;
+			default:
+				size = QSizeF(-1, -1);
+				break;
+		}
+	}
+	else {
+		qWarning() << "sizeHint() is constraint.";
+		size = rConstraint;
+	}
+	return size;
 }
 
 double GraphicsWidgetAudioResource::ResourceErPerCompositionEr(const EditRate &rCompositionEditRate) const {
@@ -1178,6 +1248,82 @@ SoundfieldGroup GraphicsWidgetAudioResource::GetSoundfieldGroup() const {
 	if(mAssset) return mAssset->GetSoundfieldGroup();
 	return SoundfieldGroup::SoundFieldGroupNone;
 }
+
+void GraphicsWidgetAudioResource::contextMenuEvent(QGraphicsSceneContextMenuEvent *pEvent) {
+
+	QMenu menu;
+	QAction *p_entrypoint_action = new QAction(QIcon(":/edit.png"), tr("Enter Entry Point in audio sample units"), this);
+	QAction *p_duration_action = new QAction(QIcon(":/edit.png"), tr("Enter Source Duration in audio sample units"), this);
+	menu.addAction(p_entrypoint_action);
+	menu.addAction(p_duration_action);
+	QAction *p_selected_action = menu.exec(pEvent->screenPos());
+
+	if(p_selected_action) {
+		if(p_selected_action == p_entrypoint_action) {
+			qint64 new_entry_point_samples = QInputDialog::getInt(&menu,"Enter EntryPoint ","Entry Point in audio sample units", GetEntryPoint().GetCount(), 0);
+			double samples_factor = ResourceErPerCompositionEr(GetCplEditRate());
+			Duration current_source_duration(GetSourceDuration());
+			Duration current_entry_point(GetEntryPoint());
+			if(GraphicsSceneComposition* p_scene = qobject_cast<GraphicsSceneComposition*>(scene())) p_scene->DelegateCommand(new SetEntryPointSamplesCommand(this, GetEntryPoint(), Duration(new_entry_point_samples)));
+			else qWarning() << "Couldn't delegate trim command.";
+			if (current_entry_point.GetCount() != new_entry_point_samples) emit EntryPointChanged(current_entry_point, Duration(new_entry_point_samples)); InOutChanged = true;
+			if(current_source_duration != GetSourceDuration()) emit SourceDurationChanged(current_source_duration, GetSourceDuration());
+			updateGeometry();
+			QRectF rect = boundingRect();
+			rect.setWidth(((GetIntrinsicDuration().GetCount()) / samples_factor));
+			rect.moveLeft(-(GetEntryPoint().GetCount() / samples_factor));
+			mpDurationIndicator->SetRect(rect);
+		}
+		else if(p_selected_action == p_duration_action) {
+			qint64 new_source_duration_samples = QInputDialog::getInt(&menu,"Enter Source Duration ","Entry Source Duration in audio sample units", GetSourceDuration().GetCount(), 0);
+			double samples_factor = ResourceErPerCompositionEr(GetCplEditRate());
+			Duration current_source_duration(GetSourceDuration());
+			if(GraphicsSceneComposition* p_scene = qobject_cast<GraphicsSceneComposition*>(scene())) p_scene->DelegateCommand(new SetSourceDurationSamplesCommand(this, GetSourceDuration(), Duration(new_source_duration_samples)));
+			else qWarning() << "Couldn't delegate trim command.";
+			if(current_source_duration != GetSourceDuration()) emit SourceDurationChanged(current_source_duration, GetSourceDuration());
+			updateGeometry();
+			QRectF rect = boundingRect();
+			rect.setWidth(((GetIntrinsicDuration().GetCount()) / samples_factor));
+			rect.moveLeft(-(GetEntryPoint().GetCount() / samples_factor));
+			mpDurationIndicator->SetRect(rect);
+		}
+	}
+}
+
+void GraphicsWidgetAudioResource::SetEntryPointSamples(const Duration &rEntryPoint) {
+
+	double samples_factor = ResourceErPerCompositionEr(GetCplEditRate());
+	Duration new_entry_point(rEntryPoint);
+	Duration current_source_duration(GetSourceDuration());
+	Duration current_entry_point(GetEntryPoint());
+	if(rEntryPoint < 0) new_entry_point = 0;
+	else if(rEntryPoint >= GetIntrinsicDuration()) new_entry_point = 0;
+	SetSourceDurationSamples(current_source_duration.GetCount() - (new_entry_point.GetCount() - GetEntryPoint().GetCount()));
+	mpData->setEntryPoint(xml_schema::NonNegativeInteger(new_entry_point.GetCount()));
+	if (current_entry_point != new_entry_point) emit EntryPointChanged(current_entry_point, new_entry_point); InOutChanged = true;
+	if(current_source_duration != GetSourceDuration()) emit SourceDurationChanged(current_source_duration, GetSourceDuration());
+	updateGeometry();
+	QRectF rect = boundingRect();
+	rect.setWidth(((GetIntrinsicDuration().GetCount()) / samples_factor));
+	rect.moveLeft(-(GetEntryPoint().GetCount() / samples_factor));
+	mpDurationIndicator->SetRect(rect);
+}
+
+void GraphicsWidgetAudioResource::SetSourceDurationSamples(const Duration &rSourceDuration) {
+
+	double samples_factor = ResourceErPerCompositionEr(GetCplEditRate());
+	Duration new_source_duration(rSourceDuration);
+	Duration current_source_duration(GetSourceDuration());
+	if(new_source_duration > GetIntrinsicDuration() - GetEntryPoint()) new_source_duration = GetIntrinsicDuration() - GetEntryPoint();
+	mpData->setSourceDuration(xml_schema::NonNegativeInteger(new_source_duration.GetCount()));
+	if (new_source_duration != current_source_duration) emit SourceDurationChanged(current_source_duration, new_source_duration); InOutChanged = true;
+	updateGeometry();
+	QRectF rect = boundingRect();
+	rect.setWidth(((GetIntrinsicDuration().GetCount()) / samples_factor));
+	rect.moveLeft(-(GetEntryPoint().GetCount() / samples_factor));
+	mpDurationIndicator->SetRect(rect);
+}
+
 
 GraphicsWidgetTimedTextResource::GraphicsWidgetTimedTextResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/, int unused_index /* = 0 */,
 		const QSharedPointer<ImfPackage> rImfPackage /* = 0 */) :
@@ -1257,7 +1403,20 @@ void GraphicsWidgetTimedTextResource::paint(QPainter *pPainter, const QStyleOpti
 			pPainter->drawText(QPointF(0, 0), cpl_in_point);
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(cpl_out_point)), writable_rect.bottom()));
 			pPainter->drawText(QPointF(0, 0), cpl_out_point);
-
+			if (mAssset && !mAssset->GetMetadata().languageTag.isEmpty()) {
+				QPen pen2 = pen;
+				QString label = mAssset->GetMetadata().languageTag;
+				QBrush brush2(QColor(CPL_FONT_COLOR), Qt::SolidPattern);
+				QRect qrect(-font_metrics.width(label)*0.1, 5, font_metrics.width(label)*1.2, font_metrics.height()*1.1);
+				pen2.setColor(QColor(CPL_FONT_COLOR));
+				pPainter->setPen(pen2);
+				pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.center().rx()* transf.m11() - font_metrics.width(label)/2.0 ), writable_rect.center().ry()));
+				pPainter->fillRect(qrect, brush2);
+				pen2.setColor(Qt::white);
+				pPainter->setPen(pen2);
+				pPainter->drawText(QPointF(0, 5+0.85*font_metrics.height()), label);
+				pPainter->setPen(pen);
+			}
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.top()));
 			pPainter->drawText(QPointF(0, 35), resource_in_point);
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(resource_out_point)), writable_rect.top()));
@@ -1449,7 +1608,20 @@ void GraphicsWidgetIABResource::paint(QPainter *pPainter, const QStyleOptionGrap
 			pPainter->drawText(QPointF(0, 0), cpl_in_point);
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(cpl_out_point)), writable_rect.bottom()));
 			pPainter->drawText(QPointF(0, 0), cpl_out_point);
-
+			if (mAssset && !mAssset->GetMetadata().languageTag.isEmpty()) {
+				QPen pen2 = pen;
+				QString label = mAssset->GetMetadata().languageTag;
+				QBrush brush2(QColor(CPL_FONT_COLOR), Qt::SolidPattern);
+				QRect qrect(-font_metrics.width(label)*0.1, 5, font_metrics.width(label)*1.2, font_metrics.height()*1.1);
+				pen2.setColor(QColor(CPL_FONT_COLOR));
+				pPainter->setPen(pen2);
+				pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.center().rx()* transf.m11() - font_metrics.width(label)/2.0 ), writable_rect.center().ry()));
+				pPainter->fillRect(qrect, brush2);
+				pen2.setColor(Qt::white);
+				pPainter->setPen(pen2);
+				pPainter->drawText(QPointF(0, 5+0.85*font_metrics.height()), label);
+				pPainter->setPen(pen);
+			}
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.top()));
 			pPainter->drawText(QPointF(0, 35), resource_in_point);
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(resource_out_point)), writable_rect.top()));
@@ -1611,7 +1783,8 @@ void GraphicsWidgetSADMResource::paint(QPainter *pPainter, const QStyleOptionGra
 
 		if(writable_rect.isEmpty() == false) {
 
-			QString duration(font_metrics.elidedText(tr("Dur.: %1").arg(MapToCplTimeline(GetSourceDuration()).GetCount()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
+			//QString duration(font_metrics.elidedText(tr("Dur.: %1").arg(MapToCplTimeline(GetSourceDuration()).GetCount()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
+			QString duration(font_metrics.elidedText(tr("Dur.: %1 at %2 fps").arg(GetSourceDuration().GetCount()).arg(GetEditRate().GetName()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
 			QString file_name;
 			if((mAssset) && mAssset->HasAffinity()) {
 					if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
@@ -1662,6 +1835,14 @@ GraphicsWidgetSADMResource* GraphicsWidgetSADMResource::Clone() const {
 double GraphicsWidgetSADMResource::ResourceErPerCompositionEr(const EditRate &rCompositionEditRate) const {
 
 	return GetEditRate().GetNumerator() * rCompositionEditRate.GetDenominator() / double(rCompositionEditRate.GetNumerator() * GetEditRate().GetDenominator());
+}
+
+void GraphicsWidgetSADMResource::contextMenuEvent(QGraphicsSceneContextMenuEvent *pEvent) {
+
+	QMenu menu;
+	QAction *p_show_adm_action = new QAction(QIcon(":/information.png"), tr("View S-ADM metadata in the S-ADM tab above!"), this);
+	menu.addAction(p_show_adm_action);
+	QAction *p_selected_action = menu.exec(pEvent->screenPos());
 }
 
 GraphicsWidgetADMResource::GraphicsWidgetADMResource(GraphicsWidgetSequence *pParent, cpl2016::TrackFileResourceType *pResource, const QSharedPointer<AssetMxfTrack> &rAsset /*= QSharedPointer<AssetMxfTrack>(NULL)*/, int unused_index /* = 0 */,
@@ -1759,6 +1940,93 @@ double GraphicsWidgetADMResource::ResourceErPerCompositionEr(const EditRate &rCo
 
 	return GetEditRate().GetNumerator() * rCompositionEditRate.GetDenominator() / double(rCompositionEditRate.GetNumerator() * GetEditRate().GetDenominator());
 }
+
+void GraphicsWidgetADMResource::contextMenuEvent(QGraphicsSceneContextMenuEvent *pEvent) {
+
+	QMenu menu;
+	QAction *p_show_adm_action = new QAction(QIcon(":/xml-icon.png"), tr("Extract ADM Metadata"), this);
+	menu.addAction(p_show_adm_action);
+	QAction *p_selected_action = menu.exec(pEvent->screenPos());
+
+	if(p_selected_action) {
+		if(p_selected_action == p_show_adm_action) {
+			if(mAssset) {
+				mpJobQueue->FlushQueue();
+				JobExtractAdmMetadata *p_extract_job = new JobExtractAdmMetadata(mAssset);
+				connect(p_extract_job, SIGNAL(Result(const QString, const QVariant)), this, SLOT(rExtractAdmMetadataWidget(const QString, const QVariant)));
+				mpJobQueue->AddJob(p_extract_job);
+				disconnect(mpJobQueue, SIGNAL(finished()), 0, 0);
+				connect(mpJobQueue, SIGNAL(finished()), this, SLOT(rJobQueueFinishedExtractAdmMetadata()));
+				mpJobQueue->StartQueue();
+			}
+		}
+	}
+}
+
+void GraphicsWidgetADMResource::rExtractAdmMetadataWidget(const QString rAdmText, const QVariant &rIdentifier) {
+	mAdmText = rAdmText;
+	// Create wizard
+	QWizard *adm_wizard = new QWizard(NULL, Qt::Popup | Qt::Dialog );
+	// Create wizard page
+	QWizardPage *adm_wizard_page = new QWizardPage(adm_wizard);
+	adm_wizard->addPage(adm_wizard_page);
+	adm_wizard->resize(1200,1000);
+	adm_wizard->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	adm_wizard->setWindowModality(Qt::WindowModal);
+	adm_wizard->setWindowTitle(tr("ADM Audio Metadata"));
+	adm_wizard->setWizardStyle(QWizard::ModernStyle);
+	adm_wizard->setStyleSheet("QWizard QPushButton {min-width: 60 px;}");
+
+	// Create text widget
+	QTextEdit *adm_text_view = new QTextEdit();
+	adm_text_view->setFontFamily("Courier New");
+	adm_text_view->setAttribute(Qt::WA_DeleteOnClose, true);
+	adm_text_view->setReadOnly(true);
+	adm_text_view->setText(mAdmText);
+
+	// Create layout for text widget and buttons
+	QVBoxLayout *vbox_layout = new QVBoxLayout();
+	vbox_layout->addWidget(adm_text_view);
+	adm_wizard_page->setLayout(vbox_layout);
+	QList<QWizard::WizardButton> layout;
+	adm_wizard->setOption(QWizard::HaveCustomButton1, true);
+	adm_wizard->setButtonText(QWizard::CustomButton1, tr("Copy to Clipboard"));
+	layout << QWizard::CustomButton1 << QWizard::Stretch << QWizard::CancelButton;
+	adm_wizard->setButtonLayout(layout);
+	connect(adm_wizard->button(QWizard::CustomButton1), SIGNAL(clicked()), this, SLOT(CopyToClipBoard()));
+	connect(adm_wizard->button(QWizard::CustomButton2), SIGNAL(clicked()), adm_wizard, SLOT(close()));
+
+	adm_wizard->setAttribute(Qt::WA_DeleteOnClose, true);
+	adm_wizard->show();
+	adm_wizard->activateWindow();
+}
+
+
+
+void GraphicsWidgetADMResource::rJobQueueFinishedExtractAdmMetadata() {
+	//mpProgressDialog->reset();
+	QString error_msg;
+	QList<Error> errors = mpJobQueue->GetErrors();
+	for(int i = 0; i < errors.size(); i++) {
+		error_msg.append(QString("%1: %2\n%3\n").arg(i + 1).arg(errors.at(i).GetErrorMsg()).arg(errors.at(i).GetErrorDescription()));
+	}
+	error_msg.chop(1); // remove last \n
+	if (error_msg != "") {
+		mpMsgBox->setText(tr("Critical error, can't extract ADM metadata:"));
+		mpMsgBox->setInformativeText(error_msg + "\n\n Aborting to extract ADM metadata");
+		mpMsgBox->setStandardButtons(QMessageBox::Ok);
+		mpMsgBox->setDefaultButton(QMessageBox::Ok);
+		mpMsgBox->setIcon(QMessageBox::Critical);
+		mpMsgBox->exec();
+	}
+}
+
+void GraphicsWidgetADMResource::CopyToClipBoard() {
+
+	QClipboard *clipboard = QGuiApplication::clipboard();
+	clipboard->setText(mAdmText);
+}
+
 
 GraphicsWidgetMarkerResource::GraphicsWidgetMarkerResource(GraphicsWidgetSequence *pParent, cpl2016::MarkerResourceType *pResource) :
 AbstractGraphicsWidgetResource(pParent, pResource, QSharedPointer<AssetMxfTrack>(NULL), QColor(CPL_COLOR_MARKER_RESOURCE)), mActiveMarkerOldPosition(-1, -1),

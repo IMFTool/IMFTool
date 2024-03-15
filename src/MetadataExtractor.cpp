@@ -422,6 +422,14 @@ Error MetadataExtractor::ReadPcmMxfDescriptor(Metadata &rMetadata, const QFileIn
 			result = reader.OP1aHeader().GetMDObjectByType(DefaultCompositeDict().ul(MDD_ADMAudioMetadataSubDescriptor), &tmp_obj);
 			if(KM_SUCCESS(result)) {  /// ************************** ADM Audio Track File
 				metadata.type = Metadata::ADM;
+				ASDCP::MXF::ADMAudioMetadataSubDescriptor *p_adm_audio_metadata_subdescriptor = NULL;
+				p_adm_audio_metadata_subdescriptor = dynamic_cast<ASDCP::MXF::ADMAudioMetadataSubDescriptor*>(tmp_obj->Clone());
+				if(p_adm_audio_metadata_subdescriptor) {
+					if (metadata.admRIFFChunkStreamID_link1 != -1) {
+						qDebug() << "Warning: Multiple ADMAudioMetadataSubDescriptor in this MXF file, shall be only one per ST 2067-204!";
+					}
+					metadata.admRIFFChunkStreamID_link1 = p_adm_audio_metadata_subdescriptor->RIFFChunkStreamID_link1;
+				}
 
 				std::list<ASDCP::MXF::InterchangeObject*> tmp_obj = std::list<ASDCP::MXF::InterchangeObject*>();
 				result = reader.OP1aHeader().GetMDObjectsByType(DefaultCompositeDict().ul(MDD_ADMSoundfieldGroupLabelSubDescriptor), tmp_obj);
@@ -472,7 +480,7 @@ Error MetadataExtractor::ReadPcmMxfDescriptor(Metadata &rMetadata, const QFileIn
 								adm_soundfield_group.mcaTitleVersion = QString(p_adm_soundfield_subdescriptor->MCATitleVersion.get().EncodeString(identbuf, IdentBufferLen));
 							}
 							if (p_adm_soundfield_subdescriptor->RIFFChunkStreamID_link2) {
-								adm_soundfield_group.mgaMetadataSectionLinkId = QString::number(p_adm_soundfield_subdescriptor->RIFFChunkStreamID_link2);
+								adm_soundfield_group.admRIFFChunkStreamID_link2 = p_adm_soundfield_subdescriptor->RIFFChunkStreamID_link2;
 							}
 							if (!p_adm_soundfield_subdescriptor->ADMAudioProgrammeID_ST2131.empty()) {
 								adm_soundfield_group.admAudioProgrammeID = QString(p_adm_soundfield_subdescriptor->ADMAudioProgrammeID_ST2131.get().EncodeString(identbuf, IdentBufferLen));

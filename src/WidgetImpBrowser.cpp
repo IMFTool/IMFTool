@@ -47,6 +47,7 @@
 #include <QPushButton>
 #include <QDesktopServices>
 #include <QScreen>
+#include <QClipboard>
 #include "WizardEssenceDescriptor.h"
 #include "SMPTE-2067-9a-2018-Sidecar.h"
 
@@ -306,6 +307,7 @@ void WidgetImpBrowser::rCustomMenuRequested(QPoint pos) {
 #ifdef APP5_ACES
 			QAction *extract_targetframe_action = new QAction(QIcon(":/folder.png"), tr("Extract target frames"), this);
 #endif
+			QAction *extract_adm_metadata_action = new QAction(QIcon(":/xml-icon.png"), tr("Extract ADM Metadata"), this);
 			connect(remove_action, SIGNAL(triggered(bool)), this, SLOT(rRemoveSelectedRow()));
 			//connect(delete_action, SIGNAL(triggered(bool)), this, SLOT(rDeleteSelectedRow()));
 			connect(view_scm_action, SIGNAL(triggered(bool)), this, SLOT(rShowSidecarCompositionMapGeneratorView()));
@@ -317,6 +319,7 @@ void WidgetImpBrowser::rCustomMenuRequested(QPoint pos) {
 #ifdef APP5_ACES
 			connect(extract_targetframe_action, SIGNAL(triggered(bool)), this, SLOT(rExtractTargetFrames()));
 #endif
+			connect(extract_adm_metadata_action, SIGNAL(triggered(bool)), this, SLOT(rExtractAdmMetadata()));
 			menu.addAction(remove_action);
 			//menu.addAction(delete_action);
 			//menu.addSeparator();
@@ -339,6 +342,9 @@ void WidgetImpBrowser::rCustomMenuRequested(QPoint pos) {
 						menu.addAction(extract_targetframe_action);
 					}
 #endif
+					if (assetMxfTrack->GetEssenceType() == Metadata::ADM) {
+						menu.addAction(extract_adm_metadata_action);
+					}
 				}
 				if(asset->GetType() == Asset::scm) {
 					menu.addAction(view_scm_action);
@@ -924,6 +930,24 @@ void WidgetImpBrowser::rJobQueueFinishedTargetFrames() {
 	}
 }
 
+void WidgetImpBrowser::rJobQueueFinishedExtractAdmMetadata() {
+	mpProgressDialog->reset();
+	QString error_msg;
+	QList<Error> errors = mpJobQueue->GetErrors();
+	for(int i = 0; i < errors.size(); i++) {
+		error_msg.append(QString("%1: %2\n%3\n").arg(i + 1).arg(errors.at(i).GetErrorMsg()).arg(errors.at(i).GetErrorDescription()));
+	}
+	error_msg.chop(1); // remove last \n
+	if (error_msg != "") {
+		mpMsgBox->setText(tr("Critical error, can't extract ADM metadata:"));
+		mpMsgBox->setInformativeText(error_msg + "\n\n Aborting to extract ADM metadata");
+		mpMsgBox->setStandardButtons(QMessageBox::Ok);
+		mpMsgBox->setDefaultButton(QMessageBox::Ok);
+		mpMsgBox->setIcon(QMessageBox::Critical);
+		mpMsgBox->exec();
+	}
+}
+
 void WidgetImpBrowser::rImpViewDoubleClicked(const QModelIndex &rIndex) {
 
 	if(mpImfPackage) {
@@ -987,6 +1011,20 @@ void WidgetImpBrowser::rExtractTargetFrames() {
 
 }
 #endif
+
+void WidgetImpBrowser::rExtractAdmMetadata() {
+	QSharedPointer<AssetMxfTrack> asset = mpImfPackage->GetAsset(mpSortProxyModelImp->mapToSource(mpViewImp->currentIndex()).row()).objectCast<AssetMxfTrack>();
+	if(asset) {
+		mpJobQueue->FlushQueue();
+		JobExtractAdmMetadata *p_extract_job = new JobExtractAdmMetadata(asset);
+		connect(p_extract_job, SIGNAL(Result(const QString, const QVariant)), this, SLOT(rExtractAdmMetadataWidget(const QString, const QVariant)));
+		mpJobQueue->AddJob(p_extract_job);
+		disconnect(mpJobQueue, SIGNAL(finished()), 0, 0);
+		connect(mpJobQueue, SIGNAL(finished()), this, SLOT(rJobQueueFinishedExtractAdmMetadata()));
+		mpJobQueue->StartQueue();
+	}
+
+}
 
 void WidgetImpBrowser::rShowSidecarCompositionMapGeneratorEdit() {
 	QSharedPointer<AssetScm> asset = mpImfPackage->GetAsset(mpSortProxyModelImp->mapToSource(mpViewImp->currentIndex()).row()).objectCast<AssetScm>();
@@ -1556,3 +1594,48 @@ void CustomTableView::startDrag(Qt::DropActions supportedActions) {
 		}
 	}
 }
+
+void WidgetImpBrowser::rExtractAdmMetadataWidget(const QString rAdmText, const QVariant &rIdentifier) {
+	mAdmText = rAdmText;
+	// Create wizard
+	QWizard *adm_wizard = new QWizard(this, Qt::Popup | Qt::Dialog );
+	// Create wizard page
+	QWizardPage *adm_wizard_page = new QWizardPage(adm_wizard);
+	adm_wizard->addPage(adm_wizard_page);
+	adm_wizard->resize(1200,1000);
+	adm_wizard->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	adm_wizard->setWindowModality(Qt::WindowModal);
+	adm_wizard->setWindowTitle(tr("ADM Audio Metadata"));
+	adm_wizard->setWizardStyle(QWizard::ModernStyle);
+	adm_wizard->setStyleSheet("QWizard QPushButton {min-width: 60 px;}");
+
+	// Create text widget
+	QTextEdit *adm_text_view = new QTextEdit();
+	adm_text_view->setFontFamily("Courier New");
+	adm_text_view->setAttribute(Qt::WA_DeleteOnClose, true);
+	adm_text_view->setReadOnly(true);
+	adm_text_view->setText(mAdmText);
+
+	// Create layout for text widget and buttons
+	QVBoxLayout *vbox_layout = new QVBoxLayout();
+	vbox_layout->addWidget(adm_text_view);
+	adm_wizard_page->setLayout(vbox_layout);
+	QList<QWizard::WizardButton> layout;
+	adm_wizard->setOption(QWizard::HaveCustomButton1, true);
+	adm_wizard->setButtonText(QWizard::CustomButton1, tr("Copy to Clipboard"));
+	layout << QWizard::CustomButton1 << QWizard::Stretch << QWizard::CancelButton;
+	adm_wizard->setButtonLayout(layout);
+	connect(adm_wizard->button(QWizard::CustomButton1), SIGNAL(clicked()), this, SLOT(CopyToClipBoard()));
+	connect(adm_wizard->button(QWizard::CustomButton2), SIGNAL(clicked()), adm_wizard, SLOT(close()));
+
+	adm_wizard->setAttribute(Qt::WA_DeleteOnClose, true);
+	adm_wizard->show();
+	adm_wizard->activateWindow();
+}
+
+void WidgetImpBrowser::CopyToClipBoard() {
+
+	QClipboard *clipboard = QGuiApplication::clipboard();
+	clipboard->setText(mAdmText);
+}
+

@@ -946,6 +946,7 @@ ImfError WidgetComposition::ParseCpl() {
 							case MainAudioSequence:
 								if(mImp) p_graphics_sequence->AddResource(new GraphicsWidgetAudioResource(p_graphics_sequence, p_file_resource->_clone(), mImp->GetAsset(ImfXmlHelper::Convert(p_file_resource->getTrackFileId())).objectCast<AssetMxfTrack>(), 0, mImp), p_graphics_sequence->GetResourceCount());
 								else p_graphics_sequence->AddResource(new GraphicsWidgetAudioResource(p_graphics_sequence, p_file_resource->_clone()), p_graphics_sequence->GetResourceCount());
+								error = CheckAudioAlignment(p_file_resource, error);
 								break;
 							case CommentarySequence:
 							case HearingImpairedCaptionsSequence:
@@ -1287,6 +1288,7 @@ void WidgetComposition::rCurrentFrameChanged(const Timecode &rCplTimecode) {
 		QUuid audio_track_id;
 		QUuid video_track_id;
 		QUuid ttml_track_id; // (k)
+		QMap<quint8, QUuid> sadm_track_ids;
 		for (int i = 0; i < GetTrackDetailCount(); i++) {
 			AbstractWidgetTrackDetails *p_track_details = GetTrackDetail(i);
 			if (p_track_details) {
@@ -1301,23 +1303,33 @@ void WidgetComposition::rCurrentFrameChanged(const Timecode &rCplTimecode) {
 				else if (p_track_details->GetType() == SubtitlesSequence) {
 					ttml_track_id = p_track_details->GetId();
 				}
+				else if (p_track_details->GetType() == MGASADMSignalSequence) {
+					sadm_track_ids.insert(i + 1, p_track_details->GetId());
+				}
 			}
 		}
 
-		QList<AbstractGraphicsWidgetResource*> resources_list = mpCompositionScene->GetResourcesAt(rCplTimecode, SubtitlesSequence | MainAudioSequence | MainImageSequence);
+		QList<AbstractGraphicsWidgetResource*> resources_list = mpCompositionScene->GetResourcesAt(rCplTimecode, SubtitlesSequence | MainAudioSequence | MainImageSequence | MGASADMSignalSequence);
 		for (int i = 0; i < resources_list.size(); i++) {
 			GraphicsWidgetSequence *p_seq = dynamic_cast<GraphicsWidgetSequence*>(resources_list.at(i)->GetSequence());
 			if (p_seq) {
-				//if(p_seq->GetTrackId() == audio_track_id) {
-				//	AbstractGraphicsWidgetResource *p_resource = resources_list.at(i);
-				//	emit CurrentAudioChanged(p_resource->GetAsset(), (p_resource->MapToCplTimeline(Timecode()) - rCplTimecode).AsPositiveDuration(), rCplTimecode);
-				//}
+				if (sadm_track_ids.values().contains(p_seq->GetTrackId())) {
+					AbstractGraphicsWidgetResource *p_resource = resources_list.at(i);
+					if (p_resource->GetLastVisibleFrame().GetOverallFrames() > -1) {
+						qint64 assetPosition = (p_resource->MapToCplTimeline(Timecode()) - rCplTimecode).AsPositiveDuration().GetCount();
+						emit CurrentSadmChanged(p_resource->GetAsset(), assetPosition, rCplTimecode, p_seq->GetTrackId(), sadm_track_ids.keys(p_seq->GetTrackId()).first());
+					}
+				}
+			}
+		}
+		for (int i = 0; i < resources_list.size(); i++) {
+			GraphicsWidgetSequence *p_seq = dynamic_cast<GraphicsWidgetSequence*>(resources_list.at(i)->GetSequence());
+			if (p_seq) {
 				if (p_seq->GetTrackId() == video_track_id) {
 					AbstractGraphicsWidgetResource *p_resource = resources_list.at(i);
 					if (p_resource->GetLastVisibleFrame().GetOverallFrames() > -1) { // avoids wrong signals near segment transitions
 						qint64 assetPosition = (p_resource->MapToCplTimeline(Timecode()) - rCplTimecode).AsPositiveDuration().GetCount();
 						assetPosition = p_resource->GetEntryPoint().GetCount() + (assetPosition - p_resource->GetEntryPoint().GetCount());// % p_resource->GetSourceDuration().GetCount());
-						//emit CurrentVideoChanged(p_resource->GetAsset(), (p_resource->MapToCplTimeline(Timecode()) - rCplTimecode).AsPositiveDuration().GetCount(), rCplTimecode, p_resource->timline_index);
 						emit CurrentVideoChanged(p_resource->GetAsset(), assetPosition, rCplTimecode, p_resource->timline_index);
 						return;
 					}
@@ -1329,6 +1341,8 @@ void WidgetComposition::rCurrentFrameChanged(const Timecode &rCplTimecode) {
 				}
 			}
 		}
+	} else {
+		emit OutOfTimeline(rCplTimecode.AsPositiveDuration().GetCount());
 	}
 }
 
@@ -1710,6 +1724,33 @@ qint64 WidgetComposition::GetTotalDuration() {
 		}
 	}
 	return total_duration;
+}
+
+ImfError WidgetComposition::CheckAudioAlignment(cpl2016::TrackFileResourceType *pFileResource, ImfError &rError) {
+	ImfError error = rError;
+	qint64 source_duration = 0;
+	quint32 samples_per_editunit = 0;
+	quint32 cpl_er_numerator = ImfXmlHelper::Convert(mData.getEditRate()).GetNumerator();
+	quint32 cpl_er_denominator = ImfXmlHelper::Convert(mData.getEditRate()).GetDenominator();
+	quint32 audiosampling_rate = 48000;
+	if (pFileResource->getEditRate().present())
+		audiosampling_rate = ImfXmlHelper::Convert(pFileResource->getEditRate().get()).GetRoundendQuotient();
+	if (pFileResource->getSourceDuration().present())
+		source_duration = pFileResource->getSourceDuration().get();
+	else if (pFileResource->getEntryPoint().present())
+		source_duration = pFileResource->getIntrinsicDuration() - pFileResource->getEntryPoint().get();
+	else
+		source_duration = pFileResource->getIntrinsicDuration();
+	if ((cpl_er_denominator == 1) || cpl_er_denominator == 1000)
+		samples_per_editunit = audiosampling_rate / cpl_er_numerator * cpl_er_denominator;
+	else if (ImfXmlHelper::Convert(mData.getEditRate()).GetNumerator() == 24000)
+		samples_per_editunit = audiosampling_rate / cpl_er_numerator * cpl_er_denominator;
+	else
+		samples_per_editunit = audiosampling_rate * 5 * cpl_er_denominator / cpl_er_numerator;
+	if ((source_duration % samples_per_editunit) != 0) {
+		error = ImfError(ImfError::MisalignedAudio, QString("One or more Main Audio Tracks have resources with a source duration that is not a multiple of one Image Edit Unit. \n\nEdit only by right-click > Enter Entry Point or right-click > Enter Audio Duration!"), true);
+	}
+	return error;
 }
 
 ImprovedSplitter::ImprovedSplitter(QWidget *pParent /*= NULL*/) :

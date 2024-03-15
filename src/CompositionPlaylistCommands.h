@@ -20,6 +20,7 @@
 
 
 class AbstractGraphicsWidgetResource;
+class GraphicsWidgetAudioResource;
 class GraphicsWidgetMarkerResource;
 class GraphicsObjectVerticalIndicator;
 class GraphicsWidgetSegmentIndicator;
@@ -47,6 +48,23 @@ private:
 };
 
 
+class SetEntryPointSamplesCommand : public QUndoCommand {
+
+public:
+	SetEntryPointSamplesCommand(GraphicsWidgetAudioResource *pResource, const Duration &rOldEntryPoint, const Duration &rNewEntryPoint, QUndoCommand *pParent = NULL);
+	virtual ~SetEntryPointSamplesCommand() {}
+	virtual void undo();
+	//! Called once when pushed on Undo Stack.
+	virtual void redo();
+
+private:
+	Q_DISABLE_COPY(SetEntryPointSamplesCommand);
+	GraphicsWidgetAudioResource *mpResource;
+	Duration mOldEntryPoint;
+	Duration mNewEntryPoint;
+};
+
+
 class SetSourceDurationCommand : public QUndoCommand {
 
 public:
@@ -59,6 +77,23 @@ public:
 private:
 	Q_DISABLE_COPY(SetSourceDurationCommand);
 	AbstractGraphicsWidgetResource *mpResource;
+	Duration mOldSourceDuration;
+	Duration mNewSourceDuration;
+};
+
+
+class SetSourceDurationSamplesCommand : public QUndoCommand {
+
+public:
+	SetSourceDurationSamplesCommand(GraphicsWidgetAudioResource *pResource, const Duration &rOldSourceDuration, const Duration &rNewSourceDuration, QUndoCommand *pParent = NULL);
+	virtual ~SetSourceDurationSamplesCommand() {}
+	virtual void undo();
+	//! Called once when pushed on Undo Stack.
+	virtual void redo();
+
+private:
+	Q_DISABLE_COPY(SetSourceDurationSamplesCommand);
+	GraphicsWidgetAudioResource *mpResource;
 	Duration mOldSourceDuration;
 	Duration mNewSourceDuration;
 };

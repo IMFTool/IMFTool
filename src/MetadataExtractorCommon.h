@@ -74,6 +74,7 @@ struct MGASoundfieldGroup {
 		QString								mcaTitle;
 		QString								mcaTitleVersion;
 		QString								admAudioProgrammeID;
+		qint32								admRIFFChunkStreamID_link2;
 	};
 
 typedef MGASoundfieldGroup ADMSoundfieldGroup;
@@ -130,6 +131,7 @@ typedef MGASoundfieldGroup ADMSoundfieldGroup;
 	QList<MGASoundfieldGroup>				mgaSoundFieldGroupList;
 	QList<ADMSoundfieldGroup>				admSoundFieldGroupList;
 	qint32									mgaAverageBytesPerSecond;
+	qint32									admRIFFChunkStreamID_link1 = -1;
 	//WR
 #ifdef APP5_ACES
 	AS_02::ACES::ResourceList_t AncillaryResources;

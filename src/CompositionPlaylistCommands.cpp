@@ -39,6 +39,21 @@ void SetEntryPointCommand::redo() {
 	mpResource->SetEntryPoint(mNewEntryPoint);
 }
 
+SetEntryPointSamplesCommand::SetEntryPointSamplesCommand(GraphicsWidgetAudioResource *pResource, const Duration &rOldEntryPoint, const Duration &rNewEntryPoint, QUndoCommand *pParent /*= NULL*/) :
+QUndoCommand(pParent), mpResource(pResource), mOldEntryPoint(rOldEntryPoint), mNewEntryPoint(rNewEntryPoint) {
+
+}
+
+void SetEntryPointSamplesCommand::undo() {
+
+	mpResource->SetEntryPointSamples(mOldEntryPoint);
+}
+
+void SetEntryPointSamplesCommand::redo() {
+
+	mpResource->SetEntryPointSamples(mNewEntryPoint);
+}
+
 SetSourceDurationCommand::SetSourceDurationCommand(AbstractGraphicsWidgetResource *pResource, const Duration &rOldSourceDuration, const Duration &rNewSourceDuration, QUndoCommand *pParent /*= NULL*/) :
 QUndoCommand(pParent), mpResource(pResource), mOldSourceDuration(rOldSourceDuration), mNewSourceDuration(rNewSourceDuration) {
 
@@ -52,6 +67,21 @@ void SetSourceDurationCommand::undo() {
 void SetSourceDurationCommand::redo() {
 
 	mpResource->SetSourceDuration(mNewSourceDuration);
+}
+
+SetSourceDurationSamplesCommand::SetSourceDurationSamplesCommand(GraphicsWidgetAudioResource *pResource, const Duration &rOldSourceDuration, const Duration &rNewSourceDuration, QUndoCommand *pParent /*= NULL*/) :
+QUndoCommand(pParent), mpResource(pResource), mOldSourceDuration(rOldSourceDuration), mNewSourceDuration(rNewSourceDuration) {
+
+}
+
+void SetSourceDurationSamplesCommand::undo() {
+
+	mpResource->SetSourceDurationSamples(mOldSourceDuration);
+}
+
+void SetSourceDurationSamplesCommand::redo() {
+
+	mpResource->SetSourceDurationSamples(mNewSourceDuration);
 }
 
 SetIntrinsicDurationCommand::SetIntrinsicDurationCommand(GraphicsWidgetMarkerResource *pResource, const Duration &rOldIntrinsicDuration, const Duration &rNewIntrinsicDuration, QUndoCommand *pParent /*= NULL*/) :
@@ -461,10 +491,20 @@ EditCommand::EditCommand(AbstractGraphicsWidgetResource *pOriginResource, const 
 												 QUndoCommand *pParent /*= NULL*/) :
 QUndoCommand(pParent) {
 
-	SetSourceDurationCommand *p_set_source_dur = new SetSourceDurationCommand(pOriginResource, rOldOriginResourceSourceDuration, rNewOriginResourceSourceDuration, this);
-	SetEntryPointCommand *p_entry_command = new SetEntryPointCommand(pCloneResource, rOldCloneResourceEntryPoint, rNewCloneResourceEntryPoint, this);
-	SetSourceDurationCommand *p_set_source_dur_two = new SetSourceDurationCommand(pCloneResource, rOldCloneResourceSourceDuration, rNewCloneResourceSourceDuration, this);
-	AddResourceCommand *p_add_resource_command = new AddResourceCommand(pCloneResource, clonedResourceSourceIndex, pTargetSequence, this);
+	GraphicsWidgetAudioResource *p_origin_audio_resource = qobject_cast<GraphicsWidgetAudioResource *>(pOriginResource);
+	GraphicsWidgetAudioResource *p_clone_audio_resource = qobject_cast<GraphicsWidgetAudioResource *>(pCloneResource);
+	if (p_origin_audio_resource && p_clone_audio_resource && pOriginResource->GetCplEditRate().HasFractionalNumberOfAudioSamplesPerImageFrame()) {
+		SetSourceDurationSamplesCommand *p_set_source_dur = new SetSourceDurationSamplesCommand(p_origin_audio_resource, rOldOriginResourceSourceDuration, rNewOriginResourceSourceDuration, this);
+		SetEntryPointSamplesCommand *p_entry_command = new SetEntryPointSamplesCommand(p_clone_audio_resource, rOldCloneResourceEntryPoint, rNewCloneResourceEntryPoint, this);
+		SetSourceDurationSamplesCommand *p_set_source_dur_two = new SetSourceDurationSamplesCommand(p_clone_audio_resource, rOldCloneResourceSourceDuration, rNewCloneResourceSourceDuration, this);
+		//AbstractGraphicsWidgetResource *p_resource = qobject_cast<AbstractGraphicsWidgetResource *>(p_clone_audio_resource->Clone());
+		AddResourceCommand *p_add_resource_command = new AddResourceCommand(p_clone_audio_resource, clonedResourceSourceIndex, pTargetSequence, this);
+	} else {
+		SetSourceDurationCommand *p_set_source_dur = new SetSourceDurationCommand(pOriginResource, rOldOriginResourceSourceDuration, rNewOriginResourceSourceDuration, this);
+		SetEntryPointCommand *p_entry_command = new SetEntryPointCommand(pCloneResource, rOldCloneResourceEntryPoint, rNewCloneResourceEntryPoint, this);
+		SetSourceDurationCommand *p_set_source_dur_two = new SetSourceDurationCommand(pCloneResource, rOldCloneResourceSourceDuration, rNewCloneResourceSourceDuration, this);
+		AddResourceCommand *p_add_resource_command = new AddResourceCommand(pCloneResource, clonedResourceSourceIndex, pTargetSequence, this);
+	}
 }
 
 MoveResourceCommand::MoveResourceCommand(AbstractGraphicsWidgetResource *pResource, int newResourceIndex, GraphicsWidgetSequence *pNewSequence, GraphicsWidgetSequence *pOldSequence, QUndoCommand *pParent /*= NULL*/) :

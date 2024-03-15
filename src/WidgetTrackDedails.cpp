@@ -205,9 +205,12 @@ void WidgetTrackDetails::InitLayout() {
 	p_tool_button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 	QMenu *p_menu = new QMenu(this);
 	mpDelete = new QAction(QIcon(":/delete.png"), tr("&Remove Track"), this);
+	mShowTrackId = new QAction(QIcon(":/information.png"), tr("&Show Track ID"), this);
 	connect(p_menu, SIGNAL(aboutToShow()), this, SLOT(EnableDeleteAction()));
 	connect(mpDelete, SIGNAL(triggered()), this, SLOT(DeleteAction()));
+	connect(mShowTrackId, SIGNAL(triggered()), this, SLOT(ShowTrackId()));
 	p_menu->addAction(mpDelete);
+	p_menu->addAction(mShowTrackId);
 	p_menu->addSeparator();
 // 	p_menu->addAction(QIcon(":/up.png"), tr("Move &Up"), this, SLOT(MoveUpAction()));
 // 	p_menu->addAction(QIcon(":/down.png"), tr("Move &Down"), this, SLOT(MoveDownAction()));
@@ -219,6 +222,9 @@ void WidgetTrackDetails::InitLayout() {
 
 	p_layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
 	setLayout(p_layout);
+
+	mpMsgBox = new QMessageBox(this);
+	mpMsgBox->setIcon(QMessageBox::Information);
 }
 
 void WidgetTrackDetails::EnableDeleteAction() {
@@ -227,6 +233,16 @@ void WidgetTrackDetails::EnableDeleteAction() {
 		mpDelete->setDisabled(true);
 	else
 		mpDelete->setEnabled(true);
+}
+
+void WidgetTrackDetails::ShowTrackId() {
+
+	mpMsgBox->setText(tr("Track ID:"));
+	mpMsgBox->setIcon(QMessageBox::Information);
+	mpMsgBox->setInformativeText(this->GetId().toString().remove("{").remove("}"));
+	mpMsgBox->setStandardButtons(QMessageBox::Ok);
+	mpMsgBox->setDefaultButton(QMessageBox::Ok);
+	mpMsgBox->exec();
 }
 
 QSize WidgetTrackDetails::sizeHint() const {
@@ -262,6 +278,9 @@ void WidgetAudioTrackDetails::InitLayout() {
 	p_tool_button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 	QMenu *p_menu = new QMenu(this);
 	p_menu->addAction(QIcon(":/delete.png"), tr("&Remove Track"), this, SLOT(DeleteAction()));
+	mShowTrackId = new QAction(QIcon(":/information.png"), tr("&Show Track ID"), this);
+	connect(mShowTrackId, SIGNAL(triggered()), this, SLOT(ShowTrackId()));
+	p_menu->addAction(mShowTrackId);
 	p_menu->addSeparator();
 	p_tool_button->setMenu(p_menu);
 	QHBoxLayout *p_layout = new QHBoxLayout();
@@ -270,4 +289,17 @@ void WidgetAudioTrackDetails::InitLayout() {
 	p_layout->addWidget(p_label);
 	p_layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
 	setLayout(p_layout);
+	mpMsgBox = new QMessageBox(this);
+	mpMsgBox->setIcon(QMessageBox::Information);
 }
+
+void WidgetAudioTrackDetails::ShowTrackId() {
+
+	mpMsgBox->setText(tr("Track ID:"));
+	mpMsgBox->setIcon(QMessageBox::Information);
+	mpMsgBox->setInformativeText(this->GetId().toString().remove("{").remove("}"));
+	mpMsgBox->setStandardButtons(QMessageBox::Ok);
+	mpMsgBox->setDefaultButton(QMessageBox::Ok);
+	mpMsgBox->exec();
+}
+

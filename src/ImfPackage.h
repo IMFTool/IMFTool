@@ -393,6 +393,7 @@ public:
 	bool HasSourceFiles() const { return !mSourceFiles.empty(); }
 	SoundfieldGroup GetSoundfieldGroup() const { return mMetadata.soundfieldGroup; }
 	EditRate GetEditRate() const { return mMetadata.editRate; }
+	EditRate GetAudioSamplingRate() const { return mMetadata.audioSamplingRate; }
 	void SetEditRate(const EditRate rEditRate) { mMetadata.editRate = rEditRate; }
 	//WR
 	QString GetLanguageTag() const { return mMetadata.languageTag; }

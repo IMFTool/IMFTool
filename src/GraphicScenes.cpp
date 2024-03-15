@@ -599,14 +599,49 @@ void GraphicsSceneComposition::ProcessDragMove(DragDropInfo &rInfo, const QPoint
 
 				else if(p_origin_resource->type() == GraphicsWidgetSADMResourceType) {
 					// Per 2067-203, The Edit Rate shall be an integer multiple of the Edit Rate of the Main Image Virtual Track
-					if(p_origin_resource->GetAsset() &&
-							( p_origin_resource->GetAsset()->GetEditRate().GetNumerator() % GetCplEditRate().GetNumerator() == 0)
-								&& (p_origin_resource->GetAsset()->GetEditRate().GetDenominator() == GetCplEditRate().GetDenominator())) {
-						rInfo.isDropable = true;
+					if(p_origin_resource->GetAsset().isNull()) {
+						error_text = tr("Asset is NULL");
+					} else if(GraphicsWidgetSequence *p_sequence = dynamic_cast<GraphicsWidgetSequence*>(grid_info_left.HorizontalOrigin)) {
+						if(p_sequence->GetType() == MGASADMSignalSequence) {
+							QUuid track_id = p_sequence->GetTrackId();
+							for(int i = 0; i < mpComposition->GetSegmentCount(); i++) {
+								GraphicsWidgetSegment *p_segment = mpComposition->GetSegment(i);
+								if(p_segment) {
+									GraphicsWidgetSequence *p_sequence = p_segment->GetSequenceWithTrackId(track_id);
+									if(p_sequence && p_sequence->IsEmpty() == false) {
+										GraphicsWidgetSADMResource *p_resource_other = NULL;
+										for (int i=0; i < p_sequence->GetResourceCount(); i++) {
+											p_resource_other = dynamic_cast<GraphicsWidgetSADMResource*>(p_sequence->GetResource(i));
+											if (p_resource_other && p_resource_other->GetAsset()) break;
+										}
+										if(p_resource_other && p_resource_other->GetAsset()) {
+											if (error_text.isEmpty() && (p_resource_other->GetAsset()->GetMetadata().audioSamplingRate != p_origin_resource->GetAsset()->GetMetadata().audioSamplingRate)) {
+												error_text = tr("Audio sampling rate mismatch: %1 but %2 expected.").arg(p_origin_resource->GetAsset()->GetMetadata().audioSamplingRate.GetQuotient()).arg(p_resource_other->GetAsset()->GetMetadata().audioSamplingRate.GetName());
+
+											}
+											if (error_text.isEmpty() && (p_resource_other->GetAsset()->GetMetadata().editRate != p_origin_resource->GetAsset()->GetMetadata().editRate)) {
+												error_text = tr("MGA Edit rate mismatch: %1 fps but %2 fps expected.").arg(p_origin_resource->GetAsset()->GetMetadata().editRate.GetQuotient()).arg(p_resource_other->GetAsset()->GetMetadata().editRate.GetName());
+
+											}
+										}
+									}
+								}
+							}
+						}
 					}
-					else {
+					if (((p_origin_resource->GetAsset()->GetEditRate().GetNumerator() % GetCplEditRate().GetNumerator()) != 0)
+							|| (p_origin_resource->GetAsset()->GetEditRate().GetDenominator() != GetCplEditRate().GetDenominator())) {
+						error_text = tr("S-ADM edit rate mismatch: %1 or a multiple expected.").arg(GetCplEditRate().GetQuotient(), 0, 'f', 2);
+					}  else if ((p_origin_resource->GetAsset()->GetAudioSamplingRate().GetNumerator()  != 48000)
+						&& (p_origin_resource->GetAsset()->GetAudioSamplingRate().GetNumerator()  != 96000)) {
+						error_text = tr("MGA S-ADM sampling rate mismatch: %1 Hz, 48000 or 96000 is expected.").arg(p_origin_resource->GetAsset()->GetAudioSamplingRate().GetQuotient(), 0, 'f', 0);
+					}
+
+					if (error_text.isEmpty()) {
+						rInfo.isDropable = true;
+					} else {
 						get_main_window()->statusBar()->setStyleSheet("QStatusBar{color:red}");
-						get_main_window()->statusBar()->showMessage(tr("S-ADM sample rate mismatch: %1 expected.").arg(GetCplEditRate().GetQuotient(), 0, 'f', 2), 5000);
+						get_main_window()->statusBar()->showMessage(error_text, 5000);
 					}
 				}
 
@@ -902,7 +937,23 @@ bool GraphicsSceneComposition::AppendEditCommand(const Timecode &rCplTimecode, Q
 	if(pRootCommand) {
 		for(int i = 0; i < resources.size(); i++) {
 			AbstractGraphicsWidgetResource *p_resource = resources.at(i);
-			if(p_resource) {
+			GraphicsWidgetAudioResource *p_audio_resource = qobject_cast<GraphicsWidgetAudioResource *>(p_resource);
+
+			if (p_audio_resource) {
+				GraphicsWidgetSequence *p_sequence = p_audio_resource->GetSequence();
+				Duration old_duration = p_audio_resource->GetSourceDuration();
+				Duration entry_point = p_audio_resource->GetEntryPoint();
+				Duration position_duration = rCplTimecode.GetOverallFrames() * p_audio_resource->GetEditRate().GetNumerator() / p_audio_resource->GetEditRate().GetDenominator()  * p_audio_resource->GetCplEditRate().GetDenominator() / p_audio_resource->GetCplEditRate().GetNumerator() + .5;
+				//Duration position_duration = p_audio_resource->ResourceErPerCompositionEr(p_audio_resource->GetEditRate()) * rCplTimecode.GetOverallFrames();
+				Duration new_duration = (position_duration - entry_point).GetCount() % old_duration.GetCount();
+				if(new_duration == 0) continue;
+				GraphicsWidgetAudioResource *p_clone = p_audio_resource->Clone();
+				addItem(p_clone);
+				new EditCommand(p_audio_resource, p_audio_resource->GetSourceDuration(), new_duration,
+												p_clone, p_audio_resource->GetSourceDuration(), old_duration - new_duration,
+												p_clone->GetEntryPoint(), p_audio_resource->GetEntryPoint() + new_duration,
+												p_sequence->GetResourceIndex(p_audio_resource) + 1, p_sequence, pRootCommand);
+			} else if(p_resource) {
 				GraphicsWidgetSequence *p_sequence = p_resource->GetSequence();
 				Duration old_duration = p_resource->MapToCplTimeline(p_resource->GetSourceDuration());
 				Timecode current_frame(rCplTimecode);

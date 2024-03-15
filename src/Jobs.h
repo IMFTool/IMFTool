@@ -230,3 +230,25 @@ private:
 
 };
 #endif
+
+
+class JobExtractAdmMetadata : public AbstractJob {
+
+	Q_OBJECT
+
+public:
+	JobExtractAdmMetadata(const QSharedPointer<AssetMxfTrack> rAssetMxf);
+	virtual ~JobExtractAdmMetadata() {}
+
+signals:
+	void Result(const QString rResult, const QVariant &rIdentifier);
+
+protected:
+	virtual Error Execute();
+
+private:
+	Q_DISABLE_COPY(JobExtractAdmMetadata);
+
+	const QSharedPointer<AssetMxfTrack> mAssetMxf;
+
+};

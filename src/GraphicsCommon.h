@@ -136,9 +136,9 @@ public:
 	GraphicsWidgetBase(QGraphicsItem *pParent = NULL);
 	virtual ~GraphicsWidgetBase() {}
 	virtual int type() const { return GraphicsWidgetBaseType; }
+	EditRate GetCplEditRate() const;
 
 protected:
-	EditRate GetCplEditRate() const;
 	virtual void CplEditRateChanged() {}
 	virtual bool ExtendGrid(QPointF &rPoint, eGridPosition which) const { return false; }
 	virtual QVariant itemChange(GraphicsItemChange change, const QVariant &rValue);

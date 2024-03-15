@@ -22,6 +22,7 @@ class WidgetVideoPreview;
 class QMessageBox;	
 class WidgetCompositionInfo;
 class WidgetTimedTextPreview;
+class WidgetSADMPreview;
 class TimelineParser;
 class WidgetContentVersionList; //WR
 class WidgetLocaleList; //WR
@@ -51,6 +52,7 @@ public:
 	//WidgetVideoPreview *mpPreview; // (k)
 	QVector<VideoResource> playlist; // (k) make private?
 	QVector<TTMLtimelineResource> ttmls;
+	QMap<quint8, QUuid> mMgaSadmTracks;
 
 signals:
 	void UndoStackChanged(QUndoStack *pStack);
@@ -83,13 +85,13 @@ private:
 	WidgetVideoPreview *mpPreview;
 	QTabWidget *mpTopTabWidget; // (k)
 	WidgetTimedTextPreview *mpTTMLPreviewWidget; // (k)
+	//S-ADM browser
+	WidgetSADMPreview *mpSADMPreviewWidget;
 	WidgetCompositionInfo *mpDetailsWidget;
 	WidgetContentVersionList *mpContentVersionListWidget; //WR
 	WidgetLocaleList *mpLocaleListWidget;
 	//TODO ISXD browser
 	//WidgetXmlTree *mpIsxdWidget;
-	//S-ADM browser
-	WidgetXmlTree *mpSadmWidget;
 	QThread *tpThread; // (k)
 	TimelineParser *timelineParser; // (k)
 	bool playListUpdateSuccess = true; // (k)

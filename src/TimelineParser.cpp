@@ -7,8 +7,6 @@
 
 void TimelineParser::run() {
 
-	int last_track = 0;
-	int track_index = 0;
 	int video_timeline_index = 0;
 
 	// loop all elements currently in timeline
@@ -48,16 +46,23 @@ void TimelineParser::run() {
 							// add playlist element to playlist
 							playlist->append(playlist_element);
 						}
+						else if (p_resource->type() == GraphicsWidgetSADMResourceType) {
+
+							//WR Refresh timeline_index when parsing timeline, timeline_index is sent by signal CurrentVideoChanged to slot xPosChanged in mpPreview
+							p_resource->timline_index = 0;
+							// S-ADM found
+							GraphicsWidgetSADMResource *timelineWidget = dynamic_cast<GraphicsWidgetSADMResource*>(p_resource);
+
+							// Create Map entries
+							if(!mMGASADMTracks->contains(ii + 1)) {
+								mMGASADMTracks->insert(ii + 1, p_sequence->GetTrackId());
+							}
+						}
 						else if (p_resource->type() == GraphicsWidgetTimedTextResourceType) {
 							// TTML resource found
 							GraphicsWidgetTimedTextResource *timelineWidget = dynamic_cast<GraphicsWidgetTimedTextResource*>(p_resource);
 
 							TTMLParser *parser = new TTMLParser();
-
-							// check for new track
-							if (ii != last_track && i == 0) {
-								track_index++;
-							}
 
 							// create new resource
 							TTMLtimelineResource resource; // new resource
@@ -113,15 +118,12 @@ void TimelineParser::run() {
 							parser->~TTMLParser();
 		
 							ttmls->append(resource);
-
-							last_track = ii;
 						}
 					}
 				}
 			}
 		}
 	}
-
 	emit PlaylistFinished();
 	this->thread()->quit();
 }

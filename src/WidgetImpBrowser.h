@@ -88,6 +88,7 @@ public slots:
 	void ShowResourceGeneratorMxfMode();
 	void slotCurrentChanged(const QModelIndex &selected, const QModelIndex &deselected);
 	void rExtractTargetFramesWidget(const QStringList, const QVariant &rIdentifier);
+	void rExtractAdmMetadataWidget(const QString, const QVariant &rIdentifier);
 	void SaveTargetFrames();
 	void slotPreviewClicked(int);
 	//WR end
@@ -116,6 +117,7 @@ private slots :
 #ifdef APP5_ACES
 	void rExtractTargetFrames();
 #endif
+	void rExtractAdmMetadata();
 	void SetMxfFile(const QStringList &rFiles);
 	void SetMxfFileDirectory(const QString&);
 	void rLoadRequest();
@@ -126,6 +128,10 @@ private slots :
 	//---- SCM ---- 
 	void SetScmFile(const QStringList &rFiles);
 	void SetScmFileDirectory(const QString&);
+	// ADM metadata view
+	void rJobQueueFinishedExtractAdmMetadata();
+
+	void CopyToClipBoard();
 
 protected:
 	virtual void keyPressEvent(QKeyEvent *pEvent);
@@ -156,5 +162,6 @@ private:
 	QList<QSharedPointer<Asset> > mAdditionalAssets;
 	QToolButton *mpButtonAddOv;
 	QStringList mTargetFrameFileList;
+	QString mAdmText;
 	//WR
 };

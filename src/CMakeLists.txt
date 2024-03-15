@@ -5,9 +5,11 @@ find_file(asdcplib_Targets_PATH NAMES asdcplibtargets.cmake PATHS "$ENV{CMAKE_HI
 find_path(asdcplib_include_DIR NAMES AS_02.h PATHS "$ENV{CMAKE_HINT}/asdcplib" ENV CMAKE_HINT PATH_SUFFIXES "include")
 find_library(XercescppLib_PATH NAMES xerces-c xerces-c_3 PATHS "${PROJECT_SOURCE_DIR}/../xercescpp" "${PROJECT_SOURCE_DIR}/../lib/xercescpp" "$ENV{CMAKE_HINT}/xercescpp" ENV CMAKE_HINT PATH_SUFFIXES "lib")
 find_library(XercescppLib_Debug_PATH NAMES xerces-cD xerces-c_3D xerces-c PATHS "${PROJECT_SOURCE_DIR}/../xercescpp" "${PROJECT_SOURCE_DIR}/../lib/xercescpp" "$ENV{CMAKE_HINT}/xercescpp" ENV CMAKE_HINT PATH_SUFFIXES "lib")
-find_path(XercescppLib_include_DIR NAMES xercesc/dom/DOM.hpp PATHS "${PROJECT_SOURCE_DIR}/../xercescpp" "${PROJECT_SOURCE_DIR}/../lib/xercescpp" "$ENV{CMAKE_HINT}/xercescpp" ENV CMAKE_HINT PATH_SUFFIXES "include")
+find_path(libz_include_DIR NAMES zlib.h zconf.h ENV CMAKE_HINT PATH_SUFFIXES "include" "zlib/include")
+find_file(libz_PATH NAMES libz.a zlib.lib ENV CMAKE_HINT PATH_SUFFIXES "lib" "zlib/lib")
 find_package(OpenJPEG)
 find_package(regxmllibc)
+find_path(XercescppLib_include_DIR NAMES xercesc/dom/DOM.hpp PATHS "${PROJECT_SOURCE_DIR}/../xercescpp" "${PROJECT_SOURCE_DIR}/../lib/xercescpp" "$ENV{CMAKE_HINT}/xercescpp" ENV CMAKE_HINT PATH_SUFFIXES "include")
 
 if(BUILD_APP5_SUPPORT)
 find_package(Imath CONFIG)
@@ -61,11 +63,12 @@ set(tool_src main.cpp MainWindow.cpp KMQtLogSink.cpp QtWaitingSpinner.cpp Widget
 	ImfPackageCommands.cpp MetadataExtractor.cpp MetadataExtractorCommon.cpp WizardResourceGenerator.cpp DelegateComboBox.cpp DelegateMetadata.cpp
 	GraphicsWidgetTimeline.cpp GraphicsWidgetSegment.cpp CompositionPlaylistCommands.cpp ImfMimeData.cpp GraphicsCommon.cpp
 	CustomProxyStyle.cpp GraphicScenes.cpp GraphicsWidgetResources.cpp GraphicsViewScaleable.cpp WidgetTrackDedails.cpp GraphicsWidgetComposition.cpp
-	GraphicsWidgetSequence.cpp Events.cpp WidgetCentral.cpp
+	GraphicsWidgetSequence.cpp Events.cpp WidgetCentral.cpp 
 	WidgetCompositionInfo.cpp UndoProxyModel.cpp JobQueue.cpp Jobs.cpp Error.cpp WizardPartialImpGenerator.cpp
 	WidgetVideoPreview.cpp WidgetImagePreview.cpp JP2K_Preview.cpp JP2K_Decoder.cpp TTMLParser.cpp WidgetTimedTextPreview.cpp TimelineParser.cpp # (k)
 	WidgetContentVersionList.cpp WidgetContentVersionListCommands.cpp WidgetLocaleList.cpp WidgetLocaleListCommands.cpp WizardEssenceDescriptor.cpp#WR
-	WizardSidecarCompositionMapGenerator.cpp WizardCompositionGenerator.cpp PreviewCommon.cpp Player.cpp WidgetXmlTree.cpp
+	WizardSidecarCompositionMapGenerator.cpp WizardCompositionGenerator.cpp PreviewCommon.cpp Player.cpp WidgetXmlTree.cpp WidgetSADMPreview.cpp XmlQSyntaxHighlighter.cpp
+	qcompressor.cpp
 	)
 if(BUILD_APP5_SUPPORT)
 set(tool_src ${tool_src} As02AcesIStream.cpp ACES_Preview.cpp ACES_Decoder.cpp
@@ -82,7 +85,8 @@ set(tool_src ${tool_src} global.h MainWindow.h KMQtLogSink.h QtWaitingSpinner.h
 	WidgetCompositionInfo.h UndoProxyModel.h SafeBool.h JobQueue.h Jobs.h Error.h WizardPartialImpGenerator.h
 	WidgetVideoPreview.h WidgetImagePreview.h JP2K_Preview.h JP2K_Decoder.h TTMLParser.h WidgetTimedTextPreview.h TimelineParser.h SMPTE_Labels.h # (k)
 	WidgetContentVersionList.h WidgetContentVersionListCommands.h WidgetLocaleList.h WidgetLocaleListCommands.h WizardEssenceDescriptor.h# WR
-	WizardSidecarCompositionMapGenerator.h WizardCompositionGenerator.h PreviewCommon.h Player.h WidgetXmlTree.h
+	WizardSidecarCompositionMapGenerator.h WizardCompositionGenerator.h PreviewCommon.h Player.h WidgetXmlTree.h WidgetSADMPreview.h XmlQSyntaxHighlighter.h
+	qcompressor.h
 	)
 if(BUILD_APP5_SUPPORT)
 set(tool_src ${tool_src} As02AcesIStream.h ACES_Preview.h ACES_Decoder.h
@@ -100,7 +104,7 @@ source_group("Synthesis Files" FILES ${synthesis_src})
 qt5_add_resources(resSources ${qt_rcc_resources})
 
 include_directories("${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/synthesis" "${XercescppLib_include_DIR}" 
-	"${asdcplib_include_DIR}" "${OPENJPEG_INCLUDE_DIRS}" "${REGXMLLIBC_INCLUDE_DIRS}")
+	"${asdcplib_include_DIR}" "${OPENJPEG_INCLUDE_DIRS}" "${REGXMLLIBC_INCLUDE_DIRS}" "${libz_include_DIR}")
 
 if(BUILD_APP5_SUPPORT)
 include_directories("${OpenEXRLib_include_DIR}/OpenEXR" "${ImathLib_include_DIR}/Imath")
@@ -120,7 +124,7 @@ endif(BUILD_APP5_SUPPORT)
 add_executable(${EXE_NAME} WIN32 ${tool_src} ${resSources} ${win_resources} ${synthesis_src})
 target_link_libraries(${EXE_NAME} general Qt5::Widgets
 	 general libas02 debug "${XercescppLib_Debug_PATH}" optimized "${XercescppLib_PATH}" debug "${OpenJPEGLib_Debug_Path}" optimized "${OpenJPEGLib_Path}"
-	 regxmllibc debug openjp2 optimized openjp2
+	 regxmllibc "${libz_PATH}" debug openjp2 optimized openjp2
 	 )
 if(BUILD_APP5_SUPPORT)
 target_link_libraries(${EXE_NAME} 
