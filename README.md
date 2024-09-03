@@ -15,7 +15,7 @@ Introductory videos are available on YouTube [[2]](#imf-video), [[3]](#imf-video
 -	Create a new IMP, based on importing existing image track files
 -	Supports App#2E JPEG2000 and App#5 ACES
 -	Experimental supoprt of HTJ2K in App 2E and App4 DCDM 
--	Track file support includes IAB (SMPTE ST 2067-201) and ISXD (SMPTE RDD 47)
+-	Track file support includes IAB (SMPTE ST 2067-201), ISXD (SMPTE ST 2067-202), MGA S-ADM (SMPTE ST 2067-203) and ADM Audio (Draft SMPTE ST 2067-204)
 -	Add Sidecar Assets to an IMP ("Add Asset" --> Add Sidecar Assets)
 -	Create, view and edit Sidecar Composition Maps (SCMs)
 -	Add a Photon QC report as sidecar file (hint: export the sidecar QC report as a Partial IMP, this leaves the Original IMP unmodified!)
@@ -49,11 +49,11 @@ to download the latest binary installers.
 
 
 ## Building
-IMF Tool is multi-platform and has been successfully built under macOS version 10.12 or higher, Windows 10 and Linux 64 bit.
+IMF Tool is multi-platform and has been successfully built under macOS version 12.6 or higher, Windows 11 and Linux 64 bit.
 The build system is based on CMake. Please use CMake to create make files and project files for eclipse or Visual Studio. Installation instructions including CMake screenshots are provided as pdf file here.
 Prerequisites:
 -	Qt Version 5.12, more recent versions may work
--	NEW: For IAB and ProRes support, a patched version of asdcplib is required: https://github.com/wruppelx/asdcplib/tree/features.IAB.ProRes
+-	For IAB, ProRes, S-ADM and ADM support, a patched version of asdcplib is required: https://github.com/imftool/asdcplib
 -	libxsd
 -	Xerces 3.1
 -	Requires OpenJPEG 2.2 (with multi-threading support), available at https://github.com/uclouvain/openjpeg

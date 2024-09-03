@@ -130,7 +130,7 @@ typedef MGASoundfieldGroup ADMSoundfieldGroup;
 	bool									isPHDR = false; // For J2K with PHDRMetadataTrackSubDescriptor
 	QList<MGASoundfieldGroup>				mgaSoundFieldGroupList;
 	QList<ADMSoundfieldGroup>				admSoundFieldGroupList;
-	qint32									mgaAverageBytesPerSecond;
+	qint32									averageBytesPerSecond; // For PCM/ADM and MGA
 	qint32									admRIFFChunkStreamID_link1 = -1;
 	//WR
 #ifdef APP5_ACES

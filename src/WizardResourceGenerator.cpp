@@ -35,6 +35,7 @@
 #include <QCursor>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QScrollArea>
 #include <qevent.h>
 #include "SMPTE_Labels.h"
 
@@ -567,7 +568,7 @@ void WizardResourceGeneratorPage::InitLayout() {
 		if(metadata.editRate.IsValid() == true)
 			p_wrapper_layout_six->addWidget(new QLabel(metadata.editRate.GetName()), i, 1, 1, 1);
 		p_wrapper_layout_six->addWidget(new QLabel(tr("Average Bytes per Second:")), ++i, 0, 1, 1);
-		p_wrapper_layout_six->addWidget(new QLabel(QString::number(metadata.mgaAverageBytesPerSecond)), i, 1, 1, 1);
+		p_wrapper_layout_six->addWidget(new QLabel(QString::number(metadata.averageBytesPerSecond)), i, 1, 1, 1);
 		Q_FOREACH (const Metadata::MGASoundfieldGroup& mgaSoundFieldGroup, metadata.mgaSoundFieldGroupList) {
 			//p_wrapper_layout_six->setVerticalSpacing(50);
 			QFrame* line = new QFrame;
@@ -601,7 +602,10 @@ void WizardResourceGeneratorPage::InitLayout() {
 
 	}
 
+	QScrollArea *p_scroll_area_SADM = new QScrollArea;
+	p_scroll_area_SADM->setWidgetResizable(true);
 	p_wrapper_widget_six->setLayout(p_wrapper_layout_six);
+	p_scroll_area_SADM->setWidget(p_wrapper_widget_six);
 
 	// ADM Audio
 	QWidget *p_wrapper_widget_seven = new QWidget(this);
@@ -618,7 +622,7 @@ void WizardResourceGeneratorPage::InitLayout() {
 		if(metadata.editRate.IsValid() == true)
 			p_wrapper_layout_seven->addWidget(new QLabel(metadata.editRate.GetName()), i, 1, 1, 1);
 		p_wrapper_layout_seven->addWidget(new QLabel(tr("Average Bytes per Second:")), ++i, 0, 1, 1);
-		p_wrapper_layout_seven->addWidget(new QLabel(QString::number(metadata.mgaAverageBytesPerSecond)), i, 1, 1, 1);
+		p_wrapper_layout_seven->addWidget(new QLabel(QString::number(metadata.averageBytesPerSecond)), i, 1, 1, 1);
 		Q_FOREACH (const Metadata::ADMSoundfieldGroup& admSoundFieldGroup, metadata.admSoundFieldGroupList) {
 			QFrame* line = new QFrame;
 			line->setFrameShape(QFrame::HLine);
@@ -651,7 +655,10 @@ void WizardResourceGeneratorPage::InitLayout() {
 
 	}
 
+	QScrollArea *p_scroll_area_ADM = new QScrollArea;
+	p_scroll_area_ADM->setWidgetResizable(true);
 	p_wrapper_widget_seven->setLayout(p_wrapper_layout_seven);
+	p_scroll_area_ADM->setWidget(p_wrapper_widget_seven);
 
 	mpStackedLayout = new QStackedLayout();
 	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::WavIndex, p_wrapper_widget_two);
@@ -659,8 +666,8 @@ void WizardResourceGeneratorPage::InitLayout() {
 	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::Jpeg2000Index, p_wrapper_widget_four);
 	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::ExrIndex, p_wrapper_widget_four);
 	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::ISXDIndex, p_wrapper_widget_five);
-	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::MGAIndex, p_wrapper_widget_six);
-	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::ADMIndex, p_wrapper_widget_seven);
+	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::MGAIndex, p_scroll_area_SADM);
+	mpStackedLayout->insertWidget(WizardResourceGeneratorPage::ADMIndex, p_scroll_area_ADM);
 	setLayout(mpStackedLayout);
 
 	registerField(FIELD_NAME_SELECTED_FILES"*", this, "FilesSelected", SIGNAL(FilesListChanged()));

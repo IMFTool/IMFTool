@@ -44,7 +44,6 @@
 #include <xercesc/dom/DOMLSSerializer.hpp>
 #include <xercesc/dom/DOMLSOutput.hpp>
 
-#include <string>
 #include <QCryptographicHash>
 #include <QMessageBox>
 #include "ImfPackageCommon.h"
@@ -572,6 +571,7 @@ Error MetadataExtractor::ReadPcmMxfDescriptor(Metadata &rMetadata, const QFileIn
 			metadata.audioSamplingRate = wave_descriptor->AudioSamplingRate;
 			metadata.audioChannelCount = wave_descriptor->ChannelCount;
 			metadata.audioQuantization = wave_descriptor->QuantizationBits;
+			metadata.averageBytesPerSecond = wave_descriptor->AvgBps;
 		}
 	}
 	else {
@@ -977,7 +977,7 @@ Error MetadataExtractor::ReadMGADescriptor(Metadata &rMetadata, const QFileInfo 
 				metadata.referenceImageEditRate = mga_descriptor->ReferenceImageEditRate.get(); // Should be present
 			mga_descriptor->ReferenceAudioAlignmentLevel.empty(); // Should be present
 			metadata.audioSamplingRate = mga_descriptor->AudioSamplingRate;
-			metadata.mgaAverageBytesPerSecond = mga_descriptor->MGASoundEssenceAverageBytesPerSecond;
+			metadata.averageBytesPerSecond = mga_descriptor->MGASoundEssenceAverageBytesPerSecond;
 
 			std::list<ASDCP::MXF::InterchangeObject*> tmp_obj = std::list<ASDCP::MXF::InterchangeObject*>();
 			result = reader.OP1aHeader().GetMDObjectsByType(DefaultCompositeDict().ul(MDD_MGASoundfieldGroupLabelSubDescriptor), tmp_obj);
@@ -1076,6 +1076,7 @@ Error MetadataExtractor::ReadWavHeader(Metadata &rMetadata, const QFileInfo &rSo
 				metadata.editRate = audio_descriptor.AudioSamplingRate;
 				metadata.audioChannelCount = audio_descriptor.ChannelCount;
 				metadata.audioQuantization = audio_descriptor.QuantizationBits;
+				metadata.averageBytesPerSecond = audio_descriptor.AvgBps;
 			}
 			else {
 				error = Error(result);
