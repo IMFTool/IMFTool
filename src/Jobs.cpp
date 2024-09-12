@@ -428,17 +428,17 @@ Error JobCallPhoton::Execute() {
 	QString qresult;
 
 #ifdef NO_UNIVERSAL_PHOTON
-	//Figure out if ADM/S-ADM Track Files are present
+	//Figure out if ADM Track Files are present
 //	QString appString = "app2or2E";
-	bool is_adm_sadm = false;
+	bool is_adm = false;
 	if (mWidgetImpBrowser && mWidgetImpBrowser->GetImfPackage()) {
 		int asset_count = mWidgetImpBrowser->GetImfPackage().data()->GetAssetCount();
 		for (int i=0; i< asset_count; i++) {
 			QSharedPointer<Asset> asset = mWidgetImpBrowser->GetImfPackage().data()->GetAsset(i);
 			if (asset && (asset.data()->GetType() == Asset::eAssetType::mxf)) {
 				QSharedPointer <AssetMxfTrack> assetMxfTrack = qSharedPointerCast<AssetMxfTrack>(asset);
-				if ((assetMxfTrack->GetEssenceType() == Metadata::ADM) || (assetMxfTrack->GetEssenceType() == Metadata::SADM)) {
-					is_adm_sadm = true;
+				if (assetMxfTrack->GetEssenceType() == Metadata::ADM) {
+					is_adm = true;
 				}
 			}
 		}
@@ -452,8 +452,8 @@ Error JobCallPhoton::Execute() {
 	arg << "-cp";
 	QString lib_dir = QString("/photon/build/libs/*");
 #ifdef NO_UNIVERSAL_PHOTON
-	if (is_adm_sadm) {
-		lib_dir = QString("/photon/build/libs-admsadm/*");
+	if (is_adm) {
+		lib_dir = QString("/photon/build/libs-adm/*");
 	}
 #endif
 #ifdef WIN32
