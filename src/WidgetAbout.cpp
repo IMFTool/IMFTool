@@ -125,7 +125,7 @@ void WidgetAbout::InitLayout() {
 	QLabel *p_label_name = new QLabel(PROJECT_NAME, this);
 	p_label_name->setFont(QFont("Arial", 20, QFont::Bold));
 	QLabel *p_label_author = new QLabel(tr("Authors: ").append("Björn Stresing, Denis Manthey, Krispin Weiß, Justin Hug, Wolfgang Ruppel"), this);
-	QLabel *p_label_version = new QLabel(tr("Version: ").append(VERSION_MAJOR"." VERSION_MINOR"." VERSION_PATCH), this);
+	QLabel *p_label_version = new QLabel(tr("Version: ").append(VERSION_MAJOR"." VERSION_MINOR"." VERSION_PATCH" (Build " VERSION_BUILD")"), this);
 	QLabel *p_label_notice = new QLabel(notice, this);
 	QLabel *p_label_icon = new QLabel(this);
 	p_label_icon->setPixmap(QPixmap(":/icon1.ico"));

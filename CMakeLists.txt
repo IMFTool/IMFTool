@@ -16,7 +16,8 @@ FIND_PROGRAM(GIT_EXECUTABLE git
 set(SVN_REV 0)
 set(VERSION_MAJOR 1)
 set(VERSION_MINOR 9)
-set(VERSION_PATCH 0)
+set(VERSION_PATCH 6)
+set(VERSION_BUILD 0)
 
 # only do this if we have an svn client.
 if (SVN_EXECUTABLE)
@@ -30,7 +31,7 @@ if (SVN_EXECUTABLE)
 
     Subversion_GET_REVISION(${CMAKE_SOURCE_DIR} SVN_REV)
     if (SVN_REV)
-        set(VERSION_PATCH ${SVN_REV})
+        set(VERSION_BUILD ${SVN_REV})
         message(STATUS "SVN Last Changed Revision Number is ${SVN_REV}")
     endif()
 endif (SVN_EXECUTABLE)
