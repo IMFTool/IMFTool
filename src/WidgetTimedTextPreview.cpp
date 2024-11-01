@@ -137,7 +137,8 @@ void WidgetTimedTextPreview::rShowTTML(const QVector<visibleTTtrack> &rttmls, in
 
 			switch (ttmls->at(i).elements.at(z).type) {
 			case 0: // TXT
-				tmp_text = QString(ttmls->at(i).elements.at(z).text).remove(QRegExp("<[^>]*>"));
+				static QRegularExpression rm_regex("<[^>]*>");
+				tmp_text = QString(ttmls->at(i).elements.at(z).text).remove(rm_regex);
 				text.append(ttmls->at(i).elements.at(z).text);
 				row_items.append(new QStandardItem(tmp_text)); // text preview
 				row_items.append(new QStandardItem("")); // no image preview
@@ -203,8 +204,9 @@ void WidgetTimedTextPreview::rShowTTML(const QVector<visibleTTtrack> &rttmls, in
 		ttml_text->setHtml(text.toHtmlEscaped());
 		break;
 	case 1: // plain text
+		static QRegularExpression rm_regex("<[^>]*>");
 		ttml_text->setFont(font_medium);
-		ttml_text->setHtml(QString(text).remove(QRegExp("<[^>]*>")));
+		ttml_text->setHtml(QString(text).remove(rm_regex));
 		break;
 	case 2: // HTML
 		ttml_text->setFont(font_html);
@@ -273,7 +275,8 @@ void WidgetTimedTextPreview::showSelection(int track, int col, int item) {
 	case 7: // plain TEXT
 		render_style = 1;
 		ttml_text->setFont(font_medium);
-		ttml_text->setHtml(QString(ttmls->at(track).elements.at(item).text).remove(QRegExp("<[^>]*>")));
+		static QRegularExpression rm_regex ("<[^>]*>");
+		ttml_text->setHtml(QString(ttmls->at(track).elements.at(item).text).remove(rm_regex));
 		break;
 	case 8: // HTML
 		render_style = 2;

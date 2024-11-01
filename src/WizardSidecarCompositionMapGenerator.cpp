@@ -141,7 +141,7 @@ void WizardSidecarCompositionMapGenerator::setSidecarCompositionMapEntry(QStanda
 
 	for (int i = 0; i < mSidecarCompositionMapEntryList.size(); i++)
 	{
-		if (mSidecarCompositionMapEntryList[i]->filepath == file->text())
+		if (mSidecarCompositionMapEntryList[i]->filepath == QFileInfo(file->text())) // TODO check if still works
 		{
 			//File already exist - the struct needs to be edited (no append)
 			mSidecarCompositionMapEntryList[i]->mAssociatedCplAssets = rAssociatedCplAssets;
@@ -152,7 +152,7 @@ void WizardSidecarCompositionMapGenerator::setSidecarCompositionMapEntry(QStanda
 	if (!elementExists)
 	{
 		AssetScm::SidecarCompositionMapEntry* map = new AssetScm::SidecarCompositionMapEntry();
-		map->filepath = file->text();
+		map->filepath = QFileInfo(file->text()); // TODO check if still works
 		map->mAssociatedCplAssets = rAssociatedCplAssets;
 		map->mCplIdsNotInCurrentImp = rCplIdsNotInCurrentImp;
 

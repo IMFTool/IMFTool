@@ -132,7 +132,7 @@ void ACES_Preview::decode() {
 
 
 	err = false; // reset
-	mDecode_time.restart(); // start calculating decode time
+	mDecode_time.start(); // start calculating decode time
 
 	if (operator!=(asset, current_asset) || !asset) { // asset changed!!
 		setAsset();

@@ -121,7 +121,7 @@ void WidgetComposition::InitLayout() {
 	mpTrackSplitter->setChildrenCollapsible(false);
 	mpCompositionTracksWidget->setWidget(mpTrackSplitter); // don't invoke setWidget() befor all widgets are added
 	QVBoxLayout *p_layout = new QVBoxLayout();
-	p_layout->setMargin(0);
+	p_layout->setContentsMargins(0, 0, 0, 0);
 	p_layout->addWidget(mpToolBar);
 	p_layout->addWidget(mpOuterSplitter);
 	setLayout(p_layout);
@@ -182,8 +182,19 @@ bool WidgetComposition::eventFilter(QObject *pObj, QEvent *pEvt) {
 		if(pObj == mpCompositionTracksWidget->viewport()) return true;
 		else if(pObj == mpTimelineView->viewport()) return true;
 		else if(pObj == mpCompositionView->viewport()) {
+
 			QWheelEvent *p_wheel_event = static_cast<QWheelEvent*>(pEvt);
-			qreal scale_factor = pow((double)2, p_wheel_event->delta() / 240.0);
+			QPoint numPixels = p_wheel_event->pixelDelta();
+			QPoint numDegrees = p_wheel_event->angleDelta() / 8;
+
+			qreal scale_factor = 1;
+			if (!numPixels.isNull()) {
+				scale_factor = pow((double)2, numPixels.y() / 240.0);
+			} else if (!numDegrees.isNull()) {
+				QPoint numSteps = numDegrees / 15;
+				scale_factor = pow((double)2, numSteps.y() / 240.0);
+			}
+
 			mpTimelineView->ScaleView(scale_factor);
 			mpCompositionView->ScaleView(scale_factor);
 			mpTimelineView->horizontalScrollBar()->setValue(mpCompositionView->horizontalScrollBar()->value());
@@ -1843,7 +1854,6 @@ bool ImprovedSplitter::eventFilter(QObject *pObject, QEvent *pEvent) {
 
 void ImprovedSplitter::childEvent(QChildEvent *pEvent) {
 
-	QSplitter::childEvent(pEvent);
 	if(pEvent->child()->isWidgetType()) {
 		QWidget *p_widget = static_cast<QWidget *>(pEvent->child());
 		if(p_widget->isWindow()) return;
@@ -1857,4 +1867,5 @@ void ImprovedSplitter::childEvent(QChildEvent *pEvent) {
 			if(parentWidget())setFixedHeight(sum + parentWidget()->height());
 		}
 	}
+	QSplitter::childEvent(pEvent);
 }

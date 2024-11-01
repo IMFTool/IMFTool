@@ -270,7 +270,8 @@ Error MetadataExtractor::ReadJP2KMxfDescriptor(Metadata &rMetadata, const QFileI
 				char buf[64];
 				QString pixel_layout;
 				pixel_layout = QString(rgba_descriptor->PixelLayout.EncodeString(buf, 64)); //WR
-				if (pixel_layout.contains(QRegExp("\\([0-9]*\\)"))) {
+				static QRegularExpression pixel_layout_regex("\\([0-9]*\\)");
+				if (pixel_layout.contains(pixel_layout_regex)) {
 					metadata.componentDepth = pixel_layout.split('(')[1].split(')').first().toInt();
 				}
 			}
@@ -855,7 +856,8 @@ Error MetadataExtractor::ReadProResMxfDescriptor(Metadata &rMetadata, const QFil
 				char buf[64];
 				QString pixel_layout;
 				pixel_layout = QString(rgba_descriptor->PixelLayout.EncodeString(buf, 64)); //WR
-				if (pixel_layout.contains(QRegExp("\\([0-9]*\\)"))) {
+				static QRegularExpression pixel_layout_regex("\\([0-9]*\\)");
+				if (pixel_layout.contains(pixel_layout_regex)) {
 					metadata.componentDepth = pixel_layout.split('(')[1].split(')').first().toInt();
 				}
 			}

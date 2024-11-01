@@ -24,8 +24,8 @@
 #include <QDialogButtonBox>
 #include <QWizardPage>
 #include <QCompleter>
-#include <QDirModel>
-#include <QRegExpValidator>
+#include <QFileSystemModel>
+#include <QRegularExpressionValidator>
 
 WizardPartialImpGenerator::WizardPartialImpGenerator(QWidget *pParent /*= NULL*/) :
 QWizard(pParent) {
@@ -65,7 +65,9 @@ void WizardPartialImpGeneratorPage::InitLayout() {
 	mpLineEditRootDir->setWhatsThis("You can select the root dir using the directory browser or enter the absolute path directly.");
 	mpLineEditRootDir->setPlaceholderText(tr("--Select Partial IMF package root directory--"));
 	QCompleter *p_completer = new QCompleter(this);
-	p_completer->setModel(new QDirModel(QStringList(), QDir::AllDirs | QDir::NoDotAndDotDot, QDir::NoSort, p_completer));
+	QFileSystemModel *p_fs_model = new QFileSystemModel(p_completer);
+	p_fs_model->setFilter(QDir::AllDirs | QDir::NoDotAndDotDot);
+	p_completer->setModel(p_fs_model);
 	p_completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
 	mpLineEditRootDir->setCompleter(p_completer);
 	QPushButton *p_button_browse = new QPushButton(tr("Browse"), this);
@@ -73,8 +75,8 @@ void WizardPartialImpGeneratorPage::InitLayout() {
 	mpLineEditDirName = new QLineEdit(this);
 	mpLineEditDirName->setWhatsThis("Enter the name of the partial IMP you want to create.");
 	mpLineEditDirName->setPlaceholderText(tr("--Enter the name of the partial IMP--"));
-	QRegExp rx("[A-Za-z0-9-_]+");
-	QRegExpValidator *v = new QRegExpValidator(rx, this);
+	static QRegularExpression rx("[A-Za-z0-9-_]+");
+	QRegularExpressionValidator *v = new QRegularExpressionValidator(rx, this);
 	mpLineEditDirName->setValidator(v);
 	mpLineEditIssuer = new QLineEdit(this);
 	mpLineEditIssuer->setPlaceholderText(tr("--Issuer--"));

@@ -127,8 +127,8 @@ void WidgetCentral::InitLyout() {
 	// (k) - start
 	tpThread = new QThread(); // create widget Thread
 	timelineParser = new TimelineParser();
-	timelineParserTime = new QTime();
-	timelineParserTime->start(); // initialize timer
+	timelineParserTime = QElapsedTimer();
+	timelineParserTime.start(); // initialize timer
 
 	timelineParser->moveToThread(tpThread);
 	connect(tpThread, SIGNAL(started()), timelineParser, SLOT(run()));
@@ -219,7 +219,7 @@ void WidgetCentral::rUpdatePlaylist() {
 			timelineParser->ttmls = &ttmls;
 			timelineParser->playlist = &playlist;
 			timelineParser->mMGASADMTracks = &mMgaSadmTracks;
-			timelineParserTime->restart();
+			timelineParserTime.restart();
 			tpThread->start();
 		}
 	}

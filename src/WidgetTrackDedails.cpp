@@ -89,7 +89,7 @@ void WidgetTrackDetailsTimeline::InitLayout() {
 
 	setLayout(p_layout);
 
-	connect(mpButtonGroup, SIGNAL(buttonToggled(int, bool)), this, SLOT(rButtonToggled(int, bool)));
+	connect(mpButtonGroup, SIGNAL(idToggled(int, bool)), this, SLOT(rButtonToggled(int, bool)));
 	connect(this, SIGNAL(FramesTimecodeToggled(bool)), this, SLOT(slotShowFrames(bool)));
 }
 

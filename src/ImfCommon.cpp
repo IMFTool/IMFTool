@@ -329,7 +329,7 @@ QString Timecode::GetAsString(const QString &rMarker) const {
 
 	// TODO: improve
 	QString ret;
-	QStringList list = rMarker.split("%", QString::SkipEmptyParts);
+	QStringList list = rMarker.split("%", Qt::SkipEmptyParts);
 	if(mFramesCount < 0) ret.append("-");
 	for(int i = 0; i < list.size(); i++) {
 		if(list.at(i).startsWith(QChar('1'))) ret.append(QString("%").append(list.at(i)).arg(GetHours(), 2, 10, QChar('0')));

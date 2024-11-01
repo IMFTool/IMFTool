@@ -15,6 +15,7 @@
 */
 #pragma once
 #include <QObject>
+#include <QElapsedTimer>
 #include <QThreadPool>
 #include "Error.h"
 #include "ImfPackage.h"
@@ -78,7 +79,7 @@ private:
 	void setAsset();
 	bool extractFrame(qint64 frameNr);
 	
-	QTime mDecode_time; // time (ms) needed to decode/convert the image
+	QElapsedTimer mDecode_time; // time (ms) needed to decode/convert the image
 	QString mMsg; // error message
 	QString mMxf_path; // path to current asset
 	quint8 mScale; // scale factor for images

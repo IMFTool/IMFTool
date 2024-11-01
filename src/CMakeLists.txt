@@ -1,15 +1,20 @@
 # Force decision if App#5 ACES support should be built
 set(BUILD_APP5_SUPPORT true CACHE BOOL "Build App#5 ACES support? Run Generate again, if this option is being changed") 
 
-find_file(asdcplib_Targets_PATH NAMES asdcplibtargets.cmake PATHS "$ENV{CMAKE_HINT}/asdcplib" ENV CMAKE_HINT PATH_SUFFIXES "targets")
-find_path(asdcplib_include_DIR NAMES AS_02.h PATHS "$ENV{CMAKE_HINT}/asdcplib" ENV CMAKE_HINT PATH_SUFFIXES "include")
-find_library(XercescppLib_PATH NAMES xerces-c xerces-c_3 PATHS "${PROJECT_SOURCE_DIR}/../xercescpp" "${PROJECT_SOURCE_DIR}/../lib/xercescpp" "$ENV{CMAKE_HINT}/xercescpp" ENV CMAKE_HINT PATH_SUFFIXES "lib")
-find_library(XercescppLib_Debug_PATH NAMES xerces-cD xerces-c_3D xerces-c PATHS "${PROJECT_SOURCE_DIR}/../xercescpp" "${PROJECT_SOURCE_DIR}/../lib/xercescpp" "$ENV{CMAKE_HINT}/xercescpp" ENV CMAKE_HINT PATH_SUFFIXES "lib")
+find_package(asdcplib REQUIRED)
+
+find_library(XercescppLib_PATH NAMES xerces-c xerces-c_3 PATH_SUFFIXES "lib")
+find_library(XercescppLib_Debug_PATH NAMES xerces-cD xerces-c_3D xerces-c PATH_SUFFIXES "lib")
+find_path(XercescppLib_include_DIR NAMES xercesc/dom/DOM.hpp PATH_SUFFIXES "include")
+
 find_path(libz_include_DIR NAMES zlib.h zconf.h ENV CMAKE_HINT PATH_SUFFIXES "include" "zlib/include")
 find_file(libz_PATH NAMES libz.a zlib.lib ENV CMAKE_HINT PATH_SUFFIXES "lib" "zlib/lib")
+
 find_package(OpenJPEG)
-find_package(regxmllibc)
-find_path(XercescppLib_include_DIR NAMES xercesc/dom/DOM.hpp PATHS "${PROJECT_SOURCE_DIR}/../xercescpp" "${PROJECT_SOURCE_DIR}/../lib/xercescpp" "$ENV{CMAKE_HINT}/xercescpp" ENV CMAKE_HINT PATH_SUFFIXES "include")
+
+find_library(regxmllibc_PATH NAMES regxmllibc libregxmllibc PATH_SUFFIXES "lib")
+find_library(regxmllibc_Debug_PATH NAMES xerces-cD xerces-c_3D xerces-c PATH_SUFFIXES "lib")
+find_path(regxmllibc_include_DIR NAMES com/sandflow/smpte/regxml/MXFFragmentBuilder.h PATH_SUFFIXES "include")
 
 if(BUILD_APP5_SUPPORT)
 find_package(Imath CONFIG)
@@ -37,10 +42,7 @@ unset(IlmBaseLib_Iex_PATH CACHE)
 unset(IlmBaseLib_Iex_Debug_PATH CACHE)
 endif(BUILD_APP5_SUPPORT)
 
-include("${asdcplib_Targets_PATH}") # Import asdcplib targets.
-
-set (qt5_modules Core Gui Widgets)
-find_package (Qt5 COMPONENTS ${qt5_modules})
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
 
 if(DOXYGEN_FOUND)
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
@@ -50,9 +52,6 @@ endif(DOXYGEN_FOUND)
 
 # Find includes in corresponding build directories.
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-# Instruct CMake to run moc automatically when needed.
-set(CMAKE_AUTOMOC ON)
 
 set(qt_rcc_resources "${PROJECT_SOURCE_DIR}/resources/qt_resources.qrc")
 set(win_resources "${PROJECT_SOURCE_DIR}/resources/win_resources.rc")
@@ -101,10 +100,10 @@ set(synthesis_src synthesis/st0433-dcmlTypes.cpp synthesis/SMPTE-429-8-2006-PKL.
 
 source_group("Resource Files" FILES ${qt_rcc_resources} ${win_resources} ${open_cl_src})
 source_group("Synthesis Files" FILES ${synthesis_src})
-qt5_add_resources(resSources ${qt_rcc_resources})
+qt_add_resources(resSources ${qt_rcc_resources})
 
-include_directories("${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/synthesis" "${XercescppLib_include_DIR}" 
-	"${asdcplib_include_DIR}" "${OPENJPEG_INCLUDE_DIRS}" "${REGXMLLIBC_INCLUDE_DIRS}" "${libz_include_DIR}")
+include_directories("${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/synthesis" "${asdcplib_INCLUDE_DIRS}" "${XercescppLib_include_DIR}"
+	"${OPENJPEG_INCLUDE_DIRS}" "${regxmllibc_include_DIR}" "${libz_include_DIR}")
 
 if(BUILD_APP5_SUPPORT)
 include_directories("${OpenEXRLib_include_DIR}/OpenEXR" "${ImathLib_include_DIR}/Imath")
@@ -122,9 +121,9 @@ add_definitions(/DAPP5_ACES)
 endif(BUILD_APP5_SUPPORT)
 
 add_executable(${EXE_NAME} WIN32 ${tool_src} ${resSources} ${win_resources} ${synthesis_src})
-target_link_libraries(${EXE_NAME} general Qt5::Widgets
+target_link_libraries(${EXE_NAME} general Qt6::Gui general Qt6::Widgets general Qt6::OpenGLWidgets general libasdcp
 	 general libas02 debug "${XercescppLib_Debug_PATH}" optimized "${XercescppLib_PATH}" debug "${OpenJPEGLib_Debug_Path}" optimized "${OpenJPEGLib_Path}"
-	 regxmllibc "${libz_PATH}" debug openjp2 optimized openjp2
+	 general "${regxmllibc_PATH}" general "${libz_PATH}" debug openjp2 optimized openjp2
 	 )
 if(BUILD_APP5_SUPPORT)
 target_link_libraries(${EXE_NAME} 

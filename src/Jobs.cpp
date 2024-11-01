@@ -52,29 +52,24 @@ Error JobCalculateHash::Execute() {
 	QCryptographicHash hasher(QCryptographicHash::Sha1);
 
 	Error error;
-	char buffer[16 * 1024];
-	qint64 count;
 	qint64 file_size = file.size();
 	qint64 bytes_read = 0;
-	int progress = 0;
-	int last_progress = 0;
+	qint64 progress = 0;
+	qint64 last_progress = 0;
+
 	do {
 		if(QThread::currentThread()->isInterruptionRequested()) {
 			error = Error(Error::WorkerInterruptionRequest);
 			break;
 		}
-		count = file.read(buffer, sizeof(buffer));
-		if(count == -1) {
-			error = Error(Error::HashCalculation, tr("Couldn't read file for Hash calculation."));
-			break;
-		}
-		bytes_read += count;
+		QByteArray data = file.read(16*1024);
+		bytes_read += data.size();
 		progress = bytes_read * 100 / file_size;
 		if (progress >= last_progress + 10) {
 			emit Progress(progress);
 			last_progress = progress;
 		}
-		hasher.addData(buffer, count);
+		hasher.addData(data);
 	} while(!file.atEnd());
 
 	if(error.IsError() == false) {
@@ -446,7 +441,7 @@ Error JobCallPhoton::Execute() {
 //		if ( appList.contains("http://www.smpte-ra.org/ns/2067-50/2017") ) appString = "app5";
 	}
 #endif
-	QProcess *myProcess = new QProcess();
+	QProcess myProcess;
 	const QString program = "java";
 	QStringList arg;
 	arg << "-cp";
@@ -470,17 +465,17 @@ Error JobCallPhoton::Execute() {
 	}
 */
 	emit Progress(20);
-	myProcess->start(program, arg);
+	myProcess.start(program, arg);
 	emit Progress(40);
-	myProcess->waitForFinished(-1);
-	if (myProcess->exitStatus() == QProcess::NormalExit) {
-		if (myProcess->exitCode() != 0) { return error = Error(Error::ExitCodeNotZero); }
+	myProcess.waitForFinished(-1);
+	if (myProcess.exitStatus() == QProcess::NormalExit) {
+		if (myProcess.exitCode() != 0) { return error = Error(Error::ExitCodeNotZero); }
 	} else {
 		return error = Error(Error::ExitStatusError);
 	}
 	emit Progress(80);
 	try {
-		qresult = myProcess->readAllStandardError(); //->readAllStandardOutput();
+		qresult = myProcess.readAllStandardError(); //->readAllStandardOutput();
 	}
 	catch (...) {
 		return error = Error(Error::PhotonQcReport);

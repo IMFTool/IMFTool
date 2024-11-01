@@ -24,7 +24,7 @@
 #include <QDialogButtonBox>
 #include <QWizardPage>
 #include <QCompleter>
-#include <QDirModel>
+#include <QFileSystemModel>
 
 
 WizardWorkspaceLauncher::WizardWorkspaceLauncher(QWidget *pParent /*= NULL*/) :
@@ -64,7 +64,9 @@ void WizardWorkspaceLauncherPage::InitLayout() {
 	mpLineEdit->setWhatsThis("You can select the root dir using the directory browser or enter the absolute path directly.");
 	mpLineEdit->setPlaceholderText(tr("--Select IMF package root directory--"));
 	QCompleter *p_completer = new QCompleter(this);
-	p_completer->setModel(new QDirModel(QStringList(), QDir::AllDirs | QDir::NoDotAndDotDot, QDir::NoSort, p_completer));
+	QFileSystemModel *p_fs_model = new QFileSystemModel(p_completer);
+	p_fs_model->setFilter(QDir::AllDirs | QDir::NoDotAndDotDot);
+	p_completer->setModel(p_fs_model);
 	p_completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
 	mpLineEdit->setCompleter(p_completer);
 	QPushButton *p_button_browse = new QPushButton(tr("Browse"), this);
@@ -103,7 +105,9 @@ void WizardWorkspaceLauncherNewImpPage::InitLayout() {
 	mpLineEdit->setWhatsThis("You can select the root dir using the directory browser or enter the absolute path directly.");
 	mpLineEdit->setPlaceholderText(tr("--Select IMF package root directory--"));
 	QCompleter *p_completer = new QCompleter(this);
-	p_completer->setModel(new QDirModel(QStringList(), QDir::AllDirs | QDir::NoDotAndDotDot, QDir::NoSort, p_completer));
+	QFileSystemModel *p_fs_model = new QFileSystemModel(p_completer);
+	p_fs_model->setFilter(QDir::AllDirs | QDir::NoDotAndDotDot);
+	p_completer->setModel(p_fs_model);
 	p_completer->setCompletionMode(QCompleter::UnfilteredPopupCompletion);
 	mpLineEdit->setCompleter(p_completer);
 	QPushButton *p_button_browse = new QPushButton(tr("Browse"), this);

@@ -333,8 +333,8 @@ void GraphicsWidgetSegmentIndicator::paint(QPainter *pPainter, const QStyleOptio
 		if(writable_rect.intersected(visible_rect).isEmpty() == false && acceptHoverEvents() == true && pOption->state & QStyle::State_MouseOver) {
 			pen.setColor(QColor(CPL_FONT_COLOR));
 			pPainter->setPen(pen);
-			segment_id = font_metrics.elidedText(segment_id, Qt::ElideRight, writable_rect.width() / 2 * transf.m11());
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.center().x() - font_metrics.width(segment_id) / 2) * transf.m11(), writable_rect.top() + font_metrics.height())); // We have to use QTransform::translate() because of bug 192573.
+			segment_id = font_metrics.elidedText(segment_id, Qt::ElideRight, writable_rect.width() * transf.m11());
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.center().rx() * transf.m11() - font_metrics.boundingRect(segment_id).width() / 2, writable_rect.top() + font_metrics.height())); // We have to use QTransform::translate() because of bug 192573.
 			pPainter->drawText(QPointF(0, 0), segment_id);
 		}
 	}

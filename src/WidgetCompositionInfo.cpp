@@ -187,7 +187,7 @@ QVariant CompositionInfoModel::data(const QModelIndex &rIndex, int role /*= Qt::
 		}
 		else if(column == ColumnIssuerDate) {
 			if(role == Qt::EditRole) {
-				return mpComposition->GetIssuerDate().toString(Qt::SystemLocaleShortDate);
+				return mpComposition->GetIssuerDate().toLocalTime().toString(Qt::TextDate);
 			}
 		}
 		//WR

@@ -1,11 +1,17 @@
-cmake_minimum_required(VERSION 3.1.0)
+cmake_minimum_required(VERSION 3.21.1)
+cmake_policy(SET CMP0135 NEW)
+
+set(EXE_NAME "IMF-Tool")
+project(${EXE_NAME})
+
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets OpenGLWidgets)
+
+qt_standard_project_setup()
 
 # Name of target executable
-set(EXE_NAME "IMF-Tool")
+
 # Helps Eclipse finding include paths:
-set(CMAKE_VERBOSE_MAKEFILE ON)
 set_property(GLOBAL PROPERTY CMAKE_CXX_USE_RESPONSE_FILE_FOR_INCLUDES ON)
-project(${EXE_NAME})
 # Get the SVN revision number if an svn command line client is
 # available.  This version will run at build time rather than only
 # at configuration generation time.
@@ -61,23 +67,6 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "Default Targets")
 set_property(GLOBAL PROPERTY AUTOGEN_TARGETS_FOLDER "Generated Files")
 set_property(GLOBAL PROPERTY AUTOMOC_TARGETS_FOLDER "Generated Files")
-# Helps Eclipse finding include paths:
-#set(CMAKE_VERBOSE_MAKEFILE ON)
-#set_property(GLOBAL PROPERTY CMAKE_CXX_USE_RESPONSE_FILE_FOR_INCLUDES ON)
-# use, i.e. don't skip the full RPATH for the build tree
-set(CMAKE_SKIP_BUILD_RPATH  OFF)
-# when building, don't use the install RPATH already
-# (but later on when installing)
-set(CMAKE_BUILD_WITH_INSTALL_RPATH OFF) 
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-# add the automatically determined parts of the RPATH
-# which point to directories outside the build tree to the install RPATH
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
-# the RPATH to be used when installing, but only if it's not a system directory
-list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
-if("${isSystemDir}" STREQUAL "-1")
-   set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-endif("${isSystemDir}" STREQUAL "-1")
 
 # Configure a header file to pass some of the CMake settings to the source code.
 configure_file("${PROJECT_SOURCE_DIR}/src/info.in" "${PROJECT_BINARY_DIR}/src/info.h")

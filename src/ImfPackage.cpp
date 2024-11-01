@@ -48,9 +48,9 @@ using namespace rxml;
 ImfPackage::ImfPackage(const QDir &rWorkingDir) :
 QAbstractTableModel(NULL), mpAssetMap(NULL), mPackingLists(), mAssetList(), mRootDir(rWorkingDir), mIsDirty(false), mIsIngest(false), mpJobQueue(NULL), mCplList() {
 
-	mpAssetMap = new AssetMap(this, mRootDir.absoluteFilePath(ASSET_SEARCH_NAME));
+	mpAssetMap = new AssetMap(this, QFileInfo(mRootDir.absoluteFilePath(ASSET_SEARCH_NAME)));
 	QUuid pkl_id = QUuid::createUuid();
-	QString pkl_file_path(mRootDir.absoluteFilePath(QString("PKL_%1.xml").arg(strip_uuid(pkl_id))));
+	QFileInfo pkl_file_path(mRootDir.absoluteFilePath(QString("PKL_%1.xml").arg(strip_uuid(pkl_id))));
 	QSharedPointer<AssetPkl> pkl_asset(new AssetPkl(pkl_file_path, pkl_id));
 	mPackingLists.push_back(new PackingList(this, pkl_file_path, pkl_id));
 	AddAsset(pkl_asset, QUuid());
@@ -60,9 +60,9 @@ QAbstractTableModel(NULL), mpAssetMap(NULL), mPackingLists(), mAssetList(), mRoo
 ImfPackage::ImfPackage(const QDir &rWorkingDir, const UserText &rIssuer, const UserText &rAnnotationText /*= QString()*/) :
 QAbstractTableModel(NULL), mpAssetMap(NULL), mPackingLists(), mAssetList(), mRootDir(rWorkingDir), mIsDirty(true), mIsIngest(false), mpJobQueue(NULL), mCplList() {
 
-	mpAssetMap = new AssetMap(this, mRootDir.absoluteFilePath(ASSET_SEARCH_NAME), rAnnotationText, rIssuer);
+	mpAssetMap = new AssetMap(this, QFileInfo(mRootDir.absoluteFilePath(ASSET_SEARCH_NAME)), rAnnotationText, rIssuer);
 	QUuid pkl_id = QUuid::createUuid();
-	QString pkl_file_path(mRootDir.absoluteFilePath(QString("PKL_%1.xml").arg(strip_uuid(pkl_id))));
+	QFileInfo pkl_file_path(mRootDir.absoluteFilePath(QString("PKL_%1.xml").arg(strip_uuid(pkl_id))));
 	QSharedPointer<AssetPkl> pkl_asset(new AssetPkl(pkl_file_path, pkl_id));
 	mPackingLists.push_back(new PackingList(this, pkl_file_path, pkl_id, QUuid(), QUuid(), rAnnotationText, rIssuer));
 	AddAsset(pkl_asset, QUuid());
@@ -109,7 +109,7 @@ ImfError ImfPackage::Ingest() {
 			beginResetModel();
 			mAssetList.clear(); // dismiss all Assets
 			endResetModel();
-			error = ParseAssetMap(mRootDir.absoluteFilePath(ASSET_SEARCH_NAME));
+			error = ParseAssetMap(QFileInfo(mRootDir.absoluteFilePath(ASSET_SEARCH_NAME)));
 			if (!error) CheckIfSupplemental();
 		}
 		else {
@@ -204,9 +204,9 @@ ImfError ImfPackage::Outgest() {
 		old_pkl_file_path = mPackingLists.at(i)->GetFilePath().absoluteFilePath();
 		RemoveAsset(mPackingLists.at(i)->GetId());
 		QFile::rename(old_pkl_file_path, pkl_file_paths[i]);
-		QSharedPointer<AssetPkl> pkl_asset(new AssetPkl(pkl_file_paths[i], pkl_ids[i]));
+		QSharedPointer<AssetPkl> pkl_asset(new AssetPkl(QFileInfo(pkl_file_paths[i]), pkl_ids[i]));
 		AddAsset(pkl_asset, QUuid());
-		rPackingLists.push_back(new PackingList(this, pkl_file_paths[i], pkl_ids[i]));
+		rPackingLists.push_back(new PackingList(this, QFileInfo(pkl_file_paths[i]), pkl_ids[i]));
 	}
 	//QFile::rename(old_pkl_file_path, pkl_file_path);
 	//QSharedPointer<AssetPkl> pkl_asset(new AssetPkl(pkl_file_path, pkl_id));

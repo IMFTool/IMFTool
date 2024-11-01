@@ -59,7 +59,6 @@ public:
 	};
 
 	enum { Page_SelectAssets, Page_SelectCpl, Page_AddAditionalInfo};
-	WizardSidecarCompositionMapGenerator(QWidget *parent = 0);
 
 	WizardSidecarCompositionMapGenerator(QWidget *pParent, QSharedPointer<ImfPackage> rImfPackage, QVector< QSharedPointer<AssetCpl> > rCplAssets = QVector< QSharedPointer<AssetCpl> >(), QSharedPointer<AssetScm> rAssetScm = QSharedPointer<AssetScm>());
 	virtual ~WizardSidecarCompositionMapGenerator() {}
@@ -110,7 +109,7 @@ class sAssetsPage : public QWizardPage
 		Q_PROPERTY(QStringList FilesSelected READ GetSourceFiles WRITE SetSourceFiles NOTIFY FilesListChanged)
 
 public:
-	sAssetsPage(QWidget *parent = 0);
+
 	sAssetsPage(QWidget *parent, QSharedPointer<ImfPackage> rImfPackage);
 	QFileDialog *mpFileDialog;
 
@@ -149,7 +148,7 @@ class sCplPage : public QWizardPage
 		Q_PROPERTY(QList<QUuid> CplsSelected READ GetSelectedCpls WRITE SetSelectedCpls NOTIFY CplListChanged)
 		
 public:
-	sCplPage(QWidget *parent = 0);
+
 	sCplPage(QWidget *parent, QVector< QSharedPointer<AssetCpl> >, QString filedirectory);
 	void SetSelectedCpls(QList<QUuid> rSelectedCpls);
 	
