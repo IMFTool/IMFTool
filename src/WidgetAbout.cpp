@@ -148,7 +148,7 @@ void WidgetAbout::InitLayout() {
 	p_layout->addLayout(p_layout_sub, 5, 0, 1, 2);
 	setLayout(p_layout);
 
-	connect(mpButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(ToggleWidget(int)));
+	connect(mpButtonGroup, SIGNAL(idClicked(int)), this, SLOT(ToggleWidget(int)));
 }
 
 void WidgetAbout::ToggleWidget(int id) const {
