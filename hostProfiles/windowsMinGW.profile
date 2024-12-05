@@ -1,0 +1,14 @@
+[settings]
+os=Windows
+arch=x86_64
+compiler=gcc
+compiler.version=13
+compiler.libcxx=libstdc++11
+compiler.threads=posix
+compiler.exception=seh
+build_type=Release
+[options]
+[tool_requires]
+qtinstaller/4.8.0@de.privatehive/stable
+mingw-builds/13.2.0
+cmake/3.21.7

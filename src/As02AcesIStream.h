@@ -39,17 +39,16 @@ class As02AcesIStream: public Imf::IStream {
 
 public:
 	As02AcesIStream();
-	virtual ~As02AcesIStream() {}
 	As02AcesIStream(const As02AcesIStream &rOther);
-	virtual bool read(char c[], int n);
-	virtual uint64_t tellg();
-	virtual void seekg(uint64_t pos);
-	virtual void clear();
+	~As02AcesIStream() override;
+	bool read(char c[], int n) override;
+	uint64_t tellg() override;
+	void seekg(uint64_t pos) override;
+	void clear() override;
 	void InitBuffer(const AS_02::ACES::FrameBuffer &rBuffer);
 
 private:
 	QExplicitlySharedDataPointer<As02AcesIStreamData> d;
 };
-
 
 Q_DECLARE_METATYPE(As02AcesIStream)

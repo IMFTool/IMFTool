@@ -32,9 +32,6 @@
 #include "As02AcesIStream.h"
 #include "PreviewCommon.h"
 
-using namespace Imf;
-using namespace Imath;
-
 class AssetMxfTrack;
 
 typedef struct
@@ -106,5 +103,3 @@ public slots:
 	// Show Active Area (true) or Show Native Resolution (false)
 	void showActiveArea(bool);
 };
-
-

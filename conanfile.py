@@ -3,39 +3,50 @@
 
 import json, os
 from conan import ConanFile
-from conan.tools.cmake import CMake, CMakeToolchain
+from conan.tools.cmake import CMake, CMakeToolchain, CMakeDeps
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.env import VirtualBuildEnv
 
 required_conan_version = ">=2.0"
 
 class ImfToolConan(ConanFile):
+    jsonInfo = json.load(open("info.json", 'r'))
     # ---Package reference---
-    name = "imftool"
-    version = "1.9.0"
+    name = jsonInfo["projectName"].lower()
+    version = "%u.%u.%u" % (jsonInfo["version"]["major"], jsonInfo["version"]["minor"], jsonInfo["version"]["patch"])
+    user = jsonInfo["domain"]
+    channel = "%s" % ("snapshot" if jsonInfo["version"]["snapshot"] else "stable")
     # ---Metadata---
-    description = "A tool for editing IMF CPLs and creating new versions of an existing IMF package"
-    license = "GPLv3"
-    author = "HSRM"
-    topics = ["IMF"]
-    homepage = "https://github.com/IMFTool"
-    url = "https://github.com/IMFTool/IMFTool"
+    description = jsonInfo["projectDescription"]
+    license = jsonInfo["license"]
+    author = jsonInfo["vendor"]
+    topics = jsonInfo["topics"]
+    homepage = jsonInfo["homepage"]
+    url = jsonInfo["repository"]
     # ---Requirements---
-    requires = ("qt/[>=6.5.0]@de.privatehive/stable", "asdcplib/[>=2.12.1]", "regxmllib/[>=1.1.5]@de.privatehive/stable", "xerces-c/[>=3.2.5]@de.privatehive/stable")
-    tool_requires = ["cmake/3.21.7", "ninja/[>=1.11.1]"]
+    requires = ("qt/6.8.0@de.privatehive/stable", "qtappbase/[~1]@de.privatehive/snapshot", "regxmllib/[>=1.1.5]", "asdcplib/[>=2.12.1]", "xerces-c/[>=3.2.5]", "openjpeg/[>=2.5.2]", "zlib/[>=1.3.1]")
+    tool_requires = ["cmake/[>=3.21.1]", "ninja/[>=1.11.1]"]
     # ---Sources---
-    exports = ["LICENSE"]
-    exports_sources = ["LICENSE", "*"]
+    exports = ["info.json", "LICENSE"]
+    exports_sources = ["info.json", "LICENSE", "regxmllib/*", "photon/*", "files/*", "src/*", "resources/*", "CMakeLists.txt"]
     # ---Binary model---
     settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False], "fPIC": [True, False] }
+    options = {"shared": [True, False], "fPIC": [True, False], "app5_support": [True, False]}
     default_options = {"shared": True,
                        "fPIC": True,
+                       "app5_support": True,
                        "qt/*:GUI": True,
                        "qt/*:opengl": "desktop",
                        "qt/*:qtbase": True,
                        "qt/*:widgets": True,
-                       "qt/*:qtsvg": True}
+                       "qt/*:qtsvg": True,
+                       "regxmllib/*:shared": False,
+                       "asdcplib/*:shared": False,
+                       "asdcplib/*:encryption_support": True,
+                       "xerces-c/*:shared": False,
+                       "xerces-c/*:network": False,
+                       "openjpeg/*:shared": False,
+                       "zlib/*:shared": False}
     # ---Build---
     generators = []
     # ---Folders---
@@ -47,11 +58,19 @@ class ImfToolConan(ConanFile):
             raise ConanInvalidConfiguration(f"{self.name} {self.version} is only supported for the following operating systems: {valid_os}")
         valid_arch = ["x86_64", "armv8"]
         if str(self.settings.arch) not in valid_arch:
-            raise ConanInvalidConfiguration(f"{self.name} {self.version} is only supported for the following architectures on {self.settings.os}: {valid_arch}") 
+            raise ConanInvalidConfiguration(f"{self.name} {self.version} is only supported for the following architectures on {self.settings.os}: {valid_arch}")
+
+    def requirements(self):
+        if self.options.app5_support:
+            self.requires("imath/3.1.9", options={"shared": True})
+            self.requires("openexr/3.3.1", options={"shared": True})
 
     def generate(self):
         VirtualBuildEnv(self).generate()
+        CMakeDeps(self).generate()
         tc = CMakeToolchain(self, generator="Ninja")
+        tc.variables["BUILD_APP5_SUPPORT"] = self.options.app5_support
+        tc.variables["SKIP_VERSION_FROM_VCS"] = True
         tc.generate()
 
     def build(self):
@@ -61,4 +80,7 @@ class ImfToolConan(ConanFile):
 
     def package(self):
         cmake = CMake(self)
-        cmake.install()
+        if self.settings.build_type == 'Release':
+            cmake.install(cli_args=["--strip"])
+        else:
+            cmake.install()

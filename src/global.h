@@ -24,15 +24,12 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QFileIconProvider>
-#include <QMutex>
 #include <QMutexLocker>
 
 
-#define DEBUG_FILE_NAME PROJECT_NAME".log"
-#define MAX_DEBUG_FILE_SIZE 1000 // [Byte]
 #define ASSET_SEARCH_NAME "ASSETMAP.xml" // never ever change this
 #define VOLINDEX_SEARCH_NAME "VOLINDEX.xml" // never ever change this
-#define CREATOR_STRING PROJECT_NAME " " VERSION_MAJOR "." VERSION_MINOR "." VERSION_PATCH
+#define CREATOR_STRING INFO_PROJECTNAME " " INFO_VERSIONSTRING
 #define MIME_TYPE_MXF "application/mxf"
 #define MIME_TYPE_XML "text/xml"
 #define WELL_KNOWN_MARKER_LABEL_SCOPE_2013 "http://www.smpte-ra.org/schemas/2067-3/2013#standard-markers"
@@ -263,40 +260,6 @@ inline bool is_mxf_file(const QFileInfo &rFilePath) {
 	if(rFilePath.suffix().compare("mxf", Qt::CaseInsensitive) == 0) return true;
 	return false;
 }
-
-
-inline QDir get_app_data_location() {
-
-#ifdef NDEBUG
-	QString writeable_location(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
-	QDir dir(writeable_location);
-	if(!dir.exists(PROJECT_NAME)) {
-		if(!dir.mkpath(PROJECT_NAME)) {
-			qCritical() << "Couldn't create writable folder. Fallback to current path.";
-			return QDir::current();
-		}
-	}
-	dir.cd(PROJECT_NAME);
-	return dir;
-#else
-	return QDir::current();
-#endif // NDEBUG
-}
-
-
-inline QDir get_app_data_ctl_location() {
-
-	QDir dir = get_app_data_location();
-	if(!dir.exists("ctl")) {
-		if(!dir.mkpath("ctl")) {
-			qCritical() << "Couldn't create writable folder. Fallback to current path.";
-			return QDir::current();
-		}
-	}
-	dir.cd("ctl");
-	return dir;
-}
-
 
 inline QMainWindow* get_main_window() {
 

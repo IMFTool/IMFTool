@@ -36,9 +36,9 @@ public:
 		{0x7d, 0x83, 0x6e, 0x16, 0x37, 0xc7, 0x4c, 0x22,
 		0xb2, 0xe0, 0x46, 0xa7, 0x17, 0xe8, 0x4f, 0x42};
 		memcpy(ProductUUID, default_ProductUUID_Data, ASDCP::UUIDlen);
-		CompanyName = "HSRM";
-		ProductName = PROJECT_NAME;
-		ProductVersion = VERSION_MAJOR "." VERSION_MINOR "." VERSION_PATCH;
+		CompanyName = INFO_VENDOR;
+		ProductName = INFO_PROJECTNAME;
+		ProductVersion = INFO_VERSIONSTRING;
 		LabelSetType = ASDCP::LS_MXF_SMPTE;
 		EncryptedEssence = false;
 		UsesHMAC = false;

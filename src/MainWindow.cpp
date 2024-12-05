@@ -427,7 +427,7 @@ void MainWindow::ShowManualPdf() {
 				  error = Error::Unknown;
 			}
 			if (!error.IsError()) {
-				file_path += tr("/manual-V").append(VERSION_MAJOR"." VERSION_MINOR"." VERSION_PATCH".pdf");
+				file_path += tr("/manual-V").append(INFO_VERSIONSTRING".pdf");
 				QFile::copy(":/manual/IMF-Tool_Users-Manual.pdf", file_path);
 				if (!QDesktopServices::openUrl(QUrl::fromLocalFile(file_path))) {
 					error = Error::SourceFileOpenError;
