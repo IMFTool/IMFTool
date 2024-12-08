@@ -18,7 +18,7 @@ if(DOXYGEN_FOUND)
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
 	add_custom_target(doc ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMENT "Generating API documentation with Doxygen" VERBATIM)
 	message(STATUS "Use target \"doc\" to generate doxygen.")
-endif(DOXYGEN_FOUND)
+endif()
 
 # Find includes in corresponding build directories.
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -73,6 +73,7 @@ qt_add_resources(resSources ${qt_rcc_resources})
 
 include_directories("${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/synthesis")
 
+add_definitions(/DXSD_CXX11 /DXSD_CXX11_NULLPTR /DXSD_CXX11_TEMPLATE_ALIAS)
 if(WIN32)
 	add_definitions(/D_CRT_SECURE_NO_WARNINGS /DUNICODE /DKM_WIN32 /DASDCP_PLATFORM=\"win32\" /DNOMINMAX /DOPENEXR_DLL)
 	if (MSVC)
@@ -86,7 +87,7 @@ if(BUILD_APP5_SUPPORT)
 	add_definitions(/DAPP5_ACES)
 endif(BUILD_APP5_SUPPORT)
 
-add_executable(IMF-Tool WIN32 ${tool_src} ${resSources} ${synthesis_src})
+qt_add_executable(IMF-Tool WIN32 MACOSX_BUNDLE ${tool_src} ${resSources} ${synthesis_src})
 
 if(BUILD_APP5_SUPPORT)
 	target_link_libraries(IMF-Tool
@@ -110,6 +111,7 @@ target_link_libraries(IMF-Tool
 
 register_icon(IMF-Tool
 		ICO "${CMAKE_SOURCE_DIR}/resources/icon1.ico"
+		ICNS "${CMAKE_SOURCE_DIR}/resources/IMFTool.icns"
 		256x256 "${CMAKE_SOURCE_DIR}/resources/IMFTool256.png"
 		48x48 "${CMAKE_SOURCE_DIR}/resources/IMFTool48.png"
 )

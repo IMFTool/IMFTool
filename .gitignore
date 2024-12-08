@@ -1,5 +1,6 @@
 .project
 .idea
+.DS_Store
 INSTALL
 LICENSE.rtf
 build*
