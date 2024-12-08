@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import json, os
+import json
 from conan import ConanFile
 from conan.tools.cmake import CMake, CMakeToolchain, CMakeDeps
 from conan.errors import ConanInvalidConfiguration
@@ -24,8 +24,8 @@ class ImfToolConan(ConanFile):
     homepage = jsonInfo["homepage"]
     url = jsonInfo["repository"]
     # ---Requirements---
-    requires = ("qt/6.8.0@de.privatehive/stable", "qtappbase/[~1]@de.privatehive/snapshot", "regxmllib/[>=1.1.5]", "asdcplib/[>=2.12.1]", "xerces-c/[>=3.2.5]", "openjpeg/[>=2.5.2]", "zlib/[>=1.3.1]")
-    tool_requires = ["cmake/[>=3.21.1]", "ninja/[>=1.11.1]"]
+    requires = ("qt/6.8.1@de.privatehive/stable", "qtappbase/1.0.0@de.privatehive/stable", "regxmllib/1.1.4", "asdcplib/2.13.1", "xerces-c/3.2.5", "openjpeg/2.5.2", "zlib/1.3.1")
+    tool_requires = ["cmake/3.21.7", "ninja/1.11.1"]
     # ---Sources---
     exports = ["info.json", "LICENSE"]
     exports_sources = ["info.json", "LICENSE", "regxmllib/*", "photon/*", "files/*", "src/*", "resources/*", "CMakeLists.txt"]
