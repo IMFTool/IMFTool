@@ -1,4 +1,6 @@
 .project
+.idea
 INSTALL
 LICENSE.rtf
-
+build*
+CMakeUserPresets.json
