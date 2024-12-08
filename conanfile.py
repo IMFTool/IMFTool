@@ -37,6 +37,7 @@ class ImfToolConan(ConanFile):
                        "app5_support": True,
                        "qt/*:GUI": True,
                        "qt/*:opengl": "desktop",
+                       "qt/*:widgetsstyle": "stylesheet",
                        "qt/*:qtbase": True,
                        "qt/*:widgets": True,
                        "qt/*:qtsvg": True,
