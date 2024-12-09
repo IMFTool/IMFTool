@@ -6,6 +6,7 @@ from conan import ConanFile
 from conan.tools.cmake import CMake, CMakeToolchain, CMakeDeps
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.env import VirtualBuildEnv
+from conan.tools.files import copy
 
 required_conan_version = ">=2.0"
 
@@ -85,3 +86,8 @@ class ImfToolConan(ConanFile):
             cmake.install(cli_args=["--strip"])
         else:
             cmake.install()
+
+    def deploy(self):
+        copy(self, "%s-%s-*-installer*" % (self.name, self.version), src=self.package_folder, dst=self.deploy_folder)
+        copy(self, "%s-%s-*.AppImage*" % (self.name, self.version), src=self.package_folder, dst=self.deploy_folder)
+        copy(self, "%s-%s-*.dmg*" % (self.name, self.version), src=self.package_folder, dst=self.deploy_folder)

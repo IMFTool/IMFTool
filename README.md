@@ -20,7 +20,7 @@ Introductory videos are available on YouTube [[2]](#imf-video), [[3]](#imf-video
 -	Create, view and edit Sidecar Composition Maps (SCMs)
 -	Add a Photon QC report as sidecar file (hint: export the sidecar QC report as a Partial IMP, this leaves the Original IMP unmodified!)
 -	Load ancestor Original Versions of Supplemental IMPs for preview and versioning
-- 	Create Photon[[4]](#photon) QC report
+-	Create Photon[[4]](#photon) QC report
 -	Edit CPL metadata
 -	Add new virtual tracks (limited to audio, subtitles and markers)
 -	Import and wrap audio and timed text resources
@@ -47,18 +47,116 @@ to download the latest binary installers.
 
 **For being notified about new releases, please "Watch" IMF Tool (on the top of this page).**
 
-
 ## Building
-IMF Tool is multi-platform and has been successfully built under macOS version 12.6 or higher, Windows 11 and Linux 64 bit.
-The build system is based on CMake. Please use CMake to create make files and project files for eclipse or Visual Studio. Installation instructions including CMake screenshots are provided as pdf file here.
-Prerequisites:
--	Qt Version 5.12, more recent versions may work
--	For IAB, ProRes, S-ADM and ADM support, a patched version of asdcplib is required: https://github.com/imftool/asdcplib
--	libxsd
--	Xerces 3.1
--	Requires OpenJPEG 2.2 (with multi-threading support), available at https://github.com/uclouvain/openjpeg
--	regxmllibc, available at https://github.com/sandflow/regxmllib/
--	The ACES build option requires IlmBase, available at https://github.com/AcademySoftwareFoundation/openexr/tree/master/IlmBase
+IMF Tool is a cross-platform application and can be compiled for macOS (x86_64 and armv8), Windows 10/11 (x86_64) and Linux (x86_64).
+The build system is based on CMake in conjunction with [conan package manager](https://conan.io/).
+> [!IMPORTANT]
+> It is not possible to build IMF Tool without conan package manager at the moment.
+ 
+#### Dependencies
+- Qt 6.8 ([conan recipe](https://github.com/Privatehive/conan-Qt))
+- QtAppBase 1.0 ([conan recipe](https://github.com/Privatehive/QtAppBase))
+- For IAB, ProRes, S-ADM and ADM support, a patched version of asdcplib is required ([conan recipe](https://github.com/IMFTool/asdcplib))
+- Xerces-C 3.2 ([conan recipe](https://conan.io/center/recipes/xerces-c?version=3.2.5))
+- OpenJPEG 2.5 ([conan recipe](https://conan.io/center/recipes/openjpeg?version=2.5.2))
+- regxmllibc ([conan recipe](https://github.com/IMFTool/regxmllib))
+- The ACES build option `app5_support` requires OpenEXR ([conan recipe](https://conan.io/center/recipes/openexr?version=3.3.1)), IMath ([conan recipe](https://conan.io/center/recipes/imath?version=3.1.9))
+
+### Build process
+
+#### Install a modern c++ compiler with c++17 support:
+
+* macOS: Install latest XCode
+* Windows: 
+  * MinGW: will be automatically downloaded during the build process if conan host profile [windowsMinGW.profile](./hostProfiles/windowsMinGW.profile) is used. No need to install MinGW manually.
+  * MSVC: Install Microsoft Visual Studio (not recommended).
+* Linux: Install gcc or clang (untested) and binutils via the package manager of your favorite Linux distribution.
+
+#### Install Conan package manager:
+
+The preferred way to install [Conan package manager](https://conan.io/) is to install [python3](https://www.python.org/) first. Then install Conan via pip/pip3:
+
+```bash
+pip install conan
+```
+
+> [!NOTE]
+> python is also needed during the Qt build process - you need it anyway
+
+#### Create a conan host profile
+
+Conan can automatically detect the installed compiler and create a so called [host profile](https://docs.conan.io/2/reference/config_files/profiles.html). This host profile contains os and compiler specific settings:
+
+> [!NOTE]
+> A warning message will show up if no compiler could be detected. For Windows this is fine if we use the provided MinGW host profile later during the build process. 
+
+```bash
+conan profile detect
+```
+
+Recommended: You can add CMake as a tool dependency to your host profile. This will automatically download CMake during the build process and you will not have to do this yourself:
+
+```bash
+printf "[tool_requires]\ncmake/3.21.7" >> $(conan profile path default)
+```
+
+#### Add additional Conan remote
+
+The above-mentioned dependencies on the IMF tool must also be built before IMF Tool can be built. Conan needs for each dependency a so called recipe (which is just a file called `conanfile.py`) describing the build steps that have to be performed.
+In general those recipes are downloaded from a remote ([conan center](https://conan.io/center) by default). Not all recipes we need are provided by Conan Center - the recipes for Qt, QtBaseApp, asdcplib and regxmllib are provided by this [remote](https://conan.privatehive.de/ui/repos/tree/General/public-conan).
+
+Add the additional remote:
+
+```bash
+conan remote add privatehive https://conan.privatehive.de/artifactory/api/conan/public-conan
+```
+
+> [!TIP]
+> You can also do without remotes completely. All you have to do is change to the directory in which a conanfile.py is located and run `conan export ./`. This is particularly helpful in the recipe development process because you are indipendent of a remote server. All required Conan recipes are linked above in the [dependencies section](#Dependencies).
+
+#### Build IMF Tool
+
+Clone this repository:
+
+```bash
+git clone https://github.com/IMFTool/IMFTool.git
+cd IMFTool
+```
+
+Now start the Conan build process:
+
+For macOS, Linux, Windows MSVC (not recommended) run:
+
+```bash
+conan create ./ --build missing
+```
+
+For Windows MinGW build run:
+
+```bash
+conan create ./ -pr:h=hostProfiles/windowsMinGW.profile --build missing
+```
+
+The build process takes some time to finish... After a successful build process Conan prints the package folder where you find the IMF Tool binaries:
+
+```bash
+[...]
+imf-tool/1.9.8@com.imftool/snapshot: Package '485b2690249c03b50cb65f306a1d71791523ae73' created
+imf-tool/1.9.8@com.imftool/snapshot: Full package reference: imf-tool/1.9.8@com.imftool/snapshot#6c1e180614bc2d492d21c7828b30a700:485b2690249c03b50cb65f306a1d71791523ae73#68de6cde00be3e4a3ac30e2f254156b4
+imf-tool/1.9.8@com.imftool/snapshot: Package folder /mnt/conan/p/b/imf-t41b35db28849d/p
+                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                                    Here you find the IMF Tool binaries
+```
+
+In the package folder you will find (depending on your build host):
+
+* macOS: dmg and app binary
+* Linux: AppImage binary
+* Windows: installer binary
+
+> [!TIP]
+> There is also a Conan command to copy the binaries from the package folder to the current working directory:
+> `conan install --requires="imf-tool/1.9.8@com.imftool/snapshot" --deployer-package="*"`
 
 ## DISCLAIMER
   THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
@@ -69,8 +167,6 @@ THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
 PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM
 IS WITH YOU.  SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF
 ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
-
-
 
 <a name="imf-intro"></a>[1] IMF: Interoperable Master Format. For an introduction see here:
 http://techblog.netflix.com/2016/03/imf-prescription-for-versionitis.html
