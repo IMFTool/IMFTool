@@ -25,7 +25,7 @@ class ImfToolConan(ConanFile):
     homepage = jsonInfo["homepage"]
     url = jsonInfo["repository"]
     # ---Requirements---
-    requires = ("qt/6.8.1@de.privatehive/stable", "qtappbase/1.0.0@de.privatehive/stable", "regxmllib/1.1.4", "asdcplib/2.13.1", "xerces-c/3.2.5", "openjpeg/2.5.2", "zlib/1.3.1")
+    requires = ("qt/6.8.1@de.privatehive/stable", "qtappbase/1.1.0@de.privatehive/stable", "regxmllib/1.1.4", "asdcplib/2.13.1", "xerces-c/3.2.5", "openjpeg/2.5.2", "zlib/1.3.1")
     tool_requires = ["cmake/3.21.7", "ninja/1.11.1"]
     # ---Sources---
     exports = ["info.json", "LICENSE"]
@@ -72,7 +72,6 @@ class ImfToolConan(ConanFile):
         CMakeDeps(self).generate()
         tc = CMakeToolchain(self, generator="Ninja")
         tc.variables["BUILD_APP5_SUPPORT"] = self.options.app5_support
-        tc.variables["SKIP_VERSION_FROM_VCS"] = True
         tc.generate()
 
     def build(self):
