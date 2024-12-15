@@ -81,7 +81,7 @@ pip install conan
 ```
 
 > [!NOTE]
-> python is needed during the Qt build process
+> python is also required during the Qt build process
 
 #### Create a conan host profile
 
@@ -94,7 +94,7 @@ Conan can automatically detect the installed compiler and create a so called [ho
 conan profile detect
 ```
 
-Recommended: You can add CMake as a tool dependency to your host profile. This will automatically download CMake during the build process and you will not have to do this yourself:
+*Recommendation:* You can add CMake as a tool dependency to your host profile. This will automatically download CMake during the build process and you will not have to install CMake yourself:
 
 ```bash
 printf "[tool_requires]\ncmake/3.23.5" >> $(conan profile path default)
@@ -103,7 +103,7 @@ printf "[tool_requires]\ncmake/3.23.5" >> $(conan profile path default)
 #### Add additional Conan remote
 
 The above-mentioned dependencies on the IMF tool must also be built before IMF Tool can be built. Conan needs for each dependency a so called recipe (which is just a file called `conanfile.py`) describing the build steps that have to be performed.
-In general those recipes are downloaded from a remote ([conan center](https://conan.io/center) by default). Not all recipes we need are provided by Conan Center - the recipes for Qt, QtBaseApp, asdcplib and regxmllib are provided by this [remote](https://conan.privatehive.de/ui/repos/tree/General/public-conan).
+In general those recipes are downloaded from a remote ([Conan Center](https://conan.io/center) by default). Not all recipes we need are provided by Conan Center - the recipes for Qt, QtBaseApp, asdcplib and regxmllib are provided by this [remote](https://conan.privatehive.de/ui/repos/tree/General/public-conan).
 
 Add the additional remote:
 
@@ -172,6 +172,9 @@ conan install ./ -of build-folder -s build_type=Debug --build missing
 
 ### VSCode
 
+> [!NOTE]
+> There seem to be some macOS-related bugs that may be fixed in a VSCode C/C++ extension update in January. The preferred way for macOS is to use Xcode.
+
 Install the [C/C++ Extension Pack](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools-extension-pack) first, then open the IMF Tool root folder in VSCode (File → Open Folder).
 Switch to the CMake tab on the left.
 
@@ -180,7 +183,7 @@ Then start debugger by clicking the ▶ icon to the right of the 'Debug' section
 
 ### Xcode
 
-Xcode is missing native support for CMake preset files. We need to generate a Xcode project file:
+Xcode lacks native support for CMake preset files. We need to generate an Xcode project file:
 
 ```bash
 conan install ./ -of build-folder -s build_type=Debug -o xcode=True --build missing
