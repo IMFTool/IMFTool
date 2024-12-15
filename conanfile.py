@@ -26,16 +26,18 @@ class ImfToolConan(ConanFile):
     url = jsonInfo["repository"]
     # ---Requirements---
     requires = ("qt/6.8.1@de.privatehive/stable", "qtappbase/1.1.0@de.privatehive/stable", "regxmllib/1.1.4", "asdcplib/2.13.1", "xerces-c/3.2.5", "openjpeg/2.5.2", "zlib/1.3.1")
-    tool_requires = ["cmake/3.21.7", "ninja/1.11.1"]
+    # cmake 3.23 is needed if we use XCode generator
+    tool_requires = ["cmake/3.23.5", "ninja/1.11.1"]
     # ---Sources---
     exports = ["info.json", "LICENSE"]
     exports_sources = ["info.json", "LICENSE", "regxmllib/*", "photon/*", "files/*", "src/*", "resources/*", "CMakeLists.txt"]
     # ---Binary model---
     settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False], "fPIC": [True, False], "app5_support": [True, False]}
+    options = {"shared": [True, False], "fPIC": [True, False], "app5_support": [True, False], "xcode": [True, False]}
     default_options = {"shared": True,
                        "fPIC": True,
                        "app5_support": True,
+                       "xcode": False,
                        "qt/*:GUI": True,
                        "qt/*:opengl": "desktop",
                        "qt/*:widgetsstyle": "stylesheet",
@@ -67,10 +69,14 @@ class ImfToolConan(ConanFile):
             self.requires("imath/3.1.9", options={"shared": True})
             self.requires("openexr/3.3.1", options={"shared": True})
 
+    def config_options(self):
+        if self.settings.os != "Macos":
+            self.options.rm_safe("Xcode")
+
     def generate(self):
         VirtualBuildEnv(self).generate()
         CMakeDeps(self).generate()
-        tc = CMakeToolchain(self, generator="Ninja")
+        tc = CMakeToolchain(self, generator="Xcode" if self.options.xcode and self.settings.os == 'Macos' else "Ninja")
         tc.variables["BUILD_APP5_SUPPORT"] = self.options.app5_support
         tc.generate()
 

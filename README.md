@@ -81,7 +81,7 @@ pip install conan
 ```
 
 > [!NOTE]
-> python is also needed during the Qt build process - you need it anyway
+> python is needed during the Qt build process
 
 #### Create a conan host profile
 
@@ -97,7 +97,7 @@ conan profile detect
 Recommended: You can add CMake as a tool dependency to your host profile. This will automatically download CMake during the build process and you will not have to do this yourself:
 
 ```bash
-printf "[tool_requires]\ncmake/3.21.7" >> $(conan profile path default)
+printf "[tool_requires]\ncmake/3.23.5" >> $(conan profile path default)
 ```
 
 #### Add additional Conan remote
@@ -157,6 +157,46 @@ In the package folder you will find (depending on your build host):
 > [!TIP]
 > There is also a Conan command to copy the binaries from the package folder to the current working directory:
 > `conan install --requires="imf-tool/1.9.8@com.imftool/snapshot" --deployer-package="*"`
+
+## DEV Setup
+
+Make sure you have gone through the steps in the [build process](#Buildprocess) and have successfully built IMF Tool at least once.
+
+To be able to debug IMF Tool an IDE is required, notably: VSCode (with installed C/C++ Extension Pack), CLion, Xcode, Visual Studio.
+
+First build all dependencies (without optimizations) and create a build folder. You can name the build folder as you wish (name given after the `-of` argument):
+
+```bash
+conan install ./ -of build-folder -s build_type=Debug --build missing
+```
+
+### VSCode
+
+Install the [C/C++ Extension Pack](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools-extension-pack) first, then open the IMF Tool root folder in VSCode (File → Open Folder).
+Switch to the CMake tab on the left.
+
+Click on the ✎ icon in the Configure section and select the 'conan-debug' config.
+Then start debugger by clicking the ▶ icon to the right of the 'Debug' section.
+
+### Xcode
+
+Xcode is missing native support for CMake preset files. We need to generate a Xcode project file:
+
+```bash
+conan install ./ -of build-folder -s build_type=Debug -o xcode=True --build missing
+source build-folder/conanbuild.sh
+cmake --preset conan-default
+```
+
+In the build folder you should find an IMF-Tool.xcodeproj that can be opened in Xcode.
+
+### CLion
+
+In the CMake settings dialog (Build, Execution, Deployment → CMake) disable the default "Debug" preset (uncheck the checkbox "Enable profile"). Then select the "conan-debug" preset and enable it (check the checkbox "Enable profile"). Then click OK.
+
+### Visual Studio
+
+Not yet tested.
 
 ## DISCLAIMER
   THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
