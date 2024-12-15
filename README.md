@@ -112,7 +112,7 @@ conan remote add privatehive https://conan.privatehive.de/artifactory/api/conan/
 ```
 
 > [!TIP]
-> You can also do without remotes completely. All you have to do is change to the directory in which a conanfile.py is located and run `conan export ./`. This is particularly helpful in the recipe development process because you are indipendent of a remote server. All required Conan recipes are linked above in the [dependencies section](#Dependencies).
+> You can also do without remotes completely. All you have to do is change to the directory in which a conanfile.py is located and run `conan export ./`. This is particularly helpful in the recipe development process because you are indipendent of a remote server. All required Conan recipes are linked above in the [dependencies section](#dependencies).
 
 #### Build IMF Tool
 
@@ -160,7 +160,7 @@ In the package folder you will find (depending on your build host):
 
 ## DEV Setup
 
-Make sure you have gone through the steps in the [build process](#Buildprocess) and have successfully built IMF Tool at least once.
+Make sure you have gone through the steps in the [build process](#build-process) and have successfully built IMF Tool at least once.
 
 To be able to debug IMF Tool an IDE is required, notably: VSCode (with installed C/C++ Extension Pack), CLion, Xcode, Visual Studio.
 
