@@ -1,0 +1,24 @@
+name: "Create Conan Package"
+on: push
+
+jobs:
+  build_linux_x86_64:
+    name: "Linux"
+    uses: Privatehive/conan-workflows/.github/workflows/createPackage.yml@master
+    with:
+      image: "ubuntu-20.04"
+      conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
+
+  build_windows_x86_64:
+    name: "Windows"
+    uses: Privatehive/conan-workflows/.github/workflows/createPackage.yml@master
+    with:
+      image: "windows-2022"
+      conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
+
+  build_macos_armv8:
+    name: "Macos"
+    uses: Privatehive/conan-workflows/.github/workflows/createPackage.yml@master
+    with:
+      image: "macos-14"
+      conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
