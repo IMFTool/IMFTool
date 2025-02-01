@@ -1465,14 +1465,14 @@ void AssetMxfTrack::SetDefaultProxyImages() {
 	QStringList arg;
 	Error error;
 	arg << "-cp";
-	arg << QApplication::applicationDirPath() + QString("/regxmllib/regxmllib.jar");
+	arg << QApplication::applicationDirPath() + QString("/share/regxmllib/regxmllib.jar");
 	arg << "com.sandflow.smpte.tools.RegXMLDump";
 	arg << "-ed";
 	arg << "-d";
-	arg << QApplication::applicationDirPath() + QString("/regxmllib/www-smpte-ra-org-reg-335-2012.xml");
-	arg << QApplication::applicationDirPath() + QString("/regxmllib/www-smpte-ra-org-reg-335-2012-13-1-aaf.xml");
-	arg << QApplication::applicationDirPath() + QString("/regxmllib/www-smpte-ra-org-reg-395-2014-13-1-aaf.xml");
-	arg << QApplication::applicationDirPath() + QString("/regxmllib/www-smpte-ra-org-reg-2003-2012.xml");
+	arg << QApplication::applicationDirPath() + QString("/share/regxmllib/www-smpte-ra-org-reg-335-2012.xml");
+	arg << QApplication::applicationDirPath() + QString("/share/regxmllib/www-smpte-ra-org-reg-335-2012-13-1-aaf.xml");
+	arg << QApplication::applicationDirPath() + QString("/share/regxmllib/www-smpte-ra-org-reg-395-2014-13-1-aaf.xml");
+	arg << QApplication::applicationDirPath() + QString("/share/regxmllib/www-smpte-ra-org-reg-2003-2012.xml");
 	arg << "-i";
 	arg << filePath;
 	myProcess->start(program, arg);
@@ -1522,7 +1522,7 @@ Error AssetMxfTrack::ExtractEssenceDescriptor(const QString &filePath) {
 	qDebug() << dicts_fname.size();
 	for (int i = 0; i < dicts_fname.size(); i++) {
 
-		QString dict_path = QApplication::applicationDirPath() + QString("/regxmllib/") + dicts_fname[i];
+		QString dict_path = QString("%1/%2").arg(AUX_REGXMLLIB, dicts_fname[i]);
 		parser->parse(dict_path.toStdString().c_str());
 		DOMDocument *doc = parser->getDocument();
 		MetaDictionary *md = new MetaDictionary();

@@ -7,6 +7,7 @@ find_package(XercesC REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(regxmllib REQUIRED)
 find_package(QtAppBase REQUIRED)
+find_package(photon REQUIRED)
 
 if(BUILD_APP5_SUPPORT)
 	message(STATUS "Building with App#5 ACES support")
@@ -115,5 +116,10 @@ register_icon(IMF-Tool
 		256x256 "${CMAKE_SOURCE_DIR}/resources/IMFTool256.png"
 		48x48 "${CMAKE_SOURCE_DIR}/resources/IMFTool48.png"
 )
+
+register_aux_path(IMF-Tool DIRECTORY "${photon_dir}" NAME photon)
+register_aux_path(IMF-Tool DIRECTORY "${photon_jre_dir}" NAME photon_jre)
+register_aux_path(IMF-Tool DIRECTORY "${PROJECT_SOURCE_DIR}/regxmllib" NAME regxmllib)
+register_aux_path(IMF-Tool DIRECTORY "${PROJECT_SOURCE_DIR}/files" NAME files)
 
 install_app(IMF-Tool)

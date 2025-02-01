@@ -353,7 +353,7 @@ Error JobExtractEssenceDescriptor::Execute() {
 
 	for (int i = 0; i < dicts_fname.size(); i++) {
 
-		QString dict_path = QApplication::applicationDirPath() + QString("/regxmllib/") + dicts_fname[i];
+		QString dict_path = QString("%1/%2").arg(AUX_REGXMLLIB, dicts_fname[i]);
 		parser->parse(dict_path.toStdString().c_str());
 		DOMDocument *doc = parser->getDocument();
 		if (doc) {
@@ -416,60 +416,29 @@ JobCallPhoton::JobCallPhoton(const QString &rWorkingDirectory, WidgetImpBrowser*
 AbstractJob("Generating Photon IMP QC Report"), mWorkingDirectory(rWorkingDirectory),  mWidgetImpBrowser(rWidgetImpBrowser){
 
 }
-#define NO_UNIVERSAL_PHOTON
+
 Error JobCallPhoton::Execute() {
 
 	Error error;
 	QString qresult;
-
-#ifdef NO_UNIVERSAL_PHOTON
-	//Figure out if ADM Track Files are present
-//	QString appString = "app2or2E";
-	bool is_adm = false;
-	if (mWidgetImpBrowser && mWidgetImpBrowser->GetImfPackage()) {
-		int asset_count = mWidgetImpBrowser->GetImfPackage().data()->GetAssetCount();
-		for (int i=0; i< asset_count; i++) {
-			QSharedPointer<Asset> asset = mWidgetImpBrowser->GetImfPackage().data()->GetAsset(i);
-			if (asset && (asset.data()->GetType() == Asset::eAssetType::mxf)) {
-				QSharedPointer <AssetMxfTrack> assetMxfTrack = qSharedPointerCast<AssetMxfTrack>(asset);
-				if (assetMxfTrack->GetEssenceType() == Metadata::ADM) {
-					is_adm = true;
-				}
-			}
-		}
-//		QVector<QString> appList = mWidgetImpBrowser->GetImfPackage().data()->GetApplicationIdentificationList();
-//		if ( appList.contains("http://www.smpte-ra.org/ns/2067-50/2017") ) appString = "app5";
-	}
-#endif
-	QProcess myProcess;
-	const QString program = "java";
+	const QString program = QString("%1/%2").arg(AUX_PHOTON_JRE, "/bin/java");
 	QStringList arg;
 	arg << "-cp";
-	QString lib_dir = QString("/photon/build/libs/*");
-#ifdef NO_UNIVERSAL_PHOTON
-	if (is_adm) {
-		lib_dir = QString("/photon/build/libs-adm/*");
-	}
-#endif
-#ifdef WIN32
-	arg << QApplication::applicationDirPath() + lib_dir + QString(";");
-#else
-	arg << QApplication::applicationDirPath() + lib_dir + QString(":");
-#endif
+	arg << QString("%1/%2").arg(AUX_PHOTON, "*");
+	arg << "-Djava.awt.headless=true";
 	arg << "com.netflix.imflibrary.app.IMPAnalyzer";
 	arg << mWorkingDirectory;
-/*
-	if (appString == "app5") {
-		arg << "--application";
-		arg << appString;
-	}
-*/
+
 	emit Progress(20);
+	QProcess myProcess;
 	myProcess.start(program, arg);
 	emit Progress(40);
 	myProcess.waitForFinished(-1);
 	if (myProcess.exitStatus() == QProcess::NormalExit) {
-		if (myProcess.exitCode() != 0) { return error = Error(Error::ExitCodeNotZero); }
+		if (myProcess.exitCode() != 0) {
+            qDebug() << "process finished with error" << myProcess.error() << myProcess.readAllStandardError();
+            return error = Error(Error::ExitCodeNotZero);
+        }
 	} else {
 		return error = Error(Error::ExitStatusError);
 	}

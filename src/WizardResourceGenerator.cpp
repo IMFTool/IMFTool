@@ -735,7 +735,7 @@ void WizardResourceGeneratorPage::GenerateEmptyTimedText(){
 
 	Error error;
 	//QStringList filePath(tr("%1/%2.xml").arg(mpLineEditFileDir->text()).arg(mpLineEditFileName->text()));
-	QStringList filePath(QApplication::applicationDirPath() + QString("/files/TTML_Empty_Minimal.xml"));
+	QStringList filePath(QString("%1/%2").arg(AUX_FILES, "TTML_Empty_Minimal.xml"));
 	if (!QFileInfo::exists(filePath.at(0))) error =  Error(Error::SourceFileOpenError, filePath.at(0));
 	if(error.IsError() == true) {
 		QString error_string = error.GetErrorDescription();

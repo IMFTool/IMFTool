@@ -277,7 +277,7 @@ void MainWindow::rCallPhoton() {
 		// Test for Java VM
 		QString qresult;
 		QProcess myProcess;
-		const QString program = "java";
+		const QString program = QString("%1/%2").arg(AUX_PHOTON_JRE, "/bin/java");
 		QStringList arg;
 		QString error_msg;
 		Error error(Error::None);
