@@ -339,7 +339,7 @@ QGroupBox::title {
 
 QLabel, QLabel:disabled {
 
-	background-color: none;
+	background-color: transparent;
 }
 
 QWidget:focus
@@ -358,6 +358,10 @@ QPushButton, QToolButton {
     border-style: solid;
 	border-radius: 0px;
     padding: 4px;
+}
+
+QPushButton:disabled, QToolButton[autoRaise="true"]:disabled {
+    background-color: transparent;
 }
 
 QComboBox {
