@@ -60,6 +60,7 @@ The build system is based on CMake in conjunction with [conan package manager](h
 - Xerces-C 3.2 ([conan recipe](https://conan.io/center/recipes/xerces-c?version=3.2.5))
 - OpenJPEG 2.5 ([conan recipe](https://conan.io/center/recipes/openjpeg?version=2.5.2))
 - regxmllibc ([conan recipe](https://github.com/IMFTool/regxmllib))
+- photon 5 pre release ([conan recipe](https://github.com/Privatehive/conan-photon))
 - The ACES build option `app5_support` requires OpenEXR ([conan recipe](https://conan.io/center/recipes/openexr?version=3.3.1)), IMath ([conan recipe](https://conan.io/center/recipes/imath?version=3.1.9))
 
 ### Build process
