@@ -421,7 +421,11 @@ Error JobCallPhoton::Execute() {
 
 	Error error;
 	QString qresult;
+#if defined(AUX_PHOTON_JRE)
 	const QString program = QString("%1/%2").arg(AUX_PHOTON_JRE, "/bin/java");
+#else
+	const QString program = "java";
+#endif
 	QStringList arg;
 	arg << "-cp";
 	arg << QString("%1/%2").arg(AUX_PHOTON, "*");

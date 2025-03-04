@@ -97,6 +97,13 @@ if(BUILD_APP5_SUPPORT)
 	)
 endif(BUILD_APP5_SUPPORT)
 
+if(UNIX AND NOT APPLE)
+	# On bspwm I'm experiencing empty progress dialog windows if the delay is too small
+	target_compile_definitions(IMF-Tool PRIVATE PROGRESS_DIALOG_DELAY=200)
+else()
+	target_compile_definitions(IMF-Tool PRIVATE PROGRESS_DIALOG_DELAY=0)
+endif()
+
 target_link_libraries(IMF-Tool
 		PRIVATE Qt6::Gui
 		PRIVATE Qt6::Widgets
@@ -118,7 +125,9 @@ register_icon(IMF-Tool
 )
 
 register_aux_path(IMF-Tool DIRECTORY "${photon_dir}" NAME photon)
-register_aux_path(IMF-Tool DIRECTORY "${photon_jre_dir}" NAME photon_jre)
+if(BUNDLE_JVM)
+	register_aux_path(IMF-Tool DIRECTORY "${photon_jre_dir}" NAME photon_jre)
+endif()
 register_aux_path(IMF-Tool DIRECTORY "${PROJECT_SOURCE_DIR}/regxmllib" NAME regxmllib)
 register_aux_path(IMF-Tool DIRECTORY "${PROJECT_SOURCE_DIR}/files" NAME files)
 

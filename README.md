@@ -61,7 +61,7 @@ The build system is based on CMake in conjunction with [conan package manager](h
 - OpenJPEG 2.5 ([conan recipe](https://conan.io/center/recipes/openjpeg?version=2.5.2))
 - regxmllibc ([conan recipe](https://github.com/IMFTool/regxmllib))
 - photon 5 pre release ([conan recipe](https://github.com/Privatehive/conan-photon))
-- The ACES build option `app5_support` requires OpenEXR ([conan recipe](https://conan.io/center/recipes/openexr?version=3.3.1)), IMath ([conan recipe](https://conan.io/center/recipes/imath?version=3.1.9))
+- The [build option](#build-options) `app5Support` requires OpenEXR ([conan recipe](https://conan.io/center/recipes/openexr?version=3.3.1)), IMath ([conan recipe](https://conan.io/center/recipes/imath?version=3.1.9))
 
 ### Build process
 
@@ -158,6 +158,12 @@ In the package folder you will find (depending on your build host):
 > [!TIP]
 > There is also a Conan command to copy the binaries from the package folder to the current working directory:
 > `conan install --requires="imf-tool/1.9.8@com.imftool/snapshot" --deployer-package="*"`
+
+### Build Options
+
+When building IMF Tool, the following build options can be provided to the `conan create` or `conan install` commands (prefixed with an `-o` ):
+* `app5Support=True/False`: Include App#5 ACES support (`True` by default)
+* `bundleJVM=True/False`: Bundle IMF Tool with a Java VM (`True` by default). The advantage is that the user does not have to install a JVM himself. The disadvantage is that the IMF Tool is about 50 MiB larger.
 
 ## DEV Setup
 
