@@ -91,6 +91,7 @@ void WidgetImpBrowser::InitLayout() {
 	mpViewImp->setShowGrid(false);
 	mpViewImp->setEditTriggers(QAbstractItemView::AllEditTriggers);
 	mpViewImp->setSortingEnabled(true);
+	mpViewImp->setFocusPolicy(Qt::NoFocus);
 	mpViewImp->horizontalHeader()->setSectionsMovable(true);
 	mpViewImp->horizontalHeader()->setHighlightSections(false);
 	mpViewImp->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -107,6 +108,7 @@ void WidgetImpBrowser::InitLayout() {
 
 	mpViewAssets = new CustomTableView(this);												//Asset Metadata View
 	mpViewAssets->setShowGrid(false);
+	mpViewAssets->setFocusPolicy(Qt::NoFocus);
 	mpViewAssets->horizontalHeader()->setSectionsMovable(true);
 	mpViewAssets->horizontalHeader()->setHighlightSections(false);
 	mpViewAssets->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);

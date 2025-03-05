@@ -765,8 +765,7 @@ QVariant ImfPackage::data(const QModelIndex &rIndex, int role /*= Qt::DisplayRol
 					default:
 						return QVariant(QPixmap(":/asset_unknown.png"));
 				}
-			}
-			else if(role == Qt::SizeHintRole) {
+			} else if(role == Qt::SizeHintRole) {
 				return QVariant(QSize(32, 34));
 			}
 		}
@@ -885,9 +884,10 @@ QVariant ImfPackage::headerData(int section, Qt::Orientation orientation, int ro
 				else if(section == ImfPackage::ColumnMetadata) {
 					return QVariant(tr("Metadata"));
 				}
-			}
-			else if(role == Qt::SizeHintRole && section == ImfPackage::ColumnIcon) {
-				// 				return QVariant(QSize(38, -1));
+			} else if(role == Qt::SizeHintRole) {
+				if(section == ImfPackage::ColumnIcon) {
+					return QVariant(QSize(32, 34));
+				}
 			}
 			break;
 		case Qt::Vertical:

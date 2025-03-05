@@ -172,6 +172,7 @@ void WizardResourceGeneratorPage::InitLayout() {
 	if (mReadOnly) mpComboBoxSoundfieldGroup->setDisabled(true);
 	mpSoundFieldGroupModel = new SoundFieldGroupModel(this);
 	mpTableViewWav = new QTableView(this);
+	mpTableViewWav->setFocusPolicy(Qt::NoFocus);
 	mpTableViewWav->setModel(mpSoundFieldGroupModel);
 	mpTableViewWav->setEditTriggers(QAbstractItemView::AllEditTriggers);
 	mpTableViewWav->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -289,6 +290,7 @@ void WizardResourceGeneratorPage::InitLayout() {
 
 	mpTimedTextModel = new TimedTextModel(this);
 	mpTableViewTimedText = new QTableView(this);
+	mpTableViewTimedText->setFocusPolicy(Qt::NoFocus);
 	mpTableViewTimedText->setModel(mpTimedTextModel);
 	mpTableViewTimedText->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	mpTableViewTimedText->setSelectionBehavior(QAbstractItemView::SelectRows);

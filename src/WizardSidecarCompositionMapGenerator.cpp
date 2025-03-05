@@ -190,6 +190,7 @@ sAssetsPage::sAssetsPage(QWidget *parent, QSharedPointer<ImfPackage> rImfPackage
 	//---- Files for CPL ----
 	mpTableViewScmFiles = new QTableView(this);
 	mpModelScmFiles = new QStandardItemModel(0, 1);
+	mpTableViewScmFiles->setFocusPolicy(Qt::NoFocus);
 	mpTableViewScmFiles->setContextMenuPolicy(Qt::CustomContextMenu);
 	mpTableViewScmFiles->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	mpTableViewScmFiles->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -423,6 +424,7 @@ sCplPage::sCplPage(QWidget *parent, QVector< QSharedPointer<AssetCpl> > rCplAsse
 	mpTableViewScmCPL->setModel(mpModelScmCPL);
 	//Signal is triggered whenever a check box is checked or unchecked (changed)
 	connect(mpModelScmCPL, SIGNAL(itemChanged(QStandardItem *)), this, SLOT(CplChecked(QStandardItem *)));
+	mpTableViewScmCPL->setFocusPolicy(Qt::NoFocus);
 	mpTableViewScmCPL->setSelectionBehavior(QAbstractItemView::SelectRows);
 	mpTableViewScmCPL->setSelectionMode(QAbstractItemView::NoSelection);
 	mpTableViewScmCPL->setShowGrid(false);
@@ -683,6 +685,7 @@ AdditionalInfoPage::AdditionalInfoPage(QWidget *parent, QString filedirectory)
 
 	// ----Table for all CPLs in IMF - package----
 	mpTableViewScmInfo = new QTableView(this);
+	mpTableViewScmInfo->setFocusPolicy(Qt::NoFocus);
 	mpTableViewScmInfo->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	mpModelScmInfo = new QStandardItemModel(0, 3); // Check box | CPL filename | UUID
 	mpTableViewScmInfo->setModel(mpModelScmInfo);

@@ -88,6 +88,7 @@ void WidgetTimedTextPreview::InitLayout() {
 
 	// create table view
 	tableView = new QTableView();
+	tableView->setFocusPolicy(Qt::NoFocus);
 	tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	tableView->setColumnWidth(0, 30);
 	tableView->setModel(tableModel);
