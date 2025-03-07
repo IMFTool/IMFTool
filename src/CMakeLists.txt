@@ -125,6 +125,7 @@ register_icon(IMF-Tool
 )
 
 register_aux_path(IMF-Tool DIRECTORY "${photon_dir}" NAME photon)
+register_aux_path(IMF-Tool DIRECTORY "${photon_adm_dir}" NAME photon_adm)
 if(BUNDLE_JVM)
 	register_aux_path(IMF-Tool DIRECTORY "${photon_jre_dir}" NAME photon_jre)
 endif()

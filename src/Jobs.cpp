@@ -421,6 +421,27 @@ Error JobCallPhoton::Execute() {
 
 	Error error;
 	QString qresult;
+
+#if defined(AUX_PHOTON_ADM)
+//Figure out if ADM Track Files are present
+//	QString appString = "app2or2E";
+	bool is_adm = false;
+	if (mWidgetImpBrowser && mWidgetImpBrowser->GetImfPackage()) {
+		int asset_count = mWidgetImpBrowser->GetImfPackage().data()->GetAssetCount();
+		for (int i=0; i< asset_count; i++) {
+			QSharedPointer<Asset> asset = mWidgetImpBrowser->GetImfPackage().data()->GetAsset(i);
+			if (asset && (asset.data()->GetType() == Asset::eAssetType::mxf)) {
+				QSharedPointer <AssetMxfTrack> assetMxfTrack = qSharedPointerCast<AssetMxfTrack>(asset);
+				if (assetMxfTrack->GetEssenceType() == Metadata::ADM) {
+					is_adm = true;
+				}
+			}
+		}
+//		QVector<QString> appList = mWidgetImpBrowser->GetImfPackage().data()->GetApplicationIdentificationList();
+//		if ( appList.contains("http://www.smpte-ra.org/ns/2067-50/2017") ) appString = "app5";
+	}
+#endif
+	
 #if defined(AUX_PHOTON_JRE)
 	const QString program = QString("%1/%2").arg(AUX_PHOTON_JRE, "/bin/java");
 #else
@@ -428,7 +449,15 @@ Error JobCallPhoton::Execute() {
 #endif
 	QStringList arg;
 	arg << "-cp";
+#if defined(AUX_PHOTON_ADM)
+	if (is_adm) {
+		arg << QString("%1/%2").arg(AUX_PHOTON_ADM, "*");
+	} else {
+		arg << QString("%1/%2").arg(AUX_PHOTON, "*");
+	}
+#else
 	arg << QString("%1/%2").arg(AUX_PHOTON, "*");
+#endif
 	arg << "-Djava.awt.headless=true";
 	arg << "com.netflix.imflibrary.app.IMPAnalyzer";
 	arg << mWorkingDirectory;
