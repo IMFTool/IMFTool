@@ -84,7 +84,7 @@ class ImfToolConan(ConanFile):
         tc.variables["BUILD_APP5_SUPPORT"] = self.options.app5Support
         if self.options.bundleJVM:
             openjdk = self.dependencies["openjdk"]
-            tc.variables["JVM_PATH"] = os.path.join(openjdk.package_folder, "jre")
+            tc.variables["JVM_PATH"] = os.path.join(openjdk.package_folder, "jre").replace("\\", "/")
         tc.generate()
 
     def build(self):
