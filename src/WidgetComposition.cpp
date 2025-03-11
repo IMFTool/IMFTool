@@ -192,7 +192,7 @@ bool WidgetComposition::eventFilter(QObject *pObj, QEvent *pEvt) {
 				scale_factor = pow((double)2, numPixels.y() / 240.0);
 			} else if (!numDegrees.isNull()) {
 				QPoint numSteps = numDegrees / 15;
-				scale_factor = pow((double)2, numSteps.y() / 240.0);
+				scale_factor = pow((double)2, numSteps.y() / 10.0);
 			}
 
 			mpTimelineView->ScaleView(scale_factor);
