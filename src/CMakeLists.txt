@@ -132,4 +132,4 @@ endif()
 register_aux_path(IMF-Tool DIRECTORY "${PROJECT_SOURCE_DIR}/regxmllib" NAME regxmllib)
 register_aux_path(IMF-Tool DIRECTORY "${PROJECT_SOURCE_DIR}/files" NAME files)
 
-install_app(IMF-Tool)
+install_app(IMF-Tool QT_IF_CONTROL_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/windows/QtIFControlScript.qs")

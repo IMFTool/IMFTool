@@ -55,12 +55,12 @@ The build system is based on CMake in conjunction with [conan package manager](h
  
 #### Dependencies
 - Qt 6.8 ([conan recipe](https://github.com/Privatehive/conan-Qt))
-- QtAppBase 1.0 ([conan recipe](https://github.com/Privatehive/QtAppBase))
+- QtAppBase 1.X ([conan recipe](https://github.com/Privatehive/QtAppBase))
 - For IAB, ProRes, S-ADM and ADM support, a patched version of asdcplib is required ([conan recipe](https://github.com/IMFTool/asdcplib))
 - Xerces-C 3.2 ([conan recipe](https://conan.io/center/recipes/xerces-c?version=3.2.5))
 - OpenJPEG 2.5 ([conan recipe](https://conan.io/center/recipes/openjpeg?version=2.5.2))
-- regxmllibc ([conan recipe](https://github.com/IMFTool/regxmllib))
-- photon 5 pre release ([conan recipe](https://github.com/Privatehive/conan-photon))
+- regxmllibc ([conan recipe](https://github.com/Privatehive/conan-regxmllib))
+- photon 4.X ([conan recipe](https://github.com/Privatehive/conan-photon))
 - The [build option](#build-options) `app5Support` requires OpenEXR ([conan recipe](https://conan.io/center/recipes/openexr?version=3.3.1)), IMath ([conan recipe](https://conan.io/center/recipes/imath?version=3.1.9))
 
 ### Build process
@@ -164,6 +164,40 @@ In the package folder you will find (depending on your build host):
 When building IMF Tool, the following build options can be provided to the `conan create` or `conan install` commands (prefixed with an `-o` ):
 * `app5Support=True/False`: Include App#5 ACES support (`True` by default)
 * `bundleJVM=True/False`: Bundle IMF Tool with a Java VM (`True` by default). The advantage is that the user does not have to install a JVM himself. The disadvantage is that the IMF Tool is about 50 MiB larger.
+
+### Code signing
+
+If desired, the IMF Tool binaries can be signed. To do so create a new conan profile named `sign_env` in your profiles folder in the conan home dir (returned by `conan config home`) with the following content:
+
+**Windows**
+
+```ini
+[buildenv]
+WIN_CODESIGN_OPTIONS=...
+```
+
+> `WIN_CODESIGN_OPTIONS`: Options passed to [signtool](https://learn.microsoft.com/de-de/dotnet/framework/tools/signtool-exe#sign-command-options). Each option must be separated by a `;` e.g.: `/n;MyCodeSigningCert;/fd;SHA256;/t;http://timestamp.digicert.com`
+
+Then provide the `sign_env` profile as an additional host profile to the conan command besides the MinGW host profile (remove MinGW host profile if MinGW is not used):
+
+```bash
+conan create ./ -pr:h=hostProfiles/windowsMinGW.profile -pr:h=sign_env --build missing
+```
+
+**macOS**
+
+```ini
+[buildenv]
+APPLE_CODESIGN_IDENTITY=...
+```
+
+> `APPLE_CODESIGN_IDENTITY`: The identity used to sign the app: It's the 10 character long alpha numeric string of the Apple Developer cert found in the Keychain Access
+
+Then provide the `sign_env` profile as an host profile to the conan command:
+
+```bash
+conan create ./ -pr:h=sign_env --build missing
+```
 
 ## DEV Setup
 
