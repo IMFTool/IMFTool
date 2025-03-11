@@ -7,6 +7,7 @@ from conan.tools.cmake import CMake, CMakeToolchain, CMakeDeps
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.env import VirtualBuildEnv
 from conan.tools.files import copy
+import os
 
 required_conan_version = ">=2.0"
 
@@ -25,7 +26,7 @@ class ImfToolConan(ConanFile):
     homepage = jsonInfo["homepage"]
     url = jsonInfo["repository"]
     # ---Requirements---
-    requires = ("qt/6.8.2@de.privatehive/stable", "qtappbase/1.8.0@de.privatehive/stable", "photon/4.10.8@imftool/stable", "regxmllib/1.1.5@imftool/stable", "asdcplib/2.13.1@imftool/stable", "xerces-c/3.2.5", "openjpeg/2.5.2", "zlib/1.3.1")
+    requires = ("qt/6.8.2@de.privatehive/stable", "qtappbase/1.8.0@de.privatehive/stable", "regxmllib/1.1.5@imftool/stable", "asdcplib/2.13.1@imftool/stable", "xerces-c/3.2.5", "openjpeg/2.5.2", "zlib/1.3.1")
     # cmake 3.23 is needed if we use XCode generator
     tool_requires = ["cmake/3.23.5", "ninja/1.11.1"]
     # ---Sources---
@@ -69,6 +70,8 @@ class ImfToolConan(ConanFile):
         if self.options.app5Support:
             self.requires("imath/3.1.9", options={"shared": True})
             self.requires("openexr/3.3.1", options={"shared": True})
+        if self.options.bundleJVM:
+            self.requires("openjdk/8.0.442@de.privatehive/stable")
 
     def config_options(self):
         if self.settings.os != "Macos":
@@ -79,7 +82,9 @@ class ImfToolConan(ConanFile):
         CMakeDeps(self).generate()
         tc = CMakeToolchain(self, generator="Xcode" if self.options.xcode and self.settings.os == 'Macos' else "Ninja")
         tc.variables["BUILD_APP5_SUPPORT"] = self.options.app5Support
-        tc.variables["BUNDLE_JVM"] = self.options.bundleJVM
+        if self.options.bundleJVM:
+            openjdk = self.dependencies["openjdk"]
+            tc.variables["JVM_PATH"] = os.path.join(openjdk.package_folder, "jre")
         tc.generate()
 
     def build(self):
