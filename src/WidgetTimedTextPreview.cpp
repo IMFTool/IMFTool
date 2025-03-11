@@ -135,10 +135,10 @@ void WidgetTimedTextPreview::rShowTTML(const QVector<visibleTTtrack> &rttmls, in
 			row_items.append(track_nr);
 			row_items.append(new QStandardItem(ttmls->at(i).formatted_time));
 			row_items.append(new QStandardItem(ttmls->at(i).fractional_frames));
+			static QRegularExpression rm_regex("<[^>]*>");
 
 			switch (ttmls->at(i).elements.at(z).type) {
 			case 0: // TXT
-				static QRegularExpression rm_regex("<[^>]*>");
 				tmp_text = QString(ttmls->at(i).elements.at(z).text).remove(rm_regex);
 				text.append(ttmls->at(i).elements.at(z).text);
 				row_items.append(new QStandardItem(tmp_text)); // text preview
@@ -198,6 +198,8 @@ void WidgetTimedTextPreview::rShowTTML(const QVector<visibleTTtrack> &rttmls, in
 		ttml_text->setLineWrapMode(QTextEdit::NoWrap);
 	}
 
+	static QRegularExpression rm_regex("<[^>]*>");
+
 	// render subtitles
 	switch (render_style) { // 0 : TEXT, 1 : pTEXT, 2 : HTML
 	case 0: // Text
@@ -205,7 +207,6 @@ void WidgetTimedTextPreview::rShowTTML(const QVector<visibleTTtrack> &rttmls, in
 		ttml_text->setHtml(text.toHtmlEscaped());
 		break;
 	case 1: // plain text
-		static QRegularExpression rm_regex("<[^>]*>");
 		ttml_text->setFont(font_medium);
 		ttml_text->setHtml(QString(text).remove(rm_regex));
 		break;
@@ -261,6 +262,8 @@ void WidgetTimedTextPreview::showSelection(int track, int col, int item) {
 		ttml_text->setLineWrapMode(QTextEdit::NoWrap);
 	}
 	
+	static QRegularExpression rm_regex ("<[^>]*>");
+
 	// set style
 	switch (col) { // 0 : TEXT, 1 : pTEXT, 2 : HTML
 	case 5: // XML
@@ -276,7 +279,6 @@ void WidgetTimedTextPreview::showSelection(int track, int col, int item) {
 	case 7: // plain TEXT
 		render_style = 1;
 		ttml_text->setFont(font_medium);
-		static QRegularExpression rm_regex ("<[^>]*>");
 		ttml_text->setHtml(QString(ttmls->at(track).elements.at(item).text).remove(rm_regex));
 		break;
 	case 8: // HTML
