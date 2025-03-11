@@ -9,6 +9,5 @@ compiler.exception=seh
 build_type=Release
 [options]
 [tool_requires]
-qtinstaller/4.8.0@de.privatehive/stable
 mingw-builds/13.2.0
 cmake/3.21.7

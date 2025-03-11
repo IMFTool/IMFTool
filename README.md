@@ -70,7 +70,7 @@ The build system is based on CMake in conjunction with [conan package manager](h
 * macOS: Install latest XCode
 * Windows: 
   * MinGW: will be automatically downloaded during the build process if conan host profile [windowsMinGW.profile](./hostProfiles/windowsMinGW.profile) is used. No need to install MinGW manually.
-  * MSVC: Install Microsoft Visual Studio (not recommended).
+  * MSVC (not recommended - use MinGW): Install Microsoft Visual Studio 2022.
 * Linux: Install gcc or clang (untested) and binutils via the package manager of your favorite Linux distribution.
 
 #### Install Conan package manager:
@@ -86,14 +86,16 @@ pip install conan
 
 #### Create a conan host profile
 
-Conan can automatically detect the installed compiler and create a so called [host profile](https://docs.conan.io/2/reference/config_files/profiles.html). This host profile contains os and compiler specific settings:
+Conan can automatically detect the installed compiler and create a so called [host profile](https://docs.conan.io/2/reference/config_files/profiles.html). This host profile is called `default` and contains os and compiler specific settings:
 
 > [!NOTE]
-> A warning message will show up if no compiler could be detected. For Windows this is fine if we use the provided MinGW host profile later during the build process. 
+> A warning message will show up if no compiler could be detected. For Windows this is fine if we use the provided MinGW host profile later during the build process.
 
 ```bash
 conan profile detect
 ```
+
+> [!NOTE] If you use MSVC make sure that the host profile contains `compiler.cppstd=17`. You can find the file path of the host profile by running `conan profile path default`.
 
 *Recommendation:* You can add CMake as a tool dependency to your host profile. This will automatically download CMake during the build process and you will not have to install CMake yourself:
 
@@ -126,10 +128,10 @@ cd IMFTool
 
 Now start the Conan build process:
 
-For macOS, Linux, Windows MSVC (not recommended) run:
+For macOS, Linux, Windows MSVC run:
 
 ```bash
-conan create ./ --build missing
+conan create ./ -pr:h=default --build missing
 ```
 
 For Windows MinGW build run:
@@ -167,7 +169,7 @@ When building IMF Tool, the following build options can be provided to the `cona
 
 ### Code signing
 
-If desired, the IMF Tool binaries can be signed. To do so create a new conan profile named `sign_env` in your profiles folder in the conan home dir (returned by `conan config home`) with the following content:
+If desired, the IMF Tool binaries can be signed. To do so create a new conan profile named `sign_env` in your profiles directory with the following content:
 
 **Windows**
 
@@ -178,7 +180,7 @@ WIN_CODESIGN_OPTIONS=...
 
 > `WIN_CODESIGN_OPTIONS`: Options passed to [signtool](https://learn.microsoft.com/de-de/dotnet/framework/tools/signtool-exe#sign-command-options). Each option must be separated by a `;` e.g.: `/n;MyCodeSigningCert;/fd;SHA256;/t;http://timestamp.digicert.com`
 
-Then provide the `sign_env` profile as an additional host profile to the conan command besides the MinGW host profile (remove MinGW host profile if MinGW is not used):
+Then provide the `sign_env` profile as an additional host profile to the conan command besides the MinGW host profile (replace MinGW host profile with the `default` profile if MinGW is not used):
 
 ```bash
 conan create ./ -pr:h=hostProfiles/windowsMinGW.profile -pr:h=sign_env --build missing
@@ -193,10 +195,10 @@ APPLE_CODESIGN_IDENTITY=...
 
 > `APPLE_CODESIGN_IDENTITY`: The identity used to sign the app: It's the 10 character long alpha numeric string of the Apple Developer cert found in the Keychain Access
 
-Then provide the `sign_env` profile as an host profile to the conan command:
+Then provide the `sign_env` profile as an additional host profile to the conan command:
 
 ```bash
-conan create ./ -pr:h=sign_env --build missing
+conan create ./ -pr:h=default -pr:h=sign_env --build missing
 ```
 
 ## DEV Setup
@@ -208,7 +210,7 @@ To be able to debug IMF Tool an IDE is required, notably: VSCode (with installed
 First build all dependencies (without optimizations) and create a build folder. You can name the build folder as you wish (name given after the `-of` argument):
 
 ```bash
-conan install ./ -of build-folder -s build_type=Debug --build missing
+conan install ./ -pr:h=default -of build-folder -s build_type=Debug --build missing
 ```
 
 ### VSCode
@@ -227,7 +229,7 @@ Then start debugger by clicking the ▶ icon to the right of the 'Debug' section
 Xcode lacks native support for CMake preset files. We need to generate an Xcode project file:
 
 ```bash
-conan install ./ -of build-folder -s build_type=Debug -o xcode=True --build missing
+conan install ./ -pr:h=default -of build-folder -s build_type=Debug -o xcode=True --build missing
 source build-folder/conanbuild.sh
 cmake --preset conan-default
 ```
