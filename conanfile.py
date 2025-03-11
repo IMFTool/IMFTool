@@ -26,7 +26,7 @@ class ImfToolConan(ConanFile):
     homepage = jsonInfo["homepage"]
     url = jsonInfo["repository"]
     # ---Requirements---
-    requires = ("qt/6.8.2@de.privatehive/stable", "qtappbase/1.8.0@de.privatehive/stable", "regxmllib/1.1.5@imftool/stable", "asdcplib/2.13.1@imftool/stable", "xerces-c/3.2.5", "openjpeg/2.5.2", "zlib/1.3.1")
+    requires = ("qt/6.8.2@de.privatehive/stable", "qtappbase/1.9.0@de.privatehive/stable", "regxmllib/1.1.5@imftool/stable", "asdcplib/2.13.1@imftool/stable", "xerces-c/3.2.5", "openjpeg/2.5.2", "zlib/1.3.1")
     # cmake 3.23 is needed if we use XCode generator
     tool_requires = ["cmake/3.23.5", "ninja/1.11.1"]
     # ---Sources---
