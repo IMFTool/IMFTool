@@ -261,4 +261,3 @@ http://techblog.netflix.com/2016/03/imf-prescription-for-versionitis.html
 <a name="imf-video2"></a>[3] IMF-Tool introductory video Part 2: https://www.youtube.com/watch?v=k6OIx7WfF8s
 
 <a name="photon"></a>[4] Photon IMF QC tool https://github.com/Netflix/photon
-
