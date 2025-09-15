@@ -17,7 +17,7 @@ jobs:
     with:
       name: "x86_64"
       image: "windows-2022"
-      conan_build_profile: "windowsMinGW.profile"
+      conan_build_profile: "windowsMinGW"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
       conan_deploy_artifacts: true
 
