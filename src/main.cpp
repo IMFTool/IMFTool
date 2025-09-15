@@ -34,59 +34,63 @@
 
 int main(int argc, char *argv[]) {
 
-	QCommandLineParser parser;
-	QCommandLineOption startupDirectoryOption(QStringList() << "i" << "imp-directory",
-			QCoreApplication::translate("main", "Open IMP in <directory> upon startup."),
-			QCoreApplication::translate("main", "directory"));
-	parser.addOption(startupDirectoryOption);
-
-	QCommandLineOption openOption(QStringList() << "a" << "open-all-cpls",
-			QCoreApplication::translate("main", "Open all CPLs from <directory>, as provided by option \"--imp-directory\", in Timeline View."));
-	parser.addOption(openOption);
-
-	QtApplicationBase<QApplication>::setCmdParser(&parser);
-	QtApplicationBase<QApplication> app(argc, argv);
-	QApplication::setWindowIcon(QIcon(":/icon1.ico"));
-	QApplication::setStyle(new CustomProxyStyle);
-
-	QString startupDirectory = parser.value(startupDirectoryOption);
-	bool openAllCpls = parser.isSet(openOption);
-
-	// load qt style sheet
-	QFile style_file(":/style/stylesheet.qss");
-	bool success = style_file.open(QFile::ReadOnly | QIODevice::Text);
-	if(success) {
-		app.setStyleSheet(QString::fromUtf8(style_file.readAll()));
-		style_file.close();
-	}
-	else {
-		qWarning() << "Couldn't load stylesheet: " << style_file.fileName();
-	}
-
-	qInfo() << "asdcplib version:" << ASDCP::Version();
-
-	// catch libasdcpmod debug messages
-	Kumu::KMQtLogSink qt_kumu_log_sinc;
-	Kumu::SetDefaultLogSink(&qt_kumu_log_sinc);
-
-	//--- register Qt metatypes here ---
-	qRegisterMetaType<SoundfieldGroup>("SoundfieldGroup");
-	qRegisterMetaType<Metadata>("Metadata");
-	qRegisterMetaType<EditRate>("EditRate");
-	qRegisterMetaType<Timecode>("Timecode");
-	qRegisterMetaType<Duration>("Duration");
-	qRegisterMetaType<WizardResourceGenerator::eMode>("WizardResourceGenerator::eMode");
+	int ret = 0;
 
 	xercesc::XMLPlatformUtils::Initialize();
 
-	MainWindow window;
-	if (!startupDirectory.isEmpty()) {
-		qDebug() << "Opening IMP at: " << startupDirectory;
-		window.setStartupDirectory(startupDirectory, openAllCpls);
-	}
-	window.showMaximized();
+	{
+		QCommandLineParser parser;
+		QCommandLineOption startupDirectoryOption(QStringList() << "i" << "imp-directory",
+				QCoreApplication::translate("main", "Open IMP in <directory> upon startup."),
+				QCoreApplication::translate("main", "directory"));
+		parser.addOption(startupDirectoryOption);
 
-	const int ret = app.start();
+		QCommandLineOption openOption(QStringList() << "a" << "open-all-cpls",
+				QCoreApplication::translate("main", "Open all CPLs from <directory>, as provided by option \"--imp-directory\", in Timeline View."));
+		parser.addOption(openOption);
+
+		QtApplicationBase<QApplication>::setCmdParser(&parser);
+		QtApplicationBase<QApplication> app(argc, argv);
+		QApplication::setWindowIcon(QIcon(":/icon1.ico"));
+		QApplication::setStyle(new CustomProxyStyle);
+
+		QString startupDirectory = parser.value(startupDirectoryOption);
+		bool openAllCpls = parser.isSet(openOption);
+
+		// load qt style sheet
+		QFile style_file(":/style/stylesheet.qss");
+		bool success = style_file.open(QFile::ReadOnly | QIODevice::Text);
+		if(success) {
+			app.setStyleSheet(QString::fromUtf8(style_file.readAll()));
+			style_file.close();
+		}
+		else {
+			qWarning() << "Couldn't load stylesheet: " << style_file.fileName();
+		}
+
+		qInfo() << "asdcplib version:" << ASDCP::Version();
+
+		// catch libasdcpmod debug messages
+		Kumu::KMQtLogSink qt_kumu_log_sinc;
+		Kumu::SetDefaultLogSink(&qt_kumu_log_sinc);
+
+		//--- register Qt metatypes here ---
+		qRegisterMetaType<SoundfieldGroup>("SoundfieldGroup");
+		qRegisterMetaType<Metadata>("Metadata");
+		qRegisterMetaType<EditRate>("EditRate");
+		qRegisterMetaType<Timecode>("Timecode");
+		qRegisterMetaType<Duration>("Duration");
+		qRegisterMetaType<WizardResourceGenerator::eMode>("WizardResourceGenerator::eMode");
+
+		MainWindow window;
+		if (!startupDirectory.isEmpty()) {
+			qDebug() << "Opening IMP at: " << startupDirectory;
+			window.setStartupDirectory(startupDirectory, openAllCpls);
+		}
+		window.showMaximized();
+
+		ret = app.start();
+	}
 
 	xercesc::XMLPlatformUtils::Terminate();
 

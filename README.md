@@ -57,8 +57,9 @@ The build system is based on CMake in conjunction with [conan package manager](h
 - Qt 6.8 ([conan recipe](https://github.com/Privatehive/conan-Qt))
 - QtAppBase 1.X ([conan recipe](https://github.com/Privatehive/QtAppBase))
 - For IAB, ProRes, S-ADM and ADM support, a patched version of asdcplib is required ([conan recipe](https://github.com/IMFTool/asdcplib))
-- Xerces-C 3.2 ([conan recipe](https://conan.io/center/recipes/xerces-c?version=3.2.5))
 - OpenJPEG 2.5 ([conan recipe](https://conan.io/center/recipes/openjpeg?version=2.5.2))
+- Xerces-C 3.2 ([conan recipe](https://conan.io/center/recipes/xerces-c?version=3.2.5))
+- libxsd 4.2 ([conan recipe](https://github.com/Privatehive/conan-libxsd))
 - regxmllibc ([conan recipe](https://github.com/Privatehive/conan-regxmllib))
 - The [build option](#build-options) `app5Support` requires OpenEXR ([conan recipe](https://conan.io/center/recipes/openexr?version=3.3.1)), IMath ([conan recipe](https://conan.io/center/recipes/imath?version=3.1.9))
 

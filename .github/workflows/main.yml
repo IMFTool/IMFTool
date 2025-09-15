@@ -9,14 +9,7 @@ jobs:
       name: "x86_64"
       image: "ubuntu-22.04"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
-
-  build_linux_armv8:
-    name: "Linux"
-    uses: Privatehive/conan-workflows/.github/workflows/createPackage.yml@master
-    with:
-      name: "armv8"
-      image: "ubuntu-22.04-arm"
-      conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
+      conan_deploy_artifacts: true
 
   build_windows_x86_64:
     name: "Windows"
@@ -24,21 +17,26 @@ jobs:
     with:
       name: "x86_64"
       image: "windows-2022"
-      conan_host_profile: "windowsMinGW"
+      conan_host_profile_path: "windowsMinGW.host.profile"
+      conan_build_profile_path: "windowsMinGW.build.profile"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
-
-  build_macos_x86_64:
-    name: "Macos"
-    uses: Privatehive/conan-workflows/.github/workflows/createPackage.yml@master
-    with:
-      name: "x86_64"
-      image: "macos-13"
-      conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
+      conan_deploy_artifacts: true
 
   build_macos_armv8:
     name: "Macos"
     uses: Privatehive/conan-workflows/.github/workflows/createPackage.yml@master
     with:
       name: "armv8"
-      image: "macos-14"
+      image: "macos-15"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
+      conan_deploy_artifacts: true
+
+  upload_recipe:
+    name: "Finalize"
+    uses: Privatehive/conan-workflows/.github/workflows/uploadRecipe.yml@master
+    needs: [ build_linux_x86_64, build_windows_x86_64, build_macos_armv8 ]
+    if: ${{ success() }}
+    secrets: inherit
+    with:
+      publish_property: ${{ github.ref == 'refs/heads/master' }}
+      conan_upload_remote: https://conan.privatehive.de/artifactory/api/conan/public-conan

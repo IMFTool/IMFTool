@@ -4,6 +4,7 @@ find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets OpenGLWidgets)
 find_package(asdcplib REQUIRED)
 find_package(OpenJPEG REQUIRED)
 find_package(XercesC REQUIRED)
+find_package(libxsd REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(regxmllib REQUIRED)
 find_package(QtAppBase REQUIRED)
@@ -61,10 +62,21 @@ if(BUILD_APP5_SUPPORT)
 	set(tool_src ${tool_src} As02AcesIStream.h ACES_Preview.h ACES_Decoder.h)
 endif(BUILD_APP5_SUPPORT)
 
-set(synthesis_src synthesis/st0433-dcmlTypes.cpp synthesis/SMPTE-429-8-2006-PKL.cpp synthesis/SMPTE-429-9-2007-AM.cpp synthesis/SMPTE-2067-2-2013-Core.cpp 
-	synthesis/SMPTE-2067-3-2013-CPL.cpp synthesis/SMPTE-2067-100a-2014-OPL.cpp synthesis/xml.cpp synthesis/xmldsig-core-schema.cpp
-	synthesis/st2067-2a-2020-Core.cpp synthesis/st2067-2b-2020-PKL.cpp synthesis/st2067-3a-2020-CPL.cpp synthesis/SMPTE-2067-9a-2018-Sidecar.cpp
-	synthesis/st2067-203a-20XX.cpp synthesis/st2067-204a-20XX.cpp
+set(synthesis_src
+		synthesis/SMPTE-429-8-2006-PKL.cpp
+		synthesis/SMPTE-429-9-2007-AM.cpp
+		synthesis/SMPTE-2067-2-2013-Core.cpp
+		synthesis/SMPTE-2067-3-2013-CPL.cpp
+		synthesis/SMPTE-2067-9a-2018-Sidecar.cpp
+		synthesis/SMPTE-2067-100a-2014-OPL.cpp
+		synthesis/st0433-dcmlTypes.cpp
+		synthesis/st2067-2a-2020-Core.cpp
+		synthesis/st2067-2b-2020-PKL.cpp
+		synthesis/st2067-3a-2020-CPL.cpp
+		synthesis/st2067-203a-20XX.cpp
+		synthesis/st2067-204a-20XX.cpp
+		synthesis/xml.cpp
+		synthesis/xmldsig-core-schema.cpp
 	)
 
 source_group("Resource Files" FILES ${qt_rcc_resources} ${open_cl_src})
@@ -110,6 +122,7 @@ target_link_libraries(IMF-Tool
 		PRIVATE QtAppBase
 		PRIVATE ZLIB::ZLIB
 		PRIVATE XercesC::XercesC
+		PRIVATE libxsd::libxsd
 		PRIVATE regxmllib::regxmllib
 		PRIVATE libasdcp
 		PRIVATE libas02

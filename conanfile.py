@@ -26,12 +26,12 @@ class ImfToolConan(ConanFile):
     homepage = jsonInfo["homepage"]
     url = jsonInfo["repository"]
     # ---Requirements---
-    requires = ("qt/6.8.2@de.privatehive/stable", "qtappbase/1.9.0@de.privatehive/stable", "regxmllib/1.1.5@imftool/stable", "asdcplib/2.13.1@imftool/stable", "xerces-c/3.2.5", "openjpeg/2.5.2", "zlib/1.3.1")
+    requires = ("qt/6.8.3@de.privatehive/stable", "qtappbase/1.9.0@de.privatehive/stable", "libxsd/4.2.0@de.privatehive/stable", "regxmllib/1.1.5@imftool/stable", "asdcplib/2.13.1@imftool/stable", "xerces-c/3.2.5", "openjpeg/2.5.2", "zlib/1.3.1")
     # cmake 3.23 is needed if we use XCode generator
     tool_requires = ["cmake/3.23.5", "ninja/1.11.1"]
     # ---Sources---
     exports = ["info.json", "LICENSE"]
-    exports_sources = ["info.json", "LICENSE", "regxmllib/*", "photon/*", "files/*", "src/*", "resources/*", "CMakeLists.txt"]
+    exports_sources = ["info.json", "LICENSE", "regxmllib/*", "photon/*", "files/*", "src/*", "xsd/*", "resources/*", "CMakeLists.txt"]
     # ---Binary model---
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False], "fPIC": [True, False], "app5Support": [True, False], "xcode": [True, False], "bundleJVM": [True, False]}
@@ -76,6 +76,10 @@ class ImfToolConan(ConanFile):
     def config_options(self):
         if self.settings.os != "Macos":
             self.options.rm_safe("Xcode")
+
+    def configure(self):
+        if self.settings.os == "Linux":
+            self.options["qt"].fontconfig = True
 
     def generate(self):
         VirtualBuildEnv(self).generate()
