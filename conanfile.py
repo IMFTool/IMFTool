@@ -28,7 +28,7 @@ class ImfToolConan(ConanFile):
     # ---Requirements---
     requires = ("qt/6.8.3@de.privatehive/stable", "qtappbase/1.9.0@de.privatehive/stable", "libxsd/4.2.0@de.privatehive/stable", "regxmllib/1.1.5@imftool/stable", "asdcplib/2.13.1@imftool/stable", "xerces-c/3.2.5", "openjpeg/2.5.2", "zlib/1.3.1")
     # cmake 3.23 is needed if we use XCode generator
-    tool_requires = ["cmake/3.23.5", "ninja/1.11.1"]
+    tool_requires = ["cmake/[>=3.22.6 <3.31.0]", "ninja/[>=1.11.1]"]
     # ---Sources---
     exports = ["info.json", "LICENSE"]
     exports_sources = ["info.json", "LICENSE", "regxmllib/*", "photon/*", "files/*", "src/*", "xsd/*", "resources/*", "CMakeLists.txt"]
