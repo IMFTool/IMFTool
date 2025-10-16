@@ -10,6 +10,7 @@ jobs:
       image: "ubuntu-22.04"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
       conan_deploy_artifacts: true
+      conan_artifact_name: "IMF-Tool_linux_x86_64_artifacts"
 
   build_windows_x86_64:
     name: "Windows"
@@ -20,6 +21,7 @@ jobs:
       conan_host_profile_path: "hostProfiles/windowsMinGW.profile"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
       conan_deploy_artifacts: true
+      conan_artifact_name: "IMF-Tool_windows_x86_64_artifacts"
 
   build_macos_armv8:
     name: "Macos"
@@ -29,3 +31,4 @@ jobs:
       image: "macos-15"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
       conan_deploy_artifacts: true
+      conan_artifact_name: "IMF-Tool_macos_armv8_artifacts"

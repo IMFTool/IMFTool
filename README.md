@@ -60,7 +60,7 @@ The build system is based on CMake in conjunction with [conan package manager](h
 - OpenJPEG 2.5 ([conan recipe](https://conan.io/center/recipes/openjpeg?version=2.5.2))
 - Xerces-C 3.2 ([conan recipe](https://conan.io/center/recipes/xerces-c?version=3.2.5))
 - libxsd 4.2 ([conan recipe](https://github.com/Privatehive/conan-libxsd))
-- regxmllibc ([conan recipe](https://github.com/Privatehive/conan-regxmllib))
+- regxmllibc 1.1.5 ([conan recipe](https://github.com/Privatehive/conan-regxmllib))
 - The [build option](#build-options) `app5Support` requires OpenEXR ([conan recipe](https://conan.io/center/recipes/openexr?version=3.3.1)), IMath ([conan recipe](https://conan.io/center/recipes/imath?version=3.1.9))
 
 ### Build process
@@ -95,7 +95,8 @@ Conan can automatically detect the installed compiler and create a so called [ho
 conan profile detect
 ```
 
-> [!NOTE] If you use MSVC make sure that the host profile contains `compiler.cppstd=17`. You can find the file path of the host profile by running `conan profile path default`.
+> [!NOTE]
+> If you use MSVC make sure that the host profile contains `compiler.cppstd=17`. You can find the file path of the host profile by running `conan profile path default`.
 
 *Recommendation:* You can add CMake as a tool dependency to your host profile. This will automatically download CMake during the build process and you will not have to install CMake yourself:
 
@@ -128,16 +129,22 @@ cd IMFTool
 
 Now start the Conan build process:
 
-For macOS, Linux, Windows MSVC run:
+For __macOS__ and __Windows MSVC__ run:
 
 ```bash
 conan create ./ -pr:h=default --build missing
 ```
 
-For Windows MinGW build run:
+For __Windows MinGW__ build run:
 
 ```bash
 conan create ./ -pr:h=hostProfiles/windowsMinGW.profile --build missing
+```
+
+For Linux additional system packages are required (like: x11, wayland, libfreetype,...). Those packages can be automatically installed via Conan (only applies to Linux distros using APT)
+
+```bash
+conan create ./ -pr:h=default --build missing -c:a tools.system.package_manager:mode=install -c:a tools.system.package_manager:sudo=True -c:a tools.system.package_manager:sudo_askpass=True -c:a tools.system.package_manager:tool=apt-get
 ```
 
 The build process takes some time to finish... After a successful build process Conan prints the package folder where you find the IMF Tool binaries:
