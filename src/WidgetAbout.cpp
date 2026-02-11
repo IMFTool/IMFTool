@@ -86,7 +86,7 @@ QString third_party = QString("Third Party:\n\n"
 		"\n"
 															).arg(QT_VERSION_STR).arg(ASDCP::Version());
 
-QString notice(PROJECT_NAME" Copyright(C) 2015-2020 Björn Stresing, Denis Manthey, Krispin Weiss, Justin Hug, Wolfgang Ruppel\n"
+QString notice(INFO_PROJECTNAME" Copyright(C) 2015-2020 Björn Stresing, Denis Manthey, Krispin Weiss, Justin Hug, Wolfgang Ruppel\n"
 							 "This program comes with ABSOLUTELY NO WARRANTY.\n"
 							 "This is free software, and you are welcome to redistribute it\n"
 							 "under certain conditions.\n\n"
@@ -100,7 +100,7 @@ QWidget(pParent) {
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	setWindowModality(Qt::WindowModal);
 	setWindowFlags(Qt::Popup);
-	setWindowTitle(tr("About").append(" " PROJECT_NAME));
+	setWindowTitle(tr("About").append(" " INFO_PROJECTNAME));
 	InitLayout();
 }
 
@@ -122,10 +122,10 @@ void WidgetAbout::InitLayout() {
 	license_file.close();
 	QTextBrowser *p_text_third_party = new QTextBrowser(this);
 	p_text_third_party->setText(third_party);
-	QLabel *p_label_name = new QLabel(PROJECT_NAME, this);
+	QLabel *p_label_name = new QLabel(INFO_PROJECTNAME, this);
 	p_label_name->setFont(QFont("Arial", 20, QFont::Bold));
 	QLabel *p_label_author = new QLabel(tr("Authors: ").append("Björn Stresing, Denis Manthey, Krispin Weiß, Justin Hug, Wolfgang Ruppel"), this);
-	QLabel *p_label_version = new QLabel(tr("Version: ").append(VERSION_MAJOR"." VERSION_MINOR"." VERSION_PATCH" (Build " VERSION_BUILD")"), this);
+	QLabel *p_label_version = new QLabel(tr("Version: ").append(INFO_VERSIONSTRING), this);
 	QLabel *p_label_notice = new QLabel(notice, this);
 	QLabel *p_label_icon = new QLabel(this);
 	p_label_icon->setPixmap(QPixmap(":/icon1.ico"));
@@ -148,7 +148,7 @@ void WidgetAbout::InitLayout() {
 	p_layout->addLayout(p_layout_sub, 5, 0, 1, 2);
 	setLayout(p_layout);
 
-	connect(mpButtonGroup, SIGNAL(buttonClicked(int)), this, SLOT(ToggleWidget(int)));
+	connect(mpButtonGroup, SIGNAL(idClicked(int)), this, SLOT(ToggleWidget(int)));
 }
 
 void WidgetAbout::ToggleWidget(int id) const {

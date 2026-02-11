@@ -1,4 +1,7 @@
 .project
+.idea
+.DS_Store
 INSTALL
 LICENSE.rtf
-
+build*
+CMakeUserPresets.json

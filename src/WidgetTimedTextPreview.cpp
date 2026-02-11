@@ -88,6 +88,7 @@ void WidgetTimedTextPreview::InitLayout() {
 
 	// create table view
 	tableView = new QTableView();
+	tableView->setFocusPolicy(Qt::NoFocus);
 	tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	tableView->setColumnWidth(0, 30);
 	tableView->setModel(tableModel);
@@ -134,10 +135,11 @@ void WidgetTimedTextPreview::rShowTTML(const QVector<visibleTTtrack> &rttmls, in
 			row_items.append(track_nr);
 			row_items.append(new QStandardItem(ttmls->at(i).formatted_time));
 			row_items.append(new QStandardItem(ttmls->at(i).fractional_frames));
+			static QRegularExpression rm_regex("<[^>]*>");
 
 			switch (ttmls->at(i).elements.at(z).type) {
 			case 0: // TXT
-				tmp_text = QString(ttmls->at(i).elements.at(z).text).remove(QRegExp("<[^>]*>"));
+				tmp_text = QString(ttmls->at(i).elements.at(z).text).remove(rm_regex);
 				text.append(ttmls->at(i).elements.at(z).text);
 				row_items.append(new QStandardItem(tmp_text)); // text preview
 				row_items.append(new QStandardItem("")); // no image preview
@@ -196,6 +198,8 @@ void WidgetTimedTextPreview::rShowTTML(const QVector<visibleTTtrack> &rttmls, in
 		ttml_text->setLineWrapMode(QTextEdit::NoWrap);
 	}
 
+	static QRegularExpression rm_regex("<[^>]*>");
+
 	// render subtitles
 	switch (render_style) { // 0 : TEXT, 1 : pTEXT, 2 : HTML
 	case 0: // Text
@@ -204,7 +208,7 @@ void WidgetTimedTextPreview::rShowTTML(const QVector<visibleTTtrack> &rttmls, in
 		break;
 	case 1: // plain text
 		ttml_text->setFont(font_medium);
-		ttml_text->setHtml(QString(text).remove(QRegExp("<[^>]*>")));
+		ttml_text->setHtml(QString(text).remove(rm_regex));
 		break;
 	case 2: // HTML
 		ttml_text->setFont(font_html);
@@ -258,6 +262,8 @@ void WidgetTimedTextPreview::showSelection(int track, int col, int item) {
 		ttml_text->setLineWrapMode(QTextEdit::NoWrap);
 	}
 	
+	static QRegularExpression rm_regex ("<[^>]*>");
+
 	// set style
 	switch (col) { // 0 : TEXT, 1 : pTEXT, 2 : HTML
 	case 5: // XML
@@ -273,7 +279,7 @@ void WidgetTimedTextPreview::showSelection(int track, int col, int item) {
 	case 7: // plain TEXT
 		render_style = 1;
 		ttml_text->setFont(font_medium);
-		ttml_text->setHtml(QString(ttmls->at(track).elements.at(item).text).remove(QRegExp("<[^>]*>")));
+		ttml_text->setHtml(QString(ttmls->at(track).elements.at(item).text).remove(rm_regex));
 		break;
 	case 8: // HTML
 		render_style = 2;

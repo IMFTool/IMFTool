@@ -15,7 +15,7 @@
  */
 #pragma once
 #include <QObject>
-#include <QTime>
+#include <QElapsedTimer>
 #include <QThreadPool>
 #include <chrono>
 #include "ImfPackage.h"
@@ -106,7 +106,7 @@ private:
 	int fps = 0; // nr of images to play/request per second
 	int ms_wait = 1000; // default wait intervall between cycles in play-loop
 	QImage nullimage; // empty image
-	QTime* mTimer; // timer used for play-loop
+	QElapsedTimer* mTimer; // timer used for play-loop
 	qreal video_framerate = 0;
 
 	// player control

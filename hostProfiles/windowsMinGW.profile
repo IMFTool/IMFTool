@@ -1,0 +1,13 @@
+[settings]
+os=Windows
+arch=x86_64
+compiler=gcc
+compiler.version=13
+compiler.libcxx=libstdc++11
+compiler.threads=posix
+compiler.exception=seh
+compiler.cppstd=gnu17
+build_type=Release
+[tool_requires]
+cmake/3.23.5
+mingw-builds/13.2.0

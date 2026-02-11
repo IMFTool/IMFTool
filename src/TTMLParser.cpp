@@ -343,18 +343,18 @@ DOMElement* elem::processTimedElementStyle(DOMElement *rEl, bool HasTiming) {
 	if (parentCSS.count() > 0) { // set serialized parentCSS in timed element
 		// Work-around for limited color value formats in QtextEdit::setHtml(), see https://github.com/IMFTool/IMFTool/issues/13
 		if (parentCSS.contains("color")) {
-			QRegExp rx3("#([0-9a-zA-Z]){3}");
-			QRegExp rx8("#([0-9a-zA-Z]){8}");
+			static QRegularExpression rx3("#([0-9a-zA-Z]){3}");
+			static QRegularExpression rx8("#([0-9a-zA-Z]){8}");
 			QString col = parentCSS["color"];
-			if (rx8.exactMatch(col)) parentCSS["color"] = col.mid(0, 7);
-			else if (rx3.exactMatch(col)) parentCSS["color"] = "#"+col[1]+col[1]+col[2]+col[2]+col[3]+col[3];
+			if (rx8.match(col).hasMatch()) parentCSS["color"] = col.mid(0, 7);
+			else if (rx3.match(col).hasMatch()) parentCSS["color"] = QString("#%1%2%3%4%5%6").arg(col[1], col[1], col[2], col[2], col[3], col[3]);
 		}
 		if (parentCSS.contains("background-color")) {
-			QRegExp rx3("#([0-9a-zA-Z]){3}");
-			QRegExp rx8("#([0-9a-zA-Z]){8}");
+			static QRegularExpression rx3("#([0-9a-zA-Z]){3}");
+			static QRegularExpression rx8("#([0-9a-zA-Z]){8}");
 			QString col = parentCSS["background-color"];
-			if (rx8.exactMatch(col)) parentCSS["background-color"] = col.mid(0, 7);
-			else if (rx3.exactMatch(col)) parentCSS["background-color"] = "#"+col[1]+col[1]+col[2]+col[2]+col[3]+col[3];
+			if (rx8.match(col).hasMatch()) parentCSS["background-color"] = col.mid(0, 7);
+			else if (rx3.match(col).hasMatch()) parentCSS["background-color"] = QString("#%1%2%3%4%5%6").arg(col[1], col[1], col[2], col[2], col[3], col[3]);
 		}
 		if (parentCSS.contains("font-family")) {
 			if (parentCSS["font-family"] == "proportionalSansSerif" )
@@ -746,7 +746,7 @@ TTMLRegion TTMLParser::parseRegion(DOMNode *node) {
 
 	// check if region has a backround-color
 	if (region.CSS.contains("background-color")) { // use it
-		region.bgColor.setNamedColor(region.CSS["background-color"]); // orange, #ff8000, #ff6 ...
+		region.bgColor = QColor::fromString(region.CSS["background-color"]); // orange, #ff8000, #ff6 ...
 	}
 	else { // default region color
 		region.bgColor = QColor(120, 0, 244, 100); // default color

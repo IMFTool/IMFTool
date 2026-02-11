@@ -339,12 +339,13 @@ QGroupBox::title {
 
 QLabel, QLabel:disabled {
 
-	background-color: none;
+	background-color: transparent;
 }
 
 QWidget:focus
 {
-    /*border: 2px solid QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #ffa02f, stop: 1 #d7801a);*/
+    /* Hide all dotted focus borders */
+    outline: none;
 }
 
 QProgressDialog > QPushButton, QDialogButtonBox QPushButton, QAbstractButton#MinSizedButton {
@@ -358,6 +359,10 @@ QPushButton, QToolButton {
     border-style: solid;
 	border-radius: 0px;
     padding: 4px;
+}
+
+QPushButton:disabled, QToolButton[autoRaise="true"]:disabled {
+    background-color: transparent;
 }
 
 QComboBox {

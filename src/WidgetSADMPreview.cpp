@@ -97,6 +97,7 @@ void WidgetSADMPreview::InitLayout() {
 	// create table view
 	mTableView = new MyTableView(this);
 	mTableView->setModel(mTableModel);
+	mTableView->setFocusPolicy(Qt::NoFocus);
 	mTableView->horizontalHeader()->setSectionsClickable(false);
 	mTableView->setSelectionMode(QAbstractItemView::NoSelection);
 	mTableView->verticalHeader()->setVisible(false);
@@ -114,7 +115,7 @@ void WidgetSADMPreview::InitLayout() {
 	mSadmText = new QTextEdit("No S-ADM Track present");
 	mSadmText->setReadOnly(true);
 	mSadmText->setFontFamily("Courier New");
-	mSadmText->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
+	mSadmText->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding);
 	if (mWrapTextEnabled == false) mSadmText->setLineWrapMode(QTextEdit::NoWrap);
 
 	mSplitter->addWidget(mSadmText);
@@ -150,6 +151,7 @@ void WidgetSADMPreview::InitLayout() {
 
 	// create table view
 	mTableViewPopUp = new MyTableView(this);
+	mTableViewPopUp->setFocusPolicy(Qt::NoFocus);
 	//mTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 	mTableViewPopUp->setModel(mTableModelPopUp);
 	mTableViewPopUp->horizontalHeader()->setSectionsClickable(false);

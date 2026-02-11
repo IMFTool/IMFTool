@@ -124,6 +124,7 @@ void Metadata::GetAsTextDocument(QTextDocument &rDoc) {
 	QTextCursor cursor(&rDoc);
 
 	QTextTableFormat tableFormat;
+	tableFormat.setBorderCollapse(false);
 	tableFormat.setBorder(.5);
 	tableFormat.setCellSpacing(0);
 	tableFormat.setCellPadding(2);

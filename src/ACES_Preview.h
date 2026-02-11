@@ -15,6 +15,7 @@
 */
 #pragma once
 #include <QObject>
+#include <QElapsedTimer>
 #include <QThreadPool>
 #include "Error.h"
 #include "ImfPackage.h"
@@ -30,9 +31,6 @@
 #include "ImfArray.h"
 #include "As02AcesIStream.h"
 #include "PreviewCommon.h"
-
-using namespace Imf;
-using namespace Imath;
 
 class AssetMxfTrack;
 
@@ -78,7 +76,7 @@ private:
 	void setAsset();
 	bool extractFrame(qint64 frameNr);
 	
-	QTime mDecode_time; // time (ms) needed to decode/convert the image
+	QElapsedTimer mDecode_time; // time (ms) needed to decode/convert the image
 	QString mMsg; // error message
 	QString mMxf_path; // path to current asset
 	quint8 mScale; // scale factor for images
@@ -105,5 +103,3 @@ public slots:
 	// Show Active Area (true) or Show Native Resolution (false)
 	void showActiveArea(bool);
 };
-
-

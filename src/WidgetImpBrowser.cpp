@@ -91,6 +91,7 @@ void WidgetImpBrowser::InitLayout() {
 	mpViewImp->setShowGrid(false);
 	mpViewImp->setEditTriggers(QAbstractItemView::AllEditTriggers);
 	mpViewImp->setSortingEnabled(true);
+	mpViewImp->setFocusPolicy(Qt::NoFocus);
 	mpViewImp->horizontalHeader()->setSectionsMovable(true);
 	mpViewImp->horizontalHeader()->setHighlightSections(false);
 	mpViewImp->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -107,6 +108,7 @@ void WidgetImpBrowser::InitLayout() {
 
 	mpViewAssets = new CustomTableView(this);												//Asset Metadata View
 	mpViewAssets->setShowGrid(false);
+	mpViewAssets->setFocusPolicy(Qt::NoFocus);
 	mpViewAssets->horizontalHeader()->setSectionsMovable(true);
 	mpViewAssets->horizontalHeader()->setHighlightSections(false);
 	mpViewAssets->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -131,7 +133,7 @@ void WidgetImpBrowser::InitLayout() {
 	p_splitter->addWidget(mpViewAssets);
 
 	QVBoxLayout *p_layout = new QVBoxLayout();
-	p_layout->setMargin(0);
+	p_layout->setContentsMargins(0, 0, 0, 0);
 	p_layout->setSpacing(0);
 	p_layout->addWidget(mpToolBar);
 	p_layout->addWidget(p_splitter);
@@ -206,7 +208,7 @@ void WidgetImpBrowser::InstallImp(const QSharedPointer<ImfPackage> &rImfPackage,
 	mpUndoProxyModel->setSourceModel(mpImfPackage.data()); // WARNING: The ImfPackage shared pointer mustn't be lost.
 
 	mpSortProxyModelImp = new QSortFilterProxyModel(this);
-	mpSortProxyModelImp->setFilterRegExp("(?:mxf|cpl|opl|unknown)");
+	mpSortProxyModelImp->setFilterRegularExpression("(?:mxf|cpl|opl|unknown)");
 	mpSortProxyModelImp->setFilterKeyColumn(ImfPackage::ColumnAssetType);
 	mpSortProxyModelImp->setSourceModel(mpUndoProxyModel);
 
@@ -220,7 +222,7 @@ void WidgetImpBrowser::InstallImp(const QSharedPointer<ImfPackage> &rImfPackage,
 	connect(mpViewImp->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(slotCurrentChanged(const QModelIndex &, const QModelIndex &)));
 
 	mpSortProxyModelAssets = new QSortFilterProxyModel(this);
-	mpSortProxyModelAssets->setFilterRegExp("(?:mxf)");
+	mpSortProxyModelAssets->setFilterRegularExpression("(?:mxf)");
 	mpSortProxyModelAssets->setFilterKeyColumn(ImfPackage::ColumnAssetType);
 	mpSortProxyModelAssets->setSourceModel(mpUndoProxyModel);
 
@@ -1065,7 +1067,7 @@ void WidgetImpBrowser::StartOutgest(bool clearUndoStack /*= true*/) {
 					QSharedPointer<AssetCpl> asset_cpl = mpImfPackage->GetAsset(i).objectCast<AssetCpl>();
 					if (asset_cpl->GetIsNew() == true) {
 						QFile::copy(asset_cpl->GetPath().absoluteFilePath(), QString("%1/%2").arg(PartialImp->GetRootDir().absolutePath()).arg(asset_cpl->GetOriginalFileName().first));
-						QSharedPointer<AssetCpl> newCPL(new AssetCpl(QString("%1/%2").arg(PartialImp->GetRootDir().absolutePath()).arg(asset_cpl->GetOriginalFileName().first), asset_cpl->GetId(), asset_cpl->GetAnnotationText()));
+						QSharedPointer<AssetCpl> newCPL(new AssetCpl(QFileInfo(QString("%1/%2").arg(PartialImp->GetRootDir().absolutePath()).arg(asset_cpl->GetOriginalFileName().first)), asset_cpl->GetId(), asset_cpl->GetAnnotationText()));
 						newCPL->SetHash(asset_cpl->GetHash());
 						QFile::remove(asset_cpl->GetPath().absoluteFilePath());
 						PartialImp->AddAsset(newCPL, PartialImp->GetPackingListId());
@@ -1076,7 +1078,7 @@ void WidgetImpBrowser::StartOutgest(bool clearUndoStack /*= true*/) {
 					QSharedPointer<AssetMxfTrack> asset_mxf = mpImfPackage->GetAsset(i).objectCast<AssetMxfTrack>();
 					if (asset_mxf->GetIsNew() == true) {
 						QFile::copy(asset_mxf->GetPath().absoluteFilePath(), QString("%1/%2").arg(PartialImp->GetRootDir().absolutePath()).arg(asset_mxf->GetOriginalFileName().first));
-						QSharedPointer<AssetMxfTrack> newMXF(new AssetMxfTrack(QString("%1/%2").arg(PartialImp->GetRootDir().absolutePath()).arg(asset_mxf->GetOriginalFileName().first), asset_mxf->GetId()));
+						QSharedPointer<AssetMxfTrack> newMXF(new AssetMxfTrack(QFileInfo(QString("%1/%2").arg(PartialImp->GetRootDir().absolutePath()).arg(asset_mxf->GetOriginalFileName().first)), asset_mxf->GetId()));
 						newMXF->SetHash(asset_mxf->GetHash());
 						QFile::remove(asset_mxf->GetPath().absoluteFilePath());
 						PartialImp->AddAsset(newMXF, PartialImp->GetPackingListId());
@@ -1087,7 +1089,7 @@ void WidgetImpBrowser::StartOutgest(bool clearUndoStack /*= true*/) {
 					QSharedPointer<AssetScm> asset_scm = mpImfPackage->GetAsset(i).objectCast<AssetScm>();
 					if (asset_scm->GetIsNew() == true) {
 						QFile::copy(asset_scm->GetPath().absoluteFilePath(), QString("%1/%2").arg(PartialImp->GetRootDir().absolutePath()).arg(asset_scm->GetOriginalFileName().first));
-						QSharedPointer<AssetScm> newSCM(new AssetScm(QString("%1/%2").arg(PartialImp->GetRootDir().absolutePath()).arg(asset_scm->GetOriginalFileName().first), asset_scm->GetId(), asset_scm->GetAnnotationText()));
+						QSharedPointer<AssetScm> newSCM(new AssetScm(QFileInfo(QString("%1/%2").arg(PartialImp->GetRootDir().absolutePath()).arg(asset_scm->GetOriginalFileName().first)), asset_scm->GetId(), asset_scm->GetAnnotationText()));
 						newSCM->SetHash(asset_scm->GetHash());
 						QFile::remove(asset_scm->GetPath().absoluteFilePath());
 						PartialImp->AddAsset(newSCM, PartialImp->GetPackingListId());
@@ -1097,7 +1099,7 @@ void WidgetImpBrowser::StartOutgest(bool clearUndoStack /*= true*/) {
 							if (asset_sidecar) {
 								// Copy asset, but do not delete. Per ST2067-9, all sidecar assets need to be present in the new IMP.
 								QFile::copy(asset_sidecar->GetPath().absoluteFilePath(), QString("%1/%2").arg(PartialImp->GetRootDir().absolutePath()).arg(asset_sidecar->GetOriginalFileName().first));
-								QSharedPointer<AssetSidecar> newSidecar(new AssetSidecar(QString("%1/%2").arg(PartialImp->GetRootDir().absolutePath()).arg(asset_sidecar->GetOriginalFileName().first), asset_sidecar->GetId()));
+								QSharedPointer<AssetSidecar> newSidecar(new AssetSidecar(QFileInfo(QString("%1/%2").arg(PartialImp->GetRootDir().absolutePath()).arg(asset_sidecar->GetOriginalFileName().first)), asset_sidecar->GetId()));
 								newSidecar->SetHash(asset_sidecar->GetHash());
 								newSidecar->GetPklData()->setType(asset_sidecar->GetPklData()->getType());
 								PartialImp->AddAsset(newSidecar, PartialImp->GetPackingListId());
@@ -1423,7 +1425,7 @@ void WidgetImpBrowser::slotCurrentChanged(const QModelIndex &selected, const QMo
 void WidgetImpBrowser::rLoadRequest() {
 	QFileDialog* pFileDialog = new QFileDialog(this, QString("Select OV location"));
 	pFileDialog->setOption(QFileDialog::DontUseNativeDialog);
-	pFileDialog->setFileMode(QFileDialog::DirectoryOnly);
+	pFileDialog->setFileMode(QFileDialog::Directory);
 	pFileDialog->setViewMode(QFileDialog::Detail);
     QList<QUrl> urls;
     if (QDir("/Volumes").exists()) urls << QUrl::fromLocalFile("/Volumes");

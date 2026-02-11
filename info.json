@@ -1,0 +1,20 @@
+{
+  "version": {
+    "major": 1,
+    "minor": 9,
+    "patch": 8,
+    "snapshot": true
+  },
+  "projectName": "IMF-Tool",
+  "projectDescription": "A tool for editing IMF CPLs and creating new versions of an existing IMF (Interoperable Master Format) package",
+  "projectId": "1732653247",
+  "vendor": "HSRM",
+  "contact": "imftool@t-online.de",
+  "domain": "com.imftool",
+  "copyrightYear": "2024",
+  "repository": "https://github.com/IMFTool/IMFTool",
+  "topics": ["IMF"],
+  "categories": ["AudioVideo"],
+  "homepage": "https://github.com/IMFTool/IMFTool",
+  "license": "GPLv3"
+}

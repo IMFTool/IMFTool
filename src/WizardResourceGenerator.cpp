@@ -172,6 +172,7 @@ void WizardResourceGeneratorPage::InitLayout() {
 	if (mReadOnly) mpComboBoxSoundfieldGroup->setDisabled(true);
 	mpSoundFieldGroupModel = new SoundFieldGroupModel(this);
 	mpTableViewWav = new QTableView(this);
+	mpTableViewWav->setFocusPolicy(Qt::NoFocus);
 	mpTableViewWav->setModel(mpSoundFieldGroupModel);
 	mpTableViewWav->setEditTriggers(QAbstractItemView::AllEditTriggers);
 	mpTableViewWav->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -187,15 +188,15 @@ void WizardResourceGeneratorPage::InitLayout() {
 	mpTableViewWav->setItemDelegateForColumn(SoundFieldGroupModel::ColumnDstChannel, new DelegateComboBox(this, false, false));
 	//WR
 	//language code is two or three lowercase letters, region code is either two uppercase letters or three digits"
-	const QRegExp rx_lang("[a-z]{2,3}\\-([A-Z]{2}|[0-9]{3})");
-	QRegExpValidator *v_lang = new QRegExpValidator(rx_lang, this);
+	const QRegularExpression rx_lang("[a-z]{2,3}\\-([A-Z]{2}|[0-9]{3})");
+	QRegularExpressionValidator *v_lang = new QRegularExpressionValidator(rx_lang, this);
 	mpLineEditLanguageTagWav = new QLineEdit(this);
 	mpLineEditLanguageTagWav->setAlignment(Qt::AlignRight);
 	mpLineEditLanguageTagWav->setText("en-US");
 	mpLineEditLanguageTagWav->setValidator(v_lang);
 	if (mReadOnly) mpLineEditLanguageTagWav->setDisabled(true);
 	connect(mpLineEditLanguageTagWav, SIGNAL(textEdited(QString)), this, SLOT(languageTagWavChanged()));
-	QRegExpValidator *v_lang2 = new QRegExpValidator(rx_lang, this);
+	QRegularExpressionValidator *v_lang2 = new QRegularExpressionValidator(rx_lang, this);
 	mpLineEditLanguageTagTT = new QLineEdit(this);
 	mpLineEditLanguageTagTT->setAlignment(Qt::AlignRight);
 	mpLineEditLanguageTagTT->setText("en-US");
@@ -203,8 +204,8 @@ void WizardResourceGeneratorPage::InitLayout() {
 	if (mReadOnly) mpLineEditLanguageTagTT->setDisabled(true);
 	connect(mpLineEditLanguageTagTT, SIGNAL(textEdited(QString)), this, SLOT(languageTagTTChanged()));
 	// Allows for whitespace and slash, but not as first character
-	QRegExp mca_items("[0-9a-zA@]{1}[0-9a-zA-Z_\\s/]*");
-	QRegExpValidator *v_mca_items = new QRegExpValidator(mca_items, this);
+	static QRegularExpression mca_items("[0-9a-zA@]{1}[0-9a-zA-Z_\\s/]*");
+	QRegularExpressionValidator *v_mca_items = new QRegularExpressionValidator(mca_items, this);
 	mpLineEditMCATitle = new QLineEdit(this);
 	mpLineEditMCATitle->setAlignment(Qt::AlignRight);
 	mpLineEditMCATitle->setText("n/a");
@@ -289,6 +290,7 @@ void WizardResourceGeneratorPage::InitLayout() {
 
 	mpTimedTextModel = new TimedTextModel(this);
 	mpTableViewTimedText = new QTableView(this);
+	mpTableViewTimedText->setFocusPolicy(Qt::NoFocus);
 	mpTableViewTimedText->setModel(mpTimedTextModel);
 	mpTableViewTimedText->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	mpTableViewTimedText->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -314,8 +316,8 @@ void WizardResourceGeneratorPage::InitLayout() {
 	pBrowseDir->setAutoDefault(false);
 	//connect(pBrowseDir, SIGNAL(clicked(bool)), this, SLOT(ShowDirDialog()));
 	connect(mpDirDialog, SIGNAL(fileSelected(const QString &)), mpLineEditFileDir, SLOT(setText(const QString &)));
-	QRegExp rx("[A-Za-z0-9-_]+");
-	QRegExpValidator *v = new QRegExpValidator(rx, this);
+	static QRegularExpression rx("[A-Za-z0-9-_]+");
+	QRegularExpressionValidator *v = new QRegularExpressionValidator(rx, this);
 	mpLineEditFileName = new QLineEdit(this);
 	mpLineEditFileName->setAlignment(Qt::AlignRight);
 	mpLineEditFileName->setPlaceholderText("file name");
@@ -686,7 +688,7 @@ void WizardResourceGeneratorPage::InitLayout() {
 	//WR
 
 	connect(mpFileDialog, SIGNAL(filesSelected(const QStringList &)), this, SLOT(SetSourceFiles(const QStringList &)));
-	connect(mpComboBoxSoundfieldGroup, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(ChangeSoundfieldGroup(const QString&)));
+	connect(mpComboBoxSoundfieldGroup, SIGNAL(currentTextChanged(const QString &)), this, SLOT(ChangeSoundfieldGroup(const QString&)));
 	connect(mpSoundFieldGroupModel, SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &, const QVector<int>&)), this, SIGNAL(completeChanged()));
 }
 
@@ -702,14 +704,14 @@ void WizardResourceGeneratorPage::textChanged()
 //WR
 void WizardResourceGeneratorPage::languageTagWavChanged()
 {
-	QRegExp rx_lang("[a-z]{2,3}\\-([A-Z]{2}|[0-9]{3})");
+	static QRegularExpression rx_lang("[a-z]{2,3}\\-([A-Z]{2}|[0-9]{3})");
 	// ^$ empty string
 	//qDebug() << mpLineEditLanguageTagWav->text();
 	// TO-DO: Disable QWizard::FinishButton if string doesn't match regexp
 }
 void WizardResourceGeneratorPage::languageTagTTChanged()
 {
-	QRegExp rx_lang("[a-z]{2,3}\\-([A-Z]{2}|[0-9]{3})");
+	static QRegularExpression rx_lang("[a-z]{2,3}\\-([A-Z]{2}|[0-9]{3})");
 	// ^$ empty string
 	//qDebug() << mpLineEditLanguageTagWav->text();
 	// TO-DO: Disable QWizard::FinishButton if string doesn't match regexp
@@ -735,7 +737,7 @@ void WizardResourceGeneratorPage::GenerateEmptyTimedText(){
 
 	Error error;
 	//QStringList filePath(tr("%1/%2.xml").arg(mpLineEditFileDir->text()).arg(mpLineEditFileName->text()));
-	QStringList filePath(QApplication::applicationDirPath() + QString("/files/TTML_Empty_Minimal.xml"));
+	QStringList filePath(QString("%1/%2").arg(AUX_FILES, "TTML_Empty_Minimal.xml"));
 	if (!QFileInfo::exists(filePath.at(0))) error =  Error(Error::SourceFileOpenError, filePath.at(0));
 	if(error.IsError() == true) {
 		QString error_string = error.GetErrorDescription();
@@ -1194,7 +1196,7 @@ void WizardResourceGeneratorPage::SwitchMode(WizardResourceGenerator::eMode mode
 		case WizardResourceGenerator::ISXDMode:
 			mpStackedLayout->setCurrentIndex(ISXDIndex);
 			mpFileDialog->setOption(QFileDialog::ShowDirsOnly, true);
-			mpFileDialog->setFileMode(QFileDialog::DirectoryOnly);
+			mpFileDialog->setFileMode(QFileDialog::Directory);
 			break;
 
 		case WizardResourceGenerator::MGAMode:
@@ -1258,7 +1260,7 @@ void WidgetProxyImage::InitLayout() {
 
 void WidgetProxyImage::rTransformationFinished(const QImage &rImage, const QVariant &rIdentifier) {
 
-	if(mpImageLabel->pixmap() == NULL && rIdentifier.toModelIndex() == mIndex) {
+	if(mpImageLabel->pixmap().isNull() && rIdentifier.toModelIndex() == mIndex) {
 		mpSpinner->stop();
 		mpImageLabel->setPixmap(QPixmap::fromImage(rImage));
 		QRect rect = geometry();

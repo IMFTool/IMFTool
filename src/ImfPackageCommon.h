@@ -354,7 +354,7 @@ public:
 
 		QDateTime date_time = QDateTime(QDate(rDateTime.year(), rDateTime.month(), rDateTime.day()), QTime(rDateTime.hours(), rDateTime.minutes(), rDateTime.seconds())); // TODO does this work?
 		if(rDateTime.zone_present() == true) {
-			date_time.setOffsetFromUtc(rDateTime.zone_hours() * 3600 + rDateTime.zone_minutes() * 60);
+			date_time.setTimeZone(QTimeZone::fromSecondsAheadOfUtc(rDateTime.zone_hours() * 3600 + rDateTime.zone_minutes() * 60));
 		}
 		return date_time;
 	}

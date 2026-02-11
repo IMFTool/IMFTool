@@ -21,6 +21,9 @@
 #include "ACES.h"
 #include "AS_02_ACES.h"
 
+using namespace Imf;
+using namespace Imath;
+
 // timeline preview constructor
 ACES_Preview::ACES_Preview() {
 	setUp();
@@ -132,7 +135,7 @@ void ACES_Preview::decode() {
 
 
 	err = false; // reset
-	mDecode_time.restart(); // start calculating decode time
+	mDecode_time.start(); // start calculating decode time
 
 	if (operator!=(asset, current_asset) || !asset) { // asset changed!!
 		setAsset();
@@ -221,7 +224,7 @@ QImage ACES::DataToQImage(quint8 rScale /* = 0 */, bool rShowDisplayWindow /* = 
 {
 	bool show_display_window = rShowDisplayWindow;
 	quint8 scale = 1 << rScale;
-	Imf::RgbaInputFile mRgbaFile(*pAcesIStream);
+	RgbaInputFile mRgbaFile(*pAcesIStream);
 	Box2i data_window;
 	Box2i display_window;
 
@@ -268,8 +271,8 @@ QImage ACES::DataToQImage(quint8 rScale /* = 0 */, bool rShowDisplayWindow /* = 
 	for (int x = 0; x < display_w; x++) {
 		for (int y = 0; y < display_h; y++) {
 			Rgba pix = inPixelsDataWindow[y*scale + offset_y][x*scale + offset_x];
-			Imath::Vec3<float> vec3in(pix.r, pix.g, pix.b);
-			Imath::Vec3<float> vec3out;
+			Vec3<float> vec3in(pix.r, pix.g, pix.b);
+			Vec3<float> vec3out;
 			//vec3out.x = 0.1; vec3out.y = 0.2; vec3out.z = 0.3;
 			A0Rec709TransformMatrix.multVecMatrix(vec3in, vec3out);
 			int r,g,b;
@@ -289,8 +292,6 @@ QImage ACES::DataToQImage(quint8 rScale /* = 0 */, bool rShowDisplayWindow /* = 
 	return image;
 }
 
-Imf::Chromaticities ACES::aces_chromaticities = Chromaticities(V2f(0.7347f, 0.2653f), V2f(0.0f, 1.0f), V2f(0.0001f, -0.077f), V2f(0.32168f, 0.33767f));
+Chromaticities ACES::aces_chromaticities = Chromaticities(V2f(0.7347f, 0.2653f), V2f(0.0f, 1.0f), V2f(0.0001f, -0.077f), V2f(0.32168f, 0.33767f));
 
-Imath::M44f ACES::A0Rec709TransformMatrix = RGBtoXYZ(aces_chromaticities, 1.0) * XYZtoRGB(Chromaticities(), 1.0);
-
-
+M44f ACES::A0Rec709TransformMatrix = RGBtoXYZ(aces_chromaticities, 1.0) * XYZtoRGB(Chromaticities(), 1.0);

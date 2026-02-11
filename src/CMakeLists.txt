@@ -1,61 +1,30 @@
-# Force decision if App#5 ACES support should be built
-set(BUILD_APP5_SUPPORT true CACHE BOOL "Build App#5 ACES support? Run Generate again, if this option is being changed") 
+option(BUILD_APP5_SUPPORT "Build App#5 ACES support?" ON)
 
-find_file(asdcplib_Targets_PATH NAMES asdcplibtargets.cmake PATHS "$ENV{CMAKE_HINT}/asdcplib" ENV CMAKE_HINT PATH_SUFFIXES "targets")
-find_path(asdcplib_include_DIR NAMES AS_02.h PATHS "$ENV{CMAKE_HINT}/asdcplib" ENV CMAKE_HINT PATH_SUFFIXES "include")
-find_library(XercescppLib_PATH NAMES xerces-c xerces-c_3 PATHS "${PROJECT_SOURCE_DIR}/../xercescpp" "${PROJECT_SOURCE_DIR}/../lib/xercescpp" "$ENV{CMAKE_HINT}/xercescpp" ENV CMAKE_HINT PATH_SUFFIXES "lib")
-find_library(XercescppLib_Debug_PATH NAMES xerces-cD xerces-c_3D xerces-c PATHS "${PROJECT_SOURCE_DIR}/../xercescpp" "${PROJECT_SOURCE_DIR}/../lib/xercescpp" "$ENV{CMAKE_HINT}/xercescpp" ENV CMAKE_HINT PATH_SUFFIXES "lib")
-find_path(libz_include_DIR NAMES zlib.h zconf.h ENV CMAKE_HINT PATH_SUFFIXES "include" "zlib/include")
-find_file(libz_PATH NAMES libz.a zlib.lib ENV CMAKE_HINT PATH_SUFFIXES "lib" "zlib/lib")
-find_package(OpenJPEG)
-find_package(regxmllibc)
-find_path(XercescppLib_include_DIR NAMES xercesc/dom/DOM.hpp PATHS "${PROJECT_SOURCE_DIR}/../xercescpp" "${PROJECT_SOURCE_DIR}/../lib/xercescpp" "$ENV{CMAKE_HINT}/xercescpp" ENV CMAKE_HINT PATH_SUFFIXES "include")
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets OpenGLWidgets)
+find_package(asdcplib REQUIRED)
+find_package(OpenJPEG REQUIRED)
+find_package(XercesC REQUIRED)
+find_package(libxsd REQUIRED)
+find_package(ZLIB REQUIRED)
+find_package(regxmllib REQUIRED)
+find_package(QtAppBase REQUIRED)
 
 if(BUILD_APP5_SUPPORT)
-find_package(Imath CONFIG)
-find_package(OpenEXR CONFIG)
-find_library(OpenEXRLib_OpenEXR_PATH NAMES OpenEXR  PATHS "$ENV{CMAKE_HINT}/openexr" ENV CMAKE_HINT PATH_SUFFIXES "lib")
-find_library(OpenEXRLib_OpenEXR_Debug_PATH NAMES OpenEXR  PATHS  "$ENV{CMAKE_HINT}/openexr" ENV CMAKE_HINT PATH_SUFFIXES "lib")
-find_path(OpenEXRLib_include_DIR NAMES OpenEXR/ImfAttribute.h PATHS "${PROJECT_SOURCE_DIR}/../openexr" "${PROJECT_SOURCE_DIR}/../lib/openexr" "$ENV{CMAKE_HINT}/openexr" ENV CMAKE_HINT PATH_SUFFIXES "include")
-find_path(ImathLib_include_DIR NAMES Imath/ImathVec.h PATHS "$ENV{CMAKE_HINT}/imath" ENV CMAKE_HINT PATH_SUFFIXES "include")
-find_library(IlmBaseLib_Imath_PATH NAMES Imath Imath-2_2 PATHS "${PROJECT_SOURCE_DIR}/../ilmbase" "${PROJECT_SOURCE_DIR}/../lib/ilmbase" "$ENV{CMAKE_HINT}/ilmbase" ENV CMAKE_HINT PATH_SUFFIXES "lib")
-find_library(IlmBaseLib_Imath_Debug_PATH NAMES Imath Imath-2_2 PATHS "${PROJECT_SOURCE_DIR}/../ilmbase" "${PROJECT_SOURCE_DIR}/../lib/ilmbase" "$ENV{CMAKE_HINT}/ilmbase" ENV CMAKE_HINT PATH_SUFFIXES "lib")
-find_library(IlmBaseLib_IlmThread_PATH NAMES IlmThread IlmThread-2_2 PATHS "${PROJECT_SOURCE_DIR}/../ilmbase" "${PROJECT_SOURCE_DIR}/../lib/ilmbase" "$ENV{CMAKE_HINT}/ilmbase" ENV CMAKE_HINT PATH_SUFFIXES "lib")
-find_library(IlmBaseLib_IlmThread_Debug_PATH NAMES IlmThread IlmThread-2_2 PATHS "${PROJECT_SOURCE_DIR}/../ilmbase" "${PROJECT_SOURCE_DIR}/../lib/ilmbase" "$ENV{CMAKE_HINT}/ilmbase" ENV CMAKE_HINT PATH_SUFFIXES "lib")
-find_library(IlmBaseLib_Iex_PATH NAMES Iex Iex-2_2 PATHS "${PROJECT_SOURCE_DIR}/../ilmbase" "${PROJECT_SOURCE_DIR}/../lib/ilmbase" "$ENV{CMAKE_HINT}/ilmbase" ENV CMAKE_HINT PATH_SUFFIXES "lib")
-find_library(IlmBaseLib_Iex_Debug_PATH NAMES Iex Iex-2_2 PATHS "${PROJECT_SOURCE_DIR}/../ilmbase" "${PROJECT_SOURCE_DIR}/../lib/ilmbase" "$ENV{CMAKE_HINT}/ilmbase" ENV CMAKE_HINT PATH_SUFFIXES "lib")
-else(BUILD_APP5_SUPPORT)
-unset(OpenEXRLib_OpenEXR_PATH CACHE)
-unset(OpenEXRLib_OpenEXR_Debug_PATH CACHE)
-unset(OpenEXRLib_include_DIR CACHE)
-unset(ImathLib_include_DIR CACHE)
-unset(IlmBaseLib_Imath_PATH CACHE)
-unset(IlmBaseLib_Imath_Debug_PATH CACHE)
-unset(IlmBaseLib_IlmThread_PATH CACHE)
-unset(IlmBaseLib_IlmThread_Debug_PATH CACHE)
-unset(IlmBaseLib_Iex_PATH CACHE)
-unset(IlmBaseLib_Iex_Debug_PATH CACHE)
-endif(BUILD_APP5_SUPPORT)
-
-include("${asdcplib_Targets_PATH}") # Import asdcplib targets.
-
-set (qt5_modules Core Gui Widgets)
-find_package (Qt5 COMPONENTS ${qt5_modules})
+	message(STATUS "Building with App#5 ACES support")
+	find_package(OpenEXR REQUIRED)
+	find_package(Imath REQUIRED)
+endif ()
 
 if(DOXYGEN_FOUND)
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
 	add_custom_target(doc ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR} COMMENT "Generating API documentation with Doxygen" VERBATIM)
 	message(STATUS "Use target \"doc\" to generate doxygen.")
-endif(DOXYGEN_FOUND)
+endif()
 
 # Find includes in corresponding build directories.
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-# Instruct CMake to run moc automatically when needed.
-set(CMAKE_AUTOMOC ON)
-
 set(qt_rcc_resources "${PROJECT_SOURCE_DIR}/resources/qt_resources.qrc")
-set(win_resources "${PROJECT_SOURCE_DIR}/resources/win_resources.rc")
 
 # source
 set(tool_src main.cpp MainWindow.cpp KMQtLogSink.cpp QtWaitingSpinner.cpp WidgetAbout.cpp
@@ -70,9 +39,9 @@ set(tool_src main.cpp MainWindow.cpp KMQtLogSink.cpp QtWaitingSpinner.cpp Widget
 	WizardSidecarCompositionMapGenerator.cpp WizardCompositionGenerator.cpp PreviewCommon.cpp Player.cpp WidgetXmlTree.cpp WidgetSADMPreview.cpp XmlQSyntaxHighlighter.cpp
 	qcompressor.cpp
 	)
+
 if(BUILD_APP5_SUPPORT)
-set(tool_src ${tool_src} As02AcesIStream.cpp ACES_Preview.cpp ACES_Decoder.cpp
-	)
+	set(tool_src ${tool_src} As02AcesIStream.cpp ACES_Preview.cpp ACES_Decoder.cpp)
 endif(BUILD_APP5_SUPPORT)
 
 # header
@@ -88,50 +57,91 @@ set(tool_src ${tool_src} global.h MainWindow.h KMQtLogSink.h QtWaitingSpinner.h
 	WizardSidecarCompositionMapGenerator.h WizardCompositionGenerator.h PreviewCommon.h Player.h WidgetXmlTree.h WidgetSADMPreview.h XmlQSyntaxHighlighter.h
 	qcompressor.h
 	)
+
 if(BUILD_APP5_SUPPORT)
-set(tool_src ${tool_src} As02AcesIStream.h ACES_Preview.h ACES_Decoder.h
-	)
+	set(tool_src ${tool_src} As02AcesIStream.h ACES_Preview.h ACES_Decoder.h)
 endif(BUILD_APP5_SUPPORT)
 
-set(synthesis_src synthesis/st0433-dcmlTypes.cpp synthesis/SMPTE-429-8-2006-PKL.cpp synthesis/SMPTE-429-9-2007-AM.cpp synthesis/SMPTE-2067-2-2013-Core.cpp 
-	synthesis/SMPTE-2067-3-2013-CPL.cpp synthesis/SMPTE-2067-100a-2014-OPL.cpp synthesis/xml.cpp synthesis/xmldsig-core-schema.cpp
-	synthesis/st2067-2a-2020-Core.cpp synthesis/st2067-2b-2020-PKL.cpp synthesis/st2067-3a-2020-CPL.cpp synthesis/SMPTE-2067-9a-2018-Sidecar.cpp
-	synthesis/st2067-203a-20XX.cpp synthesis/st2067-204a-20XX.cpp
+set(synthesis_src
+		synthesis/SMPTE-429-8-2006-PKL.cpp
+		synthesis/SMPTE-429-9-2007-AM.cpp
+		synthesis/SMPTE-2067-2-2013-Core.cpp
+		synthesis/SMPTE-2067-3-2013-CPL.cpp
+		synthesis/SMPTE-2067-9a-2018-Sidecar.cpp
+		synthesis/SMPTE-2067-100a-2014-OPL.cpp
+		synthesis/st0433-dcmlTypes.cpp
+		synthesis/st2067-2a-2020-Core.cpp
+		synthesis/st2067-2b-2020-PKL.cpp
+		synthesis/st2067-3a-2020-CPL.cpp
+		synthesis/st2067-203a-20XX.cpp
+		synthesis/st2067-204a-20XX.cpp
+		synthesis/xml.cpp
+		synthesis/xmldsig-core-schema.cpp
 	)
 
-source_group("Resource Files" FILES ${qt_rcc_resources} ${win_resources} ${open_cl_src})
+source_group("Resource Files" FILES ${qt_rcc_resources} ${open_cl_src})
 source_group("Synthesis Files" FILES ${synthesis_src})
-qt5_add_resources(resSources ${qt_rcc_resources})
+qt_add_resources(resSources ${qt_rcc_resources})
 
-include_directories("${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/synthesis" "${XercescppLib_include_DIR}" 
-	"${asdcplib_include_DIR}" "${OPENJPEG_INCLUDE_DIRS}" "${REGXMLLIBC_INCLUDE_DIRS}" "${libz_include_DIR}")
+include_directories("${PROJECT_SOURCE_DIR}/src" "${PROJECT_SOURCE_DIR}/src/synthesis")
 
-if(BUILD_APP5_SUPPORT)
-include_directories("${OpenEXRLib_include_DIR}/OpenEXR" "${ImathLib_include_DIR}/Imath")
-endif(BUILD_APP5_SUPPORT)
-
+add_definitions(/DXSD_CXX11 /DXSD_CXX11_NULLPTR /DXSD_CXX11_TEMPLATE_ALIAS)
 if(WIN32)
 	add_definitions(/D_CRT_SECURE_NO_WARNINGS /DUNICODE /DKM_WIN32 /DASDCP_PLATFORM=\"win32\" /DNOMINMAX /DOPENEXR_DLL)
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
+	if (MSVC)
+		add_link_options(/SAFESEH:NO)
+	endif ()
 elseif(UNIX)
 	add_definitions(/DASDCP_PLATFORM=\"unix\")
 endif(WIN32)
 
 if(BUILD_APP5_SUPPORT)
-add_definitions(/DAPP5_ACES)
+	add_definitions(/DAPP5_ACES)
 endif(BUILD_APP5_SUPPORT)
 
-add_executable(${EXE_NAME} WIN32 ${tool_src} ${resSources} ${win_resources} ${synthesis_src})
-target_link_libraries(${EXE_NAME} general Qt5::Widgets
-	 general libas02 debug "${XercescppLib_Debug_PATH}" optimized "${XercescppLib_PATH}" debug "${OpenJPEGLib_Debug_Path}" optimized "${OpenJPEGLib_Path}"
-	 regxmllibc "${libz_PATH}" debug openjp2 optimized openjp2
-	 )
+qt_add_executable(IMF-Tool WIN32 MACOSX_BUNDLE ${tool_src} ${resSources} ${synthesis_src})
+
 if(BUILD_APP5_SUPPORT)
-target_link_libraries(${EXE_NAME} 
-	 debug "${IlmBaseLib_IlmThread_Debug_PATH}" optimized "${IlmBaseLib_IlmThread_PATH}" debug "${IlmBaseLib_Iex_Debug_PATH}" optimized "${IlmBaseLib_Iex_PATH}"
-	 debug "${IlmBaseLib_Imath_Debug_PATH}" optimized "${IlmBaseLib_Imath_PATH}" debug "${OpenEXRLib_OpenEXR_Debug_PATH}" optimized "${OpenEXRLib_OpenEXR_PATH}"
-	 )
+	target_link_libraries(IMF-Tool
+			PRIVATE Imath::Imath
+			PRIVATE openexr::openexr
+	)
 endif(BUILD_APP5_SUPPORT)
 
-# add the install target
-install(TARGETS ${EXE_NAME} RUNTIME DESTINATION bin ARCHIVE DESTINATION lib)
+if(UNIX AND NOT APPLE)
+	# On bspwm I'm experiencing empty progress dialog windows if the delay is too small
+	target_compile_definitions(IMF-Tool PRIVATE PROGRESS_DIALOG_DELAY=200)
+else()
+	target_compile_definitions(IMF-Tool PRIVATE PROGRESS_DIALOG_DELAY=0)
+endif()
+
+target_link_libraries(IMF-Tool
+		PRIVATE Qt6::Gui
+		PRIVATE Qt6::Widgets
+		PRIVATE Qt6::OpenGLWidgets
+		PRIVATE QtAppBase
+		PRIVATE ZLIB::ZLIB
+		PRIVATE XercesC::XercesC
+		PRIVATE libxsd::libxsd
+		PRIVATE regxmllib::regxmllib
+		PRIVATE libasdcp
+		PRIVATE libas02
+		PRIVATE openjp2
+	 )
+
+register_icon(IMF-Tool
+		ICO "${CMAKE_SOURCE_DIR}/resources/icon1.ico"
+		ICNS "${CMAKE_SOURCE_DIR}/resources/IMFTool.icns"
+		256x256 "${CMAKE_SOURCE_DIR}/resources/IMFTool256.png"
+		48x48 "${CMAKE_SOURCE_DIR}/resources/IMFTool48.png"
+)
+
+register_aux_path(IMF-Tool DIRECTORY "${CMAKE_SOURCE_DIR}/photon/build/libs" NAME photon)
+register_aux_path(IMF-Tool DIRECTORY "${CMAKE_SOURCE_DIR}/photon/build/libs-adm" NAME photon_adm)
+if(JVM_PATH)
+	register_aux_path(IMF-Tool DIRECTORY "${JVM_PATH}" NAME photon_jre)
+endif()
+register_aux_path(IMF-Tool DIRECTORY "${PROJECT_SOURCE_DIR}/regxmllib" NAME regxmllib)
+register_aux_path(IMF-Tool DIRECTORY "${PROJECT_SOURCE_DIR}/files" NAME files)
+
+install_app(IMF-Tool QT_IF_CONTROL_SCRIPT "${CMAKE_CURRENT_SOURCE_DIR}/windows/QtIFControlScript.qs" APPLE_DEEP_CODESIGN)

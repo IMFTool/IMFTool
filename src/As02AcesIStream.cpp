@@ -17,15 +17,37 @@
 #include "As02AcesIStream.h"
 #include "global.h"
 
-
-As02AcesIStream::As02AcesIStream() : Imf::IStream("Unknown") {
-
-	d = new As02AcesIStreamData;
-}
-
-As02AcesIStream::As02AcesIStream(const As02AcesIStream &rOther) : Imf::IStream("Unknown"), d(rOther.d) {
+As02AcesIStreamData::As02AcesIStreamData() :
+mpData(NULL), mSize(0), mpReadPosition(NULL) {
 
 }
+
+As02AcesIStreamData::As02AcesIStreamData(const As02AcesIStreamData &rOther) :
+mpData(NULL), mSize(0), mpReadPosition(NULL) {
+
+	if(rOther.mpData != NULL) {
+		mSize = rOther.mSize;
+		if(mSize > 0) mpData = (byte_t*)malloc(mSize);
+		if(mpData != NULL) memcpy(mpData, rOther.mpData, mSize);
+		mpReadPosition = mpData;
+	}
+}
+
+As02AcesIStreamData::~As02AcesIStreamData() {
+
+	free(mpData);
+}
+
+As02AcesIStream::As02AcesIStream() : IStream("Unknown") {
+
+	d = new As02AcesIStreamData();
+}
+
+As02AcesIStream::As02AcesIStream(const As02AcesIStream &rOther) : IStream("Unknown"), d(rOther.d) {
+
+}
+
+As02AcesIStream::~As02AcesIStream() {}
 
 bool As02AcesIStream::read(char c[], int n) {
 
@@ -57,25 +79,4 @@ void As02AcesIStream::InitBuffer(const AS_02::ACES::FrameBuffer &rBuffer) {
 	d->mpData = (byte_t*)malloc(d->mSize);
 	if(d->mpData != NULL) memcpy(d->mpData, rBuffer.RoData(), d->mSize);
 	d->mpReadPosition = d->mpData;
-}
-
-As02AcesIStreamData::As02AcesIStreamData() :
-mpData(NULL), mSize(0), mpReadPosition(NULL) {
-
-}
-
-As02AcesIStreamData::As02AcesIStreamData(const As02AcesIStreamData &rOther) :
-mpData(NULL), mSize(0), mpReadPosition(NULL) {
-
-	if(rOther.mpData != NULL) {
-		mSize = rOther.mSize;
-		if(mSize > 0) mpData = (byte_t*)malloc(mSize);
-		if(mpData != NULL) memcpy(mpData, rOther.mpData, mSize);
-		mpReadPosition = mpData;
-	}
-}
-
-As02AcesIStreamData::~As02AcesIStreamData() {
-
-	free(mpData);
 }

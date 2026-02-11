@@ -15,6 +15,7 @@
 */
 #pragma once
 #include <QObject>
+#include <QElapsedTimer>
 #include <QThreadPool>
 #include "Error.h"
 #include "openjpeg.h"
@@ -74,7 +75,7 @@ private:
 	bool extractFrame(qint64 frameNr);
 	
 	int mCpus = 1; // nr of threads used for decoding
-	QTime mDecode_time; // time (ms) needed to decode/convert the image
+	QElapsedTimer mDecode_time; // time (ms) needed to decode/convert the image
 	QString mMsg; // error message
 	QString mMxf_path; // path to current asset
 

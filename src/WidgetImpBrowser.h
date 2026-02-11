@@ -53,7 +53,7 @@ public:
 	virtual ~WidgetImpBrowser();
 	void InstallImp(const QSharedPointer<ImfPackage> &rImfPackage, bool validateHash = false);
 	void UninstallImp();
-	bool IsImpInstalled() const { return mpImfPackage; }
+	bool IsImpInstalled() const { return !mpImfPackage.isNull(); }
 	virtual QSize sizeHint() const;
 	virtual QSize minimumSizeHint() const;
 	QUndoStack* GetUndoStack() const { return mpUndoStack; }

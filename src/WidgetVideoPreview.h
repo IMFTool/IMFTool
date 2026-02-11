@@ -93,7 +93,7 @@ private:
 	QVector<TTMLtimelineResource> *ttmls;
 	QVector<visibleTTtrack> current_tt; // currently visible timed text elements
 	QMap<int, QVector<TTMLtimelineResource>> ttml_tracks;
-	QTime ttml_search_time;
+	QElapsedTimer ttml_search_time;
 	qint64 next_ttml;
 	qint64 prev_ttml;
 

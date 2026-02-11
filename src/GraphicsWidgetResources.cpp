@@ -944,41 +944,41 @@ void GraphicsWidgetVideoResource::paint(QPainter *pPainter, const QStyleOptionGr
 			QString duration(font_metrics.elidedText(tr("Dur.: %1").arg(MapToCplTimeline(GetSourceDuration()).GetCount()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
 			QString file_name;
 			if((mAssset) && mAssset->HasAffinity()) {
-				if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
-				else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+				if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
+				else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
 			} else if ((mAssset) && (!mAssset->HasAffinity()) && (mAssset->GetIsOutsidePackage())) {
 				pen.setColor(mAssset->GetColor());
 				pPainter->setPen(pen);
-				if(i == 0) file_name = QString(font_metrics.elidedText("OV Asset: " + mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
-				else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+				if(i == 0) file_name = QString(font_metrics.elidedText("OV Asset: " + mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
+				else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
 			} else if ((mAssset == NULL)  ||  ((mAssset) && (!mAssset->HasAffinity()))) {
 				pen.setColor(Qt::white);
 				pPainter->setPen(pen);
-				file_name = QString(font_metrics.elidedText("Missing Asset", Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+				file_name = QString(font_metrics.elidedText("Missing Asset", Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
 			}
 			QString cpl_out_point(font_metrics.elidedText(tr("Cpl Out: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i + 1) * GetSourceDuration() - 1)).GetAsString()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
-			QString cpl_in_point(font_metrics.elidedText(tr("Cpl In: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i * (GetSourceDuration())))).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(cpl_out_point)));
+			QString cpl_in_point(font_metrics.elidedText(tr("Cpl In: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i * (GetSourceDuration())))).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(cpl_out_point).width()));
 
 			QString resource_out_point(font_metrics.elidedText(tr("Out: %1").arg(Timecode(GetEditRate(), GetEntryPoint() + GetSourceDuration() - 1).GetAsString()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
-			QString resource_in_point(font_metrics.elidedText(tr("In: %1").arg(Timecode(GetEditRate(), GetEntryPoint()).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(cpl_out_point)));
+			QString resource_in_point(font_metrics.elidedText(tr("In: %1").arg(Timecode(GetEditRate(), GetEntryPoint()).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(cpl_out_point).width()));
 			QString phdr_hint(font_metrics.elidedText(tr("PHDR data present"), Qt::ElideRight, writable_rect.width() * transf.m11()));
 
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.top() + font_metrics.height())); // We have to use QTransform::translate() because of bug 192573.
 			pPainter->drawText(QPointF(0, 0), file_name);
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(duration)), writable_rect.top() + font_metrics.height()));
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.boundingRect(duration).width()), writable_rect.top() + font_metrics.height()));
 			pPainter->drawText(QPointF(0, 0), duration);
 
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.bottom()));
 			pPainter->drawText(QPointF(0, 0), cpl_in_point);
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(cpl_out_point)), writable_rect.bottom()));
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.boundingRect(cpl_out_point).width()), writable_rect.bottom()));
 			pPainter->drawText(QPointF(0, 0), cpl_out_point);
 			if (mAssset && mAssset->GetMetadata().isPHDR) {
 				QPen pen2 = pen;
 			    QBrush brush2(QColor(CPL_FONT_COLOR), Qt::SolidPattern);
-				QRect qrect(-font_metrics.width(phdr_hint)*0.1, 5, font_metrics.width(phdr_hint)*1.2, font_metrics.height()*1.1);
+				QRect qrect(-font_metrics.boundingRect(phdr_hint).width()*0.1, 5, font_metrics.boundingRect(phdr_hint).width()*1.2, font_metrics.height()*1.1);
 				pen2.setColor(QColor(CPL_FONT_COLOR));
 				pPainter->setPen(pen2);
-				pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.center().rx()* transf.m11() - font_metrics.width(phdr_hint)/2.0 ), writable_rect.center().ry()));
+				pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.center().rx()* transf.m11() - font_metrics.boundingRect(phdr_hint).width()/2.0 ), writable_rect.center().ry()));
 				pPainter->fillRect(qrect, brush2);
 				pen2.setColor(Qt::white);
 				pPainter->setPen(pen2);
@@ -987,7 +987,7 @@ void GraphicsWidgetVideoResource::paint(QPainter *pPainter, const QStyleOptionGr
 			}
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.top()));
 			pPainter->drawText(QPointF(0, 35), resource_in_point);
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(resource_out_point)), writable_rect.top()));
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.boundingRect(resource_out_point).width()), writable_rect.top()));
 			pPainter->drawText(QPointF(0, 35), resource_out_point);
 
 			pPainter->setTransform(transf);
@@ -1145,43 +1145,43 @@ void GraphicsWidgetAudioResource::paint(QPainter *pPainter, const QStyleOptionGr
 			QString duration(font_metrics.elidedText(tr("Dur.: %L1").arg(GetSourceDuration().GetCount()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
 			QString file_name;
 			if((mAssset) && mAssset->HasAffinity()) {
-				if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
-				else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+				if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
+				else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
 			} else if ((mAssset) && (!mAssset->HasAffinity()) && (mAssset->GetIsOutsidePackage())) {
 				pen.setColor(mAssset->GetColor());
 				pPainter->setPen(pen);
-				if(i == 0) file_name = QString(font_metrics.elidedText("OV Asset: " + mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
-				else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+				if(i == 0) file_name = QString(font_metrics.elidedText("OV Asset: " + mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
+				else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
 			} else if ((mAssset == NULL)  ||  ((mAssset) && (!mAssset->HasAffinity()))) {
 				pen.setColor(Qt::white);
 				pPainter->setPen(pen);
-				file_name = QString(font_metrics.elidedText("Missing Asset", Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+				file_name = QString(font_metrics.elidedText("Missing Asset", Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
 			}
 			QString cpl_out_point(font_metrics.elidedText(tr("Cpl Out: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i + 1) * (MapToCplTimeline(GetSourceDuration()).GetCount()*GetEditRate().GetQuotient()/GetCplEditRate().GetQuotient()/*this is necessary to prevent rounding error*/) - 1)).GetAsString()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
-			QString cpl_in_point(font_metrics.elidedText(tr("Cpl In: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i * (GetSourceDuration())))).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(cpl_out_point)));
+			QString cpl_in_point(font_metrics.elidedText(tr("Cpl In: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i * (GetSourceDuration())))).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(cpl_out_point).width()));
 
 			//QString resource_out_point(font_metrics.elidedText(tr("Out: %1").arg(Timecode(GetCplEditRate(), Duration((qint64)ceil((long double)GetEntryPoint().GetCount() * GetCplEditRate().GetQuotient() / GetEditRate().GetQuotient())) + (GetSourceDuration().GetCount() * GetCplEditRate().GetQuotient() / GetEditRate().GetQuotient()) - 1).GetAsString()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
 			//QString resource_in_point(font_metrics.elidedText(tr("In: %1").arg(Timecode(GetCplEditRate(), Duration((qint64)ceil((long double)GetEntryPoint().GetCount() * GetCplEditRate().GetQuotient() / GetEditRate().GetQuotient()))).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(cpl_out_point)));
 			QString resource_out_point(font_metrics.elidedText(tr("Out: %L1").arg(GetEntryPoint().GetCount() + GetSourceDuration().GetCount()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
-			QString resource_in_point(font_metrics.elidedText(tr("In: %L1").arg(GetEntryPoint().GetCount()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(cpl_out_point)));
+			QString resource_in_point(font_metrics.elidedText(tr("In: %L1").arg(GetEntryPoint().GetCount()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(cpl_out_point).width()));
 
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.top() + font_metrics.height())); // We have to use QTransform::translate() because of bug 192573.
 			pPainter->drawText(QPointF(0, 0), file_name);
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(duration)), writable_rect.top() + font_metrics.height()));
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.boundingRect(duration).width()), writable_rect.top() + font_metrics.height()));
 			pPainter->drawText(QPointF(0, 0), duration);
 
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.bottom()));
 			pPainter->drawText(QPointF(0, 0), cpl_in_point);
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(cpl_out_point)), writable_rect.bottom()));
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.boundingRect(cpl_out_point).width()), writable_rect.bottom()));
 			pPainter->drawText(QPointF(0, 0), cpl_out_point);
 			if (mAssset) {
 				QPen pen2 = pen;
 				QString label = mAssset->GetMetadata().soundfieldGroup.GetName() + ": " + mAssset->GetMetadata().languageTag;
 				QBrush brush2(QColor(CPL_FONT_COLOR), Qt::SolidPattern);
-				QRect qrect(-font_metrics.width(label)*0.1, 5, font_metrics.width(label)*1.2, font_metrics.height()*1.1);
+				QRect qrect(-font_metrics.boundingRect(label).width()*0.1, 5, font_metrics.boundingRect(label).width()*1.2, font_metrics.height()*1.1);
 				pen2.setColor(QColor(CPL_FONT_COLOR));
 				pPainter->setPen(pen2);
-				pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.center().rx()* transf.m11() - font_metrics.width(label)/2.0 ), writable_rect.center().ry()));
+				pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.center().rx()* transf.m11() - font_metrics.boundingRect(label).width()/2.0 ), writable_rect.center().ry()));
 				pPainter->fillRect(qrect, brush2);
 				pen2.setColor(Qt::white);
 				pPainter->setPen(pen2);
@@ -1190,7 +1190,7 @@ void GraphicsWidgetAudioResource::paint(QPainter *pPainter, const QStyleOptionGr
 			}
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.top()));
 			pPainter->drawText(QPointF(0, 35), resource_in_point);
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(resource_out_point)), writable_rect.top()));
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.boundingRect(resource_out_point).width()), writable_rect.top()));
 			pPainter->drawText(QPointF(0, 35), resource_out_point);
 
 			pPainter->setTransform(transf);
@@ -1376,41 +1376,41 @@ void GraphicsWidgetTimedTextResource::paint(QPainter *pPainter, const QStyleOpti
 			QString duration(font_metrics.elidedText(tr("Dur.: %1").arg(MapToCplTimeline(GetSourceDuration()).GetCount()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
 			QString file_name;
 			if((mAssset) && mAssset->HasAffinity()) {
-				if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
-				else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+				if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
+				else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
 			} else if ((mAssset) && (!mAssset->HasAffinity()) && (mAssset->GetIsOutsidePackage())) {
 				pen.setColor(mAssset->GetColor());
 				pPainter->setPen(pen);
-				if(i == 0) file_name = QString(font_metrics.elidedText("OV Asset: " + mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
-				else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+				if(i == 0) file_name = QString(font_metrics.elidedText("OV Asset: " + mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
+				else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
 			} else if ((mAssset == NULL)  ||  ((mAssset) && (!mAssset->HasAffinity()))) {
 				pen.setColor(Qt::white);
 				pPainter->setPen(pen);
-				file_name = QString(font_metrics.elidedText("Missing Asset", Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+				file_name = QString(font_metrics.elidedText("Missing Asset", Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
 			}
 			QString cpl_out_point(font_metrics.elidedText(tr("Cpl Out: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i + 1) * (MapToCplTimeline(GetSourceDuration()).GetCount()*GetEditRate().GetQuotient()/GetCplEditRate().GetQuotient()/*this is necessary to prevent rounding error*/) - 1)).GetAsString()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
-			QString cpl_in_point(font_metrics.elidedText(tr("Cpl In: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i * (GetSourceDuration())))).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(cpl_out_point)));
+			QString cpl_in_point(font_metrics.elidedText(tr("Cpl In: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i * (GetSourceDuration())))).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(cpl_out_point).width()));
 
 			QString resource_out_point(font_metrics.elidedText(tr("Out: %1").arg(Timecode(GetCplEditRate(), Duration((qint64)ceil((long double)GetEntryPoint().GetCount() * GetCplEditRate().GetQuotient() / GetEditRate().GetQuotient())) + (GetSourceDuration().GetCount() * GetCplEditRate().GetQuotient() / GetEditRate().GetQuotient()) - 1).GetAsString()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
-			QString resource_in_point(font_metrics.elidedText(tr("In: %1").arg(Timecode(GetCplEditRate(), Duration((qint64)ceil((long double)GetEntryPoint().GetCount() * GetCplEditRate().GetQuotient() / GetEditRate().GetQuotient()))).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(cpl_out_point)));
+			QString resource_in_point(font_metrics.elidedText(tr("In: %1").arg(Timecode(GetCplEditRate(), Duration((qint64)ceil((long double)GetEntryPoint().GetCount() * GetCplEditRate().GetQuotient() / GetEditRate().GetQuotient()))).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(cpl_out_point).width()));
 
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.top() + font_metrics.height())); // We have to use QTransform::translate() because of bug 192573.
 			pPainter->drawText(QPointF(0, 0), file_name);
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(duration)), writable_rect.top() + font_metrics.height()));
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.boundingRect(duration).width()), writable_rect.top() + font_metrics.height()));
 			pPainter->drawText(QPointF(0, 0), duration);
 
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.bottom()));
 			pPainter->drawText(QPointF(0, 0), cpl_in_point);
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(cpl_out_point)), writable_rect.bottom()));
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.boundingRect(cpl_out_point).width()), writable_rect.bottom()));
 			pPainter->drawText(QPointF(0, 0), cpl_out_point);
 			if (mAssset && !mAssset->GetMetadata().languageTag.isEmpty()) {
 				QPen pen2 = pen;
 				QString label = mAssset->GetMetadata().languageTag;
 				QBrush brush2(QColor(CPL_FONT_COLOR), Qt::SolidPattern);
-				QRect qrect(-font_metrics.width(label)*0.1, 5, font_metrics.width(label)*1.2, font_metrics.height()*1.1);
+				QRect qrect(-font_metrics.boundingRect(label).width()*0.1, 5, font_metrics.boundingRect(label).width()*1.2, font_metrics.height()*1.1);
 				pen2.setColor(QColor(CPL_FONT_COLOR));
 				pPainter->setPen(pen2);
-				pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.center().rx()* transf.m11() - font_metrics.width(label)/2.0 ), writable_rect.center().ry()));
+				pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.center().rx()* transf.m11() - font_metrics.boundingRect(label).width()/2.0 ), writable_rect.center().ry()));
 				pPainter->fillRect(qrect, brush2);
 				pen2.setColor(Qt::white);
 				pPainter->setPen(pen2);
@@ -1419,7 +1419,7 @@ void GraphicsWidgetTimedTextResource::paint(QPainter *pPainter, const QStyleOpti
 			}
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.top()));
 			pPainter->drawText(QPointF(0, 35), resource_in_point);
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(resource_out_point)), writable_rect.top()));
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.boundingRect(resource_out_point).width()), writable_rect.top()));
 			pPainter->drawText(QPointF(0, 35), resource_out_point);
 
 			pPainter->setTransform(transf);
@@ -1485,37 +1485,37 @@ void GraphicsWidgetAncillaryDataResource::paint(QPainter *pPainter, const QStyle
 			QString duration(font_metrics.elidedText(tr("Dur.: %1").arg(MapToCplTimeline(GetSourceDuration()).GetCount()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
 			QString file_name;
 			if((mAssset) && mAssset->HasAffinity()) {
-					if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
-					else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+					if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
+					else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
 			} else if ((mAssset) && (!mAssset->HasAffinity()) && (mAssset->GetIsOutsidePackage())) {
 					pen.setColor(mAssset->GetColor());
 					pPainter->setPen(pen);
-					if(i == 0) file_name = QString(font_metrics.elidedText("OV Asset: " + mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
-					else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+					if(i == 0) file_name = QString(font_metrics.elidedText("OV Asset: " + mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
+					else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
 			} else if ((mAssset == NULL)  ||  ((mAssset) && (!mAssset->HasAffinity()))) {
 				pen.setColor(Qt::white);
 				pPainter->setPen(pen);
-				file_name = QString(font_metrics.elidedText("Missing Asset", Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+				file_name = QString(font_metrics.elidedText("Missing Asset", Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
 			}
 			QString cpl_out_point(font_metrics.elidedText(tr("Cpl Out: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i + 1) * GetSourceDuration() - 1)).GetAsString()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
-			QString cpl_in_point(font_metrics.elidedText(tr("Cpl In: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i * (GetSourceDuration())))).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(cpl_out_point)));
+			QString cpl_in_point(font_metrics.elidedText(tr("Cpl In: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i * (GetSourceDuration())))).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(cpl_out_point).width()));
 
 			QString resource_out_point(font_metrics.elidedText(tr("Out: %1").arg(Timecode(GetEditRate(), GetEntryPoint() +  GetSourceDuration() - 1).GetAsString()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
-			QString resource_in_point(font_metrics.elidedText(tr("In: %1").arg(Timecode(GetEditRate(), GetEntryPoint()).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(cpl_out_point)));
+			QString resource_in_point(font_metrics.elidedText(tr("In: %1").arg(Timecode(GetEditRate(), GetEntryPoint()).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(cpl_out_point).width()));
 
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.top() + font_metrics.height())); // We have to use QTransform::translate() because of bug 192573.
 			pPainter->drawText(QPointF(0, 0), file_name);
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(duration)), writable_rect.top() + font_metrics.height()));
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.boundingRect(duration).width()), writable_rect.top() + font_metrics.height()));
 			pPainter->drawText(QPointF(0, 0), duration);
 
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.bottom()));
 			pPainter->drawText(QPointF(0, 0), cpl_in_point);
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(cpl_out_point)), writable_rect.bottom()));
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.boundingRect(cpl_out_point).width()), writable_rect.bottom()));
 			pPainter->drawText(QPointF(0, 0), cpl_out_point);
 
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.top()));
 			pPainter->drawText(QPointF(0, 35), resource_in_point);
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(resource_out_point)), writable_rect.top()));
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.boundingRect(resource_out_point).width()), writable_rect.top()));
 			pPainter->drawText(QPointF(0, 35), resource_out_point);
 
 			pPainter->setTransform(transf);
@@ -1581,41 +1581,41 @@ void GraphicsWidgetIABResource::paint(QPainter *pPainter, const QStyleOptionGrap
 			QString duration(font_metrics.elidedText(tr("Dur.: %1").arg(MapToCplTimeline(GetSourceDuration()).GetCount()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
 			QString file_name;
 			if((mAssset) && mAssset->HasAffinity()) {
-					if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
-					else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+					if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
+					else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
 			} else if ((mAssset) && (!mAssset->HasAffinity()) && (mAssset->GetIsOutsidePackage())) {
 					pen.setColor(mAssset->GetColor());
 					pPainter->setPen(pen);
-					if(i == 0) file_name = QString(font_metrics.elidedText("OV Asset: " + mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
-					else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+					if(i == 0) file_name = QString(font_metrics.elidedText("OV Asset: " + mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
+					else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
 			} else if ((mAssset == NULL)  ||  ((mAssset) && (!mAssset->HasAffinity()))) {
 				pen.setColor(Qt::white);
 				pPainter->setPen(pen);
-				file_name = QString(font_metrics.elidedText("Missing Asset", Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+				file_name = QString(font_metrics.elidedText("Missing Asset", Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
 			}
 			QString cpl_out_point(font_metrics.elidedText(tr("Cpl Out: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i + 1) * GetSourceDuration() - 1)).GetAsString()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
-			QString cpl_in_point(font_metrics.elidedText(tr("Cpl In: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i * (GetSourceDuration())))).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(cpl_out_point)));
+			QString cpl_in_point(font_metrics.elidedText(tr("Cpl In: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i * (GetSourceDuration())))).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(cpl_out_point).width()));
 
 			QString resource_out_point(font_metrics.elidedText(tr("Out: %1").arg(Timecode(GetEditRate(), GetEntryPoint() +  GetSourceDuration() - 1).GetAsString()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
-			QString resource_in_point(font_metrics.elidedText(tr("In: %1").arg(Timecode(GetEditRate(), GetEntryPoint()).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(cpl_out_point)));
+			QString resource_in_point(font_metrics.elidedText(tr("In: %1").arg(Timecode(GetEditRate(), GetEntryPoint()).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(cpl_out_point).width()));
 
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.top() + font_metrics.height())); // We have to use QTransform::translate() because of bug 192573.
 			pPainter->drawText(QPointF(0, 0), file_name);
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(duration)), writable_rect.top() + font_metrics.height()));
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.boundingRect(duration).width()), writable_rect.top() + font_metrics.height()));
 			pPainter->drawText(QPointF(0, 0), duration);
 
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.bottom()));
 			pPainter->drawText(QPointF(0, 0), cpl_in_point);
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(cpl_out_point)), writable_rect.bottom()));
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.boundingRect(cpl_out_point).width()), writable_rect.bottom()));
 			pPainter->drawText(QPointF(0, 0), cpl_out_point);
 			if (mAssset && !mAssset->GetMetadata().languageTag.isEmpty()) {
 				QPen pen2 = pen;
 				QString label = mAssset->GetMetadata().languageTag;
 				QBrush brush2(QColor(CPL_FONT_COLOR), Qt::SolidPattern);
-				QRect qrect(-font_metrics.width(label)*0.1, 5, font_metrics.width(label)*1.2, font_metrics.height()*1.1);
+				QRect qrect(-font_metrics.boundingRect(label).width()*0.1, 5, font_metrics.boundingRect(label).width()*1.2, font_metrics.height()*1.1);
 				pen2.setColor(QColor(CPL_FONT_COLOR));
 				pPainter->setPen(pen2);
-				pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.center().rx()* transf.m11() - font_metrics.width(label)/2.0 ), writable_rect.center().ry()));
+				pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.center().rx()* transf.m11() - font_metrics.boundingRect(label).width()/2.0 ), writable_rect.center().ry()));
 				pPainter->fillRect(qrect, brush2);
 				pen2.setColor(Qt::white);
 				pPainter->setPen(pen2);
@@ -1624,7 +1624,7 @@ void GraphicsWidgetIABResource::paint(QPainter *pPainter, const QStyleOptionGrap
 			}
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.top()));
 			pPainter->drawText(QPointF(0, 35), resource_in_point);
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(resource_out_point)), writable_rect.top()));
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.boundingRect(resource_out_point).width()), writable_rect.top()));
 			pPainter->drawText(QPointF(0, 35), resource_out_point);
 
 			pPainter->setTransform(transf);
@@ -1690,37 +1690,37 @@ void GraphicsWidgetISXDResource::paint(QPainter *pPainter, const QStyleOptionGra
 			QString duration(font_metrics.elidedText(tr("Dur.: %1").arg(MapToCplTimeline(GetSourceDuration()).GetCount()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
 			QString file_name;
 			if((mAssset) && mAssset->HasAffinity()) {
-					if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
-					else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+					if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
+					else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
 			} else if ((mAssset) && (!mAssset->HasAffinity()) && (mAssset->GetIsOutsidePackage())) {
 					pen.setColor(mAssset->GetColor());
 					pPainter->setPen(pen);
-					if(i == 0) file_name = QString(font_metrics.elidedText("OV Asset: " + mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
-					else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+					if(i == 0) file_name = QString(font_metrics.elidedText("OV Asset: " + mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
+					else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
 			} else if ((mAssset == NULL)  ||  ((mAssset) && (!mAssset->HasAffinity()))) {
 				pen.setColor(Qt::white);
 				pPainter->setPen(pen);
-				file_name = QString(font_metrics.elidedText("Missing Asset", Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+				file_name = QString(font_metrics.elidedText("Missing Asset", Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
 			}
 			QString cpl_out_point(font_metrics.elidedText(tr("Cpl Out: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i + 1) * GetSourceDuration() - 1)).GetAsString()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
-			QString cpl_in_point(font_metrics.elidedText(tr("Cpl In: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i * (GetSourceDuration())))).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(cpl_out_point)));
+			QString cpl_in_point(font_metrics.elidedText(tr("Cpl In: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i * (GetSourceDuration())))).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(cpl_out_point).width()));
 
 			QString resource_out_point(font_metrics.elidedText(tr("Out: %1").arg(Timecode(GetEditRate(), GetEntryPoint() +  GetSourceDuration() - 1).GetAsString()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
-			QString resource_in_point(font_metrics.elidedText(tr("In: %1").arg(Timecode(GetEditRate(), GetEntryPoint()).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(cpl_out_point)));
+			QString resource_in_point(font_metrics.elidedText(tr("In: %1").arg(Timecode(GetEditRate(), GetEntryPoint()).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(cpl_out_point).width()));
 
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.top() + font_metrics.height())); // We have to use QTransform::translate() because of bug 192573.
 			pPainter->drawText(QPointF(0, 0), file_name);
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(duration)), writable_rect.top() + font_metrics.height()));
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.boundingRect(duration).width()), writable_rect.top() + font_metrics.height()));
 			pPainter->drawText(QPointF(0, 0), duration);
 
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.bottom()));
 			pPainter->drawText(QPointF(0, 0), cpl_in_point);
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(cpl_out_point)), writable_rect.bottom()));
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.boundingRect(cpl_out_point).width()), writable_rect.bottom()));
 			pPainter->drawText(QPointF(0, 0), cpl_out_point);
 
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.top()));
 			pPainter->drawText(QPointF(0, 35), resource_in_point);
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(resource_out_point)), writable_rect.top()));
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.boundingRect(resource_out_point).width()), writable_rect.top()));
 			pPainter->drawText(QPointF(0, 35), resource_out_point);
 
 			pPainter->setTransform(transf);
@@ -1787,37 +1787,37 @@ void GraphicsWidgetSADMResource::paint(QPainter *pPainter, const QStyleOptionGra
 			QString duration(font_metrics.elidedText(tr("Dur.: %1 at %2 fps").arg(GetSourceDuration().GetCount()).arg(GetEditRate().GetName()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
 			QString file_name;
 			if((mAssset) && mAssset->HasAffinity()) {
-					if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
-					else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+					if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
+					else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
 			} else if ((mAssset) && (!mAssset->HasAffinity()) && (mAssset->GetIsOutsidePackage())) {
 					pen.setColor(mAssset->GetColor());
 					pPainter->setPen(pen);
-					if(i == 0) file_name = QString(font_metrics.elidedText("OV Asset: " + mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
-					else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+					if(i == 0) file_name = QString(font_metrics.elidedText("OV Asset: " + mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
+					else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
 			} else if ((mAssset == NULL)  ||  ((mAssset) && (!mAssset->HasAffinity()))) {
 				pen.setColor(Qt::white);
 				pPainter->setPen(pen);
-				file_name = QString(font_metrics.elidedText("Missing Asset", Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+				file_name = QString(font_metrics.elidedText("Missing Asset", Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
 			}
 			QString cpl_out_point(font_metrics.elidedText(tr("Cpl Out: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i + 1) * GetSourceDuration() - 1)).GetAsString()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
-			QString cpl_in_point(font_metrics.elidedText(tr("Cpl In: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i * (GetSourceDuration())))).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(cpl_out_point)));
+			QString cpl_in_point(font_metrics.elidedText(tr("Cpl In: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i * (GetSourceDuration())))).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(cpl_out_point).width()));
 
 			QString resource_out_point(font_metrics.elidedText(tr("Out: %1").arg(Timecode(GetEditRate(), GetEntryPoint() +  GetSourceDuration() - 1).GetAsString()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
-			QString resource_in_point(font_metrics.elidedText(tr("In: %1").arg(Timecode(GetEditRate(), GetEntryPoint()).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(cpl_out_point)));
+			QString resource_in_point(font_metrics.elidedText(tr("In: %1").arg(Timecode(GetEditRate(), GetEntryPoint()).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(cpl_out_point).width()));
 
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.top() + font_metrics.height())); // We have to use QTransform::translate() because of bug 192573.
 			pPainter->drawText(QPointF(0, 0), file_name);
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(duration)), writable_rect.top() + font_metrics.height()));
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.boundingRect(duration).width()), writable_rect.top() + font_metrics.height()));
 			pPainter->drawText(QPointF(0, 0), duration);
 
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.bottom()));
 			pPainter->drawText(QPointF(0, 0), cpl_in_point);
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(cpl_out_point)), writable_rect.bottom()));
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.boundingRect(cpl_out_point).width()), writable_rect.bottom()));
 			pPainter->drawText(QPointF(0, 0), cpl_out_point);
 
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.top()));
 			pPainter->drawText(QPointF(0, 35), resource_in_point);
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(resource_out_point)), writable_rect.top()));
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.boundingRect(resource_out_point).width()), writable_rect.top()));
 			pPainter->drawText(QPointF(0, 35), resource_out_point);
 
 			pPainter->setTransform(transf);
@@ -1891,37 +1891,37 @@ void GraphicsWidgetADMResource::paint(QPainter *pPainter, const QStyleOptionGrap
 			QString duration(font_metrics.elidedText(tr("Dur.: %1").arg(MapToCplTimeline(GetSourceDuration()).GetCount()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
 			QString file_name;
 			if((mAssset) && mAssset->HasAffinity()) {
-					if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
-					else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+					if(i == 0) file_name = QString(font_metrics.elidedText(mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
+					else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
 			} else if ((mAssset) && (!mAssset->HasAffinity()) && (mAssset->GetIsOutsidePackage())) {
 					pen.setColor(mAssset->GetColor());
 					pPainter->setPen(pen);
-					if(i == 0) file_name = QString(font_metrics.elidedText("OV Asset: " + mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
-					else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+					if(i == 0) file_name = QString(font_metrics.elidedText("OV Asset: " + mAssset->GetOriginalFileName().first, Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
+					else file_name = QString(font_metrics.elidedText(tr("[Duplicate]"), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
 			} else if ((mAssset == NULL)  ||  ((mAssset) && (!mAssset->HasAffinity()))) {
 				pen.setColor(Qt::white);
 				pPainter->setPen(pen);
-				file_name = QString(font_metrics.elidedText("Missing Asset", Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(duration)));
+				file_name = QString(font_metrics.elidedText("Missing Asset", Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(duration).width()));
 			}
 			QString cpl_out_point(font_metrics.elidedText(tr("Cpl Out: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i + 1) * GetSourceDuration() - 1)).GetAsString()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
-			QString cpl_in_point(font_metrics.elidedText(tr("Cpl In: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i * (GetSourceDuration())))).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(cpl_out_point)));
+			QString cpl_in_point(font_metrics.elidedText(tr("Cpl In: %1").arg(MapToCplTimeline(Timecode(GetEditRate(), GetEntryPoint() + (i * (GetSourceDuration())))).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(cpl_out_point).width()));
 
 			QString resource_out_point(font_metrics.elidedText(tr("Out: %1").arg(Timecode(GetEditRate(), GetEntryPoint() +  GetSourceDuration() - 1).GetAsString()), Qt::ElideLeft, writable_rect.width() * transf.m11()));
-			QString resource_in_point(font_metrics.elidedText(tr("In: %1").arg(Timecode(GetEditRate(), GetEntryPoint()).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.width(cpl_out_point)));
+			QString resource_in_point(font_metrics.elidedText(tr("In: %1").arg(Timecode(GetEditRate(), GetEntryPoint()).GetAsString()), Qt::ElideRight, writable_rect.width() * transf.m11() - font_metrics.boundingRect(cpl_out_point).width()));
 
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.top() + font_metrics.height())); // We have to use QTransform::translate() because of bug 192573.
 			pPainter->drawText(QPointF(0, 0), file_name);
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(duration)), writable_rect.top() + font_metrics.height()));
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.boundingRect(duration).width()), writable_rect.top() + font_metrics.height()));
 			pPainter->drawText(QPointF(0, 0), duration);
 
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.bottom()));
 			pPainter->drawText(QPointF(0, 0), cpl_in_point);
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(cpl_out_point)), writable_rect.bottom()));
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.boundingRect(cpl_out_point).width()), writable_rect.bottom()));
 			pPainter->drawText(QPointF(0, 0), cpl_out_point);
 
 			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate(writable_rect.left() * transf.m11(), writable_rect.top()));
 			pPainter->drawText(QPointF(0, 35), resource_in_point);
-			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.width(resource_out_point)), writable_rect.top()));
+			pPainter->setTransform(QTransform(transf).scale(1 / transf.m11(), 1).translate((writable_rect.right() * transf.m11() - font_metrics.boundingRect(resource_out_point).width()), writable_rect.top()));
 			pPainter->drawText(QPointF(0, 35), resource_out_point);
 
 			pPainter->setTransform(transf);

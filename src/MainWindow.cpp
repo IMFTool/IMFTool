@@ -26,7 +26,6 @@
 #include <QToolBar>
 #include <QCoreApplication>
 #include <QGridLayout>
-#include <QDesktopWidget>
 #include <QLabel>
 #include <QPushButton>
 #include <QFileDialog>
@@ -46,6 +45,7 @@
 #include <QClipboard>
 #include <QTemporaryDir>
 #include <QDesktopServices>
+#include <QWindow>
 //WR
 
 
@@ -91,7 +91,7 @@ void MainWindow::InitLayout() {
 	QWidget *p_second_intermediate_widget = new QWidget(this); // We need this widget for painting the border defined in stylesheet.
 	mpWidgetImpBrowser = new WidgetImpBrowser(p_second_intermediate_widget);
 	QHBoxLayout *p_second_intermediate_layout = new QHBoxLayout();
-	p_second_intermediate_layout->setMargin(0);
+	p_second_intermediate_layout->setContentsMargins(0, 0, 0, 0);
 	p_second_intermediate_layout->addWidget(mpWidgetImpBrowser);
 	p_second_intermediate_widget->setLayout(p_second_intermediate_layout);
 	p_dock_widget_imp_browser->setWidget(p_second_intermediate_widget);
@@ -276,31 +276,35 @@ void MainWindow::rCallPhoton() {
 
 		// Test for Java VM
 		QString qresult;
-		QProcess *myProcess = new QProcess();
+		QProcess myProcess;
+#if defined(AUX_PHOTON_JRE)
+		const QString program = QString("%1/%2").arg(AUX_PHOTON_JRE, "/bin/java");
+#else
 		const QString program = "java";
+#endif
 		QStringList arg;
 		QString error_msg;
 		Error error(Error::None);
 		arg << "-version";
-		myProcess->start(program, arg);
-		myProcess->waitForFinished(-1);
-		if (myProcess->exitStatus() == QProcess::NormalExit) {
-			if (myProcess->exitCode() != 0) { error = Error(Error::ExitCodeNotZero); }
+		myProcess.start(program, arg);
+		myProcess.waitForFinished(-1);
+		if (myProcess.exitStatus() == QProcess::NormalExit) {
+			if (myProcess.exitCode() != 0) { error = Error(Error::ExitCodeNotZero); }
 		} else {
 			error = Error(Error::ExitStatusError);
 		}
-		if (myProcess->error() == QProcess::FailedToStart) {
+		if (myProcess.error() == QProcess::FailedToStart) {
 			error = Error(Error::Unknown);
 		}
 
 		try {
-			qresult = myProcess->readAllStandardError();
-			QRegularExpression re("([0-9]+)\\.([0-9]+)\\.([0-9]+)");
+			qresult = myProcess.readAllStandardError();
+			static QRegularExpression re("([0-9]+)\\.([0-9]+)\\.([0-9]+)");
 			QRegularExpressionMatch match = re.match(qresult, 0);
 			if (match.hasMatch()) {
-			    QString major = match.captured(1);
-			    QString minor = match.captured(2);
-			    if ((major.toInt() != 1) || (minor.toInt() < 8)) {
+			    int major = match.captured(1).toInt();
+			    int minor = match.captured(2).toInt();
+			    if (major == 1 && minor < 8) {
 			    	error_msg = "Java version mismatch, current version is " + match.captured(0);
 					mpMsgBox->setText(tr("Photon requires Java SDK 1.8 or higher - Photon QC report cannot be created!"));
 					mpMsgBox->setIcon(QMessageBox::Warning);
@@ -427,7 +431,7 @@ void MainWindow::ShowManualPdf() {
 				  error = Error::Unknown;
 			}
 			if (!error.IsError()) {
-				file_path += tr("/manual-V").append(VERSION_MAJOR"." VERSION_MINOR"." VERSION_PATCH".pdf");
+				file_path += tr("/manual-V").append(INFO_VERSIONSTRING".pdf");
 				QFile::copy(":/manual/IMF-Tool_Users-Manual.pdf", file_path);
 				if (!QDesktopServices::openUrl(QUrl::fromLocalFile(file_path))) {
 					error = Error::SourceFileOpenError;
@@ -613,20 +617,27 @@ void MainWindow::rFocusChanged(QWidget *pOld, QWidget *pNow) {
 
 void MainWindow::CenterWidget(QWidget *pWidget, bool useSizeHint) {
 
-	QSize size;
+		QSize size;
 	if(useSizeHint)
 		size = pWidget->sizeHint();
 	else
 		size = pWidget->size();
 
-	QDesktopWidget *d = QApplication::desktop();
-	int w = d->width();   // returns screen width
-	int h = d->height();  // returns screen height
-	int mw = size.width();
-	int mh = size.height();
-	int cw = (w / 2) - (mw / 2);
-	int ch = (h / 2) - (mh / 2);
-	pWidget->move(cw, ch);
+	QScreen *d = this->windowHandle()->screen();
+
+	if (d == NULL) {
+		d = QApplication::primaryScreen();
+	}
+
+	if (d) {
+		int w = d->size().width();
+		int h = d->size().height();
+		int mw = size.width();
+		int mh = size.height();
+		int cw = (w / 2) - (mw / 2);
+		int ch = (h / 2) - (mh / 2);
+		pWidget->move(cw, ch);
+	}
 }
 
 			/* -----Denis Manthey Beg----- */

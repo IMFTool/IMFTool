@@ -38,7 +38,7 @@ public:
 	virtual ~WidgetCentral();
 	void InstallImp(const QSharedPointer<ImfPackage> &rImfPackage);
 	void UninstallImp();
-	bool IsImpInstalled() const { return mpImfPackage; }
+	bool IsImpInstalled() const { return !mpImfPackage.isNull(); }
 	int ShowCplEditor(const QUuid &rCplAssetId);
 	void SaveCurrentCpl() const;
 	void SaveAllCpl() const;
@@ -96,7 +96,7 @@ private:
 	TimelineParser *timelineParser; // (k)
 	bool playListUpdateSuccess = true; // (k)
 	bool uninstalling_imp = false;
-	QTime *timelineParserTime;
+	QElapsedTimer timelineParserTime;
 	const QMap<QString, eImfApplications> mApplicationIdentificationIntegerMap {
 			{"http://www.smpte-ra.org/ns/2067-21/2021", ::App2e},
 			{"http://www.smpte-ra.org/ns/2067-21/2020", ::App2e},

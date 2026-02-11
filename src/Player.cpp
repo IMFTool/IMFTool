@@ -25,7 +25,7 @@ Player::Player(enum eDecoder rDecoder) {
 	mDecoder = rDecoder;
 	decoded_shared = static_cast<QSharedPointer<DecodedFrames>>(new DecodedFrames);
 
-	mTimer = new QTime();
+	mTimer = new QElapsedTimer();
 	mTimer->start();
 
 	threadPool = new QThreadPool();
@@ -55,24 +55,25 @@ Player::Player(enum eDecoder rDecoder) {
 
 Player::~Player()
 {
-	mTimer->~QTime();
+	delete mTimer;
+	threadPool->waitForDone(); // TODO check if works
 	for (int i = 0; i < decoders; i++) {
 		request_queue[i]->~FrameRequest();
 		if (mDecoder == Player::Decoder_JP2K) {
-			threadPool->cancel(decoder_queue_JP2K[i]);
+			delete decoder_queue_JP2K[i];
 		}
 #ifdef APP5_ACES
 		else if (mDecoder == Player::Decoder_ACES) {
-			threadPool->cancel(decoder_queue_ACES[i]);
+			delete decoder_queue_ACES[i];
 		}
 #endif
 #ifdef CODEC_HTJ2K
 		else if (mDecoder == Player::Decoder_HTJ2K) {
-			threadPool->cancel(decoder_queue_HTJ2K[i]);
+			delete decoder_queue_HTJ2K[i];
 		}
 #endif
 	}
-	threadPool->~QThreadPool();
+	delete threadPool;
 }
 
 void Player::startPlay(){
@@ -119,23 +120,7 @@ void Player::setPos(qint64 rframeNr, qint64 rTframeNr, int rplaylist_index) {
 void Player::clean() {
 
 	playing = false;
-
-	// cancel all decoding processes
-	for (int i = 0; i < decoders; i++) {
-		if (mDecoder == Player::Decoder_JP2K) {
-			threadPool->cancel(decoder_queue_JP2K[i]);
-		}
-#ifdef APP5_ACES
-		else if (mDecoder == Player::Decoder_ACES) {
-			threadPool->cancel(decoder_queue_ACES[i]);
-		}
-#endif
-#ifdef CODEC_HTJ2K
-		else if (mDecoder == Player::Decoder_HTJ2K) {
-			threadPool->cancel(decoder_queue_HTJ2K[i]);
-		}
-#endif
-	}
+	threadPool->waitForDone();
 
 	// reset vars
 	decoded_shared->decoded_total = 0;
@@ -171,7 +156,7 @@ void Player::clean() {
 void Player::playLoop(){
 	while (playing) {
 
-		mTimer->restart(); // measure loop cycle duration
+		mTimer->start(); // measure loop cycle duration
 
 		// calculate buffer fill time
 		if (decoded_shared->pending_requests >= (float)fps*1.2) {
