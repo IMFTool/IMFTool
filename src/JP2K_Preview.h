@@ -40,7 +40,7 @@ protected:
 	AS_02::JP2K::MXFReader *reader;
 	ASDCP::MXF::IndexTableSegment::IndexEntry IndexF1; // current frame offset
 	ASDCP::MXF::IndexTableSegment::IndexEntry IndexF2; // next frame offset
-	int default_buffer_size = 30000000; // byte
+	int default_buffer_size = 200000000; // byte
 
 	OPENJPEG_H::opj_image_t *psImage;
 	OPENJPEG_H::opj_codec_t *pDecompressor;

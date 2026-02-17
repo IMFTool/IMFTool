@@ -300,9 +300,9 @@ void MainWindow::rCallPhoton() {
 			if (match.hasMatch()) {
 			    QString major = match.captured(1);
 			    QString minor = match.captured(2);
-			    if ((major.toInt() != 1) || (minor.toInt() < 8)) {
+			    if (major.toInt() < 11) {
 			    	error_msg = "Java version mismatch, current version is " + match.captured(0);
-					mpMsgBox->setText(tr("Photon requires Java SDK 1.8 or higher - Photon QC report cannot be created!"));
+					mpMsgBox->setText(tr("Photon requires Java SDK 11 or higher - Photon QC report cannot be created!"));
 					mpMsgBox->setIcon(QMessageBox::Warning);
 					mpMsgBox->setInformativeText(error_msg);
 					mpMsgBox->setStandardButtons(QMessageBox::Ok);

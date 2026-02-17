@@ -53,7 +53,7 @@ protected:
 	AS_02::ACES::MXFReader *reader;
 	ASDCP::MXF::IndexTableSegment::IndexEntry IndexF1; // current frame offset
 	ASDCP::MXF::IndexTableSegment::IndexEntry IndexF2; // next frame offset
-	int default_buffer_size = 30000000; // byte
+	int default_buffer_size = 200000000; // byte
 
 	
 	As02AcesIStream* pAcesIStream;

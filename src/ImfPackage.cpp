@@ -1504,10 +1504,12 @@ Error AssetMxfTrack::ExtractEssenceDescriptor(const QString &filePath) {
 	Error error;
 
 	QList<QString> dicts_fname = QList<QString>()
-		<< "www-smpte-ra-org-reg-395-2014-13-1-aaf-phdr.xml"
-		<< "www-smpte-ra-org-reg-2003-2012.xml"
-		<< "www-smpte-ra-org-reg-335-2012-phdr.xml"
-		<< "www-smpte-ra-org-reg-335-2012-13-1-aaf.xml"
+			<< "www-smpte-ra-org-reg-395-2014-13-1-aaf-phdr.xml"
+			<< "www-smpte-ra-org-reg-2003-2012.xml"
+			<< "www-smpte-ra-org-reg-335-2012-phdr.xml"
+			<< "www-smpte-ra-org-reg-335-2012-13-1-aaf.xml"
+			<< "www-smpte-ra-org-reg-395-2014-14-9.xml"
+			<< "www-smpte-ra-org-reg-335-2012-14-9.xml"
 		;
 
 	XMLPlatformUtils::Initialize();

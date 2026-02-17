@@ -163,10 +163,10 @@ void WidgetImpBrowser::InitToolbar() {
 	connect(p_add_pcm_resource, SIGNAL(triggered(bool)), this, SLOT(ShowResourceGeneratorWavMode()));
 	QAction *p_add_ttml_resource = p_add_track_menu->addAction(QIcon(":/text.png"), tr("Wrap Timed Text Essence"));
 	connect(p_add_ttml_resource, SIGNAL(triggered(bool)), this, SLOT(ShowResourceGeneratorTimedTextMode()));
-	QAction *p_add_isxd_resource = p_add_track_menu->addAction(QIcon(":/text.png"), tr("Wrap ISXD"));
-	connect(p_add_isxd_resource, SIGNAL(triggered(bool)), this, SLOT(ShowResourceGeneratorIsxdMode()));
+	//QAction *p_add_isxd_resource = p_add_track_menu->addAction(QIcon(":/text.png"), tr("Wrap ISXD"));
+	//connect(p_add_isxd_resource, SIGNAL(triggered(bool)), this, SLOT(ShowResourceGeneratorIsxdMode()));
 	p_add_track_menu->addSeparator();
-	QAction *p_add_cpl_asset = p_add_track_menu->addAction(QIcon(":/asset_cpl.png"), tr("Composition Playlist"));
+	QAction *p_add_cpl_asset = p_add_track_menu->addAction(QIcon(":/asset_cpl.png"), tr("Create new Composition Playlist"));
 	connect(p_add_cpl_asset, SIGNAL(triggered(bool)), this, SLOT(ShowCompositionGenerator()));
 	p_add_track_menu->addSeparator();
 	QAction *p_add_mxf_resource = p_add_track_menu->addAction(QIcon(":/asset_mxf.png"), tr("Add existing MXF Track File"));

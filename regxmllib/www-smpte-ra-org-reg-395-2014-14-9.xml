@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--Created: Thu Feb 12 20:16:43 CET 2026--><!--By: regxmllib build e70c41187603a19c470093e3667a4abd6ed301ae--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
+    <SchemeID>urn:uuid:3c343e7c-f7b1-5fa0-7fc9-96aaa45cb485</SchemeID>
+    <SchemeURI>http://www.smpte-ra.org/reg/395/2014/14/9</SchemeURI>
+    <MetaDefinitions>
+        <ClassDefinition>
+            <Identification>urn:smpte:ul:060e2b34.027f0105.0e090502.00000000</Identification>
+            <Symbol>ISXDDataEssenceDescriptor</Symbol>
+            <Description>Identifies an ISXD Data Essence Descriptor</Description>
+            <Name>ISXD Data Essence Descriptor</Name>
+            <ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01014300</ParentClass>
+            <IsConcrete>true</IsConcrete>
+        </ClassDefinition>
+        <ClassDefinition>
+            <Identification>urn:smpte:ul:060e2b34.027f0105.0e090603.00000000</Identification>
+            <Symbol>IADataEssenceDescriptor</Symbol>
+            <Description>Immersive Audio Data Essence Descriptor</Description>
+            <Name>Immersive Audio Data Essence Descriptor</Name>
+            <ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01014300</ParentClass>
+            <IsConcrete>true</IsConcrete>
+        </ClassDefinition>
+        <ClassDefinition>
+            <Identification>urn:smpte:ul:060e2b34.027f0105.0e090606.00000000</Identification>
+            <Symbol>IADataEssenceSubDescriptor</Symbol>
+            <Description>Defines the Immersive Audio Data Essence SubDescriptor Set</Description>
+            <Name>IA Data Essence SubDescriptor</Name>
+            <ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+            <IsConcrete>true</IsConcrete>
+        </ClassDefinition>
+        <ClassDefinition>
+            <Identification>urn:smpte:ul:060e2b34.027f0105.0e090607.01010103</Identification>
+            <Symbol>PHDRMetadataTrackSubDescriptor</Symbol>
+            <Description>Identifies a PHDR Metadata Track Sub Descriptor</Description>
+            <Name>PHDR Metadata Track Sub Descriptor</Name>
+            <ParentClass>urn:smpte:ul:060e2b34.027f0101.0d010101.01015900</ParentClass>
+            <IsConcrete>true</IsConcrete>
+        </ClassDefinition>
+    </MetaDefinitions>
+</Extension>

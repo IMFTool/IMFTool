@@ -16,7 +16,7 @@ FIND_PROGRAM(GIT_EXECUTABLE git
 set(SVN_REV 0)
 set(VERSION_MAJOR 1)
 set(VERSION_MINOR 9)
-set(VERSION_PATCH 7)
+set(VERSION_PATCH 8)
 set(VERSION_BUILD 0)
 
 # only do this if we have an svn client.

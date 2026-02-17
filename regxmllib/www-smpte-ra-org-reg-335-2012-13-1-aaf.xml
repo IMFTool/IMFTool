@@ -1,117 +1,117 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--Created: Mon Nov 20 16:46:02 CET 2023--><!--By: regxmllib build 8f1fc70fa6af1bcb82804272241d6a2ad4057424--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
-<SchemeID>urn:uuid:facc8b86-8a02-5fae-7fe6-40ca8c2923ad</SchemeID>
-<SchemeURI>http://www.smpte-ra.org/reg/335/2012/13/1/aaf</SchemeURI>
-<MetaDefinitions>
-<PropertyDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010102.0d010101.01010100</Identification>
-<Symbol>TapeFormat</Symbol>
-<Description>Physical tape format from an enumerated list</Description>
-<Name>Tape Format</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.02010102.00000000</Type>
-<IsOptional>true</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>14851</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01012e00</MemberOf>
-</PropertyDefinition>
-<PropertyDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010101.0d010401.03010200</Identification>
-<Symbol>AS_03_Identifier</Symbol>
-<Description>The program identifier as a text string, e.g. P900000HD</Description>
-<Name>AS-03 Identifier</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
-<IsOptional>false</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>0</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.03010000</MemberOf>
-</PropertyDefinition>
-<PropertyDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010101.0d010401.03010100</Identification>
-<Symbol>AS_03_IdentifierKind</Symbol>
-<Description>A controlled-vocabulary string value indicating the kind of program identifier, e.g. PBS PackageID</Description>
-<Name>AS-03 Identifier Kind</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
-<IsOptional>false</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>0</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.03010000</MemberOf>
-</PropertyDefinition>
-<PropertyDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010101.0d010401.03010300</Identification>
-<Symbol>AS_03_ShimName</Symbol>
-<Description>A controlled-vocabulary string value indicating the AS-03 Shim Name, e.g. PBS NGIS HD Playout</Description>
-<Name>AS-03 Shim Name</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
-<IsOptional>false</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>0</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.03010000</MemberOf>
-</PropertyDefinition>
-<PropertyDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010101.0d010401.03010400</Identification>
-<Symbol>AS_03_SignalStandard</Symbol>
-<Description>A controlled-vocabulary string value indicating the signal standard of video contained in this AS-03 file</Description>
-<Name>AS-03 Signal Standard</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
-<IsOptional>false</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>0</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.03010000</MemberOf>
-</PropertyDefinition>
-<PropertyDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010101.0d010401.03010500</Identification>
-<Symbol>AS_03_IntendedAFD</Symbol>
-<Description>A string value indicating the intended display format for the program, per SMPTE 2016-1 table 1 a3 a2 a1 a0 with optional informative appended text e.g. 1001 Pillarbox, 0100 Letterbox, 1000 FullHD</Description>
-<Name>AS-03 Intended AFD</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
-<IsOptional>false</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>0</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.03010000</MemberOf>
-</PropertyDefinition>
-<PropertyDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010101.0d010401.03010600</Identification>
-<Symbol>AS_03_SlateTitle</Symbol>
-<Description>A string that specifies a program title to be displayed to traffic and master control operators, e.g. Sesame Street</Description>
-<Name>AS-03 Slate Title</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
-<IsOptional>true</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>0</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.03010000</MemberOf>
-</PropertyDefinition>
-<PropertyDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010101.0d010401.03010700</Identification>
-<Symbol>AS_03_NOLACode</Symbol>
-<Description>A string that specifies the program series code and episode number, e.g. SESA 4187</Description>
-<Name>AS-03 NOLA Code</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
-<IsOptional>true</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>0</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.03010000</MemberOf>
-</PropertyDefinition>
-<PropertyDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010101.0d010401.03010800</Identification>
-<Symbol>AS_03_Rating</Symbol>
-<Description>A controlled-vocabulary string that specifies the V-Chip rating of the program, e.g. TV-G</Description>
-<Name>AS-03 Rating</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
-<IsOptional>true</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>0</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.03010000</MemberOf>
-</PropertyDefinition>
-<PropertyDefinition>
-<Identification>urn:smpte:ul:060e2b34.01010101.0d010401.03010900</Identification>
-<Symbol>AS_03_NielsenStreamIdentifier</Symbol>
-<Description>A string that specifies Nielsen stream identifier for the program</Description>
-<Name>AS-03 Nielsen Stream Identifier</Name>
-<Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
-<IsOptional>true</IsOptional>
-<IsUniqueIdentifier>false</IsUniqueIdentifier>
-<LocalIdentification>0</LocalIdentification>
-<MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.03010000</MemberOf>
-</PropertyDefinition>
-</MetaDefinitions>
+<!--Created: Thu Feb 12 20:16:44 CET 2026--><!--By: regxmllib build e70c41187603a19c470093e3667a4abd6ed301ae--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
+    <SchemeID>urn:uuid:facc8b86-8a02-5fae-7fe6-40ca8c2923ad</SchemeID>
+    <SchemeURI>http://www.smpte-ra.org/reg/335/2012/13/1/aaf</SchemeURI>
+    <MetaDefinitions>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.01010102.0d010101.01010100</Identification>
+            <Symbol>TapeFormat</Symbol>
+            <Description>Physical tape format from an enumerated list</Description>
+            <Name>Tape Format</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.02010102.00000000</Type>
+            <IsOptional>true</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>14851</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01012e00</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.01010101.0d010401.03010200</Identification>
+            <Symbol>AS_03_Identifier</Symbol>
+            <Description>The program identifier as a text string, e.g. P900000HD</Description>
+            <Name>AS-03 Identifier</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.03010000</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.01010101.0d010401.03010100</Identification>
+            <Symbol>AS_03_IdentifierKind</Symbol>
+            <Description>A controlled-vocabulary string value indicating the kind of program identifier, e.g. PBS PackageID</Description>
+            <Name>AS-03 Identifier Kind</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.03010000</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.01010101.0d010401.03010300</Identification>
+            <Symbol>AS_03_ShimName</Symbol>
+            <Description>A controlled-vocabulary string value indicating the AS-03 Shim Name, e.g. PBS NGIS HD Playout</Description>
+            <Name>AS-03 Shim Name</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.03010000</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.01010101.0d010401.03010400</Identification>
+            <Symbol>AS_03_SignalStandard</Symbol>
+            <Description>A controlled-vocabulary string value indicating the signal standard of video contained in this AS-03 file</Description>
+            <Name>AS-03 Signal Standard</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.03010000</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.01010101.0d010401.03010500</Identification>
+            <Symbol>AS_03_IntendedAFD</Symbol>
+            <Description>A string value indicating the intended display format for the program, per SMPTE 2016-1 table 1 a3 a2 a1 a0 with optional informative appended text e.g. 1001 Pillarbox, 0100 Letterbox, 1000 FullHD</Description>
+            <Name>AS-03 Intended AFD</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.03010000</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.01010101.0d010401.03010600</Identification>
+            <Symbol>AS_03_SlateTitle</Symbol>
+            <Description>A string that specifies a program title to be displayed to traffic and master control operators, e.g. Sesame Street</Description>
+            <Name>AS-03 Slate Title</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+            <IsOptional>true</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.03010000</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.01010101.0d010401.03010700</Identification>
+            <Symbol>AS_03_NOLACode</Symbol>
+            <Description>A string that specifies the program series code and episode number, e.g. SESA 4187</Description>
+            <Name>AS-03 NOLA Code</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+            <IsOptional>true</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.03010000</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.01010101.0d010401.03010800</Identification>
+            <Symbol>AS_03_Rating</Symbol>
+            <Description>A controlled-vocabulary string that specifies the V-Chip rating of the program, e.g. TV-G</Description>
+            <Name>AS-03 Rating</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+            <IsOptional>true</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.03010000</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.01010101.0d010401.03010900</Identification>
+            <Symbol>AS_03_NielsenStreamIdentifier</Symbol>
+            <Description>A string that specifies Nielsen stream identifier for the program</Description>
+            <Name>AS-03 Nielsen Stream Identifier</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+            <IsOptional>true</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010401.03010000</MemberOf>
+        </PropertyDefinition>
+    </MetaDefinitions>
 </Extension>

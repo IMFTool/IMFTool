@@ -59,7 +59,7 @@ mData(ImfXmlHelper::Convert(QUuid::createUuid()), ImfXmlHelper::Convert(QDateTim
 	cpl_namespace["ds"].name = XML_NAMESPACE_DS;
 	cpl_namespace["xs"].name = XML_NAMESPACE_XS;
 	cpl_namespace["iab"].name = XML_NAMESPACE_IAB;
-	cpl_namespace["rdd47"].name = XML_NAMESPACE_RDD47;
+	//cpl_namespace["rdd47"].name = XML_NAMESPACE_RDD47;
 	cpl_namespace["imfsadm"].name = XML_NAMESPACE_SADM;
 	cpl_namespace["imfadm"].name = XML_NAMESPACE_ADM;
 	cpl_namespace["isxd"].name = XML_NAMESPACE_ISXD;
@@ -440,7 +440,7 @@ ImfError WidgetComposition::Write(const QString &rDestination /*= QString()*/) {
 								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("iab")->second.name).c_str(), (xsd::cxx::xml::string("iab:IABSequence").c_str()));
 								break;
 							case ISXDSequence:
-								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("rdd47")->second.name).c_str(), (xsd::cxx::xml::string("rdd47:ISXDSequence").c_str()));
+								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("isxd")->second.name).c_str(), (xsd::cxx::xml::string("isxd:ISXDSequence").c_str()));
 								break;
 							case MGASADMSignalSequence:
 								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("imfsadm")->second.name).c_str(), (xsd::cxx::xml::string("imfsadm:MGASADMSignalSequence").c_str()));
@@ -637,7 +637,7 @@ ImfError WidgetComposition::WriteNew(const QString &rDestination /*= QString()*/
 								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("iab")->second.name).c_str(), (xsd::cxx::xml::string("iab:IABSequence").c_str()));
 								break;
 							case ISXDSequence:
-								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("rdd47")->second.name).c_str(), (xsd::cxx::xml::string("rdd47:ISXDSequence").c_str()));
+								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("isxd")->second.name).c_str(), (xsd::cxx::xml::string("isxd:ISXDSequence").c_str()));
 								break;
 							case MGASADMSignalSequence:
 								p_dom_element = doc.createElementNS(xsd::cxx::xml::string(cpl_namespace.find("imfsadm")->second.name).c_str(), (xsd::cxx::xml::string("imfsadm:MGASADMSignalSequence").c_str()));
@@ -1356,7 +1356,7 @@ XmlSerializationError WidgetComposition::WriteMinimal(const QString &rDestinatio
 	cpl_namespace["ds"].name = XML_NAMESPACE_DS;
 	cpl_namespace["xs"].name = XML_NAMESPACE_XS;
 	cpl_namespace["iab"].name = XML_NAMESPACE_IAB;
-	cpl_namespace["rdd47"].name = XML_NAMESPACE_RDD47;
+	//cpl_namespace["rdd47"].name = XML_NAMESPACE_RDD47;
 	cpl_namespace["imfsadm"].name = XML_NAMESPACE_SADM;
 	cpl_namespace["imfadm"].name = XML_NAMESPACE_ADM;
 	cpl_namespace["isxd"].name = XML_NAMESPACE_ISXD;
