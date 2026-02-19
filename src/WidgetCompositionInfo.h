@@ -46,6 +46,7 @@ private:
 	CompositionInfoModel *mpModel;
 	UndoProxyModel *mpProxyModel;
 	const QMap<QString, QString> mApplicationIdentificationSelectionMap {
+			{"http://www.smpte-ra.org/ns/2067-21/5ED", "App 2E"},
 			{"http://www.smpte-ra.org/ns/2067-21/2021", "App 2E"},
 			{"http://www.smpte-ra.org/ns/2067-21/2020", "App 2E"},
 /*
@@ -112,6 +113,7 @@ private:
 
 	QPointer<WidgetComposition> mpComposition;
 	const QMap<QString, QString> mApplicationIdentificationMap {
+			{"http://www.smpte-ra.org/ns/2067-21/5ED", "App 2E"},
 			{"http://www.smpte-ra.org/ns/2067-21/2021", "App 2E"},
 			{"http://www.smpte-ra.org/ns/2067-21/2020", "App 2E"},
 			{"http://www.smpte-ra.org/schemas/2067-20/2016", "App #2 2016"},

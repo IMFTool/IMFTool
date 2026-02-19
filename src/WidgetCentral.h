@@ -98,6 +98,7 @@ private:
 	bool uninstalling_imp = false;
 	QTime *timelineParserTime;
 	const QMap<QString, eImfApplications> mApplicationIdentificationIntegerMap {
+			{"http://www.smpte-ra.org/ns/2067-21/5ED", ::App2e},
 			{"http://www.smpte-ra.org/ns/2067-21/2021", ::App2e},
 			{"http://www.smpte-ra.org/ns/2067-21/2020", ::App2e},
 			{"http://www.smpte-ra.org/schemas/2067-20/2016", ::App2},
