@@ -184,7 +184,7 @@ void WidgetTrackDetails::InitLayout() {
 			p_tool_button->setIcon(QIcon(":/sound_bw.png"));
 			break;
 		case ISXDSequence:
-			p_label->setText(tr("ISXD RDD47"));
+			p_label->setText(tr("ISXD"));
 			p_tool_button->setIcon(QIcon(":/xml-icon.png"));
 			break;
 		case MGASADMSignalSequence:
