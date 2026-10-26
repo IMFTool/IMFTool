@@ -318,7 +318,7 @@ Error JobExtractEssenceDescriptor::Execute() {
 	Error error;
 
 	QList<QString> dicts_fname = QList<QString>()
-		<< "www-smpte-ra-org-reg-395-2014-13-1-aaf-phdr.xml"
+		<< "www-smpte-ra-org-reg-395-2014-13-1-aaf.xml"
 		<< "www-smpte-ra-org-reg-2003-2012.xml"
 		<< "www-smpte-ra-org-reg-335-2012-phdr.xml"
 		<< "www-smpte-ra-org-reg-335-2012-13-1-aaf.xml"
@@ -429,7 +429,7 @@ Error JobCallPhoton::Execute() {
 	QProcess *myProcess = new QProcess();
 	const QString program = "java";
 	QStringList arg;
-	arg << "-cp";
+	arg << "--enable-final-field-mutation=ALL-UNNAMED" << "-Dslf4j.internal.verbosity=WARN" << "-cp";
 	QString lib_dir = QString("/photon/build/libs/*");
 #ifdef NO_UNIVERSAL_PHOTON
 	if (is_adm) {

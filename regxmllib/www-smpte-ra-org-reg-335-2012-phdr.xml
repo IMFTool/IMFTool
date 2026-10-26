@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--Created: Thu Feb 12 20:16:43 CET 2026--><!--By: regxmllib build e70c41187603a19c470093e3667a4abd6ed301ae--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
-    <SchemeID>urn:uuid:e9ad45b5-abdb-5f16-7ffc-ff560e475a87</SchemeID>
+<!--Created: Tue Oct 20 22:16:02 PDT 2026--><!--By: regmxflib build n/a--><!--See: https://github.com/sandflow/regmxflib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
+    <SchemeID>urn:uuid:a8846f64-c6e3-541b-b276-ad1991606075</SchemeID>
     <SchemeURI>http://www.smpte-ra.org/reg/335/2012</SchemeURI>
     <MetaDefinitions>
         <PropertyDefinition>
@@ -6588,6 +6588,17 @@
             <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017a00</MemberOf>
         </PropertyDefinition>
         <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.0402030c.05000000</Identification>
+            <Symbol>IABMaxObjectCount</Symbol>
+            <Description>IABMaxObjectCount specifies the maximum count of Object Definitions per IAFrame in the IAB</Description>
+            <Name>IABMaxObjectCount</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+            <IsOptional>true</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01017b00</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
             <Identification>urn:smpte:ul:060e2b34.0101010e.04010606.02030000</Identification>
             <Symbol>HEVCConstantBPictureFlag</Symbol>
             <Description>TRUE if the number of B Pictures is always constant</Description>
@@ -7367,6 +7378,314 @@
             <IsUniqueIdentifier>false</IsUniqueIdentifier>
             <LocalIdentification>0</LocalIdentification>
             <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810c</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.04020308.01000000</Identification>
+            <Symbol>RIFFChunkStreamID</Symbol>
+            <Description>The Stream ID of the Generic Stream carrying the ckData bytes of the RIFF Chunk</Description>
+            <Name>RIFF Chunk Stream ID</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810d</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.04020308.02000000</Identification>
+            <Symbol>RIFFChunkID</Symbol>
+            <Description>The ckID value of the RIFF Chunk</Description>
+            <Name>RIFF Chunk ID</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01100400.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810d</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.04020308.03000000</Identification>
+            <Symbol>RIFFChunkUUID</Symbol>
+            <Description>A globally unique identifier for the RIFF Chunk</Description>
+            <Name>RIFF Chunk UUID</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01030300.00000000</Type>
+            <IsOptional>true</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810d</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.04020308.04000000</Identification>
+            <Symbol>RIFFChunkHashSHA1</Symbol>
+            <Description>The SHA-1 digest of the ckData bytes of the RIFF Chunk</Description>
+            <Name>RIFF Chunk Hash SHA-1</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.04100100.00000000</Type>
+            <IsOptional>true</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810d</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.04020309.01000000</Identification>
+            <Symbol>NumLocalChannels</Symbol>
+            <Description>The number of MXF Sound Track channels referenced in ADMChannelMappingsArray</Description>
+            <Name>Num Local Channels</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810e</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.04020309.02000000</Identification>
+            <Symbol>NumADMAudioTrackUIDs</Symbol>
+            <Description>The number of ADM audioTrackUID entities referenced in ADMChannelMappingsArray</Description>
+            <Name>Num ADM audioTrackUIDs</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01010200.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810e</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.04020309.03000000</Identification>
+            <Symbol>ADMChannelMappingsArray</Symbol>
+            <Description>Array of ADMChannelMapping instances</Description>
+            <Name>ADM Channel Mappings Array</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.05061100.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810e</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.04020309.04000000</Identification>
+            <Symbol>LocalChannelID</Symbol>
+            <Description>The ID of the MXF Sound Track channel containing essence identified by the associated ADM audioTrackUID</Description>
+            <Name>Local Channel ID</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810f</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.04020309.05000000</Identification>
+            <Symbol>ADMAudioTrackUID</Symbol>
+            <Description>The UID of the associated ADM audioTrackUID, as defined in Rec. ITU-R BS.2076</Description>
+            <Name>ADM audioTrackUID</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810f</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.04020309.06000000</Identification>
+            <Symbol>ADMAudioTrackChannelFormatID</Symbol>
+            <Description>The linked ADM audioTrackFormatID or ADM audioChannelFormatID value, as defined in Rec. ITU-R BS.2076</Description>
+            <Name>ADM audioTrackChannelFormatID</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810f</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.04020309.07000000</Identification>
+            <Symbol>ADMAudioPackFormatID</Symbol>
+            <Description>The linked ADM audioPackFormatID value, as defined in Rec. ITU-R BS.2076</Description>
+            <Name>ADM audioPackFormatID</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+            <IsOptional>true</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810f</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.04020308.06000000</Identification>
+            <Symbol>RIFFChunkStreamIDsArray</Symbol>
+            <Description>The Stream IDs for the applicable RIFF Chunks</Description>
+            <Name>RIFF Chunk Stream IDs Array</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.04010900.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018110</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.0402030a.01000000</Identification>
+            <Symbol>RIFFChunkStreamID_link1</Symbol>
+            <Description>The Stream ID for the RIFF Chunk carrying the associated ADM metadata</Description>
+            <Name>RIFF Chunk Stream ID (link 1)</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018111</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.0402030a.02000000</Identification>
+            <Symbol>ADMProfileLevelULBatch</Symbol>
+            <Description>Batch of ULs, each representing a Profile and Level to which the associated ADM metadata complies</Description>
+            <Name>ADM Profile and Level UL Batch</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.04030100.00000000</Type>
+            <IsOptional>true</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018111</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.0402030b.01000000</Identification>
+            <Symbol>RIFFChunkStreamID_link2</Symbol>
+            <Description>The Stream ID for the RIFF Chunk carrying the associated ADM metadata</Description>
+            <Name>RIFF Chunk Stream ID (link 2)</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018112</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.0402030b.02000000</Identification>
+            <Symbol>ADMAudioProgrammeID_ST2131</Symbol>
+            <Description>audioProgrammeID of the associated ADM audioProgramme, as defined in Rec. ITU-R BS.2076</Description>
+            <Name>ADM audioProgrammeID (SMPTE ST 2131)</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+            <IsOptional>true</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018112</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.0402030b.03000000</Identification>
+            <Symbol>ADMAudioContentID_ST2131</Symbol>
+            <Description>audioContentID of the associated ADM audioContent, as defined in Rec. ITU-R BS.2076</Description>
+            <Name>ADM audioContentID (SMPTE ST 2131)</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+            <IsOptional>true</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018112</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.0402030b.04000000</Identification>
+            <Symbol>ADMAudioObjectID_ST2131</Symbol>
+            <Description>audioObjectID of the associated ADM audioObject, as defined in Rec. ITU-R BS.2076</Description>
+            <Name>ADM audioObjectID (SMPTE ST 2131)</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+            <IsOptional>true</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018112</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.04030303.01000000</Identification>
+            <Symbol>TextCharacterEncoding</Symbol>
+            <Description>The name of the encoding used to convert the bytes of the Timed Events Resource into a sequence of characters</Description>
+            <Name>Text Character Encoding</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018113</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.04030303.02000000</Identification>
+            <Symbol>TextMIMEType</Symbol>
+            <Description>The MIME type of the Timed Events Resource</Description>
+            <Name>Text MIME Type</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018113</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.04030303.03000000</Identification>
+            <Symbol>EventSchemeURIs</Symbol>
+            <Description>URIs identifying the Event Schemes in use</Description>
+            <Name>Event Scheme URIs</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018113</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.04030304.01000000</Identification>
+            <Symbol>TimedEventsAncillaryResourceID</Symbol>
+            <Description>ID of the Timed Events Ancillary Resource as used as a reference in the Timed Events Resource</Description>
+            <Name>Timed Events Ancillary Resource ID</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018114</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.04030304.02000000</Identification>
+            <Symbol>TimedEventsAncillaryResourceMIMEType</Symbol>
+            <Description>The MIME type of the Timed Events Ancillary Resource</Description>
+            <Name>Timed Events Ancillary Resource MIME Type</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018114</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.04030304.03000000</Identification>
+            <Symbol>TimedEventsAncillaryResourceStreamID</Symbol>
+            <Description>The Stream ID of the Generic Stream carrying the bytes of the Timed Events Ancillary Resource</Description>
+            <Name>Timed Events Ancillary Resource Stream ID</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018114</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.0402030c.01000000</Identification>
+            <Symbol>IABBedMetaID</Symbol>
+            <Description>IAB MetaID of the associated BedDefinition, as defined in SMPTE ST 2098-2</Description>
+            <Name>IABBedMetaID</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018115</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.0402030c.02000000</Identification>
+            <Symbol>IABChannelID</Symbol>
+            <Description>IAB ChannelID that uniquely identifies a channel within a bed along with its routing destination, as defined in SMPTE ST 2098-2</Description>
+            <Name>IABChannelID</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01010300.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018115</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.0402030c.03000000</Identification>
+            <Symbol>IABAudioDescription</Symbol>
+            <Description>IAB AudioDescription provides a description of the contents of the audio, as defined in SMPTE ST 2098-2</Description>
+            <Name>IABAudioDescription</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01010100.00000000</Type>
+            <IsOptional>false</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018115</MemberOf>
+        </PropertyDefinition>
+        <PropertyDefinition>
+            <Identification>urn:smpte:ul:060e2b34.0101010e.0402030c.04000000</Identification>
+            <Symbol>IABAudioDescriptionText</Symbol>
+            <Description>IAB AudioDescriptionText provides a custom description of the contents of the audio, as defined in SMPTE ST 2098-2</Description>
+            <Name>IABAudioDescriptionText</Name>
+            <Type>urn:smpte:ul:060e2b34.01040101.01100200.00000000</Type>
+            <IsOptional>true</IsOptional>
+            <IsUniqueIdentifier>false</IsUniqueIdentifier>
+            <LocalIdentification>0</LocalIdentification>
+            <MemberOf>urn:smpte:ul:060e2b34.027f0101.0d010101.01018115</MemberOf>
         </PropertyDefinition>
         <PropertyDefinition>
             <Identification>urn:smpte:ul:060e2b34.01010102.06010107.01000000</Identification>
@@ -10800,5 +11119,5 @@
 <LocalIdentification>0</LocalIdentification>
 <MemberOf>urn:smpte:ul:060e2b34.02530105.0e090607.01010103</MemberOf>
 </PropertyDefinition>
-</MetaDefinitions>
+    </MetaDefinitions>
 </Extension>

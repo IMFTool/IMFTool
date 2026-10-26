@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!--Created: Thu Feb 12 20:16:44 CET 2026--><!--By: regxmllib build e70c41187603a19c470093e3667a4abd6ed301ae--><!--See: https://github.com/sandflow/regxmllib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
-    <SchemeID>urn:uuid:eb4c6bf8-c197-5ffe-7f01-2123ea606f17</SchemeID>
+<!--Created: Tue Oct 20 22:16:02 PDT 2026--><!--By: regmxflib build n/a--><!--See: https://github.com/sandflow/regmxflib--><Extension xmlns="http://www.smpte-ra.org/schemas/2001-1b/2013/metadict">
+    <SchemeID>urn:uuid:fcc8fc0f-03e3-519e-8902-229e8cae9392</SchemeID>
     <SchemeURI>http://www.smpte-ra.org/reg/2003/2012</SchemeURI>
     <MetaDefinitions>
         <TypeDefinitionInteger>
@@ -2062,6 +2062,12 @@
             <ReferencedType>urn:smpte:ul:060e2b34.027f0101.0d010101.01018105</ReferencedType>
         </TypeDefinitionStrongObjectReference>
         <TypeDefinitionStrongObjectReference>
+            <Identification>urn:smpte:ul:060e2b34.01040101.05023300.00000000</Identification>
+            <Symbol>ADMChannelMappingStrongReference</Symbol>
+            <Name>ADMChannelMappingStrongReference</Name>
+            <ReferencedType>urn:smpte:ul:060e2b34.027f0101.0d010101.0101810f</ReferencedType>
+        </TypeDefinitionStrongObjectReference>
+        <TypeDefinitionStrongObjectReference>
             <Identification>urn:smpte:ul:060e2b34.01040101.05023400.00000000</Identification>
             <Symbol>DescriptiveFrameworkDefinitionStrongReference</Symbol>
             <Description>DescriptiveFrameworkDefinitionStrongReference</Description>
@@ -2382,6 +2388,12 @@
             <Symbol>VC6EchelonPropertiesStrongReferenceArray</Symbol>
             <Name>VC-6 Echelon Properties Strong Reference in an ordered Array</Name>
             <ElementType>urn:smpte:ul:060e2b34.01040101.05023200.00000000</ElementType>
+        </TypeDefinitionVariableArray>
+        <TypeDefinitionVariableArray>
+            <Identification>urn:smpte:ul:060e2b34.01040101.05061100.00000000</Identification>
+            <Symbol>ADMChannelMappingStrongReferenceVector</Symbol>
+            <Name>ADMChannelMappingStrongReferenceVector</Name>
+            <ElementType>urn:smpte:ul:060e2b34.01040101.05023300.00000000</ElementType>
         </TypeDefinitionVariableArray>
         <TypeDefinitionSet>
             <Identification>urn:smpte:ul:060e2b34.01040101.05070100.00000000</Identification>
