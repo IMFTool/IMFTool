@@ -15,6 +15,7 @@
  */
 #include "MainWindow.h"
 #include "global.h"
+#include "AuxPath.h"
 #include "WidgetAbout.h"
 #include "WidgetImpBrowser.h"
 #include "WizardWorkspaceLauncher.h"

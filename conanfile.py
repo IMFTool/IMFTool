@@ -8,6 +8,8 @@ from conan.errors import ConanInvalidConfiguration
 from conan.tools.env import VirtualBuildEnv
 from conan.tools.files import copy
 import os
+import shutil
+import stat
 
 required_conan_version = ">=2.0"
 
@@ -26,7 +28,7 @@ class ImfToolConan(ConanFile):
     homepage = jsonInfo["homepage"]
     url = jsonInfo["repository"]
     # ---Requirements---
-    requires = ("qt/6.11.2@de.privatehive/stable", "qtappbase/1.9.0@de.privatehive/stable", "libxsd/4.2.0@de.privatehive/stable", "regxmllib/1.1.5@imftool/stable", "asdcplib/2.13.1@imftool/stable", "xerces-c/3.2.5", "openjpeg/2.5.2", "zlib/1.3.1")
+    requires = ("qt/6.11.2@de.privatehive/stable", "qtappbase/1.10.0@de.privatehive/stable", "libxsd/4.2.0@de.privatehive/stable", "regxmllib/1.1.5@imftool/stable", "asdcplib/2.13.1@imftool/stable", "xerces-c/3.2.5", "openjpeg/2.5.2", "zlib/1.3.1")
     # cmake 3.23 is needed if we use XCode generator
     tool_requires = ["cmake/[>=3.22.6 <3.31.0]", "ninja/[>=1.11.1]"]
     # ---Sources---
@@ -87,8 +89,25 @@ class ImfToolConan(ConanFile):
         tc = CMakeToolchain(self, generator="Xcode" if self.options.xcode and self.settings.os == 'Macos' else "Ninja")
         tc.variables["BUILD_APP5_SUPPORT"] = self.options.app5Support
         if self.options.bundleJVM:
+            # Stage only the runtime parts of the JDK. The licenses folder contains directories like "java.desktop"
+            # which codesign mistakes for nested bundles, so their dots are replaced
             openjdk = self.dependencies["openjdk"]
-            tc.variables["JVM_PATH"] = openjdk.package_folder.replace("\\", "/")
+            jre = os.path.join(self.generators_folder, "jre")
+            for folder in ["bin", "conf", "lib"]:
+                copy(self, "*", src=os.path.join(openjdk.package_folder, folder), dst=os.path.join(jre, folder))
+            licenses = os.path.join(openjdk.package_folder, "licenses")
+            if os.path.isdir(licenses):
+                for module in os.listdir(licenses):
+                    # Licenses are relative symlinks into other modules on Linux which would break by the renaming,
+                    # so copy their content instead
+                    shutil.copytree(os.path.join(licenses, module), os.path.join(jre, "legal", module.replace(".", "_")), dirs_exist_ok=True)
+            # codesign has to write to every file (e.g. the read-only CDS archives in lib/server)
+            for root, _, files in os.walk(jre):
+                for file in files:
+                    path = os.path.join(root, file)
+                    if not os.path.islink(path):
+                        os.chmod(path, os.stat(path).st_mode | stat.S_IWUSR)
+            tc.variables["JVM_PATH"] = jre.replace("\\", "/")
         tc.generate()
 
     def build(self):

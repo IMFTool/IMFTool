@@ -15,6 +15,7 @@
  */
 #include "ImfPackage.h"
 #include "global.h"
+#include "AuxPath.h"
 #include "SMPTE-2067-3-2013-CPL.h"
 #include "SMPTE-2067-100a-2014-OPL.h"
 #include "ImfMimeData.h"

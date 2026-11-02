@@ -15,6 +15,7 @@
  */
 #include "WizardResourceGenerator.h"
 #include "global.h"
+#include "AuxPath.h"
 #include "ImfCommon.h"
 #include "QtWaitingSpinner.h"
 #include "MetadataExtractor.h"
