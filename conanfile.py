@@ -8,6 +8,7 @@ from conan.errors import ConanInvalidConfiguration
 from conan.tools.env import VirtualBuildEnv
 from conan.tools.files import copy
 import os
+import shutil
 import stat
 
 required_conan_version = ">=2.0"
@@ -97,12 +98,15 @@ class ImfToolConan(ConanFile):
             licenses = os.path.join(openjdk.package_folder, "licenses")
             if os.path.isdir(licenses):
                 for module in os.listdir(licenses):
-                    copy(self, "*", src=os.path.join(licenses, module), dst=os.path.join(jre, "legal", module.replace(".", "_")))
+                    # Licenses are relative symlinks into other modules on Linux which would break by the renaming,
+                    # so copy their content instead
+                    shutil.copytree(os.path.join(licenses, module), os.path.join(jre, "legal", module.replace(".", "_")), dirs_exist_ok=True)
             # codesign has to write to every file (e.g. the read-only CDS archives in lib/server)
             for root, _, files in os.walk(jre):
                 for file in files:
                     path = os.path.join(root, file)
-                    os.chmod(path, os.stat(path).st_mode | stat.S_IWUSR)
+                    if not os.path.islink(path):
+                        os.chmod(path, os.stat(path).st_mode | stat.S_IWUSR)
             tc.variables["JVM_PATH"] = jre.replace("\\", "/")
         tc.generate()
 
