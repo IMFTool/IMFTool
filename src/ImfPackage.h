@@ -36,6 +36,7 @@
 #include <QUndoCommand>
 #include <QVector>
 #include <QItemSelection>
+#include <QElapsedTimer>
 
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/util/PlatformUtils.hpp>

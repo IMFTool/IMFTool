@@ -942,9 +942,8 @@ bool GraphicsSceneComposition::AppendEditCommand(const Timecode &rCplTimecode, Q
 			if (p_audio_resource) {
 				GraphicsWidgetSequence *p_sequence = p_audio_resource->GetSequence();
 				Duration old_duration = p_audio_resource->GetSourceDuration();
-				Duration entry_point = p_audio_resource->GetEntryPoint();
+				Duration entry_point = p_audio_resource->MapToCplTimeline(p_resource->GetFirstVisibleFrame()).GetOverallFrames() * p_audio_resource->GetEditRate().GetNumerator() / p_audio_resource->GetEditRate().GetDenominator()  * p_audio_resource->GetCplEditRate().GetDenominator() / p_audio_resource->GetCplEditRate().GetNumerator() + .5;
 				Duration position_duration = rCplTimecode.GetOverallFrames() * p_audio_resource->GetEditRate().GetNumerator() / p_audio_resource->GetEditRate().GetDenominator()  * p_audio_resource->GetCplEditRate().GetDenominator() / p_audio_resource->GetCplEditRate().GetNumerator() + .5;
-				//Duration position_duration = p_audio_resource->ResourceErPerCompositionEr(p_audio_resource->GetEditRate()) * rCplTimecode.GetOverallFrames();
 				Duration new_duration = (position_duration - entry_point).GetCount() % old_duration.GetCount();
 				if(new_duration == 0) continue;
 				GraphicsWidgetAudioResource *p_clone = p_audio_resource->Clone();
