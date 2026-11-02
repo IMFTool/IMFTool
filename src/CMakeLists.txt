@@ -137,7 +137,6 @@ register_icon(IMF-Tool
 )
 
 register_aux_path(IMF-Tool DIRECTORY "${CMAKE_SOURCE_DIR}/photon/build/libs" NAME photon)
-register_aux_path(IMF-Tool DIRECTORY "${CMAKE_SOURCE_DIR}/photon/build/libs-adm" NAME photon_adm)
 if(JVM_PATH)
 	register_aux_path(IMF-Tool DIRECTORY "${JVM_PATH}" NAME photon_jre)
 endif()

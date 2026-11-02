@@ -71,7 +71,7 @@ class ImfToolConan(ConanFile):
             self.requires("imath/3.1.9", options={"shared": True})
             self.requires("openexr/3.3.1", options={"shared": True})
         if self.options.bundleJVM:
-            self.requires("openjdk/8.0.442@de.privatehive/stable")
+            self.requires("openjdk/19.0.2@de.privatehive/stable")
 
     def config_options(self):
         if self.settings.os != "Macos":
@@ -88,7 +88,7 @@ class ImfToolConan(ConanFile):
         tc.variables["BUILD_APP5_SUPPORT"] = self.options.app5Support
         if self.options.bundleJVM:
             openjdk = self.dependencies["openjdk"]
-            tc.variables["JVM_PATH"] = os.path.join(openjdk.package_folder, "jre").replace("\\", "/")
+            tc.variables["JVM_PATH"] = openjdk.package_folder.replace("\\", "/")
         tc.generate()
 
     def build(self):

@@ -493,11 +493,10 @@ QUndoCommand(pParent) {
 
 	GraphicsWidgetAudioResource *p_origin_audio_resource = qobject_cast<GraphicsWidgetAudioResource *>(pOriginResource);
 	GraphicsWidgetAudioResource *p_clone_audio_resource = qobject_cast<GraphicsWidgetAudioResource *>(pCloneResource);
-	if (p_origin_audio_resource && p_clone_audio_resource && pOriginResource->GetCplEditRate().HasFractionalNumberOfAudioSamplesPerImageFrame()) {
+	if (p_origin_audio_resource && p_clone_audio_resource /*&& pOriginResource->GetCplEditRate().HasFractionalNumberOfAudioSamplesPerImageFrame()*/) {
 		SetSourceDurationSamplesCommand *p_set_source_dur = new SetSourceDurationSamplesCommand(p_origin_audio_resource, rOldOriginResourceSourceDuration, rNewOriginResourceSourceDuration, this);
 		SetEntryPointSamplesCommand *p_entry_command = new SetEntryPointSamplesCommand(p_clone_audio_resource, rOldCloneResourceEntryPoint, rNewCloneResourceEntryPoint, this);
 		SetSourceDurationSamplesCommand *p_set_source_dur_two = new SetSourceDurationSamplesCommand(p_clone_audio_resource, rOldCloneResourceSourceDuration, rNewCloneResourceSourceDuration, this);
-		//AbstractGraphicsWidgetResource *p_resource = qobject_cast<AbstractGraphicsWidgetResource *>(p_clone_audio_resource->Clone());
 		AddResourceCommand *p_add_resource_command = new AddResourceCommand(p_clone_audio_resource, clonedResourceSourceIndex, pTargetSequence, this);
 	} else {
 		SetSourceDurationCommand *p_set_source_dur = new SetSourceDurationCommand(pOriginResource, rOldOriginResourceSourceDuration, rNewOriginResourceSourceDuration, this);

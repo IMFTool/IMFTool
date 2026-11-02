@@ -313,32 +313,12 @@ Error JobExtractEssenceDescriptor::Execute() {
 	Error error;
 
 	QList<QString> dicts_fname = QList<QString>()
-/*		<< "www-smpte-ra-org-reg-335-2012-13-1-amwa-as12.xml"
-		<< "www-smpte-ra-org-reg-335-2012-13-1-amwa-rules.xml"
-		<< "www-smpte-ra-org-reg-335-2012-13-4-archive.xml"
-		<< "www-smpte-ra-org-reg-335-2012-13-12-as11.xml"
-		<< "www-smpte-ra-org-reg-335-2012-13-13.xml"
-		<< "www-smpte-ra-org-reg-395-2014.xml"*/
-		<< "www-smpte-ra-org-reg-395-2014-13-1-aaf-phdr.xml"
-/*		<< "www-smpte-ra-org-reg-395-2014-13-1-amwa-as10.xml"
-		<< "www-smpte-ra-org-reg-395-2014-13-1-amwa-as11.xml"
-		<< "www-smpte-ra-org-reg-395-2014-13-1-amwa-as12.xml"
-		<< "www-smpte-ra-org-reg-395-2014-13-1-amwa-as-common.xml"
-		<< "www-smpte-ra-org-reg-395-2014-13-4-archive.xml"
-		<< "www-smpte-ra-org-reg-395-2014-13-12-as11.xml"
-		<< "www-smpte-ra-org-reg-395-2014-13-13.xml"*/
+		<< "www-smpte-ra-org-reg-395-2014-13-1-aaf.xml"
 		<< "www-smpte-ra-org-reg-2003-2012.xml"
-/*		<< "www-smpte-ra-org-reg-2003-2012-13-1-amwa-as11.xml"
-		<< "www-smpte-ra-org-reg-2003-2012-13-1-amwa-as12.xml"
-		<< "www-smpte-ra-org-reg-2003-2012-13-4-archive.xml"
-		<< "www-smpte-ra-org-reg-2003-2012-13-12-as11.xml"
-		<< "www-ebu-ch-metadata-schemas-ebucore-smpte-class13-element.xml"
-		<< "www-ebu-ch-metadata-schemas-ebucore-smpte-class13-group.xml"
-		<< "www-ebu-ch-metadata-schemas-ebucore-smpte-class13-type.xml" */
 		<< "www-smpte-ra-org-reg-335-2012-phdr.xml"
 		<< "www-smpte-ra-org-reg-335-2012-13-1-aaf.xml"
-//		<< "www-smpte-ra-org-reg-335-2012-13-1-amwa-as10.xml"
-//		<< "www-smpte-ra-org-reg-335-2012-13-1-amwa-as11.xml"
+		<< "www-smpte-ra-org-reg-395-2014-14-9.xml"
+		<< "www-smpte-ra-org-reg-335-2012-14-9.xml"
 		;
 
 	XMLPlatformUtils::Initialize();
@@ -448,7 +428,8 @@ Error JobCallPhoton::Execute() {
 	const QString program = "java";
 #endif
 	QStringList arg;
-	arg << "-cp";
+	//arg << "--enable-final-field-mutation=ALL-UNNAMED" << "-Dslf4j.internal.verbosity=WARN" << "-cp";
+	arg << "-Dslf4j.internal.verbosity=WARN" << "-cp";
 #if defined(AUX_PHOTON_ADM)
 	if (is_adm) {
 		arg << QString("%1/%2").arg(AUX_PHOTON_ADM, "*");
