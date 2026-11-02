@@ -15,6 +15,7 @@
  * along with this program.If not, see <http://www.gnu.org/licenses/>.
  */
 #include "Jobs.h"
+#include "AuxPath.h"
 #include "AS_02.h"
 #include "Metadata.h"
 #include <vector>
