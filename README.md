@@ -138,7 +138,7 @@ conan create ./ -pr:h=default --build missing
 For __Windows MinGW__ build run:
 
 ```bash
-conan create ./ -pr:h=hostProfiles/windowsMinGW.profile --build missing
+conan create ./ -pr:h=hostProfiles/windowsMinGW.profile -pr:b=hostProfiles/windowsMinGW.build.profile --build missing
 ```
 
 For Linux additional system packages are required (like: x11, wayland, libfreetype,...). Those packages can be automatically installed via Conan (only applies to Linux distros using APT)
@@ -190,7 +190,7 @@ WIN_CODESIGN_OPTIONS=...
 Then provide the `sign_env` profile as an additional host profile to the conan command besides the MinGW host profile (replace MinGW host profile with the `default` profile if MinGW is not used):
 
 ```bash
-conan create ./ -pr:h=hostProfiles/windowsMinGW.profile -pr:h=sign_env --build missing
+conan create ./ -pr:h=hostProfiles/windowsMinGW.profile -pr:h=sign_env -pr:b=hostProfiles/windowsMinGW.build.profile --build missing
 ```
 
 **macOS**

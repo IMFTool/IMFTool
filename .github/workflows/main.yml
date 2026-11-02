@@ -19,6 +19,7 @@ jobs:
       name: "x86_64"
       image: "windows-2022"
       conan_host_profile_path: "hostProfiles/windowsMinGW.profile"
+      conan_build_profile_path: "hostProfiles/windowsMinGW.build.profile"
       conan_remotes: https://conan.privatehive.de/artifactory/api/conan/public-conan
       conan_deploy_artifacts: true
       conan_artifact_name: "IMF-Tool_windows_x86_64_artifacts"
