@@ -3,5 +3,5 @@
 .DS_Store
 INSTALL
 LICENSE.rtf
-build*
+build-folder
 CMakeUserPresets.json

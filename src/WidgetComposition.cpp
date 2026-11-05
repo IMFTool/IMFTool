@@ -184,16 +184,16 @@ bool WidgetComposition::eventFilter(QObject *pObj, QEvent *pEvt) {
 		else if(pObj == mpCompositionView->viewport()) {
 
 			QWheelEvent *p_wheel_event = static_cast<QWheelEvent*>(pEvt);
-			QPoint numPixels = p_wheel_event->pixelDelta();
-			QPoint numDegrees = p_wheel_event->angleDelta() / 8;
-
-			qreal scale_factor = 1;
-			if (!numPixels.isNull()) {
-				scale_factor = pow((double)2, numPixels.y() / 240.0);
-			} else if (!numDegrees.isNull()) {
-				QPoint numSteps = numDegrees / 15;
-				scale_factor = pow((double)2, numSteps.y() / 4.0);
-			}
+			// Always derive the zoom from angleDelta() using floating point math.
+			// pixelDelta() is truncated to whole pixels by Qt (e.g. on macOS trackpads), which drops
+			// small deltas and makes zooming stutter. angleDelta() has twice the resolution there.
+			// Integer step division would also swallow sub-notch deltas of high-resolution wheels.
+			const qreal angle_delta_y = p_wheel_event->angleDelta().y();
+			// Trackpads (pixel scrolling devices) zoom like the former Qt5 delta()/240,
+			// classic wheels keep 2^(1/4) per notch (120 / 480).
+			const qreal divisor = p_wheel_event->pixelDelta().isNull() ? 480.0 : 240.0;
+			const qreal scale_factor = pow(2.0, angle_delta_y / divisor);
+			if(qFuzzyCompare(scale_factor, 1.0)) return true;
 
 			mpTimelineView->ScaleView(scale_factor);
 			mpCompositionView->ScaleView(scale_factor);
