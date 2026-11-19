@@ -188,11 +188,11 @@ bool WidgetComposition::eventFilter(QObject *pObj, QEvent *pEvt) {
 			// pixelDelta() is truncated to whole pixels by Qt (e.g. on macOS trackpads), which drops
 			// small deltas and makes zooming stutter. angleDelta() has twice the resolution there.
 			// Integer step division would also swallow sub-notch deltas of high-resolution wheels.
-			const qreal angle_delta_y = p_wheel_event->angleDelta().y();
+			const qreal angle_delta_x = p_wheel_event->angleDelta().x();
 			// Trackpads (pixel scrolling devices) zoom like the former Qt5 delta()/240,
 			// classic wheels keep 2^(1/4) per notch (120 / 480).
 			const qreal divisor = p_wheel_event->pixelDelta().isNull() ? 480.0 : 240.0;
-			const qreal scale_factor = pow(2.0, angle_delta_y / divisor);
+			const qreal scale_factor = pow(2.0, angle_delta_x / divisor);
 			if(qFuzzyCompare(scale_factor, 1.0)) return true;
 
 			mpTimelineView->ScaleView(scale_factor);
